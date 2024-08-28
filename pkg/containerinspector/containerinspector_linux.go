@@ -24,7 +24,7 @@ import (
 
 	"github.com/containernetworking/plugins/pkg/ns"
 
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/native"
+	"github.com/farcloser/lepton/pkg/inspecttypes/native"
 )
 
 func InspectNetNS(ctx context.Context, pid int) (*native.NetNS, error) {

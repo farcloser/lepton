@@ -18,18 +18,14 @@ package volume
 
 import (
 	"context"
-	"errors"
 
-	"github.com/containerd/log"
-
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/formatter"
+	"github.com/farcloser/lepton/pkg/api/types"
 )
 
-func Inspect(ctx context.Context, volumes []string, options types.VolumeInspectOptions) error {
+func Inspect(ctx context.Context, volumes []string, options *types.VolumeInspectOptions) ([]interface{}, []error, error) {
 	volStore, err := Store(options.GOptions.Namespace, options.GOptions.DataRoot, options.GOptions.Address)
 	if err != nil {
-		return err
+		return nil, nil, err
 	}
 	result := []interface{}{}
 
@@ -42,16 +38,6 @@ func Inspect(ctx context.Context, volumes []string, options types.VolumeInspectO
 		}
 		result = append(result, vol)
 	}
-	err = formatter.FormatSlice(options.Format, options.Stdout, result)
-	if err != nil {
-		return err
-	}
-	for _, warn := range warns {
-		log.G(ctx).Warn(warn)
-	}
 
-	if len(warns) != 0 {
-		return errors.New("some volumes could not be inspected")
-	}
-	return nil
+	return result, warns, nil
 }

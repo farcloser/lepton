@@ -24,12 +24,12 @@ import (
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
-	"github.com/containerd/nerdctl/v2/pkg/dnsutil/hostsstore"
-	"github.com/containerd/nerdctl/v2/pkg/idutil/containerwalker"
-	"github.com/containerd/nerdctl/v2/pkg/labels"
-	"github.com/containerd/nerdctl/v2/pkg/namestore"
+	"github.com/farcloser/lepton/pkg/api/types"
+	"github.com/farcloser/lepton/pkg/clientutil"
+	"github.com/farcloser/lepton/pkg/dnsutil/hostsstore"
+	"github.com/farcloser/lepton/pkg/idutil/containerwalker"
+	"github.com/farcloser/lepton/pkg/labels"
+	"github.com/farcloser/lepton/pkg/namestore"
 )
 
 // Rename change container name to a new name
@@ -44,7 +44,7 @@ func Rename(ctx context.Context, client *containerd.Client, containerID, newCont
 	if err != nil {
 		return err
 	}
-	hostst, err := hostsstore.NewStore(dataStore)
+	hostst, err := hostsstore.New(dataStore, options.GOptions.Namespace)
 	if err != nil {
 		return err
 	}
@@ -84,7 +84,7 @@ func renameContainer(ctx context.Context, container containerd.Container, newNam
 				labels.Name: name,
 			}
 			namst.Rename(newName, id, name)
-			hostst.Update(ns, id, name)
+			hostst.Update(id, name)
 			container.SetLabels(ctx, lbls)
 		}
 	}()
@@ -93,7 +93,7 @@ func renameContainer(ctx context.Context, container containerd.Container, newNam
 		return err
 	}
 	if runtime.GOOS == "linux" {
-		if err = hostst.Update(ns, id, newName); err != nil {
+		if err = hostst.Update(id, newName); err != nil {
 			log.G(ctx).WithError(err).Warn("failed to update host networking definitions " +
 				"- if your container is using network 'none', this is expected - otherwise, please report this as a bug")
 		}

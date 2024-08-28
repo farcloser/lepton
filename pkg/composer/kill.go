@@ -19,9 +19,8 @@ package composer
 import (
 	"context"
 
-	"golang.org/x/sync/errgroup"
-
 	"github.com/containerd/log"
+	"golang.org/x/sync/errgroup"
 )
 
 type KillOptions struct {

@@ -26,7 +26,7 @@ import (
 
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/lockutil"
+	"github.com/farcloser/lepton/pkg/lockutil"
 )
 
 // This is meant to store stateful informations about containers that we receive from ocihooks

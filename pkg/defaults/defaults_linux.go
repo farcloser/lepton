@@ -18,6 +18,7 @@ package defaults
 
 import (
 	"fmt"
+	"github.com/farcloser/lepton/pkg/consts"
 	"net"
 	"os"
 	"path/filepath"
@@ -26,7 +27,7 @@ import (
 	gocni "github.com/containerd/go-cni"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
+	"github.com/farcloser/lepton/pkg/rootlessutil"
 )
 
 const (
@@ -37,13 +38,13 @@ const (
 
 func DataRoot() string {
 	if !rootlessutil.IsRootless() {
-		return "/var/lib/nerdctl"
+		return "/var/lib/" + consts.BinaryName
 	}
 	xdh, err := rootlessutil.XDGDataHome()
 	if err != nil {
 		panic(err)
 	}
-	return filepath.Join(xdh, "nerdctl")
+	return filepath.Join(xdh, consts.BinaryName)
 }
 
 func CNIPath() string {
@@ -102,13 +103,13 @@ func CNIRuntimeDir() string {
 
 func NerdctlTOML() string {
 	if !rootlessutil.IsRootless() {
-		return "/etc/nerdctl/nerdctl.toml"
+		return filepath.Join("/etc", consts.BinaryName, consts.ConfigFileName)
 	}
 	xch, err := rootlessutil.XDGConfigHome()
 	if err != nil {
 		panic(err)
 	}
-	return filepath.Join(xch, "nerdctl/nerdctl.toml")
+	return filepath.Join(xch, consts.BinaryName, consts.ConfigFileName)
 }
 
 func HostsDirs() []string {

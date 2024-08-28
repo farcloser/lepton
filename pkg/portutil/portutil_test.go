@@ -24,8 +24,8 @@ import (
 
 	gocni "github.com/containerd/go-cni"
 
-	"github.com/containerd/nerdctl/v2/pkg/labels"
-	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
+	"github.com/farcloser/lepton/pkg/labels"
+	"github.com/farcloser/lepton/pkg/rootlessutil"
 )
 
 func TestTestParseFlagPWithPlatformSpec(t *testing.T) {

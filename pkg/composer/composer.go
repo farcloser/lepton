@@ -25,13 +25,12 @@ import (
 
 	composecli "github.com/compose-spec/compose-go/v2/cli"
 	compose "github.com/compose-spec/compose-go/v2/types"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/composer/serviceparser"
-	"github.com/containerd/nerdctl/v2/pkg/identifiers"
-	"github.com/containerd/nerdctl/v2/pkg/reflectutil"
+	"github.com/farcloser/lepton/pkg/composer/serviceparser"
+	"github.com/farcloser/lepton/pkg/identifiers"
+	"github.com/farcloser/lepton/pkg/reflectutil"
 )
 
 // Options groups the command line options recommended for a Compose implementation (ProjectOptions) and extra options for nerdctl
@@ -51,7 +50,6 @@ type Options struct {
 	EnsureImage      func(ctx context.Context, imageName, pullMode, platform string, ps *serviceparser.Service, quiet bool) error
 	DebugPrintFull   bool // full debug print, may leak secret env var to logs
 	Experimental     bool // enable experimental features
-	IPFSAddress      string
 }
 
 func New(o Options, client *containerd.Client) (*Composer, error) {

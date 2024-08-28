@@ -29,42 +29,43 @@ import (
 	"strconv"
 	"strings"
 
-	dockercliopts "github.com/docker/cli/opts"
-	dockeropts "github.com/docker/docker/opts"
-	"github.com/opencontainers/runtime-spec/specs-go"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/containers"
 	"github.com/containerd/containerd/v2/pkg/cio"
 	"github.com/containerd/containerd/v2/pkg/oci"
 	gocni "github.com/containerd/go-cni"
 	"github.com/containerd/log"
+	dockercliopts "github.com/docker/cli/opts"
+	dockeropts "github.com/docker/docker/opts"
+	"github.com/opencontainers/runtime-spec/specs-go"
 
-	"github.com/containerd/nerdctl/v2/pkg/annotations"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
-	"github.com/containerd/nerdctl/v2/pkg/cmd/image"
-	"github.com/containerd/nerdctl/v2/pkg/cmd/volume"
-	"github.com/containerd/nerdctl/v2/pkg/containerutil"
-	"github.com/containerd/nerdctl/v2/pkg/flagutil"
-	"github.com/containerd/nerdctl/v2/pkg/idgen"
-	"github.com/containerd/nerdctl/v2/pkg/imgutil"
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
-	"github.com/containerd/nerdctl/v2/pkg/ipcutil"
-	"github.com/containerd/nerdctl/v2/pkg/labels"
-	"github.com/containerd/nerdctl/v2/pkg/logging"
-	"github.com/containerd/nerdctl/v2/pkg/maputil"
-	"github.com/containerd/nerdctl/v2/pkg/mountutil"
-	"github.com/containerd/nerdctl/v2/pkg/namestore"
-	"github.com/containerd/nerdctl/v2/pkg/platformutil"
-	"github.com/containerd/nerdctl/v2/pkg/referenceutil"
-	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
-	"github.com/containerd/nerdctl/v2/pkg/strutil"
+	"github.com/farcloser/lepton/pkg/annotations"
+	"github.com/farcloser/lepton/pkg/api/types"
+	"github.com/farcloser/lepton/pkg/clientutil"
+	"github.com/farcloser/lepton/pkg/cmd/image"
+	"github.com/farcloser/lepton/pkg/cmd/volume"
+	"github.com/farcloser/lepton/pkg/containerutil"
+	"github.com/farcloser/lepton/pkg/errs"
+	"github.com/farcloser/lepton/pkg/flagutil"
+	"github.com/farcloser/lepton/pkg/idgen"
+	"github.com/farcloser/lepton/pkg/imgutil"
+	"github.com/farcloser/lepton/pkg/inspecttypes/dockercompat"
+	"github.com/farcloser/lepton/pkg/ipcutil"
+	"github.com/farcloser/lepton/pkg/labels"
+	"github.com/farcloser/lepton/pkg/logging"
+	"github.com/farcloser/lepton/pkg/maputil"
+	"github.com/farcloser/lepton/pkg/mountutil"
+	"github.com/farcloser/lepton/pkg/namestore"
+	"github.com/farcloser/lepton/pkg/platformutil"
+	"github.com/farcloser/lepton/pkg/referenceutil"
+	"github.com/farcloser/lepton/pkg/rootlessutil"
+	"github.com/farcloser/lepton/pkg/strutil"
 )
 
 // Create will create a container.
 func Create(ctx context.Context, client *containerd.Client, args []string, netManager containerutil.NetworkOptionsManager, options types.ContainerCreateOptions) (containerd.Container, func(), error) {
-	// Acquire an exclusive lock on the volume store until we are done to avoid being raced by other volume operations
+	// Acquire an exclusive lock on the volume store until we are done to avoid being raced by any other
+	// volume operations (or any other operation involving volume manipulation)
 	volStore, err := volume.Store(options.GOptions.Namespace, options.GOptions.DataRoot, options.GOptions.Address)
 	if err != nil {
 		return nil, nil, err
@@ -73,7 +74,7 @@ func Create(ctx context.Context, client *containerd.Client, args []string, netMa
 	if err != nil {
 		return nil, nil, err
 	}
-	defer volStore.Unlock()
+	defer volStore.Release()
 
 	// simulate the behavior of double dash
 	newArg := []string{}
@@ -840,7 +841,8 @@ func generateGcFunc(ctx context.Context, container containerd.Container, ns, id,
 			if containerNameStore, errE = namestore.New(dataStore, ns); errE != nil {
 				log.G(ctx).WithError(errE).Warnf("failed to instantiate container name store during cleanup for container %q", id)
 			}
-			if errE = containerNameStore.Release(name, id); errE != nil {
+			// Double-releasing may happen with containers started with --rm, so, ignore NotFound errors
+			if errE := containerNameStore.Release(name, id); errE != nil && !errors.Is(errE, errs.ErrNotFound) {
 				log.G(ctx).WithError(errE).Warnf("failed to release container name store for container %q (%s)", name, id)
 			}
 		}

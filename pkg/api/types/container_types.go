@@ -257,11 +257,6 @@ type ContainerCreateOptions struct {
 	Ulimit []string
 	// #endregion
 
-	// #region for ipfs flags
-	// IPFSAddress specifies the multiaddr of IPFS API (default uses $IPFS_PATH env variable if defined or local directory ~/.ipfs)
-	IPFSAddress string
-	// #endregion
-
 	// ImagePullOpt specifies image pull options which holds the ImageVerifyOptions for verifying the image.
 	ImagePullOpt ImagePullOptions
 }

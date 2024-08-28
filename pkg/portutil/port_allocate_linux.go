@@ -19,8 +19,8 @@ package portutil
 import (
 	"fmt"
 
-	"github.com/containerd/nerdctl/v2/pkg/portutil/iptable"
-	"github.com/containerd/nerdctl/v2/pkg/portutil/procnet"
+	"github.com/farcloser/lepton/pkg/portutil/iptable"
+	"github.com/farcloser/lepton/pkg/portutil/procnet"
 )
 
 const (

@@ -26,12 +26,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/fluent/fluent-logger-golang/fluent"
-
 	"github.com/containerd/containerd/v2/core/runtime/v2/logging"
 	"github.com/containerd/log"
+	"github.com/fluent/fluent-logger-golang/fluent"
 
-	"github.com/containerd/nerdctl/v2/pkg/strutil"
+	"github.com/farcloser/lepton/pkg/strutil"
 )
 
 type FluentdLogger struct {

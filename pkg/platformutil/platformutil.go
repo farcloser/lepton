@@ -19,11 +19,10 @@ package platformutil
 import (
 	"fmt"
 
+	"github.com/containerd/platforms"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 
-	"github.com/containerd/platforms"
-
-	"github.com/containerd/nerdctl/v2/pkg/strutil"
+	"github.com/farcloser/lepton/pkg/strutil"
 )
 
 // NewMatchComparerFromOCISpecPlatformSlice returns MatchComparer.

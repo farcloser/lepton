@@ -25,9 +25,6 @@ import (
 	"text/tabwriter"
 	"time"
 
-	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
-	"golang.org/x/sync/errgroup"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/images"
 	"github.com/containerd/containerd/v2/core/remotes"
@@ -35,8 +32,10 @@ import (
 	"github.com/containerd/containerd/v2/pkg/progress"
 	"github.com/containerd/log"
 	"github.com/containerd/platforms"
+	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
+	"golang.org/x/sync/errgroup"
 
-	"github.com/containerd/nerdctl/v2/pkg/imgutil/jobs"
+	"github.com/farcloser/lepton/pkg/imgutil/jobs"
 )
 
 // Push pushes an image to a remote registry.

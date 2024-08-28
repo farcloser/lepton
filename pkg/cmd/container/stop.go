@@ -23,9 +23,9 @@ import (
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/errdefs"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/containerutil"
-	"github.com/containerd/nerdctl/v2/pkg/idutil/containerwalker"
+	"github.com/farcloser/lepton/pkg/api/types"
+	"github.com/farcloser/lepton/pkg/containerutil"
+	"github.com/farcloser/lepton/pkg/idutil/containerwalker"
 )
 
 // Stop stops a list of containers specified by `reqs`.

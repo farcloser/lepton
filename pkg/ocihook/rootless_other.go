@@ -22,9 +22,8 @@ import (
 	"context"
 	"fmt"
 
-	rlkclient "github.com/rootless-containers/rootlesskit/v2/pkg/api/client"
-
 	gocni "github.com/containerd/go-cni"
+	rlkclient "github.com/rootless-containers/rootlesskit/v2/pkg/api/client"
 )
 
 func exposePortsRootless(ctx context.Context, rlkClient rlkclient.Client, ports []gocni.PortMapping) error {

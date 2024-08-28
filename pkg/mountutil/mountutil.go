@@ -23,16 +23,15 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/containerd/containerd/v2/pkg/oci"
+	"github.com/containerd/log"
 	"github.com/moby/sys/userns"
 	"github.com/opencontainers/runtime-spec/specs-go"
 
-	"github.com/containerd/containerd/v2/pkg/oci"
-	"github.com/containerd/log"
-
-	"github.com/containerd/nerdctl/v2/pkg/identifiers"
-	"github.com/containerd/nerdctl/v2/pkg/idgen"
-	"github.com/containerd/nerdctl/v2/pkg/mountutil/volumestore"
-	"github.com/containerd/nerdctl/v2/pkg/strutil"
+	"github.com/farcloser/lepton/pkg/identifiers"
+	"github.com/farcloser/lepton/pkg/idgen"
+	"github.com/farcloser/lepton/pkg/mountutil/volumestore"
+	"github.com/farcloser/lepton/pkg/strutil"
 )
 
 const (
@@ -59,7 +58,7 @@ type volumeSpec struct {
 	AnonymousVolume string
 }
 
-func ProcessFlagV(s string, volStore volumestore.VolumeStore, createDir bool) (*Processed, error) {
+func ProcessFlagV(s string, volumeStore volumestore.VolumeStore, createDir bool) (*Processed, error) {
 	var (
 		res      *Processed
 		volSpec  volumeSpec
@@ -81,7 +80,7 @@ func ProcessFlagV(s string, volStore volumestore.VolumeStore, createDir bool) (*
 		}
 
 		// create anonymous volume
-		volSpec, err = handleAnonymousVolumes(dst, volStore)
+		volSpec, err = handleAnonymousVolumes(dst, volumeStore)
 		if err != nil {
 			return nil, err
 		}
@@ -101,7 +100,7 @@ func ProcessFlagV(s string, volStore volumestore.VolumeStore, createDir bool) (*
 
 		// Get volume spec
 		src = split[0]
-		volSpec, err = handleVolumeToMount(src, dst, volStore, createDir)
+		volSpec, err = handleVolumeToMount(src, dst, volumeStore, createDir)
 		if err != nil {
 			return nil, err
 		}
@@ -184,12 +183,12 @@ func handleBindMounts(source string, createDir bool) (volumeSpec, error) {
 	return res, nil
 }
 
-func handleAnonymousVolumes(s string, volStore volumestore.VolumeStore) (volumeSpec, error) {
+func handleAnonymousVolumes(s string, volumeStore volumestore.VolumeStore) (volumeSpec, error) {
 	var res volumeSpec
 	res.AnonymousVolume = idgen.GenerateID()
 
 	log.L.Debugf("creating anonymous volume %q, for %q", res.AnonymousVolume, s)
-	anonVol, err := volStore.Create(res.AnonymousVolume, []string{})
+	anonVol, err := volumeStore.CreateWithoutLock(res.AnonymousVolume, []string{})
 	if err != nil {
 		return res, fmt.Errorf("failed to create an anonymous volume %q: %w", res.AnonymousVolume, err)
 	}
@@ -199,12 +198,12 @@ func handleAnonymousVolumes(s string, volStore volumestore.VolumeStore) (volumeS
 	return res, nil
 }
 
-func handleNamedVolumes(source string, volStore volumestore.VolumeStore) (volumeSpec, error) {
+func handleNamedVolumes(source string, volumeStore volumestore.VolumeStore) (volumeSpec, error) {
 	var res volumeSpec
 	res.Name = source
 
 	// Create returns an existing volume or creates a new one if necessary.
-	vol, err := volStore.Create(res.Name, nil)
+	vol, err := volumeStore.CreateWithoutLock(res.Name, nil)
 	if err != nil {
 		return res, fmt.Errorf("failed to get volume %q: %w", res.Name, err)
 	}

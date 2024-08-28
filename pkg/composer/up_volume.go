@@ -22,8 +22,8 @@ import (
 
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/labels"
-	"github.com/containerd/nerdctl/v2/pkg/reflectutil"
+	"github.com/farcloser/lepton/pkg/labels"
+	"github.com/farcloser/lepton/pkg/reflectutil"
 )
 
 func (c *Composer) upVolume(ctx context.Context, shortName string) error {
@@ -43,7 +43,7 @@ func (c *Composer) upVolume(ctx context.Context, shortName string) error {
 	// shortName is like "db_data", fullName is like "compose-wordpress_db_data"
 	fullName := vol.Name
 	// FIXME: this is racy. By the time we get below to creating the volume, there is no guarantee that things are still fine
-	// Furthermore, volStore.Get no longer errors if the volume already exists (docker behavior), so, the purpose of this
+	// Furthermore, volumeStore.Get no longer errors if the volume already exists (docker behavior), so, the purpose of this
 	// call needs to be assessed (it might still error if the name is malformed, or if there is a filesystem error)
 	volExists, err := c.VolumeExists(fullName)
 	if err != nil {

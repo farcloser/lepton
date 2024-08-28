@@ -32,8 +32,8 @@ import (
 	"github.com/containerd/log"
 	"github.com/containerd/typeurl/v2"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/formatter"
+	"github.com/farcloser/lepton/pkg/api/types"
+	"github.com/farcloser/lepton/pkg/formatter"
 )
 
 // EventOut contains information about an event.

@@ -17,9 +17,11 @@
 // Package annotations defines OCI annotations
 package annotations
 
+import "github.com/farcloser/lepton/pkg/consts"
+
 const (
 	// Prefix is the common prefix of nerdctl annotations
-	Prefix = "nerdctl/"
+	Prefix = consts.BinaryName + "/"
 
 	// Bypass4netns is the flag for acceleration with bypass4netns
 	// Boolean value which can be parsed with strconv.ParseBool() is required.

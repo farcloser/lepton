@@ -21,15 +21,14 @@ import (
 	"context"
 	"io"
 
-	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/images"
 	"github.com/containerd/containerd/v2/core/remotes"
 	"github.com/containerd/log"
+	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 
-	"github.com/containerd/nerdctl/v2/pkg/imgutil/jobs"
-	"github.com/containerd/nerdctl/v2/pkg/platformutil"
+	"github.com/farcloser/lepton/pkg/imgutil/jobs"
+	"github.com/farcloser/lepton/pkg/platformutil"
 )
 
 // Config for content fetch
@@ -75,8 +74,6 @@ func Pull(ctx context.Context, client *containerd.Client, ref string, config *Co
 	opts := []containerd.RemoteOpt{
 		containerd.WithResolver(config.Resolver),
 		containerd.WithImageHandler(h),
-		//nolint:staticcheck
-		containerd.WithSchema1Conversion, //lint:ignore SA1019 nerdctl should support schema1 as well.
 		containerd.WithPlatformMatcher(platformMC),
 	}
 	opts = append(opts, config.RemoteOpts...)

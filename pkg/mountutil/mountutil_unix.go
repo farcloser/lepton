@@ -23,7 +23,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/containerd/nerdctl/v2/pkg/mountutil/volumestore"
+	"github.com/farcloser/lepton/pkg/mountutil/volumestore"
 )
 
 func splitVolumeSpec(s string) ([]string, error) {
@@ -32,11 +32,11 @@ func splitVolumeSpec(s string) ([]string, error) {
 	return split, nil
 }
 
-func handleVolumeToMount(source string, dst string, volStore volumestore.VolumeStore, createDir bool) (volumeSpec, error) {
+func handleVolumeToMount(source string, dst string, volumeStore volumestore.VolumeStore, createDir bool) (volumeSpec, error) {
 	switch {
 	// Handle named volumes
 	case isNamedVolume(source):
-		return handleNamedVolumes(source, volStore)
+		return handleNamedVolumes(source, volumeStore)
 
 	// Handle bind volumes (file paths)
 	default:

@@ -18,9 +18,11 @@
 // The labels defined in this package are also passed to OCI containers as annotations.
 package labels
 
+import "github.com/farcloser/lepton/pkg/consts"
+
 const (
 	// Prefix is the common prefix of nerdctl labels
-	Prefix = "nerdctl/"
+	Prefix = consts.BinaryName + "/"
 
 	// Namespace is the containerd namespace such as "default", "k8s.io"
 	Namespace = Prefix + "namespace"

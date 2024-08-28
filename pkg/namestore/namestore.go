@@ -24,8 +24,8 @@ import (
 
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/identifiers"
-	"github.com/containerd/nerdctl/v2/pkg/lockutil"
+	"github.com/farcloser/lepton/pkg/identifiers"
+	"github.com/farcloser/lepton/pkg/lockutil"
 )
 
 func New(dataStore, ns string) (NameStore, error) {

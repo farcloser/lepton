@@ -19,20 +19,18 @@ package clientutil
 import (
 	"context"
 	"fmt"
-	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
-
-	"github.com/opencontainers/go-digest"
 
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/pkg/namespaces"
 	"github.com/containerd/log"
 	"github.com/containerd/platforms"
+	"github.com/opencontainers/go-digest"
 
-	"github.com/containerd/nerdctl/v2/pkg/platformutil"
-	"github.com/containerd/nerdctl/v2/pkg/systemutil"
+	"github.com/farcloser/lepton/pkg/platformutil"
+	"github.com/farcloser/lepton/pkg/systemutil"
 )
 
 func NewClient(ctx context.Context, namespace, address string, opts ...containerd.Opt) (*containerd.Client, context.Context, context.CancelFunc, error) {
@@ -78,25 +76,7 @@ func NewClientWithPlatform(ctx context.Context, namespace, address, platform str
 	return NewClient(ctx, namespace, address, clientOpts...)
 }
 
-// DataStore returns a string like "/var/lib/nerdctl/1935db59".
-// "1935db9" is from `$(echo -n "/run/containerd/containerd.sock" | sha256sum | cut -c1-8)`
-// on Windows it will return "%PROGRAMFILES%/nerdctl/1935db59"
-func DataStore(dataRoot, address string) (string, error) {
-	if err := os.MkdirAll(dataRoot, 0700); err != nil {
-		return "", err
-	}
-	addrHash, err := getAddrHash(address)
-	if err != nil {
-		return "", err
-	}
-	dataStore := filepath.Join(dataRoot, addrHash)
-	if err := os.MkdirAll(dataStore, 0700); err != nil {
-		return "", err
-	}
-	return dataStore, nil
-}
-
-func getAddrHash(addr string) (string, error) {
+func DataStore(dataRoot string, addr string) (string, error) {
 	const addrHashLen = 8
 
 	if runtime.GOOS != "windows" {
@@ -111,5 +91,5 @@ func getAddrHash(addr string) (string, error) {
 
 	d := digest.SHA256.FromString(addr)
 	h := d.Encoded()[0:addrHashLen]
-	return h, nil
+	return filepath.Join(dataRoot, h), nil
 }

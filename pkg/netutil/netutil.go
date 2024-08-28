@@ -30,19 +30,19 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/containernetworking/cni/libcni"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/pkg/namespaces"
 	"github.com/containerd/errdefs"
 	"github.com/containerd/log"
+	"github.com/containernetworking/cni/libcni"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/labels"
-	"github.com/containerd/nerdctl/v2/pkg/lockutil"
-	"github.com/containerd/nerdctl/v2/pkg/netutil/nettype"
-	subnetutil "github.com/containerd/nerdctl/v2/pkg/netutil/subnet"
-	"github.com/containerd/nerdctl/v2/pkg/strutil"
+	"github.com/farcloser/lepton/pkg/api/types"
+	"github.com/farcloser/lepton/pkg/errs"
+	"github.com/farcloser/lepton/pkg/labels"
+	"github.com/farcloser/lepton/pkg/lockutil"
+	"github.com/farcloser/lepton/pkg/netutil/nettype"
+	subnetutil "github.com/farcloser/lepton/pkg/netutil/subnet"
+	"github.com/farcloser/lepton/pkg/strutil"
 )
 
 type CNIEnv struct {
@@ -381,7 +381,7 @@ func (e *CNIEnv) createDefaultNetworkConfig() error {
 // generateNetworkConfig does not fill "File" field.
 func (e *CNIEnv) generateNetworkConfig(name string, labels []string, plugins []CNIPlugin) (*NetworkConfig, error) {
 	if name == "" || len(plugins) == 0 {
-		return nil, errdefs.ErrInvalidArgument
+		return nil, errs.ErrInvalidArgument
 	}
 	for _, f := range plugins {
 		p := filepath.Join(e.Path, f.GetPluginType())
@@ -459,7 +459,7 @@ func (e *CNIEnv) networkConfigList() ([]*NetworkConfig, error) {
 				return nil, err
 			}
 		}
-		id, labels := nerdctlIDLabels(lcl.Bytes)
+		id, labels := IDLabels(lcl.Bytes)
 		l = append(l, &NetworkConfig{
 			NetworkConfigList: lcl,
 			NerdctlID:         id,
@@ -470,10 +470,10 @@ func (e *CNIEnv) networkConfigList() ([]*NetworkConfig, error) {
 	return l, nil
 }
 
-func nerdctlIDLabels(b []byte) (*string, *map[string]string) {
+func IDLabels(b []byte) (*string, *map[string]string) {
 	type idLabels struct {
-		ID     *string            `json:"nerdctlID,omitempty"`
-		Labels *map[string]string `json:"nerdctlLabels,omitempty"`
+		ID     *string            `json:"leptonID,omitempty"`
+		Labels *map[string]string `json:"leptonLabels,omitempty"`
 	}
 	var idl idLabels
 	if err := json.Unmarshal(b, &idl); err != nil {

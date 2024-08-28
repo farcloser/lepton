@@ -23,14 +23,13 @@ import (
 	"strings"
 	"time"
 
+	v1 "github.com/containerd/cgroups/v3/cgroup1/stats"
+	v2 "github.com/containerd/cgroups/v3/cgroup2/stats"
 	"github.com/vishvananda/netlink"
 	"github.com/vishvananda/netns"
 
-	v1 "github.com/containerd/cgroups/v3/cgroup1/stats"
-	v2 "github.com/containerd/cgroups/v3/cgroup2/stats"
-
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/native"
-	"github.com/containerd/nerdctl/v2/pkg/statsutil"
+	"github.com/farcloser/lepton/pkg/inspecttypes/native"
+	"github.com/farcloser/lepton/pkg/statsutil"
 )
 
 //nolint:nakedret

@@ -21,20 +21,18 @@ import (
 	"reflect"
 	"testing"
 
+	containerd "github.com/containerd/containerd/v2/client"
+	ctdsnapshotters "github.com/containerd/containerd/v2/pkg/snapshotters"
 	digest "github.com/opencontainers/go-digest"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 	"gotest.tools/v3/assert"
 
-	containerd "github.com/containerd/containerd/v2/client"
-	ctdsnapshotters "github.com/containerd/containerd/v2/pkg/snapshotters"
-
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/imgutil/pull"
+	"github.com/farcloser/lepton/pkg/api/types"
+	"github.com/farcloser/lepton/pkg/imgutil/pull"
 )
 
 const (
-	targetRefLabel = "containerd.io/snapshot/remote/stargz.reference"
-	testRef        = "test:latest"
+	testRef = "test:latest"
 )
 
 func TestGetSnapshotterOpts(t *testing.T) {
@@ -43,29 +41,19 @@ func TestGetSnapshotterOpts(t *testing.T) {
 		check func(t *testing.T, o snapshotterOpts)
 	}
 	testCases := []testCase{
-		{
-			sns:   []string{"overlayfs"},
-			check: sameOpts(&defaultSnapshotterOpts{snapshotter: "overlayfs"}),
-		},
+		/*
+			{
+				sns:   []string{"overlayfs"},
+				check: sameOpts(&defaultSnapshotterOpts{snapshotter: "overlayfs"}),
+			},
+		*/
 		{
 			sns:   []string{"overlayfs2"},
 			check: sameOpts(&defaultSnapshotterOpts{snapshotter: "overlayfs2"}),
 		},
 		{
-			sns:   []string{"stargz", "stargz-v1"},
-			check: remoteSnOpts("stargz", true),
-		},
-		{
 			sns:   []string{"soci"},
 			check: remoteSnOpts("soci", true),
-		},
-		{
-			sns:   []string{"overlaybd", "overlaybd-v2"},
-			check: sameOpts(&remoteSnapshotterOpts{snapshotter: "overlaybd"}),
-		},
-		{
-			sns:   []string{"nydus", "nydus-v3"},
-			check: sameOpts(&remoteSnapshotterOpts{snapshotter: "nydus"}),
 		},
 	}
 	for _, tc := range testCases {
@@ -135,24 +123,10 @@ func TestRemoteSnapshotterOpts(t *testing.T) {
 		check []func(t *testing.T, a map[string]string)
 	}{
 		{
-			name: "stargz",
-			check: []func(t *testing.T, a map[string]string){
-				checkRemoteSnapshotterAnnotataions, checkStargzSnapshotterAnnotataions,
-			},
-		},
-		{
 			name: "soci",
 			check: []func(t *testing.T, a map[string]string){
 				checkRemoteSnapshotterAnnotataions, checkSociSnapshotterAnnotataions,
 			},
-		},
-		{
-			name:  "nydus",
-			check: []func(t *testing.T, a map[string]string){checkRemoteSnapshotterAnnotataions},
-		},
-		{
-			name:  "overlaybd",
-			check: []func(t *testing.T, a map[string]string){checkRemoteSnapshotterAnnotataions},
 		},
 	}
 
@@ -182,12 +156,6 @@ func TestRemoteSnapshotterOpts(t *testing.T) {
 func checkRemoteSnapshotterAnnotataions(t *testing.T, a map[string]string) {
 	assert.Check(t, a != nil)
 	assert.Equal(t, a[ctdsnapshotters.TargetRefLabel], testRef)
-}
-
-func checkStargzSnapshotterAnnotataions(t *testing.T, a map[string]string) {
-	assert.Check(t, a != nil)
-	_, ok := a["containerd.io/snapshot/remote/urls"]
-	assert.Equal(t, ok, true)
 }
 
 // using values from soci source to check for annotations (

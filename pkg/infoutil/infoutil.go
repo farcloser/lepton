@@ -26,17 +26,16 @@ import (
 	"time"
 
 	"github.com/Masterminds/semver/v3"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/introspection"
 	ptypes "github.com/containerd/containerd/v2/pkg/protobuf/types"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/buildkitutil"
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/native"
-	"github.com/containerd/nerdctl/v2/pkg/logging"
-	"github.com/containerd/nerdctl/v2/pkg/version"
+	"github.com/farcloser/lepton/pkg/buildkitutil"
+	"github.com/farcloser/lepton/pkg/inspecttypes/dockercompat"
+	"github.com/farcloser/lepton/pkg/inspecttypes/native"
+	"github.com/farcloser/lepton/pkg/logging"
+	"github.com/farcloser/lepton/pkg/version"
 )
 
 func NativeDaemonInfo(ctx context.Context, client *containerd.Client) (*native.DaemonInfo, error) {
@@ -80,7 +79,7 @@ func Info(ctx context.Context, client *containerd.Client, snapshotter, cgroupMan
 
 	var info dockercompat.Info
 	info.ID = daemonIntro.UUID
-	// Storage drivers and logging drivers are not really Server concept for nerdctl, but mimics `docker info` output
+	// Storage drivers and logging drivers are not really Server concepts, but mimics `docker info` output
 	info.Driver = snapshotter
 	info.Plugins.Log = logging.Drivers()
 	info.Plugins.Storage = snapshotterPlugins

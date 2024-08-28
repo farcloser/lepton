@@ -23,9 +23,9 @@ import (
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/netutil"
-	"github.com/containerd/nerdctl/v2/pkg/strutil"
+	"github.com/farcloser/lepton/pkg/api/types"
+	"github.com/farcloser/lepton/pkg/netutil"
+	"github.com/farcloser/lepton/pkg/strutil"
 )
 
 func Prune(ctx context.Context, client *containerd.Client, options types.NetworkPruneOptions) error {

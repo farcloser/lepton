@@ -26,13 +26,13 @@ import (
 	"github.com/containerd/containerd/v2/pkg/oci"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
-	"github.com/containerd/nerdctl/v2/pkg/dnsutil"
-	"github.com/containerd/nerdctl/v2/pkg/dnsutil/hostsstore"
-	"github.com/containerd/nerdctl/v2/pkg/netutil"
-	"github.com/containerd/nerdctl/v2/pkg/resolvconf"
-	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
+	"github.com/farcloser/lepton/pkg/api/types"
+	"github.com/farcloser/lepton/pkg/clientutil"
+	"github.com/farcloser/lepton/pkg/dnsutil"
+	"github.com/farcloser/lepton/pkg/dnsutil/hostsstore"
+	"github.com/farcloser/lepton/pkg/netutil"
+	"github.com/farcloser/lepton/pkg/resolvconf"
+	"github.com/farcloser/lepton/pkg/rootlessutil"
 )
 
 type cniNetworkManagerPlatform struct {
@@ -99,10 +99,16 @@ func (m *cniNetworkManager) ContainerNetworkingOpts(_ context.Context, container
 	}
 
 	// the content of /etc/hosts is created in OCI Hook
-	etcHostsPath, err := hostsstore.AllocHostsFile(dataStore, m.globalOptions.Namespace, containerID)
+	hs, err := hostsstore.New(dataStore, m.globalOptions.Namespace)
 	if err != nil {
 		return nil, nil, err
 	}
+
+	etcHostsPath, err := hs.AllocHostsFile(containerID, []byte(""))
+	if err != nil {
+		return nil, nil, err
+	}
+
 	opts = append(opts, withCustomResolvConf(resolvConfPath), withCustomHosts(etcHostsPath))
 
 	if m.netOpts.UTSNamespace != UtsNamespaceHost {

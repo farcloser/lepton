@@ -22,12 +22,12 @@ import (
 
 	containerd "github.com/containerd/containerd/v2/client"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/cmd/builder"
-	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
-	"github.com/containerd/nerdctl/v2/pkg/cmd/image"
-	"github.com/containerd/nerdctl/v2/pkg/cmd/network"
-	"github.com/containerd/nerdctl/v2/pkg/cmd/volume"
+	"github.com/farcloser/lepton/pkg/api/types"
+	"github.com/farcloser/lepton/pkg/cmd/builder"
+	"github.com/farcloser/lepton/pkg/cmd/container"
+	"github.com/farcloser/lepton/pkg/cmd/image"
+	"github.com/farcloser/lepton/pkg/cmd/network"
+	"github.com/farcloser/lepton/pkg/cmd/volume"
 )
 
 // Prune will remove all unused containers, networks,
@@ -47,11 +47,10 @@ func Prune(ctx context.Context, client *containerd.Client, options types.SystemP
 		return err
 	}
 	if options.Volumes {
-		if err := volume.Prune(ctx, client, types.VolumePruneOptions{
+		if _, _, _, err := volume.Prune(ctx, client, &types.VolumePruneOptions{
 			GOptions: options.GOptions,
 			All:      false,
 			Force:    true,
-			Stdout:   options.Stdout,
 		}); err != nil {
 			return err
 		}

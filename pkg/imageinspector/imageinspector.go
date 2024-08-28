@@ -24,8 +24,8 @@ import (
 	"github.com/containerd/containerd/v2/core/snapshots"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/imgutil"
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/native"
+	"github.com/farcloser/lepton/pkg/imgutil"
+	"github.com/farcloser/lepton/pkg/inspecttypes/native"
 )
 
 // Inspect inspects the image, for the platform specified in image.platform.

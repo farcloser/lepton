@@ -19,9 +19,8 @@ package containerdutil
 import (
 	"context"
 
-	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
-
 	"github.com/containerd/containerd/v2/core/content"
+	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 )
 
 var ReadBlob = readBlobWithCache()

@@ -28,8 +28,6 @@ func TestSuggestContainerName(t *testing.T) {
 	assert.Equal(t, "alpine-16f6d", SuggestContainerName("alpine:3.15", containerID))
 	assert.Equal(t, "alpine-16f6d", SuggestContainerName("docker.io/library/alpine:3.15", containerID))
 	assert.Equal(t, "alpine-16f6d", SuggestContainerName("docker.io/library/alpine:latest", containerID))
-	assert.Equal(t, "ipfs-bafkr-16f6d", SuggestContainerName("bafkreicq4dg6nkef5ju422ptedcwfz6kcvpvvhuqeykfrwq5krazf3muze", containerID))
-	assert.Equal(t, "ipfs-bafkr-16f6d", SuggestContainerName("ipfs://bafkreicq4dg6nkef5ju422ptedcwfz6kcvpvvhuqeykfrwq5krazf3muze", containerID))
 	assert.Equal(t, "untitled-16f6d", SuggestContainerName("invalid://alpine", containerID))
 	assert.Equal(t, "untitled-16f6d", SuggestContainerName("", containerID))
 }

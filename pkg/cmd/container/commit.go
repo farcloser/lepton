@@ -25,10 +25,10 @@ import (
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/idutil/containerwalker"
-	"github.com/containerd/nerdctl/v2/pkg/imgutil/commit"
-	"github.com/containerd/nerdctl/v2/pkg/referenceutil"
+	"github.com/farcloser/lepton/pkg/api/types"
+	"github.com/farcloser/lepton/pkg/idutil/containerwalker"
+	"github.com/farcloser/lepton/pkg/imgutil/commit"
+	"github.com/farcloser/lepton/pkg/referenceutil"
 )
 
 // Commit will commit a container’s file changes or settings into a new image.

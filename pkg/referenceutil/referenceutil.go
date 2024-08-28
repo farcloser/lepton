@@ -19,10 +19,8 @@ package referenceutil
 import (
 	"fmt"
 	"path"
-	"strings"
 
-	distributionref "github.com/distribution/reference"
-	"github.com/ipfs/go-cid"
+	"github.com/distribution/reference"
 )
 
 // Reference is a reference to an image.
@@ -32,43 +30,22 @@ type Reference interface {
 	String() string
 }
 
-// ParseAnyReference parses the passed reference as IPFS, CID, or a classic reference.
+// ParseAnyReference parses the passed reference as CID, or a classic reference.
 // Unlike ParseAny, it is not limited to the DockerRef limitations (being either tagged or digested)
 // and should be used instead.
 func ParseAnyReference(rawRef string) (Reference, error) {
-	if scheme, ref, err := ParseIPFSRefWithScheme(rawRef); err == nil {
-		return Reference(stringRef{scheme: scheme, s: ref}), nil
-	}
-	if c, err := cid.Decode(rawRef); err == nil {
-		return c, nil
-	}
-	return distributionref.ParseAnyReference(rawRef)
+	return reference.ParseAnyReference(rawRef)
 }
 
 // ParseAny parses the passed reference with allowing it to be non-docker reference.
-// If the ref has IPFS scheme or can be parsed as CID, it's parsed as an IPFS reference.
-// Otherwise it's parsed as a docker reference.
+// Otherwise, it's parsed as a docker reference.
 func ParseAny(rawRef string) (Reference, error) {
-	if scheme, ref, err := ParseIPFSRefWithScheme(rawRef); err == nil {
-		return stringRef{scheme: scheme, s: ref}, nil
-	}
-	if c, err := cid.Decode(rawRef); err == nil {
-		return c, nil
-	}
 	return ParseDockerRef(rawRef)
 }
 
 // ParseDockerRef parses the passed reference with assuming it's a docker reference.
-func ParseDockerRef(rawRef string) (distributionref.Named, error) {
-	return distributionref.ParseDockerRef(rawRef)
-}
-
-// ParseIPFSRefWithScheme parses the passed reference with assuming it's an IPFS reference with scheme prefix.
-func ParseIPFSRefWithScheme(name string) (scheme, ref string, err error) {
-	if strings.HasPrefix(name, "ipfs://") || strings.HasPrefix(name, "ipns://") {
-		return name[:4], name[7:], nil
-	}
-	return "", "", fmt.Errorf("reference is not an IPFS reference")
+func ParseDockerRef(rawRef string) (reference.Named, error) {
+	return reference.ParseDockerRef(rawRef)
 }
 
 type stringRef struct {
@@ -92,15 +69,13 @@ func SuggestContainerName(rawRef, containerID string) string {
 		r, err := ParseAny(rawRef)
 		if err == nil {
 			switch rr := r.(type) {
-			case distributionref.Named:
+			case reference.Named:
 				if rrName := rr.Name(); rrName != "" {
 					imageNameBased := path.Base(rrName)
 					if imageNameBased != "" {
 						name = imageNameBased + "-" + containerID[:shortIDLength]
 					}
 				}
-			case cid.Cid:
-				name = "ipfs" + "-" + rr.String()[:shortIDLength] + "-" + containerID[:shortIDLength]
 			case stringRef:
 				name = rr.scheme + "-" + rr.s[:shortIDLength] + "-" + containerID[:shortIDLength]
 			}

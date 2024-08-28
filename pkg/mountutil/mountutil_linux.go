@@ -25,17 +25,16 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/containerd/containerd/v2/core/containers"
+	"github.com/containerd/containerd/v2/core/mount"
+	"github.com/containerd/containerd/v2/pkg/oci"
+	"github.com/containerd/log"
 	"github.com/docker/go-units"
 	mobymount "github.com/moby/sys/mount"
 	"github.com/opencontainers/runtime-spec/specs-go"
 	"golang.org/x/sys/unix"
 
-	"github.com/containerd/containerd/v2/core/containers"
-	"github.com/containerd/containerd/v2/core/mount"
-	"github.com/containerd/containerd/v2/pkg/oci"
-	"github.com/containerd/log"
-
-	"github.com/containerd/nerdctl/v2/pkg/mountutil/volumestore"
+	"github.com/farcloser/lepton/pkg/mountutil/volumestore"
 )
 
 /*
@@ -291,7 +290,7 @@ func ProcessFlagTmpfs(s string) (*Processed, error) {
 	return res, nil
 }
 
-func ProcessFlagMount(s string, volStore volumestore.VolumeStore) (*Processed, error) {
+func ProcessFlagMount(s string, volumeStore volumestore.VolumeStore) (*Processed, error) {
 	fields := strings.Split(s, ",")
 	var (
 		mountType        string
@@ -431,7 +430,7 @@ func ProcessFlagMount(s string, volStore volumestore.VolumeStore) (*Processed, e
 		return ProcessFlagTmpfs(fieldsStr)
 	case Volume, Bind:
 		// createDir=false for --mount option to disallow creating directories on host if not found
-		return ProcessFlagV(fieldsStr, volStore, false)
+		return ProcessFlagV(fieldsStr, volumeStore, false)
 	}
 	return nil, fmt.Errorf("invalid mount type '%s' must be a volume/bind/tmpfs", mountType)
 }

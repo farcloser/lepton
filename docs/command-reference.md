@@ -118,8 +118,6 @@ It does not necessarily mean that the corresponding features are missing in cont
   - [:whale: nerdctl compose run](#whale-nerdctl-compose-run)
   - [:whale: nerdctl compose top](#whale-nerdctl-compose-top)
   - [:whale: nerdctl compose version](#whale-nerdctl-compose-version)
-- [IPFS management](#ipfs-management)
-  - [:nerd_face: nerdctl ipfs registry serve](#nerd_face-nerdctl-ipfs-registry-serve)
 - [Global flags](#global-flags)
 - [Unimplemented Docker commands](#unimplemented-docker-commands)
 
@@ -1665,28 +1663,6 @@ Flags:
 - :whale: `-f, --format`: Format the output. Values: [pretty | json] (default "pretty")
 - :whale: `--short`: Shows only Compose's version number
 
-## IPFS management
-
-P2P image distribution (IPFS) is completely optional. Your host is NOT connected to any P2P network, unless you opt in to [install and run IPFS daemon](https://docs.ipfs.io/install/).
-
-### :nerd_face: nerdctl ipfs registry serve
-
-Serve read-only registry backed by IPFS on localhost.
-This is needed to run `nerdctl build` with pulling base images from IPFS.
-Other commands (e.g. `nerdctl push ipfs://<image-name>` and `nerdctl pull ipfs://<CID>`) don't require this.
-
-You need to install `ipfs` command on the host.
-See [`ipfs.md`](./ipfs.md) for details.
-
-Usage: `nerdctl ipfs registry serve [OPTIONS]`
-
-Flags:
-
-- :nerd_face: `--ipfs-address`: Multiaddr of IPFS API (default is pulled from `$IPFS_PATH/api` file. If `$IPFS_PATH` env var is not present, it defaults to `~/.ipfs`).
-- :nerd_face: `--listen-registry`: Address to listen (default `localhost:5050`).
-- :nerd_face: `--read-retry-num`: Times to retry query on IPFS (default 0 (no retry))
-- :nerd_face: `--read-timeout`: Timeout duration of a read request to IPFS (default 0 (no timeout))
-
 ## Global flags
 
 - :nerd_face: :blue_square: `--address`:  containerd address, optionally with "unix://" prefix
@@ -1700,7 +1676,6 @@ Flags:
 - :nerd_face: :blue_square: `--data-root`: nerdctl data root, e.g. "/var/lib/nerdctl"
 - :nerd_face: `--cgroup-manager=(cgroupfs|systemd|none)`: cgroup manager
   - Default: "systemd" on cgroup v2 (rootful & rootless), "cgroupfs" on v1 rootful, "none" on v1 rootless
-- :nerd_face: `--insecure-registry`: skips verifying HTTPS certs, and allows falling back to plain HTTP
 - :nerd_face: `--host-gateway-ip`: IP address that the special 'host-gateway' string in --add-host resolves to. It has no effect without setting --add-host
   - Default: the IP address of the host
 

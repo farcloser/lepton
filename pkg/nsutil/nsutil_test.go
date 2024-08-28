@@ -21,7 +21,7 @@ import (
 
 	"gotest.tools/v3/assert"
 
-	"github.com/containerd/nerdctl/v2/pkg/nsutil"
+	"github.com/farcloser/lepton/pkg/nsutil"
 )
 
 func TestValidateNamespaceName(t *testing.T) {

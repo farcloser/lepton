@@ -17,30 +17,36 @@
 package volume
 
 import (
-	"fmt"
-
 	"github.com/docker/docker/pkg/stringid"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/native"
-	"github.com/containerd/nerdctl/v2/pkg/labels"
-	"github.com/containerd/nerdctl/v2/pkg/strutil"
+	"github.com/farcloser/lepton/pkg/api/types"
+	"github.com/farcloser/lepton/pkg/clientutil"
+	"github.com/farcloser/lepton/pkg/inspecttypes/native"
+	"github.com/farcloser/lepton/pkg/labels"
+	"github.com/farcloser/lepton/pkg/mountutil/volumestore"
+	"github.com/farcloser/lepton/pkg/strutil"
 )
 
-func Create(name string, options types.VolumeCreateOptions) (*native.Volume, error) {
+func Create(name string, options *types.VolumeCreateOptions) (*native.Volume, error) {
+	dataStore, err := clientutil.DataStore(options.GOptions.DataRoot, options.GOptions.Address)
+	if err != nil {
+		return nil, err
+	}
+
+	volumeStore, err := volumestore.New(dataStore, options.GOptions.Namespace)
+	if err != nil {
+		return nil, err
+	}
+
 	if name == "" {
 		name = stringid.GenerateRandomID()
 		options.Labels = append(options.Labels, labels.AnonymousVolumes+"=")
 	}
-	volStore, err := Store(options.GOptions.Namespace, options.GOptions.DataRoot, options.GOptions.Address)
+
+	vol, err := volumeStore.Create(name, strutil.DedupeStrSlice(options.Labels))
 	if err != nil {
 		return nil, err
 	}
-	labels := strutil.DedupeStrSlice(options.Labels)
-	vol, err := volStore.Create(name, labels)
-	if err != nil {
-		return nil, err
-	}
-	fmt.Fprintln(options.Stdout, name)
+
 	return vol, nil
 }

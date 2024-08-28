@@ -27,9 +27,9 @@ import (
 	"github.com/containerd/log"
 	"github.com/containerd/platforms"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/containerutil"
-	"github.com/containerd/nerdctl/v2/pkg/idutil/imagewalker"
+	"github.com/farcloser/lepton/pkg/api/types"
+	"github.com/farcloser/lepton/pkg/containerutil"
+	"github.com/farcloser/lepton/pkg/idutil/imagewalker"
 )
 
 // Remove removes a list of `images`.

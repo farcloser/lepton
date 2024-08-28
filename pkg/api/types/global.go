@@ -16,6 +16,6 @@
 
 package types
 
-import "github.com/containerd/nerdctl/v2/pkg/config"
+import "github.com/farcloser/lepton/pkg/config"
 
 type GlobalCommandOptions config.Config

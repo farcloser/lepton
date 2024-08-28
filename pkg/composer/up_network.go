@@ -22,8 +22,8 @@ import (
 
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/labels"
-	"github.com/containerd/nerdctl/v2/pkg/reflectutil"
+	"github.com/farcloser/lepton/pkg/labels"
+	"github.com/farcloser/lepton/pkg/reflectutil"
 )
 
 func (c *Composer) upNetwork(ctx context.Context, shortName string) error {

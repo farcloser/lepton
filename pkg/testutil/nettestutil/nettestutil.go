@@ -25,6 +25,8 @@ import (
 	"time"
 
 	"github.com/containerd/errdefs"
+
+	"github.com/farcloser/lepton/pkg/errs"
 )
 
 func HTTPGet(urlStr string, attempts int, insecure bool) (*http.Response, error) {
@@ -33,7 +35,7 @@ func HTTPGet(urlStr string, attempts int, insecure bool) (*http.Response, error)
 		err  error
 	)
 	if attempts < 1 {
-		return nil, errdefs.ErrInvalidArgument
+		return nil, errs.ErrInvalidArgument
 	}
 	client := &http.Client{
 		Timeout: 3 * time.Second,

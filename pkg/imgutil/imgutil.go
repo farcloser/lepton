@@ -24,10 +24,6 @@ import (
 	"net/http"
 	"reflect"
 
-	distributionref "github.com/distribution/reference"
-	"github.com/opencontainers/image-spec/identity"
-	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/content"
 	"github.com/containerd/containerd/v2/core/images"
@@ -38,12 +34,15 @@ import (
 	"github.com/containerd/imgcrypt/images/encryption"
 	"github.com/containerd/log"
 	"github.com/containerd/platforms"
+	distributionref "github.com/distribution/reference"
+	"github.com/opencontainers/image-spec/identity"
+	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/errutil"
-	"github.com/containerd/nerdctl/v2/pkg/idutil/imagewalker"
-	"github.com/containerd/nerdctl/v2/pkg/imgutil/dockerconfigresolver"
-	"github.com/containerd/nerdctl/v2/pkg/imgutil/pull"
+	"github.com/farcloser/lepton/pkg/api/types"
+	"github.com/farcloser/lepton/pkg/errutil"
+	"github.com/farcloser/lepton/pkg/idutil/imagewalker"
+	"github.com/farcloser/lepton/pkg/imgutil/dockerconfigresolver"
+	"github.com/farcloser/lepton/pkg/imgutil/pull"
 )
 
 // EnsuredImage contains the image existed in containerd and its metadata.
@@ -52,7 +51,6 @@ type EnsuredImage struct {
 	Image       containerd.Image
 	ImageConfig ocispec.ImageConfig
 	Snapshotter string
-	Remote      bool // true for stargz or overlaybd
 }
 
 // PullMode is either one of "always", "missing", "never"
@@ -79,7 +77,6 @@ func GetExistingImage(ctx context.Context, client *containerd.Client, snapshotte
 				Image:       image,
 				ImageConfig: *imgConfig,
 				Snapshotter: snapshotter,
-				Remote:      getSnapshotterOpts(snapshotter).isRemote(),
 			}
 			if unpacked, err := image.IsUnpacked(ctx, snapshotter); err == nil && !unpacked {
 				if err := image.Unpack(ctx, snapshotter); err != nil {
@@ -134,10 +131,6 @@ func EnsureImage(ctx context.Context, client *containerd.Client, rawRef string, 
 	refDomain := distributionref.Domain(named)
 
 	var dOpts []dockerconfigresolver.Opt
-	if options.GOptions.InsecureRegistry {
-		log.G(ctx).Warnf("skipping verifying HTTPS certs for %q", refDomain)
-		dOpts = append(dOpts, dockerconfigresolver.WithSkipVerifyCerts(true))
-	}
 	dOpts = append(dOpts, dockerconfigresolver.WithHostsDirs(options.GOptions.HostsDir))
 	resolver, err := dockerconfigresolver.New(ctx, refDomain, dOpts...)
 	if err != nil {
@@ -150,17 +143,7 @@ func EnsureImage(ctx context.Context, client *containerd.Client, rawRef string, 
 		if !errors.Is(err, http.ErrSchemeMismatch) && !errutil.IsErrConnectionRefused(err) {
 			return nil, err
 		}
-		if options.GOptions.InsecureRegistry {
-			log.G(ctx).WithError(err).Warnf("server %q does not seem to support HTTPS, falling back to plain HTTP", refDomain)
-			dOpts = append(dOpts, dockerconfigresolver.WithPlainHTTP(true))
-			resolver, err = dockerconfigresolver.New(ctx, refDomain, dOpts...)
-			if err != nil {
-				return nil, err
-			}
-			return PullImage(ctx, client, resolver, ref, options)
-		}
 		log.G(ctx).WithError(err).Errorf("server %q does not seem to support HTTPS", refDomain)
-		log.G(ctx).Info("Hint: you may want to try --insecure-registry to allow plain HTTP (if you are in a trusted network)")
 		return nil, err
 
 	}
@@ -250,7 +233,6 @@ func PullImage(ctx context.Context, client *containerd.Client, resolver remotes.
 		Image:       containerdImage,
 		ImageConfig: *imgConfig,
 		Snapshotter: options.GOptions.Snapshotter,
-		Remote:      snOpt.isRemote(),
 	}
 	return res, nil
 

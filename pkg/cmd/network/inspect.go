@@ -23,12 +23,12 @@ import (
 
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/formatter"
-	"github.com/containerd/nerdctl/v2/pkg/idutil/netwalker"
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/native"
-	"github.com/containerd/nerdctl/v2/pkg/netutil"
+	"github.com/farcloser/lepton/pkg/api/types"
+	"github.com/farcloser/lepton/pkg/formatter"
+	"github.com/farcloser/lepton/pkg/idutil/netwalker"
+	"github.com/farcloser/lepton/pkg/inspecttypes/dockercompat"
+	"github.com/farcloser/lepton/pkg/inspecttypes/native"
+	"github.com/farcloser/lepton/pkg/netutil"
 )
 
 func Inspect(ctx context.Context, options types.NetworkInspectOptions) error {

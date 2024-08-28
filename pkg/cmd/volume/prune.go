@@ -18,75 +18,64 @@ package volume
 
 import (
 	"context"
-	"fmt"
 
 	containerd "github.com/containerd/containerd/v2/client"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/labels"
+	"github.com/farcloser/lepton/pkg/api/types"
+	"github.com/farcloser/lepton/pkg/clientutil"
+	"github.com/farcloser/lepton/pkg/inspecttypes/native"
+	"github.com/farcloser/lepton/pkg/labels"
+	"github.com/farcloser/lepton/pkg/mountutil/volumestore"
 )
 
-func Prune(ctx context.Context, client *containerd.Client, options types.VolumePruneOptions) error {
-	// Get the volume store and lock it until we are done.
-	// This will prevent racing new containers from being created or removed until we are done with the cleanup of volumes
-	volStore, err := Store(options.GOptions.Namespace, options.GOptions.DataRoot, options.GOptions.Address)
+func Prune(ctx context.Context, client *containerd.Client, options *types.VolumePruneOptions) (removed []string, cannotRemove []string, errList []error, err error) {
+	dataStore, err := clientutil.DataStore(options.GOptions.DataRoot, options.GOptions.Address)
 	if err != nil {
-		return err
-	}
-	err = volStore.Lock()
-	if err != nil {
-		return err
-	}
-	defer volStore.Unlock()
-
-	// Get containers and see which volumes are used
-	containers, err := client.Containers(ctx)
-	if err != nil {
-		return err
+		return nil, nil, nil, err
 	}
 
-	usedVolumesList, err := usedVolumes(ctx, containers)
+	volStore, err := volumestore.New(dataStore, options.GOptions.Namespace)
 	if err != nil {
-		return err
-	}
-	var removeNames []string // nolint: prealloc
-
-	// Get the list of known volumes from the store
-	volumes, err := volStore.List(false)
-	if err != nil {
-		return err
+		return nil, nil, nil, err
 	}
 
-	// Iterate through the known volumes, making sure we do not remove in-use volumes
-	// but capture as well anon volumes (if --all was passed)
-	for _, volume := range volumes {
-		if _, ok := usedVolumesList[volume.Name]; ok {
-			continue
+	var toRemove []string // nolint: prealloc
+
+	removed, err = volStore.Prune(func(volumes []*native.Volume) ([]string, error) {
+		// Get containers and see which volumes are used
+		containers, err := client.Containers(ctx)
+		if err != nil {
+			return nil, err
 		}
-		if !options.All {
-			if volume.Labels == nil {
+
+		usedVolumesList, err := usedVolumes(ctx, containers)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, volume := range volumes {
+			if _, ok := usedVolumesList[volume.Name]; ok {
 				continue
 			}
-			val, ok := (*volume.Labels)[labels.AnonymousVolumes]
-			//skip the named volume and only remove the anonymous volume
-			if !ok || val != "" {
-				continue
-			}
-		}
-		removeNames = append(removeNames, volume.Name)
-	}
 
-	// Remove the volumes from that list
-	removedNames, _, err := volStore.Remove(removeNames)
-	if err != nil {
-		return err
-	}
-	if len(removedNames) > 0 {
-		fmt.Fprintln(options.Stdout, "Deleted Volumes:")
-		for _, name := range removedNames {
-			fmt.Fprintln(options.Stdout, name)
+			if !options.All {
+				if volume.Labels == nil {
+					continue
+				}
+				val, ok := (*volume.Labels)[labels.AnonymousVolumes]
+				// skip the named volume and only remove the anonymous volume
+				if !ok || val != "" {
+					continue
+				}
+			}
+
+			toRemove = append(toRemove, volume.Name)
 		}
-		fmt.Fprintln(options.Stdout, "")
-	}
-	return nil
+
+		// FIXME: @apostasie: implement filters here
+		// Needs significant refacto, as we need VolumeNatives instead of just names
+		return toRemove, nil
+	})
+
+	return removed, nil, nil, err
 }

@@ -22,6 +22,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/farcloser/lepton/pkg/consts"
 	"net"
 	"os/exec"
 	"path/filepath"
@@ -29,15 +30,14 @@ import (
 	"strings"
 
 	"github.com/Masterminds/semver/v3"
+	"github.com/containerd/log"
 	"github.com/go-viper/mapstructure/v2"
 	"github.com/vishvananda/netlink"
 
-	"github.com/containerd/log"
-
-	"github.com/containerd/nerdctl/v2/pkg/defaults"
-	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
-	"github.com/containerd/nerdctl/v2/pkg/strutil"
-	"github.com/containerd/nerdctl/v2/pkg/systemutil"
+	"github.com/farcloser/lepton/pkg/defaults"
+	"github.com/farcloser/lepton/pkg/rootlessutil"
+	"github.com/farcloser/lepton/pkg/strutil"
+	"github.com/farcloser/lepton/pkg/systemutil"
 )
 
 const (
@@ -117,7 +117,7 @@ func (e *CNIEnv) generateCNIPlugins(driver string, name string, ipam map[string]
 		}
 		var bridge *bridgeConfig
 		if name == DefaultNetworkName {
-			bridge = newBridgePlugin("nerdctl0")
+			bridge = newBridgePlugin(consts.BinaryName + "0")
 		} else {
 			bridge = newBridgePlugin("br-" + networkID(name)[:12])
 		}

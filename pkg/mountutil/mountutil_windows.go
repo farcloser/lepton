@@ -33,7 +33,7 @@ import (
 	"github.com/containerd/errdefs"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/mountutil/volumestore"
+	"github.com/farcloser/lepton/pkg/mountutil/volumestore"
 )
 
 const (
@@ -81,11 +81,11 @@ func ProcessFlagTmpfs(s string) (*Processed, error) {
 	return nil, errdefs.ErrNotImplemented
 }
 
-func ProcessFlagMount(s string, volStore volumestore.VolumeStore) (*Processed, error) {
+func ProcessFlagMount(s string, volumeStore volumestore.VolumeStore) (*Processed, error) {
 	return nil, errdefs.ErrNotImplemented
 }
 
-func handleVolumeToMount(source string, dst string, volStore volumestore.VolumeStore, createDir bool) (volumeSpec, error) {
+func handleVolumeToMount(source string, dst string, volumeStore volumestore.VolumeStore, createDir bool) (volumeSpec, error) {
 	// Validate source and destination types
 	if _, err := (validateNamedPipeSpec(source, dst)); err != nil {
 		return volumeSpec{}, err
@@ -94,7 +94,7 @@ func handleVolumeToMount(source string, dst string, volStore volumestore.VolumeS
 	switch {
 	// Handle named volumes
 	case isNamedVolume(source):
-		return handleNamedVolumes(source, volStore)
+		return handleNamedVolumes(source, volumeStore)
 
 	// Handle named pipes
 	case isNamedPipe(source):

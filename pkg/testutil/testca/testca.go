@@ -56,8 +56,8 @@ func New(t testing.TB) *CA {
 	cert := &x509.Certificate{
 		SerialNumber: serialNumber(t),
 		Subject: pkix.Name{
-			Organization: []string{"nerdctl test organization"},
-			CommonName:   fmt.Sprintf("nerdctl CA (%s)", t.Name()),
+			Organization: []string{"test organization"},
+			CommonName:   fmt.Sprintf("test CA (%s)", t.Name()),
 		},
 		NotBefore:             time.Now(),
 		NotAfter:              time.Now().Add(24 * time.Hour),
@@ -106,8 +106,8 @@ func (ca *CA) NewCert(host string, additional ...string) *Cert {
 	cert := &x509.Certificate{
 		SerialNumber: serialNumber(t),
 		Subject: pkix.Name{
-			Organization: []string{"nerdctl test organization"},
-			CommonName:   fmt.Sprintf("nerdctl %s (%s)", host, t.Name()),
+			Organization: []string{"test organization"},
+			CommonName:   fmt.Sprintf("%s (%s)", host, t.Name()),
 		},
 		NotBefore:   time.Now(),
 		NotAfter:    time.Now().Add(24 * time.Hour),

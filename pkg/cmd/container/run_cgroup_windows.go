@@ -19,7 +19,7 @@ package container
 import (
 	"github.com/containerd/containerd/v2/pkg/oci"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/farcloser/lepton/pkg/api/types"
 )
 
 func generateCgroupOpts(id string, options types.ContainerCreateOptions) ([]oci.SpecOpts, error) {

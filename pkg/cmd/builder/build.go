@@ -28,21 +28,20 @@ import (
 	"strconv"
 	"strings"
 
-	distributionref "github.com/distribution/reference"
-	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/images"
 	"github.com/containerd/containerd/v2/core/images/archive"
 	"github.com/containerd/errdefs"
 	"github.com/containerd/log"
 	"github.com/containerd/platforms"
+	distributionref "github.com/distribution/reference"
+	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/buildkitutil"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
-	"github.com/containerd/nerdctl/v2/pkg/platformutil"
-	"github.com/containerd/nerdctl/v2/pkg/strutil"
+	"github.com/farcloser/lepton/pkg/api/types"
+	"github.com/farcloser/lepton/pkg/buildkitutil"
+	"github.com/farcloser/lepton/pkg/clientutil"
+	"github.com/farcloser/lepton/pkg/platformutil"
+	"github.com/farcloser/lepton/pkg/strutil"
 )
 
 type PlatformParser interface {

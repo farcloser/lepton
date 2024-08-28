@@ -26,11 +26,11 @@ import (
 	"github.com/containerd/containerd/v2/pkg/cio"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/consoleutil"
-	"github.com/containerd/nerdctl/v2/pkg/errutil"
-	"github.com/containerd/nerdctl/v2/pkg/idutil/containerwalker"
-	"github.com/containerd/nerdctl/v2/pkg/signalutil"
+	"github.com/farcloser/lepton/pkg/api/types"
+	"github.com/farcloser/lepton/pkg/consoleutil"
+	"github.com/farcloser/lepton/pkg/errutil"
+	"github.com/farcloser/lepton/pkg/idutil/containerwalker"
+	"github.com/farcloser/lepton/pkg/signalutil"
 )
 
 // Attach attaches stdin, stdout, and stderr to a running container.

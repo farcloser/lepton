@@ -26,17 +26,16 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/containerd/containerd/v2/core/runtime/v2/logging"
+	"github.com/containerd/errdefs"
+	"github.com/containerd/log"
 	"github.com/docker/go-units"
 	"github.com/fahedouch/go-logrotate"
 	"github.com/fsnotify/fsnotify"
 
-	"github.com/containerd/containerd/v2/core/runtime/v2/logging"
-	"github.com/containerd/errdefs"
-	"github.com/containerd/log"
-
-	"github.com/containerd/nerdctl/v2/pkg/logging/jsonfile"
-	"github.com/containerd/nerdctl/v2/pkg/logging/tail"
-	"github.com/containerd/nerdctl/v2/pkg/strutil"
+	"github.com/farcloser/lepton/pkg/logging/jsonfile"
+	"github.com/farcloser/lepton/pkg/logging/tail"
+	"github.com/farcloser/lepton/pkg/strutil"
 )
 
 var JSONDriverLogOpts = []string{

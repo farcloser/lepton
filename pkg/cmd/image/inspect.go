@@ -23,18 +23,17 @@ import (
 	"strings"
 	"time"
 
-	"github.com/distribution/reference"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/images"
 	"github.com/containerd/log"
+	"github.com/distribution/reference"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/containerdutil"
-	"github.com/containerd/nerdctl/v2/pkg/formatter"
-	"github.com/containerd/nerdctl/v2/pkg/imageinspector"
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
-	"github.com/containerd/nerdctl/v2/pkg/referenceutil"
+	"github.com/farcloser/lepton/pkg/api/types"
+	"github.com/farcloser/lepton/pkg/containerdutil"
+	"github.com/farcloser/lepton/pkg/formatter"
+	"github.com/farcloser/lepton/pkg/imageinspector"
+	"github.com/farcloser/lepton/pkg/inspecttypes/dockercompat"
+	"github.com/farcloser/lepton/pkg/referenceutil"
 )
 
 func inspectIdentifier(ctx context.Context, client *containerd.Client, identifier string) ([]images.Image, string, string, error) {

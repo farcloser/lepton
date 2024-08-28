@@ -27,10 +27,10 @@ import (
 	"github.com/containerd/containerd/v2/pkg/oci"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/apparmorutil"
-	"github.com/containerd/nerdctl/v2/pkg/defaults"
-	"github.com/containerd/nerdctl/v2/pkg/maputil"
-	"github.com/containerd/nerdctl/v2/pkg/strutil"
+	"github.com/farcloser/lepton/pkg/apparmorutil"
+	"github.com/farcloser/lepton/pkg/defaults"
+	"github.com/farcloser/lepton/pkg/maputil"
+	"github.com/farcloser/lepton/pkg/strutil"
 )
 
 var privilegedOpts = []oci.SpecOpts{

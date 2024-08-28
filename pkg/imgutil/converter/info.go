@@ -22,7 +22,7 @@ type ConvertedImageInfo struct {
 	// The reference is the image's name and digest concatenated with "@" (i.e. `<name>@<digest>`).
 	Image string `json:"Image"`
 
-	// ExtraImages is a set of converter-specific additional images (e.g. external TOC image of eStargz).
+	// ExtraImages is a set of converter-specific additional images
 	// The reference format is the same as the "Image" field.
 	ExtraImages []string `json:"ExtraImages"`
 }

@@ -25,12 +25,11 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/containerd/log"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/containerd/log"
-
-	"github.com/containerd/nerdctl/v2/pkg/composer/serviceparser"
-	"github.com/containerd/nerdctl/v2/pkg/labels"
+	"github.com/farcloser/lepton/pkg/composer/serviceparser"
+	"github.com/farcloser/lepton/pkg/labels"
 )
 
 func (c *Composer) upServices(ctx context.Context, parsedServices []*serviceparser.Service, uo UpOptions) error {

@@ -24,12 +24,11 @@ import (
 	"strings"
 	"time"
 
-	distributionref "github.com/distribution/reference"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/images"
+	distributionref "github.com/distribution/reference"
 
-	"github.com/containerd/nerdctl/v2/pkg/referenceutil"
+	"github.com/farcloser/lepton/pkg/referenceutil"
 )
 
 // Filter types supported to filter images.

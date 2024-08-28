@@ -18,6 +18,7 @@ package testutil
 
 import (
 	"context"
+	"github.com/farcloser/lepton/pkg/consts"
 	"os"
 	"path/filepath"
 	"testing"
@@ -55,7 +56,7 @@ func (cd *ComposeDir) CleanUp() {
 }
 
 func NewComposeDir(t testing.TB, dockerComposeYAML string) *ComposeDir {
-	tmpDir, err := os.MkdirTemp("", "nerdctl-compose-test")
+	tmpDir, err := os.MkdirTemp("", consts.BinaryName+"-compose-test")
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -22,12 +22,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/docker/docker/pkg/system"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/log"
+	"github.com/docker/docker/pkg/system"
 
-	"github.com/containerd/nerdctl/v2/pkg/labels"
+	"github.com/farcloser/lepton/pkg/labels"
 )
 
 type CopyOptions struct {

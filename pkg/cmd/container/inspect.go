@@ -25,13 +25,13 @@ import (
 	"github.com/containerd/containerd/v2/core/snapshots"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/containerdutil"
-	"github.com/containerd/nerdctl/v2/pkg/containerinspector"
-	"github.com/containerd/nerdctl/v2/pkg/formatter"
-	"github.com/containerd/nerdctl/v2/pkg/idutil/containerwalker"
-	"github.com/containerd/nerdctl/v2/pkg/imgutil"
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
+	"github.com/farcloser/lepton/pkg/api/types"
+	"github.com/farcloser/lepton/pkg/containerdutil"
+	"github.com/farcloser/lepton/pkg/containerinspector"
+	"github.com/farcloser/lepton/pkg/formatter"
+	"github.com/farcloser/lepton/pkg/idutil/containerwalker"
+	"github.com/farcloser/lepton/pkg/imgutil"
+	"github.com/farcloser/lepton/pkg/inspecttypes/dockercompat"
 )
 
 // Inspect prints detailed information for each container in `containers`.

@@ -18,10 +18,11 @@
 package identifiers
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 
-	"github.com/containerd/errdefs"
+	"github.com/farcloser/lepton/pkg/errs"
 )
 
 const AllowedIdentfierChars = `[a-zA-Z0-9][a-zA-Z0-9_.-]`
@@ -35,11 +36,11 @@ var AllowedIdentifierPattern = regexp.MustCompile(`^` + AllowedIdentfierChars + 
 // while the Docker compatible implementation omits the length check entirely.
 func ValidateDockerCompat(s string) error {
 	if len(s) == 0 {
-		return fmt.Errorf("identifier must not be empty %w", errdefs.ErrInvalidArgument)
+		return errors.Join(errs.ErrInvalidArgument, errors.New("identifier must not be empty"))
 	}
 
 	if !AllowedIdentifierPattern.MatchString(s) {
-		return fmt.Errorf("identifier %q must match pattern %q: %w", s, AllowedIdentfierChars, errdefs.ErrInvalidArgument)
+		return errors.Join(errs.ErrInvalidArgument, fmt.Errorf("identifier %q must match pattern %q", s, AllowedIdentfierChars))
 	}
 
 	if err := validatePlatformSpecific(s); err != nil {

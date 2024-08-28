@@ -23,26 +23,25 @@ import (
 	"net"
 	"path/filepath"
 
+	gocni "github.com/containerd/go-cni"
 	b4nnapi "github.com/rootless-containers/bypass4netns/pkg/api"
 	"github.com/rootless-containers/bypass4netns/pkg/api/daemon/client"
 	rlkclient "github.com/rootless-containers/rootlesskit/v2/pkg/api/client"
 
-	"github.com/containerd/errdefs"
-	gocni "github.com/containerd/go-cni"
-
-	"github.com/containerd/nerdctl/v2/pkg/annotations"
+	"github.com/farcloser/lepton/pkg/annotations"
+	"github.com/farcloser/lepton/pkg/errs"
 )
 
 func NewBypass4netnsCNIBypassManager(client client.Client, rlkClient rlkclient.Client, annotationsMap map[string]string) (*Bypass4netnsCNIBypassManager, error) {
 	if client == nil || rlkClient == nil {
-		return nil, errdefs.ErrInvalidArgument
+		return nil, errs.ErrInvalidArgument
 	}
 	enabled, bindEnabled, err := IsBypass4netnsEnabled(annotationsMap)
 	if err != nil {
 		return nil, err
 	}
 	if !enabled {
-		return nil, errdefs.ErrInvalidArgument
+		return nil, errs.ErrInvalidArgument
 	}
 	var ignoreSubnets []string
 	if v := annotationsMap[annotations.Bypass4netnsIgnoreSubnets]; v != "" {

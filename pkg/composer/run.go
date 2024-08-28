@@ -24,12 +24,11 @@ import (
 
 	"github.com/compose-spec/compose-go/v2/format"
 	"github.com/compose-spec/compose-go/v2/types"
+	"github.com/containerd/log"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/containerd/log"
-
-	"github.com/containerd/nerdctl/v2/pkg/composer/serviceparser"
-	"github.com/containerd/nerdctl/v2/pkg/idgen"
+	"github.com/farcloser/lepton/pkg/composer/serviceparser"
+	"github.com/farcloser/lepton/pkg/idgen"
 )
 
 type RunOptions struct {

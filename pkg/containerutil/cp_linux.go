@@ -28,15 +28,14 @@ import (
 	"strconv"
 	"strings"
 
-	securejoin "github.com/cyphar/filepath-securejoin"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/mount"
 	"github.com/containerd/errdefs"
 	"github.com/containerd/log"
+	securejoin "github.com/cyphar/filepath-securejoin"
 
-	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
-	"github.com/containerd/nerdctl/v2/pkg/tarutil"
+	"github.com/farcloser/lepton/pkg/rootlessutil"
+	"github.com/farcloser/lepton/pkg/tarutil"
 )
 
 // CopyFiles implements `nerdctl cp`.

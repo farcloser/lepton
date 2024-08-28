@@ -22,11 +22,10 @@ import (
 	"os"
 
 	"github.com/compose-spec/compose-go/v2/types"
-
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/composer/serviceparser"
-	"github.com/containerd/nerdctl/v2/pkg/reflectutil"
+	"github.com/farcloser/lepton/pkg/composer/serviceparser"
+	"github.com/farcloser/lepton/pkg/reflectutil"
 )
 
 type UpOptions struct {
@@ -36,7 +35,6 @@ type UpOptions struct {
 	NoColor              bool
 	NoLogPrefix          bool
 	ForceBuild           bool
-	IPFS                 bool
 	QuietPull            bool
 	RemoveOrphans        bool
 	Scale                map[string]int // map of service name to replicas

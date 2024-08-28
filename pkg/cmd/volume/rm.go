@@ -18,102 +18,53 @@ package volume
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 
 	containerd "github.com/containerd/containerd/v2/client"
-	"github.com/containerd/errdefs"
-	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
-	"github.com/containerd/nerdctl/v2/pkg/labels"
-	"github.com/containerd/nerdctl/v2/pkg/mountutil"
+	"github.com/farcloser/lepton/pkg/api/types"
+	"github.com/farcloser/lepton/pkg/clientutil"
+	"github.com/farcloser/lepton/pkg/errs"
+	"github.com/farcloser/lepton/pkg/mountutil/volumestore"
 )
 
-func Remove(ctx context.Context, client *containerd.Client, volumes []string, options types.VolumeRemoveOptions) error {
-	// Get the volume store and lock it until we are done.
-	// This will prevent racing new containers from being created or removed until we are done with the cleanup of volumes
-	volStore, err := Store(options.GOptions.Namespace, options.GOptions.DataRoot, options.GOptions.Address)
+func Remove(ctx context.Context, client *containerd.Client, volumes []string, options *types.VolumeRemoveOptions) (removed []string, cannotRemove []string, errList []error, err error) {
+	dataStore, err := clientutil.DataStore(options.GOptions.DataRoot, options.GOptions.Address)
 	if err != nil {
-		return err
-	}
-	err = volStore.Lock()
-	if err != nil {
-		return err
-	}
-	defer volStore.Unlock()
-
-	// Get containers and see which volumes are used
-	containers, err := client.Containers(ctx)
-	if err != nil {
-		return err
+		return nil, volumes, nil, err
 	}
 
-	usedVolumesList, err := usedVolumes(ctx, containers)
+	volStore, err := volumestore.New(dataStore, options.GOptions.Namespace)
 	if err != nil {
-		return err
+		return nil, volumes, nil, err
 	}
 
-	volumeNames := []string{}
-	cannotRemove := []error{}
-
-	for _, name := range volumes {
-		if _, ok := usedVolumesList[name]; ok {
-			cannotRemove = append(cannotRemove, fmt.Errorf("volume %q is in use (%w)", name, errdefs.ErrFailedPrecondition))
-			continue
-		}
-		volumeNames = append(volumeNames, name)
-	}
-	// if err is set, this is a hard filesystem error
-	removedNames, warns, err := volStore.Remove(volumeNames)
-	if err != nil {
-		return err
-	}
-	cannotRemove = append(cannotRemove, warns...)
-	// Otherwise, output on stdout whatever was successful
-	for _, name := range removedNames {
-		fmt.Fprintln(options.Stdout, name)
-	}
-	// Log the rest
-	for _, volErr := range cannotRemove {
-		log.G(ctx).Warn(volErr)
-	}
-	if len(cannotRemove) > 0 {
-		return errors.New("some volumes could not be removed")
-	}
-	return nil
-}
-
-func usedVolumes(ctx context.Context, containers []containerd.Container) (map[string]struct{}, error) {
-	usedVolumesList := make(map[string]struct{})
-	for _, c := range containers {
-		l, err := c.Labels(ctx)
+	removed, notRemoved, warns, err := volStore.Remove(func() ([]string, error) {
+		containers, err := client.Containers(ctx)
 		if err != nil {
-			// Containerd note: there is no guarantee that the containers we got from the list still exist at this point
-			// If that is the case, just ignore and move on
-			if errors.Is(err, errdefs.ErrNotFound) {
-				log.G(ctx).Debugf("container %q is gone - ignoring", c.ID())
+			return nil, err
+		}
+
+		usedVolumesList, err := usedVolumes(ctx, containers)
+		if err != nil {
+			return nil, err
+		}
+
+		toRemove := []string{}
+		for _, name := range volumes {
+			if cid, ok := usedVolumesList[name]; ok {
+				cannotRemove = append(cannotRemove, name)
+				errList = append(errList, errors.Join(errs.ErrFailedPrecondition, fmt.Errorf("volume %q is in use by container %q", name, cid)))
 				continue
 			}
-			return nil, err
-		}
-		mountsJSON, ok := l[labels.Mounts]
-		if !ok {
-			continue
+			toRemove = append(toRemove, name)
 		}
 
-		var mounts []dockercompat.MountPoint
-		err = json.Unmarshal([]byte(mountsJSON), &mounts)
-		if err != nil {
-			return nil, err
-		}
-		for _, m := range mounts {
-			if m.Type == mountutil.Volume {
-				usedVolumesList[m.Name] = struct{}{}
-			}
-		}
-	}
-	return usedVolumesList, nil
+		return toRemove, nil
+	})
+
+	cannotRemove = append(cannotRemove, notRemoved...)
+
+	return removed, cannotRemove, append(errList, warns...), err
 }

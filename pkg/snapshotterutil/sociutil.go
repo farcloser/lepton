@@ -25,7 +25,7 @@ import (
 
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/farcloser/lepton/pkg/api/types"
 )
 
 // CreateSoci creates a SOCI index(`rawRef`)
@@ -120,10 +120,6 @@ func PushSoci(rawRef string, gOpts types.GlobalCommandOptions, allPlatform bool,
 		for _, p := range platforms {
 			sociCmd.Args = append(sociCmd.Args, "--platform", p)
 		}
-	}
-	if gOpts.InsecureRegistry {
-		sociCmd.Args = append(sociCmd.Args, "--skip-verify")
-		sociCmd.Args = append(sociCmd.Args, "--plain-http")
 	}
 	if len(gOpts.HostsDir) > 0 {
 		sociCmd.Args = append(sociCmd.Args, "--hosts-dir")

@@ -25,7 +25,7 @@ import (
 
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/imgutil"
+	"github.com/farcloser/lepton/pkg/imgutil"
 )
 
 // SignNotation signs an image(`rawRef`) using a notation key name (`keyNameRef`)

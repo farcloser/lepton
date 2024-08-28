@@ -35,18 +35,17 @@ import (
 	"strings"
 	"time"
 
-	"github.com/docker/go-connections/nat"
-	"github.com/opencontainers/runtime-spec/specs-go"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/runtime/restart"
 	"github.com/containerd/go-cni"
 	"github.com/containerd/log"
+	"github.com/docker/go-connections/nat"
+	"github.com/opencontainers/runtime-spec/specs-go"
 
-	"github.com/containerd/nerdctl/v2/pkg/imgutil"
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/native"
-	"github.com/containerd/nerdctl/v2/pkg/labels"
-	"github.com/containerd/nerdctl/v2/pkg/ocihook/state"
+	"github.com/farcloser/lepton/pkg/imgutil"
+	"github.com/farcloser/lepton/pkg/inspecttypes/native"
+	"github.com/farcloser/lepton/pkg/labels"
+	"github.com/farcloser/lepton/pkg/ocihook/state"
 )
 
 // From https://github.com/moby/moby/blob/v26.1.2/api/types/types.go#L34-L140
@@ -259,16 +258,16 @@ func ContainerFromNative(n *native.Container) (*Container, error) {
 		}
 		hostname = sp.Hostname
 	}
-	if nerdctlStateDir := n.Labels[labels.StateDir]; nerdctlStateDir != "" {
-		resolvConfPath := filepath.Join(nerdctlStateDir, "resolv.conf")
+	if stateDir := n.Labels[labels.StateDir]; stateDir != "" {
+		resolvConfPath := filepath.Join(stateDir, "resolv.conf")
 		if _, err := os.Stat(resolvConfPath); err == nil {
 			c.ResolvConfPath = resolvConfPath
 		}
-		hostnamePath := filepath.Join(nerdctlStateDir, "hostname")
+		hostnamePath := filepath.Join(stateDir, "hostname")
 		if _, err := os.Stat(hostnamePath); err == nil {
 			c.HostnamePath = hostnamePath
 		}
-		c.LogPath = filepath.Join(nerdctlStateDir, n.ID+"-json.log")
+		c.LogPath = filepath.Join(stateDir, n.ID+"-json.log")
 		if _, err := os.Stat(c.LogPath); err != nil {
 			c.LogPath = ""
 		}

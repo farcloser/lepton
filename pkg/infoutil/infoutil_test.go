@@ -21,7 +21,7 @@ import (
 
 	"gotest.tools/v3/assert"
 
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
+	"github.com/farcloser/lepton/pkg/inspecttypes/dockercompat"
 )
 
 func TestParseBuildctlVersion(t *testing.T) {

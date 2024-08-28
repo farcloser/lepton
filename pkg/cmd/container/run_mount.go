@@ -28,11 +28,6 @@ import (
 	"strings"
 	"time"
 
-	securejoin "github.com/cyphar/filepath-securejoin"
-	"github.com/moby/sys/userns"
-	"github.com/opencontainers/image-spec/identity"
-	"github.com/opencontainers/runtime-spec/specs-go"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/containers"
 	"github.com/containerd/containerd/v2/core/leases"
@@ -41,15 +36,19 @@ import (
 	"github.com/containerd/continuity/fs"
 	"github.com/containerd/errdefs"
 	"github.com/containerd/log"
+	securejoin "github.com/cyphar/filepath-securejoin"
+	"github.com/moby/sys/userns"
+	"github.com/opencontainers/image-spec/identity"
+	"github.com/opencontainers/runtime-spec/specs-go"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/idgen"
-	"github.com/containerd/nerdctl/v2/pkg/imgutil"
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
-	"github.com/containerd/nerdctl/v2/pkg/labels"
-	"github.com/containerd/nerdctl/v2/pkg/mountutil"
-	"github.com/containerd/nerdctl/v2/pkg/mountutil/volumestore"
-	"github.com/containerd/nerdctl/v2/pkg/strutil"
+	"github.com/farcloser/lepton/pkg/api/types"
+	"github.com/farcloser/lepton/pkg/idgen"
+	"github.com/farcloser/lepton/pkg/imgutil"
+	"github.com/farcloser/lepton/pkg/inspecttypes/dockercompat"
+	"github.com/farcloser/lepton/pkg/labels"
+	"github.com/farcloser/lepton/pkg/mountutil"
+	"github.com/farcloser/lepton/pkg/mountutil/volumestore"
+	"github.com/farcloser/lepton/pkg/strutil"
 )
 
 // copy from https://github.com/containerd/containerd/blob/v1.6.0-rc.1/pkg/cri/opts/spec_linux.go#L129-L151
@@ -92,11 +91,11 @@ func withMounts(mounts []specs.Mount) oci.SpecOpts {
 }
 
 // parseMountFlags parses --volume, --mount and --tmpfs.
-func parseMountFlags(volStore volumestore.VolumeStore, options types.ContainerCreateOptions) ([]*mountutil.Processed, error) {
+func parseMountFlags(volumeStore volumestore.VolumeStore, options types.ContainerCreateOptions) ([]*mountutil.Processed, error) {
 	var parsed []*mountutil.Processed //nolint:prealloc
 	for _, v := range strutil.DedupeStrSlice(options.Volume) {
 		// createDir=true for -v option to allow creation of directory on host if not found.
-		x, err := mountutil.ProcessFlagV(v, volStore, true)
+		x, err := mountutil.ProcessFlagV(v, volumeStore, true)
 		if err != nil {
 			return nil, err
 		}
@@ -112,7 +111,7 @@ func parseMountFlags(volStore volumestore.VolumeStore, options types.ContainerCr
 	}
 
 	for _, v := range strutil.DedupeStrSlice(options.Mount) {
-		x, err := mountutil.ProcessFlagMount(v, volStore)
+		x, err := mountutil.ProcessFlagMount(v, volumeStore)
 		if err != nil {
 			return nil, err
 		}
@@ -125,7 +124,7 @@ func parseMountFlags(volStore volumestore.VolumeStore, options types.ContainerCr
 // generateMountOpts generates volume-related mount opts.
 // Other mounts such as procfs mount are not handled here.
 func generateMountOpts(ctx context.Context, client *containerd.Client, ensuredImage *imgutil.EnsuredImage,
-	volStore volumestore.VolumeStore, options types.ContainerCreateOptions) ([]oci.SpecOpts, []string, []*mountutil.Processed, error) {
+	volumeStore volumestore.VolumeStore, options types.ContainerCreateOptions) ([]oci.SpecOpts, []string, []*mountutil.Processed, error) {
 	//nolint:golint,prealloc
 	var (
 		opts        []oci.SpecOpts
@@ -214,7 +213,7 @@ func generateMountOpts(ctx context.Context, client *containerd.Client, ensuredIm
 		}
 	}
 
-	if parsed, err := parseMountFlags(volStore, options); err != nil {
+	if parsed, err := parseMountFlags(volumeStore, options); err != nil {
 		return nil, nil, nil, err
 	} else if len(parsed) > 0 {
 		ociMounts := make([]specs.Mount, len(parsed))
@@ -258,7 +257,7 @@ func generateMountOpts(ctx context.Context, client *containerd.Client, ensuredIm
 
 		log.G(ctx).Debugf("creating anonymous volume %q, for \"VOLUME %s\"",
 			anonVolName, imgVolRaw)
-		anonVol, err := volStore.Create(anonVolName, []string{})
+		anonVol, err := volumeStore.CreateWithoutLock(anonVolName, []string{})
 		if err != nil {
 			return nil, nil, nil, err
 		}

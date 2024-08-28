@@ -25,17 +25,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/docker/go-units"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/runtime/restart"
 	"github.com/containerd/containerd/v2/pkg/oci"
 	"github.com/containerd/errdefs"
 	"github.com/containerd/log"
+	"github.com/docker/go-units"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 
-	"github.com/containerd/nerdctl/v2/pkg/portutil"
+	"github.com/farcloser/lepton/pkg/portutil"
 )
 
 func ContainerStatus(ctx context.Context, c containerd.Container) string {

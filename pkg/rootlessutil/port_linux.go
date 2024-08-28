@@ -20,16 +20,16 @@ import (
 	"context"
 	"net"
 
+	gocni "github.com/containerd/go-cni"
 	"github.com/rootless-containers/rootlesskit/v2/pkg/api/client"
 	"github.com/rootless-containers/rootlesskit/v2/pkg/port"
 
-	"github.com/containerd/errdefs"
-	gocni "github.com/containerd/go-cni"
+	"github.com/farcloser/lepton/pkg/errs"
 )
 
 func NewRootlessCNIPortManager(client client.Client) (*RootlessCNIPortManager, error) {
 	if client == nil {
-		return nil, errdefs.ErrInvalidArgument
+		return nil, errs.ErrInvalidArgument
 	}
 	pm := &RootlessCNIPortManager{
 		Client: client,

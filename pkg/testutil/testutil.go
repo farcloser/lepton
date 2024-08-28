@@ -21,6 +21,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/farcloser/lepton/pkg/consts"
 	"io"
 	"os"
 	"os/exec"
@@ -32,19 +33,18 @@ import (
 	"time"
 
 	"github.com/Masterminds/semver/v3"
+	"github.com/containerd/containerd/v2/defaults"
 	"github.com/opencontainers/go-digest"
 	"gotest.tools/v3/assert"
 	"gotest.tools/v3/icmd"
 
-	"github.com/containerd/containerd/v2/defaults"
-
-	"github.com/containerd/nerdctl/v2/pkg/buildkitutil"
-	"github.com/containerd/nerdctl/v2/pkg/imgutil"
-	"github.com/containerd/nerdctl/v2/pkg/infoutil"
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/native"
-	"github.com/containerd/nerdctl/v2/pkg/platformutil"
-	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
+	"github.com/farcloser/lepton/pkg/buildkitutil"
+	"github.com/farcloser/lepton/pkg/imgutil"
+	"github.com/farcloser/lepton/pkg/infoutil"
+	"github.com/farcloser/lepton/pkg/inspecttypes/dockercompat"
+	"github.com/farcloser/lepton/pkg/inspecttypes/native"
+	"github.com/farcloser/lepton/pkg/platformutil"
+	"github.com/farcloser/lepton/pkg/rootlessutil"
 )
 
 type Base struct {
@@ -77,7 +77,7 @@ func (b *Base) Cmd(args ...string) *Cmd {
 	return cmd
 }
 
-// ComposeCmd executes `nerdctl -n nerdctl-test compose` or `docker-compose`
+// ComposeCmd executes `lepton --namespace Namespace compose` or `docker-compose`
 func (b *Base) ComposeCmd(args ...string) *Cmd {
 	binary := b.Binary
 	binaryArgs := append(b.Args, append([]string{"compose"}, args...)...)
@@ -535,7 +535,7 @@ func (c *Cmd) OutLines() []string {
 type Target = string
 
 const (
-	Nerdctl = Target("nerdctl")
+	Nerdctl = Target(consts.BinaryName)
 	Docker  = Target("docker")
 )
 
@@ -688,7 +688,7 @@ func RequireExecutable(t testing.TB, name string) {
 	}
 }
 
-const Namespace = "nerdctl-test"
+const Namespace = "lepton-test"
 
 func NewBaseWithNamespace(t *testing.T, ns string) *Base {
 	if ns == "" || ns == "default" || ns == Namespace {
@@ -737,7 +737,7 @@ func newBase(t *testing.T, ns string, ipv6Compatible bool, kubernetesCompatible 
 	var err error
 	switch base.Target {
 	case Nerdctl:
-		base.Binary, err = exec.LookPath("nerdctl")
+		base.Binary, err = exec.LookPath(consts.BinaryName)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -762,9 +762,9 @@ func Identifier(t testing.TB) string {
 	s = strings.ReplaceAll(s, " ", "_")
 	s = strings.ReplaceAll(s, "/", "-")
 	s = strings.ToLower(s)
-	s = "nerdctl-" + s
+	s = consts.BinaryName + "-" + s
 	if len(s) > 76 {
-		s = "nerdctl-" + digest.SHA256.FromString(t.Name()).Encoded()
+		s = consts.BinaryName + "-" + digest.SHA256.FromString(t.Name()).Encoded()
 	}
 	return s
 }

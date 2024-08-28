@@ -20,7 +20,7 @@ import (
 	"github.com/containerd/containerd/v2/contrib/apparmor"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/defaults"
+	"github.com/farcloser/lepton/pkg/defaults"
 )
 
 func Load() error {

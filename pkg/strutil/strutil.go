@@ -36,7 +36,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/containerd/errdefs"
+	"github.com/farcloser/lepton/pkg/errs"
 )
 
 // ConvertKVStringsToMap is from https://github.com/moby/moby/blob/v20.10.0-rc2/runconfig/opts/parse.go
@@ -104,7 +104,7 @@ func ParseCSVMap(s string) (map[string]string, error) {
 		return nil, fmt.Errorf("cannot parse %q: %w", s, err)
 	}
 	if len(ra) != 1 {
-		return nil, fmt.Errorf("expected a single line, got %d lines: %w", len(ra), errdefs.ErrInvalidArgument)
+		return nil, fmt.Errorf("expected a single line, got %d lines: %w", len(ra), errs.ErrInvalidArgument)
 	}
 	fields := ra[0]
 	m := make(map[string]string)

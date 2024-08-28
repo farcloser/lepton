@@ -17,6 +17,7 @@
 package defaults
 
 import (
+	"github.com/farcloser/lepton/pkg/consts"
 	"os"
 	"path/filepath"
 )
@@ -28,7 +29,7 @@ const (
 )
 
 func DataRoot() string {
-	return filepath.Join(os.Getenv("ProgramData"), "nerdctl")
+	return filepath.Join(os.Getenv("ProgramData"), consts.BinaryName)
 }
 
 func CNIPath() string {
@@ -60,7 +61,7 @@ func NerdctlTOML() string {
 	if err != nil {
 		panic(err)
 	}
-	return filepath.Join(ucd, "nerdctl\\nerdctl.toml")
+	return filepath.Join(ucd, consts.BinaryName, consts.ConfigFileName)
 }
 
 func HostsDirs() []string {

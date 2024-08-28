@@ -21,7 +21,7 @@ import (
 
 	containerd "github.com/containerd/containerd/v2/client"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/farcloser/lepton/pkg/api/types"
 )
 
 func Create(ctx context.Context, client *containerd.Client, namespace string, options types.NamespaceCreateOptions) error {

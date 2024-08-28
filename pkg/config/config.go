@@ -20,43 +20,39 @@ import (
 	"github.com/containerd/containerd/v2/defaults"
 	"github.com/containerd/containerd/v2/pkg/namespaces"
 
-	ncdefaults "github.com/containerd/nerdctl/v2/pkg/defaults"
+	ncdefaults "github.com/farcloser/lepton/pkg/defaults"
 )
 
-// Config corresponds to nerdctl.toml .
+// Config is stored in consts.ConfigFileName .
 // See docs/config.md .
 type Config struct {
-	Debug            bool     `toml:"debug"`
-	DebugFull        bool     `toml:"debug_full"`
-	Address          string   `toml:"address"`
-	Namespace        string   `toml:"namespace"`
-	Snapshotter      string   `toml:"snapshotter"`
-	CNIPath          string   `toml:"cni_path"`
-	CNINetConfPath   string   `toml:"cni_netconfpath"`
-	DataRoot         string   `toml:"data_root"`
-	CgroupManager    string   `toml:"cgroup_manager"`
-	InsecureRegistry bool     `toml:"insecure_registry"`
-	HostsDir         []string `toml:"hosts_dir"`
-	Experimental     bool     `toml:"experimental"`
-	HostGatewayIP    string   `toml:"host_gateway_ip"`
+	Debug          bool     `toml:"debug"`
+	Address        string   `toml:"address"`
+	Namespace      string   `toml:"namespace"`
+	Snapshotter    string   `toml:"snapshotter"`
+	CNIPath        string   `toml:"cni_path"`
+	CNINetConfPath string   `toml:"cni_netconfpath"`
+	DataRoot       string   `toml:"data_root"`
+	CgroupManager  string   `toml:"cgroup_manager"`
+	HostsDir       []string `toml:"hosts_dir"`
+	Experimental   bool     `toml:"experimental"`
+	HostGatewayIP  string   `toml:"host_gateway_ip"`
 }
 
 // New creates a default Config object statically,
 // without interpolating CLI flags, env vars, and toml.
 func New() *Config {
 	return &Config{
-		Debug:            false,
-		DebugFull:        false,
-		Address:          defaults.DefaultAddress,
-		Namespace:        namespaces.Default,
-		Snapshotter:      defaults.DefaultSnapshotter,
-		CNIPath:          ncdefaults.CNIPath(),
-		CNINetConfPath:   ncdefaults.CNINetConfPath(),
-		DataRoot:         ncdefaults.DataRoot(),
-		CgroupManager:    ncdefaults.CgroupManager(),
-		InsecureRegistry: false,
-		HostsDir:         ncdefaults.HostsDirs(),
-		Experimental:     true,
-		HostGatewayIP:    ncdefaults.HostGatewayIP(),
+		Debug:          false,
+		Address:        defaults.DefaultAddress,
+		Namespace:      namespaces.Default,
+		Snapshotter:    defaults.DefaultSnapshotter,
+		CNIPath:        ncdefaults.CNIPath(),
+		CNINetConfPath: ncdefaults.CNINetConfPath(),
+		DataRoot:       ncdefaults.DataRoot(),
+		CgroupManager:  ncdefaults.CgroupManager(),
+		HostsDir:       ncdefaults.HostsDirs(),
+		Experimental:   true,
+		HostGatewayIP:  ncdefaults.HostGatewayIP(),
 	}
 }

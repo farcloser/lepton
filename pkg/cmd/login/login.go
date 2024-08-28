@@ -27,20 +27,18 @@ import (
 	"os"
 	"strings"
 
+	"github.com/containerd/containerd/v2/core/remotes/docker"
+	"github.com/containerd/containerd/v2/core/remotes/docker/config"
+	"github.com/containerd/errdefs"
+	"github.com/containerd/log"
 	dockercliconfig "github.com/docker/cli/cli/config"
 	dockercliconfigtypes "github.com/docker/cli/cli/config/types"
 	"github.com/docker/docker/api/types/registry"
 	"golang.org/x/net/context/ctxhttp"
 	"golang.org/x/term"
 
-	"github.com/containerd/containerd/v2/core/remotes/docker"
-	"github.com/containerd/containerd/v2/core/remotes/docker/config"
-	"github.com/containerd/errdefs"
-	"github.com/containerd/log"
-
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/errutil"
-	"github.com/containerd/nerdctl/v2/pkg/imgutil/dockerconfigresolver"
+	"github.com/farcloser/lepton/pkg/api/types"
+	"github.com/farcloser/lepton/pkg/imgutil/dockerconfigresolver"
 )
 
 const unencryptedPasswordWarning = `WARNING: Your password will be stored unencrypted in %s.
@@ -149,10 +147,6 @@ func loginClientSide(ctx context.Context, globalOptions types.GlobalCommandOptio
 		return "", err
 	}
 	var dOpts []dockerconfigresolver.Opt
-	if globalOptions.InsecureRegistry {
-		log.G(ctx).Warnf("skipping verifying HTTPS certs for %q", host)
-		dOpts = append(dOpts, dockerconfigresolver.WithSkipVerifyCerts(true))
-	}
 	dOpts = append(dOpts, dockerconfigresolver.WithHostsDirs(globalOptions.HostsDir))
 
 	authCreds := func(acArg string) (string, string, error) {
@@ -188,10 +182,6 @@ func loginClientSide(ctx context.Context, globalOptions types.GlobalCommandOptio
 	}
 	for i, rh := range regHosts {
 		err = tryLoginWithRegHost(ctx, rh)
-		if err != nil && globalOptions.InsecureRegistry && (errors.Is(err, http.ErrSchemeMismatch) || errutil.IsErrConnectionRefused(err)) {
-			rh.Scheme = "http"
-			err = tryLoginWithRegHost(ctx, rh)
-		}
 		identityToken := fetchedRefreshTokens[rh.Host] // can be empty
 		if err == nil {
 			return identityToken, nil

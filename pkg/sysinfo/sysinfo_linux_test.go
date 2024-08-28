@@ -32,7 +32,7 @@ import (
 	"golang.org/x/sys/unix"
 	"gotest.tools/v3/assert"
 
-	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
+	"github.com/farcloser/lepton/pkg/rootlessutil"
 )
 
 func TestReadProcBool(t *testing.T) {

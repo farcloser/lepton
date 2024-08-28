@@ -20,25 +20,21 @@ import (
 	"context"
 	"errors"
 	"io"
-	"os"
-	"path/filepath"
-
-	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/errdefs"
 	"github.com/containerd/platforms"
+	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/cmd/volume"
-	"github.com/containerd/nerdctl/v2/pkg/composer"
-	"github.com/containerd/nerdctl/v2/pkg/composer/serviceparser"
-	"github.com/containerd/nerdctl/v2/pkg/imgutil"
-	"github.com/containerd/nerdctl/v2/pkg/ipfs"
-	"github.com/containerd/nerdctl/v2/pkg/netutil"
-	"github.com/containerd/nerdctl/v2/pkg/referenceutil"
-	"github.com/containerd/nerdctl/v2/pkg/signutil"
-	"github.com/containerd/nerdctl/v2/pkg/strutil"
+	"github.com/farcloser/lepton/pkg/api/types"
+	"github.com/farcloser/lepton/pkg/cmd/volume"
+	"github.com/farcloser/lepton/pkg/composer"
+	"github.com/farcloser/lepton/pkg/composer/serviceparser"
+	"github.com/farcloser/lepton/pkg/imgutil"
+	"github.com/farcloser/lepton/pkg/netutil"
+	"github.com/farcloser/lepton/pkg/referenceutil"
+	"github.com/farcloser/lepton/pkg/signutil"
+	"github.com/farcloser/lepton/pkg/strutil"
 )
 
 // New returns a new *composer.Composer.
@@ -73,12 +69,12 @@ func New(client *containerd.Client, globalOptions types.GlobalCommandOptions, op
 		return false, nil
 	}
 
-	volStore, err := volume.Store(globalOptions.Namespace, globalOptions.DataRoot, globalOptions.Address)
+	volumeStore, err := volume.Store(globalOptions.Namespace, globalOptions.DataRoot, globalOptions.Address)
 	if err != nil {
 		return nil, err
 	}
 	options.VolumeExists = func(volName string) (bool, error) {
-		_, volGetErr := volStore.Get(volName, false)
+		_, volGetErr := volumeStore.Get(volName, false)
 		if volGetErr == nil {
 			return true, nil
 		} else if errors.Is(volGetErr, errdefs.ErrNotFound) {
@@ -121,24 +117,6 @@ func New(client *containerd.Client, globalOptions types.GlobalCommandOptions, op
 			RFlags:          types.RemoteSnapshotterFlags{},
 			Stdout:          stdout,
 			Stderr:          stderr,
-		}
-
-		// IPFS reference
-		if scheme, ref, err := referenceutil.ParseIPFSRefWithScheme(imageName); err == nil {
-			var ipfsPath string
-			if ipfsAddress := options.IPFSAddress; ipfsAddress != "" {
-				dir, err := os.MkdirTemp("", "apidirtmp")
-				if err != nil {
-					return err
-				}
-				defer os.RemoveAll(dir)
-				if err := os.WriteFile(filepath.Join(dir, "api"), []byte(ipfsAddress), 0600); err != nil {
-					return err
-				}
-				ipfsPath = dir
-			}
-			_, err = ipfs.EnsureImage(ctx, client, scheme, ref, ipfsPath, imgPullOpts)
-			return err
 		}
 
 		imageVerifyOptions := imageVerifyOptionsFromCompose(ps)

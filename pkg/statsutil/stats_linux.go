@@ -19,10 +19,9 @@ package statsutil
 import (
 	"time"
 
-	"github.com/vishvananda/netlink"
-
 	v1 "github.com/containerd/cgroups/v3/cgroup1/stats"
 	v2 "github.com/containerd/cgroups/v3/cgroup2/stats"
+	"github.com/vishvananda/netlink"
 )
 
 func SetCgroupStatsFields(previousStats *ContainerStats, data *v1.Metrics, links []netlink.Link) (StatsEntry, error) {

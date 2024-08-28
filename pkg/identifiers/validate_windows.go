@@ -19,8 +19,6 @@ package identifiers
 import (
 	"fmt"
 	"regexp"
-
-	"github.com/containerd/errdefs"
 )
 
 // See https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file
@@ -30,7 +28,7 @@ var windowsDisallowed = regexp.MustCompile(`^(con|prn|nul|aux|com[1-9¹²³]|lpt
 
 func validatePlatformSpecific(identifier string) error {
 	if windowsDisallowed.MatchString(identifier) {
-		return fmt.Errorf("identifier %q must not match reserved windows pattern %q: %w", identifier, windowsDisallowed, errdefs.ErrInvalidArgument)
+		return fmt.Errorf("identifier %q must not match reserved windows pattern %q: %w", identifier, windowsDisallowed, errs.ErrInvalidArgument)
 	}
 
 	if identifier[len(identifier)-1:] == "." {

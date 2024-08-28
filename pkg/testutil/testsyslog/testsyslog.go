@@ -26,8 +26,8 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
-	"github.com/containerd/nerdctl/v2/pkg/testutil/testca"
+	"github.com/farcloser/lepton/pkg/rootlessutil"
+	"github.com/farcloser/lepton/pkg/testutil/testca"
 )
 
 func StartServer(n, la string, done chan<- string, certs ...*testca.Cert) (addr string, sock io.Closer) {

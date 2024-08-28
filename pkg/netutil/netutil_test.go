@@ -28,9 +28,9 @@ import (
 
 	"gotest.tools/v3/assert"
 
-	ncdefaults "github.com/containerd/nerdctl/v2/pkg/defaults"
-	"github.com/containerd/nerdctl/v2/pkg/labels"
-	"github.com/containerd/nerdctl/v2/pkg/testutil"
+	ncdefaults "github.com/farcloser/lepton/pkg/defaults"
+	"github.com/farcloser/lepton/pkg/labels"
+	"github.com/farcloser/lepton/pkg/testutil"
 )
 
 const preExistingNetworkConfigTemplate = `

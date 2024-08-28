@@ -26,15 +26,14 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/docker/go-units"
-	"github.com/opencontainers/runtime-spec/specs-go"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/containers"
 	"github.com/containerd/containerd/v2/pkg/oci"
+	"github.com/docker/go-units"
+	"github.com/opencontainers/runtime-spec/specs-go"
 
-	"github.com/containerd/nerdctl/v2/pkg/idutil/containerwalker"
-	"github.com/containerd/nerdctl/v2/pkg/labels"
+	"github.com/farcloser/lepton/pkg/idutil/containerwalker"
+	"github.com/farcloser/lepton/pkg/labels"
 )
 
 type IPCMode string

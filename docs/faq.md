@@ -99,7 +99,7 @@ nerdctl also supports credential helper binaries such as `docker-credential-ecr-
 
 ### How to use a non-HTTPS registry?
 
-Use `nerdctl --insecure-registry run <IMAGE>`. See also [`registry.md`](./registry.md).
+See [`registry.md`](./registry.md).
 
 ### How to specify the CA certificate of the registry?
 

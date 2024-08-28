@@ -28,22 +28,21 @@ import (
 	"strings"
 	"time"
 
+	gocni "github.com/containerd/go-cni"
+	"github.com/containerd/log"
 	types100 "github.com/containernetworking/cni/pkg/types/100"
 	"github.com/opencontainers/runtime-spec/specs-go"
 	b4nndclient "github.com/rootless-containers/bypass4netns/pkg/api/daemon/client"
 	rlkclient "github.com/rootless-containers/rootlesskit/v2/pkg/api/client"
 
-	gocni "github.com/containerd/go-cni"
-	"github.com/containerd/log"
-
-	"github.com/containerd/nerdctl/v2/pkg/bypass4netnsutil"
-	"github.com/containerd/nerdctl/v2/pkg/dnsutil/hostsstore"
-	"github.com/containerd/nerdctl/v2/pkg/labels"
-	"github.com/containerd/nerdctl/v2/pkg/namestore"
-	"github.com/containerd/nerdctl/v2/pkg/netutil"
-	"github.com/containerd/nerdctl/v2/pkg/netutil/nettype"
-	"github.com/containerd/nerdctl/v2/pkg/ocihook/state"
-	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
+	"github.com/farcloser/lepton/pkg/bypass4netnsutil"
+	"github.com/farcloser/lepton/pkg/dnsutil/hostsstore"
+	"github.com/farcloser/lepton/pkg/labels"
+	"github.com/farcloser/lepton/pkg/namestore"
+	"github.com/farcloser/lepton/pkg/netutil"
+	"github.com/farcloser/lepton/pkg/netutil/nettype"
+	"github.com/farcloser/lepton/pkg/ocihook/state"
+	"github.com/farcloser/lepton/pkg/rootlessutil"
 )
 
 const (
@@ -408,7 +407,7 @@ func applyNetworkSettings(opts *handlerOpts) error {
 		return err
 	}
 	ctx := context.Background()
-	hs, err := hostsstore.NewStore(opts.dataStore)
+	hs, err := hostsstore.New(opts.dataStore, opts.state.Annotations[labels.Namespace])
 	if err != nil {
 		return err
 	}
@@ -436,7 +435,6 @@ func applyNetworkSettings(opts *handlerOpts) error {
 		gocni.WithArgs("NERDCTL_CNI_DHCP_HOSTNAME", opts.state.Annotations[labels.Hostname]),
 	)
 	hsMeta := hostsstore.Meta{
-		Namespace:  opts.state.Annotations[labels.Namespace],
 		ID:         opts.state.ID,
 		Networks:   make(map[string]*types100.Result, len(opts.cniNames)),
 		Hostname:   opts.state.Annotations[labels.Hostname],
@@ -586,11 +584,11 @@ func onPostStop(opts *handlerOpts) error {
 			log.L.WithError(err).Errorf("failed to call cni.Remove")
 			return err
 		}
-		hs, err := hostsstore.NewStore(opts.dataStore)
+		hs, err := hostsstore.New(opts.dataStore, ns)
 		if err != nil {
 			return err
 		}
-		if err := hs.Release(ns, opts.state.ID); err != nil {
+		if err := hs.Release(opts.state.ID); err != nil {
 			return err
 		}
 	}

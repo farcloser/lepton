@@ -17,20 +17,20 @@
 package dockercompat
 
 import (
+	"github.com/farcloser/lepton/pkg/consts"
 	"net"
 	"os"
 	"path/filepath"
 	"runtime"
 	"testing"
 
+	containerd "github.com/containerd/containerd/v2/client"
+	"github.com/containerd/containerd/v2/core/containers"
 	"github.com/docker/go-connections/nat"
 	"github.com/opencontainers/runtime-spec/specs-go"
 	"gotest.tools/v3/assert"
 
-	containerd "github.com/containerd/containerd/v2/client"
-	"github.com/containerd/containerd/v2/core/containers"
-
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/native"
+	"github.com/farcloser/lepton/pkg/inspecttypes/native"
 )
 
 func TestContainerFromNative(t *testing.T) {
@@ -52,9 +52,9 @@ func TestContainerFromNative(t *testing.T) {
 			n: &native.Container{
 				Container: containers.Container{
 					Labels: map[string]string{
-						"nerdctl/mounts":    "[{\"Type\":\"bind\",\"Source\":\"/mnt/foo\",\"Destination\":\"/mnt/foo\",\"Mode\":\"rshared,rw\",\"RW\":true,\"Propagation\":\"rshared\"}]",
-						"nerdctl/state-dir": tempStateDir,
-						"nerdctl/hostname":  "host1",
+						consts.BinaryName + "/mounts":    "[{\"Type\":\"bind\",\"Source\":\"/mnt/foo\",\"Destination\":\"/mnt/foo\",\"Mode\":\"rshared,rw\",\"RW\":true,\"Propagation\":\"rshared\"}]",
+						consts.BinaryName + "/state-dir": tempStateDir,
+						consts.BinaryName + "/hostname":  "host1",
 					},
 				},
 				Spec: &specs.Spec{},
@@ -87,9 +87,9 @@ func TestContainerFromNative(t *testing.T) {
 				},
 				Config: &Config{
 					Labels: map[string]string{
-						"nerdctl/mounts":    "[{\"Type\":\"bind\",\"Source\":\"/mnt/foo\",\"Destination\":\"/mnt/foo\",\"Mode\":\"rshared,rw\",\"RW\":true,\"Propagation\":\"rshared\"}]",
-						"nerdctl/state-dir": tempStateDir,
-						"nerdctl/hostname":  "host1",
+						consts.BinaryName + "/mounts":    "[{\"Type\":\"bind\",\"Source\":\"/mnt/foo\",\"Destination\":\"/mnt/foo\",\"Mode\":\"rshared,rw\",\"RW\":true,\"Propagation\":\"rshared\"}]",
+						consts.BinaryName + "/state-dir": tempStateDir,
+						consts.BinaryName + "/hostname":  "host1",
 					},
 					Hostname: "host1",
 				},
@@ -298,7 +298,7 @@ func TestNetworkSettingsFromNative(t *testing.T) {
 			},
 			s: &specs.Spec{
 				Annotations: map[string]string{
-					"nerdctl/ports": "[{\"HostPort\":8075,\"ContainerPort\":77,\"Protocol\":\"tcp\",\"HostIP\":\"127.0.0.1\"}]",
+					consts.BinaryName + "/ports": "[{\"HostPort\":8075,\"ContainerPort\":77,\"Protocol\":\"tcp\",\"HostIP\":\"127.0.0.1\"}]",
 				},
 			},
 			expected: &NetworkSettings{

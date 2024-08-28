@@ -24,21 +24,20 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/containerd/containerd/api/services/introspection/v1"
+	containerd "github.com/containerd/containerd/v2/client"
+	"github.com/containerd/log"
 	"github.com/docker/go-units"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 
-	"github.com/containerd/containerd/api/services/introspection/v1"
-	containerd "github.com/containerd/containerd/v2/client"
-	"github.com/containerd/log"
-
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/formatter"
-	"github.com/containerd/nerdctl/v2/pkg/infoutil"
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/native"
-	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
-	"github.com/containerd/nerdctl/v2/pkg/strutil"
+	"github.com/farcloser/lepton/pkg/api/types"
+	"github.com/farcloser/lepton/pkg/formatter"
+	"github.com/farcloser/lepton/pkg/infoutil"
+	"github.com/farcloser/lepton/pkg/inspecttypes/dockercompat"
+	"github.com/farcloser/lepton/pkg/inspecttypes/native"
+	"github.com/farcloser/lepton/pkg/rootlessutil"
+	"github.com/farcloser/lepton/pkg/strutil"
 )
 
 func Info(ctx context.Context, client *containerd.Client, options types.SystemInfoOptions) error {

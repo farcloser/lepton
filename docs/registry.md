@@ -4,15 +4,6 @@ nerdctl uses `${DOCKER_CONFIG}/config.json` for the authentication with image re
 
 `$DOCKER_CONFIG` defaults to `$HOME/.docker`.
 
-## Using insecure registry
-
-If you face `http: server gave HTTP response to HTTPS client` and you cannot configure TLS for the registry, try `--insecure-registry` flag:
-
-e.g.,
-```console
-$ nerdctl --insecure-registry run --rm 192.168.12.34:5000/foo
-```
-
 ## Specifying certificates
 
 

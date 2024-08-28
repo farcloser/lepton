@@ -22,7 +22,6 @@ import (
 	"os/exec"
 
 	"github.com/Microsoft/go-winio"
-
 	"github.com/containerd/containerd/v2/pkg/cio"
 	"github.com/containerd/log"
 )
