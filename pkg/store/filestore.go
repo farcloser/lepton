@@ -237,37 +237,6 @@ func (vs *fileStore) List(key ...string) ([]string, error) {
 	return entries, nil
 }
 
-/*
-func (vs *fileStore) GroupRename(oldKey []string, newKey []string) error {
-	if vs.locked == nil {
-		return errors.Join(ErrFaultyImplementation, fmt.Errorf("operations on the store must use locking"))
-	}
-
-	if err := validateAllPathComponents(oldKey...); err != nil {
-		return err
-	}
-
-	if err := validateAllPathComponents(newKey...); err != nil {
-		return err
-	}
-
-	origin := filepath.Join(append([]string{vs.dir}, oldKey...)...)
-	destination := filepath.Join(append([]string{vs.dir}, newKey...)...)
-
-	err := os.MkdirAll(filepath.Dir(destination), vs.dirPerm)
-	if err != nil {
-		return errors.Join(ErrSystemFailure, err)
-	}
-
-	err = os.Rename(origin, destination)
-	if err != nil {
-		return errors.Join(ErrSystemFailure, err)
-	}
-
-	return nil
-}
-*/
-
 func (vs *fileStore) Delete(key ...string) error {
 	if vs.locked == nil {
 		return errors.Join(ErrFaultyImplementation, fmt.Errorf("operations on the store must use locking"))

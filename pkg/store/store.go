@@ -84,10 +84,6 @@ type Manager interface {
 	// It is necessary though when we are going to pass these filepath to containerd for eg.
 	Location(key ...string) (string, error)
 
-	// GroupRename will rename a group (eg: dir)
-	// NOTE: not used right now. Implementation is also commented out, provided here pending use case identification.
-	// GroupRename(oldKey []string, newKey []string) error
-
 	// GroupSize will return the combined size of all objects stored under the group (eg: dir)
 	GroupSize(key ...string) (int64, error)
 	// GroupEnsure ensures that a given group (eg: directory) exists
