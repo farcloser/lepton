@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strings"
 
 	"github.com/moby/sys/userns"
@@ -129,22 +128,21 @@ func ProcessFlagV(s string, volStore volumestore.VolumeStore, createDir bool) (*
 	}
 
 	fstype := DefaultMountType
-	if runtime.GOOS != "freebsd" {
-		found := false
-		for _, opt := range options {
-			switch opt {
-			case "rbind", "bind":
-				fstype = "bind"
-				found = true
-			}
-			if found {
-				break
-			}
+	found := false
+	for _, opt := range options {
+		switch opt {
+		case "rbind", "bind":
+			fstype = "bind"
+			found = true
 		}
-		if !found {
-			options = append(options, "rbind")
+		if found {
+			break
 		}
 	}
+	if !found {
+		options = append(options, "rbind")
+	}
+
 	res.Mount = specs.Mount{
 		Type:        fstype,
 		Source:      cleanMount(src),

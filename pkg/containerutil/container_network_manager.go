@@ -531,7 +531,6 @@ func (m *hostNetworkManager) ContainerNetworkingOpts(_ context.Context, containe
 		withDedupMounts("/etc/resolv.conf", withCustomResolvConf(resolvConfPath)),
 	}
 
-	// `/etc/hostname` does not exist on FreeBSD
 	if runtime.GOOS == "linux" && m.netOpts.UTSNamespace != UtsNamespaceHost {
 		hostname := m.netOpts.Hostname
 		if hostname == "" {

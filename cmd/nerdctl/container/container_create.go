@@ -36,9 +36,6 @@ func NewCreateCommand() *cobra.Command {
 	case "windows":
 		longHelp += "\n"
 		longHelp += "WARNING: `nerdctl create` is experimental on Windows and currently broken (https://github.com/containerd/nerdctl/issues/28)"
-	case "freebsd":
-		longHelp += "\n"
-		longHelp += "WARNING: `nerdctl create` is experimental on FreeBSD and currently requires `--net=none` (https://github.com/containerd/nerdctl/blob/main/docs/freebsd.md)"
 	}
 	var createCommand = &cobra.Command{
 		Use:               "create [flags] IMAGE [COMMAND] [ARG...]",
@@ -419,7 +416,7 @@ func createAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	if (createOpt.Platform == "windows" || createOpt.Platform == "freebsd") && !createOpt.GOptions.Experimental {
+	if createOpt.Platform == "windows" && !createOpt.GOptions.Experimental {
 		return fmt.Errorf("%s requires experimental mode to be enabled", createOpt.Platform)
 	}
 	client, ctx, cancel, err := clientutil.NewClientWithPlatform(cmd.Context(), createOpt.GOptions.Namespace, createOpt.GOptions.Address, createOpt.Platform)

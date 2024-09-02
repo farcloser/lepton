@@ -334,29 +334,3 @@ jobs:
       - name: "Run integration tests"
         # See https://github.com/containerd/nerdctl/blob/main/docs/testing.md#about-parallelization
         run: go test -p 1 -v ./cmd/nerdctl/...
-
-  test-integration-freebsd:
-    name: FreeBSD
-    # ubuntu-24.04 lacks the vagrant package
-    runs-on: ubuntu-22.04
-    timeout-minutes: 20
-
-    steps:
-      - uses: actions/checkout@v4.1.7
-      - uses: actions/cache@v4
-        with:
-          path: /root/.vagrant.d
-          key: vagrant-${{ matrix.box }}
-      - name: Set up vagrant
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libvirt-daemon libvirt-daemon-system vagrant vagrant-libvirt
-          sudo systemctl enable --now libvirtd
-      - name: Boot VM
-        run: |
-          ln -sf Vagrantfile.freebsd Vagrantfile
-          sudo vagrant up --no-tty
-      - name: test-unit
-        run: sudo vagrant up --provision-with=test-unit
-      - name: test-integration
-        run: sudo vagrant up --provision-with=test-integration

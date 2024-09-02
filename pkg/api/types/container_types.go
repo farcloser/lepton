@@ -85,7 +85,7 @@ type ContainerCreateOptions struct {
 	// #endregion
 
 	// #region for platform flags
-	// Platform set target platform for build (e.g., "amd64", "arm64", "windows", "freebsd")
+	// Platform set target platform for build (e.g., "amd64", "arm64", "windows")
 	Platform string
 	// #endregion
 

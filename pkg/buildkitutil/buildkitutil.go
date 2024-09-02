@@ -133,7 +133,7 @@ func PingBKDaemon(buildkitHost string) error {
 }
 
 func pingBKDaemon(buildkitHost string) (output string, _ error) {
-	supportedOses := []string{"linux", "freebsd", "windows"}
+	supportedOses := []string{"linux", "windows"}
 	if !slices.Contains(supportedOses, runtime.GOOS) {
 		return "", fmt.Errorf("only %s are supported", strings.Join(supportedOses, ", "))
 	}
