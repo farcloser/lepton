@@ -22,8 +22,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
-	"path/filepath"
 
 	"github.com/opencontainers/go-digest"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
@@ -45,9 +43,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/errutil"
 	"github.com/containerd/nerdctl/v2/pkg/imgutil/dockerconfigresolver"
 	"github.com/containerd/nerdctl/v2/pkg/imgutil/push"
-	"github.com/containerd/nerdctl/v2/pkg/ipfs"
 	"github.com/containerd/nerdctl/v2/pkg/platformutil"
-	"github.com/containerd/nerdctl/v2/pkg/referenceutil"
 	"github.com/containerd/nerdctl/v2/pkg/signutil"
 	"github.com/containerd/nerdctl/v2/pkg/snapshotterutil"
 )
@@ -55,50 +51,6 @@ import (
 // Push pushes an image specified by `rawRef`.
 func Push(ctx context.Context, client *containerd.Client, rawRef string, options types.ImagePushOptions) error {
 	parsedReference, err := referenceutil.Parse(rawRef)
-	if err != nil {
-		return err
-	}
-
-	if parsedReference.Protocol != "" {
-		if parsedReference.Protocol != referenceutil.IPFSProtocol {
-			return fmt.Errorf("ipfs scheme is only supported but got %q", parsedReference.Protocol)
-		}
-		log.G(ctx).Infof("pushing image %q to IPFS", parsedReference)
-
-		// Ensure all the layers are here: https://github.com/containerd/nerdctl/issues/3489
-		// XXX what if the image is a CID, or only otherwise available on ipfs?
-		err = EnsureAllContent(ctx, client, parsedReference.String(), options.GOptions)
-		if err != nil {
-			return err
-		}
-
-		var ipfsPath string
-		if options.IpfsAddress != "" {
-			dir, err := os.MkdirTemp("", "apidirtmp")
-			if err != nil {
-				return err
-			}
-			defer os.RemoveAll(dir)
-			if err := os.WriteFile(filepath.Join(dir, "api"), []byte(options.IpfsAddress), 0600); err != nil {
-				return err
-			}
-			ipfsPath = dir
-		}
-
-		var layerConvert converter.ConvertFunc
-		if options.Estargz {
-			layerConvert = eStargzConvertFunc()
-		}
-		c, err := ipfs.Push(ctx, client, parsedReference.String(), layerConvert, options.AllPlatforms, options.Platforms, options.IpfsEnsureImage, ipfsPath)
-		if err != nil {
-			log.G(ctx).WithError(err).Warnf("ipfs push failed")
-			return err
-		}
-		fmt.Fprintln(options.Stdout, c)
-		return nil
-	}
-
-	parsedReference, err = referenceutil.Parse(rawRef)
 	if err != nil {
 		return err
 	}

@@ -36,7 +36,6 @@ type UpOptions struct {
 	NoColor              bool
 	NoLogPrefix          bool
 	ForceBuild           bool
-	IPFS                 bool
 	QuietPull            bool
 	RemoveOrphans        bool
 	ForceRecreate        bool

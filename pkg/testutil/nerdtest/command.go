@@ -25,9 +25,7 @@ import (
 
 	"gotest.tools/v3/assert"
 
-	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
-	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest/platform"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
 )
 
@@ -148,20 +146,6 @@ func (nc *nerdCommand) prep() {
 
 		if nc.Config.Read(stargz) == enabled {
 			nc.Env["CONTAINERD_SNAPSHOTTER"] = "stargz"
-		}
-
-		if nc.Config.Read(ipfs) == enabled {
-			var ipfsPath string
-			if rootlessutil.IsRootless() {
-				var err error
-				ipfsPath, err = platform.DataHome()
-				ipfsPath = filepath.Join(ipfsPath, "ipfs")
-				assert.NilError(nc.T(), err)
-			} else {
-				ipfsPath = filepath.Join(os.Getenv("HOME"), ".ipfs")
-			}
-
-			nc.Env["IPFS_PATH"] = ipfsPath
 		}
 
 		// If no NERDCTL_TOML was explicitly provided, set it to the private dir

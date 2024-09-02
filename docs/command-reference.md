@@ -118,8 +118,6 @@ It does not necessarily mean that the corresponding features are missing in cont
   - [:whale: nerdctl compose run](#whale-nerdctl-compose-run)
   - [:whale: nerdctl compose top](#whale-nerdctl-compose-top)
   - [:whale: nerdctl compose version](#whale-nerdctl-compose-version)
-- [IPFS management](#ipfs-management)
-  - [:nerd_face: nerdctl ipfs registry serve](#nerd_face-nerdctl-ipfs-registry-serve)
 - [Global flags](#global-flags)
 - [Unimplemented Docker commands](#unimplemented-docker-commands)
 
@@ -133,7 +131,6 @@ Run a command in a new container.
 
 Usage: `nerdctl run [OPTIONS] IMAGE [COMMAND] [ARG...]`
 
-:nerd_face: `ipfs://` prefix can be used for `IMAGE` to pull it from IPFS. See [`ipfs.md`](./ipfs.md) for details.
 :nerd_face: `oci-archive://` prefix can be used for `IMAGE` to specify a local file system path to an OCI formatted tarball.
 
 Basic flags:
@@ -387,10 +384,6 @@ Verify flags:
 - :nerd_face: `--cosign-certificate-oidc-issuer`: The OIDC issuer expected in a valid Fulcio certificate for --verify=cosign,, e.g. https://token.actions.githubusercontent.com or https://oauth2.sigstore.dev/auth. Either --cosign-certificate-oidc-issuer or --cosign-certificate-oidc-issuer-regexp must be set for keyless flows
 - :nerd_face: `--cosign-certificate-oidc-issuer-regexp`: A regular expression alternative to --certificate-oidc-issuer for --verify=cosign,. Accepts the Go regular expression syntax described at https://golang.org/s/re2syntax. Either --cosign-certificate-oidc-issuer or --cosign-certificate-oidc-issuer-regexp must be set for keyless flows
 
-IPFS flags:
-
-- :nerd_face: `--ipfs-address`: Multiaddr of IPFS API (default uses `$IPFS_PATH` env variable if defined or local directory `~/.ipfs`)
-
 Unimplemented `docker run` flags:
     `--blkio-weight-device`, `--cpu-rt-*`, `--device-*`,
     `--disable-content-trust`, `--domainname`, `--expose`, `--health-*`, `--isolation`, `--no-healthcheck`,
@@ -423,7 +416,6 @@ Create a new container.
 
 Usage: `nerdctl create [OPTIONS] IMAGE [COMMAND] [ARG...]`
 
-:nerd_face: `ipfs://` prefix can be used for `IMAGE` to pull it from IPFS. See [`ipfs.md`](./ipfs.md) for details.
 :nerd_face: `oci-archive://` prefix can be used for `IMAGE` to specify a local file system path to an OCI formatted tarball.
 
 The `nerdctl create` command similar to `nerdctl run -d` except the container is never started. You can then use the `nerdctl start <container_id>` command to start the container at any point.
@@ -710,7 +702,6 @@ Flags:
 - :whale: `--cache-to=CACHE`: Cache export destinations (eg. user/app:cache, type=local,dest=path/to/dir) (compatible with `docker buildx build`)
 - :whale: `--platform=(amd64|arm64|...)`: Set target platform for build (compatible with `docker buildx build`)
 - :whale: `--iidfile=FILE`: Write the image ID to the file
-- :nerd_face: `--ipfs`: Build image with pulling base images from IPFS. See [`ipfs.md`](./ipfs.md) for details.
 - :whale: `--label`: Set metadata for an image
 - :whale: `--network=(default|host|none)`: Set the networking mode for the RUN instructions during build.(compatible with `buildctl build`)
 - :whale: `--build-context`: Set additional contexts for build (e.g. dir2=/path/to/dir2, myorg/myapp=docker-image://path/to/myorg/myapp)
@@ -765,8 +756,6 @@ Pull an image from a registry.
 
 Usage: `nerdctl pull [OPTIONS] NAME[:TAG|@DIGEST]`
 
-:nerd_face: `ipfs://` prefix can be used for `NAME` to pull it from IPFS. See [`ipfs.md`](./ipfs.md) for details.
-
 Flags:
 
 - :whale: `--platform=(amd64|arm64|...)`: Pull content for a specific platform
@@ -780,7 +769,6 @@ Flags:
 - :nerd_face: `--cosign-certificate-identity-regexp`: A regular expression alternative to --cosign-certificate-identity for --verify=cosign. Accepts the Go regular expression syntax described at https://golang.org/s/re2syntax. Either --cosign-certificate-identity or --cosign-certificate-identity-regexp must be set for keyless flows
 - :nerd_face: `--cosign-certificate-oidc-issuer`: The OIDC issuer expected in a valid Fulcio certificate for --verify=cosign,, e.g. https://token.actions.githubusercontent.com or https://oauth2.sigstore.dev/auth. Either --cosign-certificate-oidc-issuer or --cosign-certificate-oidc-issuer-regexp must be set for keyless flows
 - :nerd_face: `--cosign-certificate-oidc-issuer-regexp`: A regular expression alternative to --certificate-oidc-issuer for --verify=cosign,. Accepts the Go regular expression syntax described at https://golang.org/s/re2syntax. Either --cosign-certificate-oidc-issuer or --cosign-certificate-oidc-issuer-regexp must be set for keyless flows
-- :nerd_face: `--ipfs-address`: Multiaddr of IPFS API (default uses `$IPFS_PATH` env variable if defined or local directory `~/.ipfs`)
 - :nerd_face: `--soci-index-digest`: Specify a particular index digest for SOCI. If left empty, SOCI will automatically use the index determined by the selection policy.
 
 Unimplemented `docker pull` flags: `--all-tags`, `--disable-content-trust` (default true)
@@ -791,8 +779,6 @@ Push an image to a registry.
 
 Usage: `nerdctl push [OPTIONS] NAME[:TAG]`
 
-:nerd_face: `ipfs://` prefix can be used for `NAME` to push it to IPFS. See [`ipfs.md`](./ipfs.md) for details.
-
 Flags:
 
 - :nerd_face: `--platform=(amd64|arm64|...)`: Push content for a specific platform
@@ -801,7 +787,6 @@ Flags:
 - :nerd_face: `--cosign-key`: Path to the private key file, KMS, URI or Kubernetes Secret for `--sign=cosign`
 - :nerd_face: `--notation-key-name`: Signing key name for a key previously added to notation's key list for `--sign=notation`
 - :nerd_face: `--allow-nondistributable-artifacts`: Allow pushing images with non-distributable blobs
-- :nerd_face: `--ipfs-address`: Multiaddr of IPFS API (default uses `$IPFS_PATH` env variable if defined or local directory `~/.ipfs`)
 - :whale: `-q, --quiet`: Suppress verbose output
 - :nerd_face: `--soci-span-size`: Span size in bytes that soci index uses to segment layer data. Default is 4 MiB.
 - :nerd_face: `--soci-min-layer-size`: Minimum layer size in bytes to build zTOC for. Smaller layers won't have zTOC and not lazy pulled. Default is 10 MiB.
@@ -1389,7 +1374,6 @@ Flags:
 
 - :whale: `-f, --file`: Specify an alternate compose file
 - :whale: `-p, --project-name`: Specify an alternate project name
-- :nerd_face: `--ipfs-address`: Multiaddr of IPFS API (default uses `$IPFS_PATH` env variable if defined or local directory `~/.ipfs`)
 - :whale: `--profile: Specify a profile to enable
 - :whale: `--env-file` : Specify an alternate environment file
 
@@ -1407,7 +1391,6 @@ Flags:
 - :whale: `--no-color`: Produce monochrome output
 - :whale: `--no-log-prefix`: Don't print prefix in logs
 - :whale: `--build`: Build images before starting containers.
-- :nerd_face: `--ipfs`: Build images with pulling base images from IPFS. See [`ipfs.md`](./ipfs.md) for details.
 - :whale: `--quiet-pull`: Pull without printing progress information
 - :whale: `--scale`: Scale SERVICE to NUM instances. Overrides the `scale` setting in the Compose file if present.
 - :whale: `--remove-orphans`: Remove containers for services not defined in the Compose file
@@ -1446,7 +1429,6 @@ Flags:
 - :whale: `--build-arg`: Set build-time variables for services
 - :whale: `--no-cache`: Do not use cache when building the image
 - :whale: `--progress`: Set type of progress output (auto, plain, tty). Use plain to show container output
-- :nerd_face: `--ipfs`: Build images with pulling base images from IPFS. See [`ipfs.md`](./ipfs.md) for details.
 
 Unimplemented `docker-compose build` (V1) flags:  `--compress`, `--force-rm`, `--memory`, `--no-rm`, `--parallel`, `--pull`, `--quiet`
 
@@ -1674,28 +1656,6 @@ Flags:
 
 - :whale: `-f, --format`: Format the output. Values: [pretty | json] (default "pretty")
 - :whale: `--short`: Shows only Compose's version number
-
-## IPFS management
-
-P2P image distribution (IPFS) is completely optional. Your host is NOT connected to any P2P network, unless you opt in to [install and run IPFS daemon](https://docs.ipfs.io/install/).
-
-### :nerd_face: nerdctl ipfs registry serve
-
-Serve read-only registry backed by IPFS on localhost.
-This is needed to run `nerdctl build` with pulling base images from IPFS.
-Other commands (e.g. `nerdctl push ipfs://<image-name>` and `nerdctl pull ipfs://<CID>`) don't require this.
-
-You need to install `ipfs` command on the host.
-See [`ipfs.md`](./ipfs.md) for details.
-
-Usage: `nerdctl ipfs registry serve [OPTIONS]`
-
-Flags:
-
-- :nerd_face: `--ipfs-address`: Multiaddr of IPFS API (default is pulled from `$IPFS_PATH/api` file. If `$IPFS_PATH` env var is not present, it defaults to `~/.ipfs`).
-- :nerd_face: `--listen-registry`: Address to listen (default `localhost:5050`).
-- :nerd_face: `--read-retry-num`: Times to retry query on IPFS (default 0 (no retry))
-- :nerd_face: `--read-timeout`: Timeout duration of a read request to IPFS (default 0 (no timeout))
 
 ## Global flags
 

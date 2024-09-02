@@ -48,7 +48,6 @@ ARG CONTAINERIZED_SYSTEMD_VERSION=v0.1.1
 ARG GOTESTSUM_VERSION=v1.12.0
 ARG NYDUS_VERSION=v2.3.0
 ARG SOCI_SNAPSHOTTER_VERSION=0.8.0
-ARG KUBO_VERSION=v0.31.0
 
 FROM --platform=$BUILDPLATFORM tonistiigi/xx:1.6.1 AS xx
 
@@ -103,18 +102,6 @@ RUN git checkout ${BYPASS4NETNS_VERSION} && \
 ENV CGO_ENABLED=1
 RUN GO=xx-go make static && \
   xx-verify --static bypass4netns && cp -a bypass4netns bypass4netnsd /out/${TARGETARCH}
-
-FROM build-base-debian AS build-kubo
-ARG KUBO_VERSION
-ARG TARGETARCH
-RUN git clone https://github.com/ipfs/kubo.git /go/src/github.com/ipfs/kubo
-WORKDIR /go/src/github.com/ipfs/kubo
-RUN git checkout ${KUBO_VERSION} && \
-  mkdir -p /out/${TARGETARCH}
-ENV CGO_ENABLED=0
-RUN xx-go --wrap && \
-  make build && \
-  xx-verify --static cmd/ipfs/ipfs && cp -a cmd/ipfs/ipfs /out/${TARGETARCH}
 
 FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine AS build-base
 RUN apk add --no-cache make git curl
@@ -298,20 +285,12 @@ ARG SOCI_SNAPSHOTTER_VERSION
 RUN fname="soci-snapshotter-${SOCI_SNAPSHOTTER_VERSION}-${TARGETOS:-linux}-${TARGETARCH:-amd64}.tar.gz" && \
   curl -o "${fname}" -fsSL --proto '=https' --tlsv1.2 "https://github.com/awslabs/soci-snapshotter/releases/download/v${SOCI_SNAPSHOTTER_VERSION}/${fname}" && \
   tar -C /usr/local/bin -xvf "${fname}" soci soci-snapshotter-grpc
-# enable offline ipfs for integration test
-COPY --from=build-kubo /out/${TARGETARCH:-amd64}/* /usr/local/bin/
 COPY ./Dockerfile.d/test-integration-etc_containerd-stargz-grpc_config.toml /etc/containerd-stargz-grpc/config.toml
-COPY ./Dockerfile.d/test-integration-ipfs-offline.service /usr/local/lib/systemd/system/
 COPY ./Dockerfile.d/test-integration-buildkit-nerdctl-test.service /usr/local/lib/systemd/system/
 COPY ./Dockerfile.d/test-integration-soci-snapshotter.service /usr/local/lib/systemd/system/
 RUN cp /usr/local/bin/tini /usr/local/bin/tini-custom
 # using test integration containerd config
 COPY ./Dockerfile.d/test-integration-etc_containerd_config.toml /etc/containerd/config.toml
-# install ipfs service. avoid using 5001(api)/8080(gateway) which are reserved by tests.
-RUN systemctl enable test-integration-ipfs-offline test-integration-buildkit-nerdctl-test test-integration-soci-snapshotter && \
-  ipfs init && \
-  ipfs config Addresses.API "/ip4/127.0.0.1/tcp/5888" && \
-  ipfs config Addresses.Gateway "/ip4/127.0.0.1/tcp/5889"
 # install nydus components
 ARG NYDUS_VERSION
 RUN curl -o nydus-static.tgz -fsSL --proto '=https' --tlsv1.2 "https://github.com/dragonflyoss/image-service/releases/download/${NYDUS_VERSION}/nydus-static-${NYDUS_VERSION}-linux-${TARGETARCH}.tgz" && \
@@ -336,8 +315,6 @@ RUN ssh-keygen -q -t rsa -f /root/.ssh/id_rsa -N '' && \
   mkdir -p /home/rootless/.local/share && \
   chown -R rootless:rootless /home/rootless
 COPY ./Dockerfile.d/etc_systemd_system_user@.service.d_delegate.conf /etc/systemd/system/user@.service.d/delegate.conf
-# ipfs daemon for rootless containerd will be enabled in /test-integration-rootless.sh
-RUN systemctl disable test-integration-ipfs-offline
 VOLUME /home/rootless/.local/share
 COPY ./Dockerfile.d/test-integration-rootless.sh /
 RUN chmod a+rx /test-integration-rootless.sh

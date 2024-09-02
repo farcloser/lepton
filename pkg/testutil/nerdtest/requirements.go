@@ -43,7 +43,6 @@ var only test.ConfigValue = "Only"
 // These are used for down the road configuration and custom behavior inside command
 var modePrivate test.ConfigKey = "PrivateMode"
 var stargz test.ConfigKey = "Stargz"
-var ipfs test.ConfigKey = "IPFS"
 var enabled test.ConfigValue = "Enabled"
 
 // OnlyIPv6 marks a test as suitable to be run exclusively inside an ipv6 environment
@@ -256,7 +255,6 @@ var Registry = test.Require(
 				}
 				helpers.Ensure("pull", "--quiet", registryImage)
 				helpers.Ensure("pull", "--quiet", platform.DockerAuthImage)
-				helpers.Ensure("pull", "--quiet", platform.KuboImage)
 			},
 			Cleanup: func(data test.Data, helpers test.Helpers) {
 				// FIXME: figure out what to do with reg setup/cleanup routines
@@ -299,15 +297,6 @@ var Build = &test.Requirement{
 		// The price to pay is that we might get cache from another test.
 		// This can be avoided individually by passing --no-cache if and when necessary
 		// helpers.Anyhow("builder", "prune", "--all", "--force")
-	},
-}
-
-var IPFS = &test.Requirement{
-	Check: func(data test.Data, helpers test.Helpers) (ret bool, mess string) {
-		// FIXME: we should be able to access the env (at least through helpers.Command().) instead of this gym
-		helpers.Write(ipfs, enabled)
-		// FIXME: this is incomplete. We obviously need a daemon running, properly configured
-		return test.Binary("ipfs").Check(data, helpers)
 	},
 }
 

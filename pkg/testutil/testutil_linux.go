@@ -41,7 +41,6 @@ var (
 	MariaDBImage                = mirrorOf("mariadb:10.5")
 	DockerAuthImage             = mirrorOf("cesanta/docker_auth:1.7")
 	FluentdImage                = "fluent/fluentd:v1.17.0-debian-1.0"
-	KuboImage                   = mirrorOf("ipfs/kubo:v0.16.0")
 	SystemdImage                = "ghcr.io/containerd/stargz-snapshotter:0.15.1-kind"
 	GolangImage                 = mirrorOf("golang:1.18")
 

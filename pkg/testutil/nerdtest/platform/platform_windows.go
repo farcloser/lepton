@@ -32,6 +32,5 @@ func mirrorOf(s string) string {
 var (
 	RegistryImageStable = mirrorOf("registry:2")
 	RegistryImageNext   = "ghcr.io/distribution/distribution:"
-	KuboImage           = mirrorOf("ipfs/kubo:v0.16.0")
 	DockerAuthImage     = mirrorOf("cesanta/docker_auth:1.7")
 )

@@ -20,8 +20,6 @@ import (
 	"context"
 	"errors"
 	"io"
-	"os"
-	"path/filepath"
 
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 
@@ -34,7 +32,6 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/composer"
 	"github.com/containerd/nerdctl/v2/pkg/composer/serviceparser"
 	"github.com/containerd/nerdctl/v2/pkg/imgutil"
-	"github.com/containerd/nerdctl/v2/pkg/ipfs"
 	"github.com/containerd/nerdctl/v2/pkg/netutil"
 	"github.com/containerd/nerdctl/v2/pkg/referenceutil"
 	"github.com/containerd/nerdctl/v2/pkg/signutil"
@@ -121,28 +118,6 @@ func New(client *containerd.Client, globalOptions types.GlobalCommandOptions, op
 			RFlags:          types.RemoteSnapshotterFlags{},
 			Stdout:          stdout,
 			Stderr:          stderr,
-		}
-
-		parsedReference, err := referenceutil.Parse(imageName)
-		if err != nil {
-			return err
-		}
-
-		if parsedReference.Protocol != "" {
-			var ipfsPath string
-			if ipfsAddress := options.IPFSAddress; ipfsAddress != "" {
-				dir, err := os.MkdirTemp("", "apidirtmp")
-				if err != nil {
-					return err
-				}
-				defer os.RemoveAll(dir)
-				if err := os.WriteFile(filepath.Join(dir, "api"), []byte(ipfsAddress), 0600); err != nil {
-					return err
-				}
-				ipfsPath = dir
-			}
-			_, err = ipfs.EnsureImage(ctx, client, string(parsedReference.Protocol), parsedReference.String(), ipfsPath, imgPullOpts)
-			return err
 		}
 
 		imageVerifyOptions := imageVerifyOptionsFromCompose(ps)

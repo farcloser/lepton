@@ -33,7 +33,7 @@ const (
 func NewPushCommand() *cobra.Command {
 	var pushCommand = &cobra.Command{
 		Use:               "push [flags] NAME[:TAG]",
-		Short:             "Push an image or a repository to a registry. Optionally specify \"ipfs://\" or \"ipns://\" scheme to push image to IPFS.",
+		Short:             "Push an image or a repository to a registry.",
 		Args:              helpers.IsExactArgs(1),
 		RunE:              pushAction,
 		ValidArgsFunction: pushShellComplete,
@@ -48,8 +48,6 @@ func NewPushCommand() *cobra.Command {
 	// #endregion
 
 	pushCommand.Flags().Bool("estargz", false, "Convert the image into eStargz")
-	pushCommand.Flags().Bool("ipfs-ensure-image", true, "Ensure the entire contents of the image is locally available before push")
-	pushCommand.Flags().String("ipfs-address", "", "multiaddr of IPFS API (default uses $IPFS_PATH env variable if defined or local directory ~/.ipfs)")
 
 	// #region sign flags
 	pushCommand.Flags().String("sign", "none", "Sign the image (none|cosign|notation")
@@ -89,14 +87,6 @@ func processImagePushOptions(cmd *cobra.Command) (types.ImagePushOptions, error)
 	if err != nil {
 		return types.ImagePushOptions{}, err
 	}
-	ipfsEnsureImage, err := cmd.Flags().GetBool("ipfs-ensure-image")
-	if err != nil {
-		return types.ImagePushOptions{}, err
-	}
-	ipfsAddress, err := cmd.Flags().GetString("ipfs-address")
-	if err != nil {
-		return types.ImagePushOptions{}, err
-	}
 	quiet, err := cmd.Flags().GetBool("quiet")
 	if err != nil {
 		return types.ImagePushOptions{}, err
@@ -120,8 +110,6 @@ func processImagePushOptions(cmd *cobra.Command) (types.ImagePushOptions, error)
 		Platforms:                      platform,
 		AllPlatforms:                   allPlatforms,
 		Estargz:                        estargz,
-		IpfsEnsureImage:                ipfsEnsureImage,
-		IpfsAddress:                    ipfsAddress,
 		Quiet:                          quiet,
 		AllowNondistributableArtifacts: allowNonDist,
 		Stdout:                         cmd.OutOrStdout(),

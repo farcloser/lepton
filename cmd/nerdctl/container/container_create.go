@@ -30,7 +30,7 @@ import (
 )
 
 func NewCreateCommand() *cobra.Command {
-	shortHelp := "Create a new container. Optionally specify \"ipfs://\" or \"ipns://\" scheme to pull image from IPFS."
+	shortHelp := "Create a new container."
 	longHelp := shortHelp
 	switch runtime.GOOS {
 	case "windows":
@@ -394,13 +394,6 @@ func processContainerCreateOptions(cmd *cobra.Command) (types.ContainerCreateOpt
 	}
 	// #endregion
 
-	// #region for ipfs flags
-	opt.IPFSAddress, err = cmd.Flags().GetString("ipfs-address")
-	if err != nil {
-		return opt, err
-	}
-	// #endregion
-
 	// #region for image pull and verify options
 	imageVerifyOpt, err := helpers.ProcessImageVerifyOptions(cmd)
 	if err != nil {
@@ -413,7 +406,6 @@ func processContainerCreateOptions(cmd *cobra.Command) (types.ContainerCreateOpt
 	opt.ImagePullOpt = types.ImagePullOptions{
 		GOptions:      opt.GOptions,
 		VerifyOptions: imageVerifyOpt,
-		IPFSAddress:   opt.IPFSAddress,
 		Stdout:        opt.Stdout,
 		Stderr:        opt.Stderr,
 		Quiet:         quiet,

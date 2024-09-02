@@ -31,7 +31,7 @@ import (
 func NewPullCommand() *cobra.Command {
 	var pullCommand = &cobra.Command{
 		Use:           "pull [flags] NAME[:TAG]",
-		Short:         "Pull an image from a registry. Optionally specify \"ipfs://\" or \"ipns://\" scheme to pull image from IPFS.",
+		Short:         "Pull an image from a registry.",
 		Args:          helpers.IsExactArgs(1),
 		RunE:          pullAction,
 		SilenceUsage:  true,
@@ -66,8 +66,6 @@ func NewPullCommand() *cobra.Command {
 	// #endregion
 
 	pullCommand.Flags().BoolP("quiet", "q", false, "Suppress verbose output")
-
-	pullCommand.Flags().String("ipfs-address", "", "multiaddr of IPFS API (default uses $IPFS_PATH env variable if defined or local directory ~/.ipfs)")
 
 	return pullCommand
 }
@@ -104,10 +102,6 @@ func processPullCommandFlags(cmd *cobra.Command) (types.ImagePullOptions, error)
 	if err != nil {
 		return types.ImagePullOptions{}, err
 	}
-	ipfsAddressStr, err := cmd.Flags().GetString("ipfs-address")
-	if err != nil {
-		return types.ImagePullOptions{}, err
-	}
 
 	sociIndexDigest, err := cmd.Flags().GetString("soci-index-digest")
 	if err != nil {
@@ -125,7 +119,6 @@ func processPullCommandFlags(cmd *cobra.Command) (types.ImagePullOptions, error)
 		Unpack:          unpack,
 		Mode:            "always",
 		Quiet:           quiet,
-		IPFSAddress:     ipfsAddressStr,
 		RFlags: types.RemoteSnapshotterFlags{
 			SociIndexDigest: sociIndexDigest,
 		},

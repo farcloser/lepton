@@ -125,29 +125,6 @@ func TestIssue3425(t *testing.T) {
 				},
 				Expected: test.Expects(0, nil, nil),
 			},
-			{
-				Description: "with ipfs",
-				Require: test.Require(
-					nerdtest.Private,
-					nerdtest.IPFS,
-					test.Not(test.Windows),
-					test.Not(nerdtest.Docker),
-				),
-				Setup: func(data test.Data, helpers test.Helpers) {
-					helpers.Ensure("image", "pull", testutil.CommonImage)
-					helpers.Ensure("run", "-d", "--name", data.Identifier(), testutil.CommonImage)
-					helpers.Ensure("image", "rm", "-f", testutil.CommonImage)
-					helpers.Ensure("image", "pull", testutil.CommonImage)
-				},
-				Cleanup: func(data test.Data, helpers test.Helpers) {
-					helpers.Anyhow("rm", "-f", data.Identifier())
-					helpers.Anyhow("rmi", "-f", data.Identifier())
-				},
-				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-					return helpers.Command("image", "push", "ipfs://"+testutil.CommonImage)
-				},
-				Expected: test.Expects(0, nil, nil),
-			},
 		},
 	}
 
