@@ -35,8 +35,6 @@ import (
 	"github.com/containerd/containerd/v2/core/images/converter/uncompress"
 	"github.com/containerd/log"
 	"github.com/containerd/stargz-snapshotter/estargz"
-	estargzconvert "github.com/containerd/stargz-snapshotter/nativeconverter/estargz"
-	estargzexternaltocconvert "github.com/containerd/stargz-snapshotter/nativeconverter/estargz/externaltoc"
 	zstdchunkedconvert "github.com/containerd/stargz-snapshotter/nativeconverter/zstdchunked"
 	"github.com/containerd/stargz-snapshotter/recorder"
 
@@ -72,15 +70,11 @@ func Convert(ctx context.Context, client *containerd.Client, srcRawRef, targetRa
 	}
 	convertOpts = append(convertOpts, converter.WithPlatform(platMC))
 
-	estargz := options.Estargz
 	zstd := options.Zstd
 	zstdchunked := options.ZstdChunked
 	var finalize func(ctx context.Context, cs content.Store, ref string, desc *ocispec.Descriptor) (*images.Image, error)
-	if estargz || zstd || zstdchunked {
+	if zstd || zstdchunked {
 		convertCount := 0
-		if estargz {
-			convertCount++
-		}
 		if zstd {
 			convertCount++
 		}
@@ -88,18 +82,12 @@ func Convert(ctx context.Context, client *containerd.Client, srcRawRef, targetRa
 			convertCount++
 		}
 		if convertCount > 1 {
-			return errors.New("options --estargz, and --zstdchunked lead to conflict, only one of them can be used")
+			return errors.New("options --zstd and --zstdchunked lead to conflict, only one of them can be used")
 		}
 
 		var convertFunc converter.ConvertFunc
 		var convertType string
 		switch {
-		case estargz:
-			convertFunc, finalize, err = getESGZConverter(options)
-			if err != nil {
-				return err
-			}
-			convertType = "estargz"
 		case zstd:
 			convertFunc, err = getZstdConverter(options)
 			if err != nil {
@@ -158,62 +146,6 @@ func Convert(ctx context.Context, client *containerd.Client, srcRawRef, targetRa
 		res.ExtraImages = append(res.ExtraImages, finimg.Name+"@"+finimg.Target.Digest.String())
 	}
 	return printConvertedImage(options.Stdout, options, res)
-}
-
-func getESGZConverter(options types.ImageConvertOptions) (convertFunc converter.ConvertFunc, finalize func(ctx context.Context, cs content.Store, ref string, desc *ocispec.Descriptor) (*images.Image, error), _ error) {
-	if options.EstargzExternalToc && !options.GOptions.Experimental {
-		return nil, nil, fmt.Errorf("estargz-external-toc requires experimental mode to be enabled")
-	}
-	if options.EstargzKeepDiffID && !options.GOptions.Experimental {
-		return nil, nil, fmt.Errorf("option --estargz-keep-diff-id must be specified with --estargz-external-toc")
-	}
-	if options.EstargzExternalToc {
-		if !options.EstargzKeepDiffID {
-			esgzOpts, err := getESGZConvertOpts(options)
-			if err != nil {
-				return nil, nil, err
-			}
-			convertFunc, finalize = estargzexternaltocconvert.LayerConvertFunc(esgzOpts, options.EstargzCompressionLevel)
-		} else {
-			convertFunc, finalize = estargzexternaltocconvert.LayerConvertLossLessFunc(estargzexternaltocconvert.LayerConvertLossLessConfig{
-				CompressionLevel: options.EstargzCompressionLevel,
-				ChunkSize:        options.EstargzChunkSize,
-				MinChunkSize:     options.EstargzMinChunkSize,
-			})
-		}
-	} else {
-		esgzOpts, err := getESGZConvertOpts(options)
-		if err != nil {
-			return nil, nil, err
-		}
-		convertFunc = estargzconvert.LayerConvertFunc(esgzOpts...)
-	}
-	return convertFunc, finalize, nil
-}
-
-func getESGZConvertOpts(options types.ImageConvertOptions) ([]estargz.Option, error) {
-
-	esgzOpts := []estargz.Option{
-		estargz.WithCompressionLevel(options.EstargzCompressionLevel),
-		estargz.WithChunkSize(options.EstargzChunkSize),
-		estargz.WithMinChunkSize(options.EstargzMinChunkSize),
-	}
-
-	if options.EstargzRecordIn != "" {
-		if !options.GOptions.Experimental {
-			return nil, fmt.Errorf("estargz-record-in requires experimental mode to be enabled")
-		}
-
-		log.L.Warn("--estargz-record-in flag is experimental and subject to change")
-		paths, err := readPathsFromRecordFile(options.EstargzRecordIn)
-		if err != nil {
-			return nil, err
-		}
-		esgzOpts = append(esgzOpts, estargz.WithPrioritizedFiles(paths))
-		var ignored []string
-		esgzOpts = append(esgzOpts, estargz.WithAllowPrioritizeNotFound(&ignored))
-	}
-	return esgzOpts, nil
 }
 
 func getZstdConverter(options types.ImageConvertOptions) (converter.ConvertFunc, error) {

@@ -33,8 +33,7 @@ import (
 )
 
 const (
-	targetRefLabel = "containerd.io/snapshot/remote/stargz.reference"
-	testRef        = "test:latest"
+	testRef = "test:latest"
 )
 
 func TestGetSnapshotterOpts(t *testing.T) {
@@ -50,10 +49,6 @@ func TestGetSnapshotterOpts(t *testing.T) {
 		{
 			sns:   []string{"overlayfs2"},
 			check: sameOpts(&defaultSnapshotterOpts{snapshotter: "overlayfs2"}),
-		},
-		{
-			sns:   []string{"stargz", "stargz-v1"},
-			check: remoteSnOpts("stargz", true),
 		},
 		{
 			sns:   []string{"soci"},
@@ -127,12 +122,6 @@ func TestRemoteSnapshotterOpts(t *testing.T) {
 		check []func(t *testing.T, a map[string]string)
 	}{
 		{
-			name: "stargz",
-			check: []func(t *testing.T, a map[string]string){
-				checkRemoteSnapshotterAnnotataions, checkStargzSnapshotterAnnotataions,
-			},
-		},
-		{
 			name: "soci",
 			check: []func(t *testing.T, a map[string]string){
 				checkRemoteSnapshotterAnnotataions, checkSociSnapshotterAnnotataions,
@@ -166,12 +155,6 @@ func TestRemoteSnapshotterOpts(t *testing.T) {
 func checkRemoteSnapshotterAnnotataions(t *testing.T, a map[string]string) {
 	assert.Check(t, a != nil)
 	assert.Equal(t, a[ctdsnapshotters.TargetRefLabel], testRef)
-}
-
-func checkStargzSnapshotterAnnotataions(t *testing.T, a map[string]string) {
-	assert.Check(t, a != nil)
-	_, ok := a["containerd.io/snapshot/remote/urls"]
-	assert.Equal(t, ok, true)
 }
 
 // using values from soci source to check for annotations (

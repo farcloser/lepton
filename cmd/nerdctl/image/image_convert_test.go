@@ -38,10 +38,6 @@ func TestImageConvert(t *testing.T) {
 		args       []string
 	}{
 		{
-			"esgz",
-			[]string{"--estargz"},
-		},
-		{
 			"zstd",
 			[]string{"--zstd", "--zstd-compression-level", "3"},
 		},

@@ -79,31 +79,6 @@ $ nerdctl run -it --rm alpine
 
 If `fuse-overlayfs` does not work, try `export CONTAINERD_SNAPSHOTTER=native`.
 
-### Stargz Snapshotter
-[Stargz Snapshotter](./stargz.md) enables lazy-pulling of images.
-
-To enable Stargz snapshotter, run the following command:
-```console
-$ containerd-rootless-setuptool.sh install-stargz
-```
-
-Then, add the following config to `~/.config/containerd/config.toml` and run `systemctl --user restart containerd.service`:
-```toml
-[proxy_plugins]
-  [proxy_plugins."stargz"]
-      type = "snapshot"
-# NOTE: replace "1000" with your actual UID
-      address = "/run/user/1000/containerd-stargz-grpc/containerd-stargz-grpc.sock"
-```
-
-The snapshotter can be specified as `$CONTAINERD_SNAPSHOTTER`.
-```console
-$ export CONTAINERD_SNAPSHOTTER=stargz
-$ nerdctl run -it --rm ghcr.io/stargz-containers/alpine:3.10.2-esgz
-```
-
-See https://github.com/containerd/stargz-snapshotter/blob/main/docs/pre-converted-images.md for the image list.
-
 ## bypass4netns
 | :zap: Requirement | nerdctl >= 0.17 |
 |-------------------|-----------------|

@@ -17,8 +17,6 @@
 package image
 
 import (
-	"compress/gzip"
-
 	"github.com/spf13/cobra"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
@@ -30,7 +28,7 @@ import (
 
 const imageConvertHelp = `Convert an image format.
 
-e.g., 'nerdctl image convert --estargz --oci example.com/foo:orig example.com/foo:esgz'
+e.g., 'nerdctl image convert --oci example.com/foo:orig example.com/foo:esgz'
 
 Use '--platform' to define the output platform.
 When '--all-platforms' is given all images in a manifest list must be available.
@@ -52,16 +50,6 @@ func newImageConvertCommand() *cobra.Command {
 	}
 
 	imageConvertCommand.Flags().String("format", "", "Format the output using the given Go template, e.g, 'json'")
-
-	// #region estargz flags
-	imageConvertCommand.Flags().Bool("estargz", false, "Convert legacy tar(.gz) layers to eStargz for lazy pulling. Should be used in conjunction with '--oci'")
-	imageConvertCommand.Flags().String("estargz-record-in", "", "Read 'ctr-remote optimize --record-out=<FILE>' record file (EXPERIMENTAL)")
-	imageConvertCommand.Flags().Int("estargz-compression-level", gzip.BestCompression, "eStargz compression level")
-	imageConvertCommand.Flags().Int("estargz-chunk-size", 0, "eStargz chunk size")
-	imageConvertCommand.Flags().Int("estargz-min-chunk-size", 0, "The minimal number of bytes of data must be written in one gzip stream. (requires stargz-snapshotter >= v0.13.0)")
-	imageConvertCommand.Flags().Bool("estargz-external-toc", false, "Separate TOC JSON into another image (called \"TOC image\"). The name of TOC image is the original + \"-esgztoc\" suffix. Both eStargz and the TOC image should be pushed to the same registry. (requires stargz-snapshotter >= v0.13.0) (EXPERIMENTAL)")
-	imageConvertCommand.Flags().Bool("estargz-keep-diff-id", false, "Convert to esgz without changing diffID (cannot be used in conjunction with '--estargz-record-in'. must be specified with '--estargz-external-toc')")
-	// #endregion
 
 	// #region zstd flags
 	imageConvertCommand.Flags().Bool("zstd", false, "Convert legacy tar(.gz) layers to zstd. Should be used in conjunction with '--oci'")
@@ -99,37 +87,6 @@ func processImageConvertOptions(cmd *cobra.Command) (types.ImageConvertOptions, 
 	if err != nil {
 		return types.ImageConvertOptions{}, err
 	}
-
-	// #region estargz flags
-	estargz, err := cmd.Flags().GetBool("estargz")
-	if err != nil {
-		return types.ImageConvertOptions{}, err
-	}
-	estargzRecordIn, err := cmd.Flags().GetString("estargz-record-in")
-	if err != nil {
-		return types.ImageConvertOptions{}, err
-	}
-	estargzCompressionLevel, err := cmd.Flags().GetInt("estargz-compression-level")
-	if err != nil {
-		return types.ImageConvertOptions{}, err
-	}
-	estargzChunkSize, err := cmd.Flags().GetInt("estargz-chunk-size")
-	if err != nil {
-		return types.ImageConvertOptions{}, err
-	}
-	estargzMinChunkSize, err := cmd.Flags().GetInt("estargz-min-chunk-size")
-	if err != nil {
-		return types.ImageConvertOptions{}, err
-	}
-	estargzExternalTOC, err := cmd.Flags().GetBool("estargz-external-toc")
-	if err != nil {
-		return types.ImageConvertOptions{}, err
-	}
-	estargzKeepDiffID, err := cmd.Flags().GetBool("estargz-keep-diff-id")
-	if err != nil {
-		return types.ImageConvertOptions{}, err
-	}
-	// #endregion
 
 	// #region zstd flags
 	zstd, err := cmd.Flags().GetBool("zstd")
@@ -185,15 +142,6 @@ func processImageConvertOptions(cmd *cobra.Command) (types.ImageConvertOptions, 
 	return types.ImageConvertOptions{
 		GOptions: globalOptions,
 		Format:   format,
-		// #region estargz flags
-		Estargz:                 estargz,
-		EstargzRecordIn:         estargzRecordIn,
-		EstargzCompressionLevel: estargzCompressionLevel,
-		EstargzChunkSize:        estargzChunkSize,
-		EstargzMinChunkSize:     estargzMinChunkSize,
-		EstargzExternalToc:      estargzExternalTOC,
-		EstargzKeepDiffID:       estargzKeepDiffID,
-		// #endregion
 		// #region zstd flags
 		Zstd:                 zstd,
 		ZstdCompressionLevel: zstdCompressionLevel,
