@@ -33,7 +33,6 @@ import (
 const (
 	snapshotterNameOverlaybd = "overlaybd"
 	snapshotterNameStargz    = "stargz"
-	snapshotterNameNydus     = "nydus"
 	snapshotterNameSoci      = "soci"
 	snapshotterNameCvmfs     = "cvmfs-snapshotter"
 
@@ -45,7 +44,6 @@ const (
 var builtinRemoteSnapshotterOpts = map[string]snapshotterOpts{
 	snapshotterNameOverlaybd: &remoteSnapshotterOpts{snapshotter: "overlaybd"},
 	snapshotterNameStargz:    &remoteSnapshotterOpts{snapshotter: "stargz", extraLabels: stargzExtraLabels},
-	snapshotterNameNydus:     &remoteSnapshotterOpts{snapshotter: "nydus"},
 	snapshotterNameSoci:      &remoteSnapshotterOpts{snapshotter: "soci", extraLabels: sociExtraLabels},
 	snapshotterNameCvmfs:     &remoteSnapshotterOpts{snapshotter: "cvmfs-snapshotter"},
 }

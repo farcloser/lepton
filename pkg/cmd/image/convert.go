@@ -35,7 +35,6 @@ import (
 	"github.com/containerd/containerd/v2/core/images/converter"
 	"github.com/containerd/containerd/v2/core/images/converter/uncompress"
 	"github.com/containerd/log"
-	nydusconvert "github.com/containerd/nydus-snapshotter/pkg/converter"
 	"github.com/containerd/stargz-snapshotter/estargz"
 	estargzconvert "github.com/containerd/stargz-snapshotter/nativeconverter/estargz"
 	estargzexternaltocconvert "github.com/containerd/stargz-snapshotter/nativeconverter/estargz/externaltoc"
@@ -43,7 +42,6 @@ import (
 	"github.com/containerd/stargz-snapshotter/recorder"
 
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	converterutil "github.com/containerd/nerdctl/v2/pkg/imgutil/converter"
 	"github.com/containerd/nerdctl/v2/pkg/platformutil"
 	"github.com/containerd/nerdctl/v2/pkg/referenceutil"
@@ -85,9 +83,8 @@ func Convert(ctx context.Context, client *containerd.Client, srcRawRef, targetRa
 	zstd := options.Zstd
 	zstdchunked := options.ZstdChunked
 	overlaybd := options.Overlaybd
-	nydus := options.Nydus
 	var finalize func(ctx context.Context, cs content.Store, ref string, desc *ocispec.Descriptor) (*images.Image, error)
-	if estargz || zstd || zstdchunked || overlaybd || nydus {
+	if estargz || zstd || zstdchunked || overlaybd {
 		convertCount := 0
 		if estargz {
 			convertCount++
@@ -101,12 +98,9 @@ func Convert(ctx context.Context, client *containerd.Client, srcRawRef, targetRa
 		if overlaybd {
 			convertCount++
 		}
-		if nydus {
-			convertCount++
-		}
 
 		if convertCount > 1 {
-			return errors.New("options --estargz, --zstdchunked, --overlaybd and --nydus lead to conflict, only one of them can be used")
+			return errors.New("options --estargz, --zstdchunked and --overlaybd lead to conflict, only one of them can be used")
 		}
 
 		var convertFunc converter.ConvertFunc
@@ -140,37 +134,13 @@ func Convert(ctx context.Context, client *containerd.Client, srcRawRef, targetRa
 			convertFunc = overlaybdconvert.IndexConvertFunc(obdOpts...)
 			convertOpts = append(convertOpts, converter.WithIndexConvertFunc(convertFunc))
 			convertType = "overlaybd"
-		case nydus:
-			nydusOpts, err := getNydusConvertOpts(options)
-			if err != nil {
-				return err
-			}
-			convertHooks := converter.ConvertHooks{
-				PostConvertHook: nydusconvert.ConvertHookFunc(nydusconvert.MergeOption{
-					WorkDir:          nydusOpts.WorkDir,
-					BuilderPath:      nydusOpts.BuilderPath,
-					FsVersion:        nydusOpts.FsVersion,
-					ChunkDictPath:    nydusOpts.ChunkDictPath,
-					PrefetchPatterns: nydusOpts.PrefetchPatterns,
-					OCI:              true,
-				}),
-			}
-			convertOpts = append(convertOpts, converter.WithIndexConvertFunc(
-				converter.IndexConvertFuncWithHook(
-					nydusconvert.LayerConvertFunc(*nydusOpts),
-					true,
-					platMC,
-					convertHooks,
-				)),
-			)
-			convertType = "nydus"
 		}
 
 		if convertType != "overlaybd" {
 			convertOpts = append(convertOpts, converter.WithLayerConvertFunc(convertFunc))
 		}
 		if !options.Oci {
-			if nydus || overlaybd {
+			if overlaybd {
 				log.G(ctx).Warnf("option --%s should be used in conjunction with --oci, forcibly enabling on oci mediatype for %s conversion", convertType, convertType)
 			} else {
 				log.G(ctx).Warnf("option --%s should be used in conjunction with --oci", convertType)
@@ -299,27 +269,6 @@ func getZstdchunkedConverter(options types.ImageConvertOptions) (converter.Conve
 		esgzOpts = append(esgzOpts, estargz.WithAllowPrioritizeNotFound(&ignored))
 	}
 	return zstdchunkedconvert.LayerConvertFuncWithCompressionLevel(zstd.EncoderLevelFromZstd(options.ZstdChunkedCompressionLevel), esgzOpts...), nil
-}
-
-func getNydusConvertOpts(options types.ImageConvertOptions) (*nydusconvert.PackOption, error) {
-	workDir := options.NydusWorkDir
-	if workDir == "" {
-		var err error
-		workDir, err = clientutil.DataStore(options.GOptions.DataRoot, options.GOptions.Address)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return &nydusconvert.PackOption{
-		BuilderPath: options.NydusBuilderPath,
-		// the path will finally be used is <NERDCTL_DATA_ROOT>/nydus-converter-<hash>,
-		// for example: /var/lib/nerdctl/1935db59/nydus-converter-3269662176/,
-		// and it will be deleted after the conversion
-		WorkDir:          workDir,
-		PrefetchPatterns: options.NydusPrefetchPatterns,
-		Compressor:       options.NydusCompressor,
-		FsVersion:        "6",
-	}, nil
 }
 
 func getOBDConvertOpts(options types.ImageConvertOptions) ([]overlaybdconvert.Option, error) {

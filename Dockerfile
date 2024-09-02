@@ -46,7 +46,6 @@ ARG GO_VERSION=1.23
 ARG UBUNTU_VERSION=24.04
 ARG CONTAINERIZED_SYSTEMD_VERSION=v0.1.1
 ARG GOTESTSUM_VERSION=v1.12.0
-ARG NYDUS_VERSION=v2.3.0
 ARG SOCI_SNAPSHOTTER_VERSION=0.8.0
 
 FROM --platform=$BUILDPLATFORM tonistiigi/xx:1.6.1 AS xx
@@ -291,12 +290,6 @@ COPY ./Dockerfile.d/test-integration-soci-snapshotter.service /usr/local/lib/sys
 RUN cp /usr/local/bin/tini /usr/local/bin/tini-custom
 # using test integration containerd config
 COPY ./Dockerfile.d/test-integration-etc_containerd_config.toml /etc/containerd/config.toml
-# install nydus components
-ARG NYDUS_VERSION
-RUN curl -o nydus-static.tgz -fsSL --proto '=https' --tlsv1.2 "https://github.com/dragonflyoss/image-service/releases/download/${NYDUS_VERSION}/nydus-static-${NYDUS_VERSION}-linux-${TARGETARCH}.tgz" && \
-  tar xzf nydus-static.tgz && \
-  mv nydus-static/nydus-image nydus-static/nydusd nydus-static/nydusify /usr/bin/ && \
-  rm nydus-static.tgz
 CMD ["./hack/test-integration.sh"]
 
 FROM test-integration AS test-integration-rootless

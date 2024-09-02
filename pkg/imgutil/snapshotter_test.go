@@ -63,10 +63,6 @@ func TestGetSnapshotterOpts(t *testing.T) {
 			sns:   []string{"overlaybd", "overlaybd-v2"},
 			check: sameOpts(&remoteSnapshotterOpts{snapshotter: "overlaybd"}),
 		},
-		{
-			sns:   []string{"nydus", "nydus-v3"},
-			check: sameOpts(&remoteSnapshotterOpts{snapshotter: "nydus"}),
-		},
 	}
 	for _, tc := range testCases {
 		for i := range tc.sns {
@@ -145,10 +141,6 @@ func TestRemoteSnapshotterOpts(t *testing.T) {
 			check: []func(t *testing.T, a map[string]string){
 				checkRemoteSnapshotterAnnotataions, checkSociSnapshotterAnnotataions,
 			},
-		},
-		{
-			name:  "nydus",
-			check: []func(t *testing.T, a map[string]string){checkRemoteSnapshotterAnnotataions},
 		},
 		{
 			name:  "overlaybd",
