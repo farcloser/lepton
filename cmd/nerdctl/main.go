@@ -38,7 +38,6 @@ import (
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/image"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/inspect"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/internal"
-	"github.com/containerd/nerdctl/v2/cmd/nerdctl/ipfs"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/login"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/namespace"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/network"
@@ -319,9 +318,6 @@ Config file ($NERDCTL_TOML): %s
 
 		// Compose
 		compose.NewComposeCommand(),
-
-		// IPFS
-		ipfs.NewIPFSCommand(),
 	)
 	addApparmorCommand(rootCmd)
 	container.AddCpCommand(rootCmd)

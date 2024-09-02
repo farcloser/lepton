@@ -36,8 +36,6 @@ ARG BYPASS4NETNS_VERSION=v0.4.1
 # Extra deps: FUSE-OverlayFS
 ARG FUSE_OVERLAYFS_VERSION=v1.14
 ARG CONTAINERD_FUSE_OVERLAYFS_VERSION=v1.0.8
-# Extra deps: IPFS
-ARG KUBO_VERSION=v0.29.0
 # Extra deps: Init
 ARG TINI_VERSION=v0.19.0
 # Extra deps: Debug
@@ -103,18 +101,6 @@ RUN git checkout ${BYPASS4NETNS_VERSION} && \
 ENV CGO_ENABLED=1
 RUN GO=xx-go make static && \
   xx-verify --static bypass4netns && cp -a bypass4netns bypass4netnsd /out/${TARGETARCH}
-
-FROM build-base-debian AS build-kubo
-ARG KUBO_VERSION
-ARG TARGETARCH
-RUN git clone https://github.com/ipfs/kubo.git /go/src/github.com/ipfs/kubo
-WORKDIR /go/src/github.com/ipfs/kubo
-RUN git checkout ${KUBO_VERSION} && \
-  mkdir -p /out/${TARGETARCH}
-ENV CGO_ENABLED=0
-RUN xx-go --wrap && \
-  make build && \
-  xx-verify --static cmd/ipfs/ipfs && cp -a cmd/ipfs/ipfs /out/${TARGETARCH}
 
 FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine AS build-base
 RUN apk add --no-cache make git curl
@@ -213,9 +199,6 @@ RUN fname="containerd-fuse-overlayfs-${CONTAINERD_FUSE_OVERLAYFS_VERSION/v}-${TA
   tar xzf "${fname}" -C /out/bin && \
   rm -f "${fname}" && \
   echo "- containerd-fuse-overlayfs: ${CONTAINERD_FUSE_OVERLAYFS_VERSION}" >> /out/share/doc/nerdctl-full/README.md
-ARG KUBO_VERSION
-COPY --from=build-kubo /out/${TARGETARCH:-amd64}/* /out/bin/
-RUN echo "- Kubo (IPFS): ${KUBO_VERSION}" >> /out/share/doc/nerdctl-full/README.md
 ARG TINI_VERSION
 RUN fname="tini-static-${TARGETARCH:-amd64}" && \
   curl -o "${fname}" -fsSL --proto '=https' --tlsv1.2 "https://github.com/krallin/tini/releases/download/${TINI_VERSION}/${fname}" && \
@@ -234,7 +217,6 @@ RUN echo "" >> /out/share/doc/nerdctl-full/README.md && \
   echo "## License" >> /out/share/doc/nerdctl-full/README.md && \
   echo "- bin/slirp4netns:    [GNU GENERAL PUBLIC LICENSE, Version 2](https://github.com/rootless-containers/slirp4netns/blob/${SLIRP4NETNS_VERSION}/COPYING)" >> /out/share/doc/nerdctl-full/README.md && \
   echo "- bin/fuse-overlayfs: [GNU GENERAL PUBLIC LICENSE, Version 2](https://github.com/containers/fuse-overlayfs/blob/${FUSE_OVERLAYFS_VERSION}/COPYING)" >> /out/share/doc/nerdctl-full/README.md && \
-  echo "- bin/ipfs: [Combination of MIT-only license and dual MIT/Apache-2.0 license](https://github.com/ipfs/kubo/blob/${KUBO_VERSION}/LICENSE)" >> /out/share/doc/nerdctl-full/README.md && \
   echo "- bin/{runc,bypass4netns,bypass4netnsd}: Apache License 2.0, statically linked with libseccomp ([LGPL 2.1](https://github.com/seccomp/libseccomp/blob/main/LICENSE), source code available at https://github.com/seccomp/libseccomp/)" >> /out/share/doc/nerdctl-full/README.md && \
   echo "- bin/tini: [MIT License](https://github.com/krallin/tini/blob/${TINI_VERSION}/LICENSE)" >> /out/share/doc/nerdctl-full/README.md && \
   echo "- Other files: [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)" >> /out/share/doc/nerdctl-full/README.md && \
@@ -299,19 +281,11 @@ ARG SOCI_SNAPSHOTTER_VERSION
 RUN fname="soci-snapshotter-${SOCI_SNAPSHOTTER_VERSION}-${TARGETOS:-linux}-${TARGETARCH:-amd64}.tar.gz" && \
   curl -o "${fname}" -fsSL --proto '=https' --tlsv1.2 "https://github.com/awslabs/soci-snapshotter/releases/download/v${SOCI_SNAPSHOTTER_VERSION}/${fname}" && \
   tar -C /usr/local/bin -xvf "${fname}" soci soci-snapshotter-grpc
-# enable offline ipfs for integration test
-COPY ./Dockerfile.d/test-integration-etc_containerd-stargz-grpc_config.toml /etc/containerd-stargz-grpc/config.toml
-COPY ./Dockerfile.d/test-integration-ipfs-offline.service /usr/local/lib/systemd/system/
 COPY ./Dockerfile.d/test-integration-buildkit-nerdctl-test.service /usr/local/lib/systemd/system/
 COPY ./Dockerfile.d/test-integration-soci-snapshotter.service /usr/local/lib/systemd/system/
 RUN cp /usr/local/bin/tini /usr/local/bin/tini-custom
 # using test integration containerd config
 COPY ./Dockerfile.d/test-integration-etc_containerd_config.toml /etc/containerd/config.toml
-# install ipfs service. avoid using 5001(api)/8080(gateway) which are reserved by tests.
-RUN systemctl enable test-integration-ipfs-offline test-integration-buildkit-nerdctl-test test-integration-soci-snapshotter && \
-  ipfs init && \
-  ipfs config Addresses.API "/ip4/127.0.0.1/tcp/5888" && \
-  ipfs config Addresses.Gateway "/ip4/127.0.0.1/tcp/5889"
 # install nydus components
 ARG NYDUS_VERSION
 RUN curl -o nydus-static.tgz -fsSL --proto '=https' --tlsv1.2 "https://github.com/dragonflyoss/image-service/releases/download/${NYDUS_VERSION}/nydus-static-${NYDUS_VERSION}-linux-${TARGETARCH}.tgz" && \
@@ -337,8 +311,6 @@ RUN ssh-keygen -q -t rsa -f /root/.ssh/id_rsa -N '' && \
   mkdir -p /home/rootless/.local/share && \
   chown -R rootless:rootless /home/rootless
 COPY ./Dockerfile.d/etc_systemd_system_user@.service.d_delegate.conf /etc/systemd/system/user@.service.d/delegate.conf
-# ipfs daemon for rootless containerd will be enabled in /test-integration-rootless.sh
-RUN systemctl disable test-integration-ipfs-offline
 VOLUME /home/rootless/.local/share
 COPY ./Dockerfile.d/test-integration-rootless.sh /
 RUN chmod a+rx /test-integration-rootless.sh

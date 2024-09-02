@@ -42,7 +42,6 @@ dependencies=(
   containers/fuse-overlayfs
   containerd/fuse-overlayfs-snapshotter
   gotestyourself/gotestsum
-  ipfs/kubo
   containerd/nydus-snapshotter
   containernetworking/plugins
   rootless-containers/rootlesskit

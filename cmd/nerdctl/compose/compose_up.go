@@ -44,7 +44,6 @@ func newComposeUpCommand() *cobra.Command {
 	composeUpCommand.Flags().Bool("no-color", false, "Produce monochrome output")
 	composeUpCommand.Flags().Bool("no-log-prefix", false, "Don't print prefix in logs")
 	composeUpCommand.Flags().Bool("build", false, "Build images before starting containers.")
-	composeUpCommand.Flags().Bool("ipfs", false, "Allow pulling base images from IPFS during build")
 	composeUpCommand.Flags().Bool("quiet-pull", false, "Pull without printing progress information")
 	composeUpCommand.Flags().Bool("remove-orphans", false, "Remove containers for services not defined in the Compose file.")
 	composeUpCommand.Flags().StringArray("scale", []string{}, "Scale SERVICE to NUM instances. Overrides the `scale` setting in the Compose file if present.")
@@ -85,10 +84,6 @@ func composeUpAction(cmd *cobra.Command, services []string) error {
 	}
 	if build && noBuild {
 		return errors.New("--build and --no-build can not be combined")
-	}
-	enableIPFS, err := cmd.Flags().GetBool("ipfs")
-	if err != nil {
-		return err
 	}
 	quietPull, err := cmd.Flags().GetBool("quiet-pull")
 	if err != nil {
@@ -137,7 +132,6 @@ func composeUpAction(cmd *cobra.Command, services []string) error {
 		NoColor:              noColor,
 		NoLogPrefix:          noLogPrefix,
 		ForceBuild:           build,
-		IPFS:                 enableIPFS,
 		QuietPull:            quietPull,
 		RemoveOrphans:        removeOrphans,
 		Scale:                scale,

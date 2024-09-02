@@ -22,8 +22,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
-	"path/filepath"
 
 	distributionref "github.com/distribution/reference"
 	"github.com/opencontainers/go-digest"
@@ -46,47 +44,13 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/errutil"
 	"github.com/containerd/nerdctl/v2/pkg/imgutil/dockerconfigresolver"
 	"github.com/containerd/nerdctl/v2/pkg/imgutil/push"
-	"github.com/containerd/nerdctl/v2/pkg/ipfs"
 	"github.com/containerd/nerdctl/v2/pkg/platformutil"
-	"github.com/containerd/nerdctl/v2/pkg/referenceutil"
 	"github.com/containerd/nerdctl/v2/pkg/signutil"
 	"github.com/containerd/nerdctl/v2/pkg/snapshotterutil"
 )
 
 // Push pushes an image specified by `rawRef`.
 func Push(ctx context.Context, client *containerd.Client, rawRef string, options types.ImagePushOptions) error {
-	if scheme, ref, err := referenceutil.ParseIPFSRefWithScheme(rawRef); err == nil {
-		if scheme != "ipfs" {
-			return fmt.Errorf("ipfs scheme is only supported but got %q", scheme)
-		}
-		log.G(ctx).Infof("pushing image %q to IPFS", ref)
-
-		var ipfsPath string
-		if options.IpfsAddress != "" {
-			dir, err := os.MkdirTemp("", "apidirtmp")
-			if err != nil {
-				return err
-			}
-			defer os.RemoveAll(dir)
-			if err := os.WriteFile(filepath.Join(dir, "api"), []byte(options.IpfsAddress), 0600); err != nil {
-				return err
-			}
-			ipfsPath = dir
-		}
-
-		var layerConvert converter.ConvertFunc
-		if options.Estargz {
-			layerConvert = eStargzConvertFunc()
-		}
-		c, err := ipfs.Push(ctx, client, ref, layerConvert, options.AllPlatforms, options.Platforms, options.IpfsEnsureImage, ipfsPath)
-		if err != nil {
-			log.G(ctx).WithError(err).Warnf("ipfs push failed")
-			return err
-		}
-		fmt.Fprintln(options.Stdout, c)
-		return nil
-	}
-
 	named, err := distributionref.ParseDockerRef(rawRef)
 	if err != nil {
 		return err

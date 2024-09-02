@@ -27,7 +27,6 @@ require (
 	github.com/containerd/platforms v0.2.1
 	github.com/containerd/stargz-snapshotter v0.15.2-0.20240709063920-1dac5ef89319
 	github.com/containerd/stargz-snapshotter/estargz v0.15.2-0.20240709063920-1dac5ef89319
-	github.com/containerd/stargz-snapshotter/ipfs v0.15.2-0.20240709063920-1dac5ef89319
 	github.com/containerd/typeurl/v2 v2.2.0
 	github.com/containernetworking/cni v1.2.3
 	github.com/containernetworking/plugins v1.5.1
@@ -44,7 +43,6 @@ require (
 	github.com/fluent/fluent-logger-golang v1.9.0
 	github.com/fsnotify/fsnotify v1.7.0
 	github.com/go-viper/mapstructure/v2 v2.1.0
-	github.com/ipfs/go-cid v0.4.1
 	github.com/klauspost/compress v1.17.9
 	github.com/mattn/go-isatty v0.0.20
 	github.com/moby/sys/mount v0.3.4

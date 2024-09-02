@@ -46,7 +46,6 @@ SYSTEMD_CONTAINERD_UNIT="containerd.service"
 SYSTEMD_BUILDKIT_UNIT="buildkit.service"
 SYSTEMD_FUSE_OVERLAYFS_UNIT="containerd-fuse-overlayfs.service"
 SYSTEMD_STARGZ_UNIT="stargz-snapshotter.service"
-SYSTEMD_IPFS_UNIT="ipfs-daemon.service"
 SYSTEMD_BYPASS4NETNSD_UNIT="bypass4netnsd.service"
 
 # global vars
@@ -431,7 +430,6 @@ cmd_entrypoint_install_stargz() {
 
 		[Service]
 		Environment=PATH=$BIN:/sbin:/usr/sbin:$PATH
-		Environment=IPFS_PATH=${XDG_DATA_HOME}/ipfs
 		ExecStart="$REALPATH0" nsenter -- containerd-stargz-grpc -address "${XDG_RUNTIME_DIR}/containerd-stargz-grpc/containerd-stargz-grpc.sock" -root "${XDG_DATA_HOME}/containerd-stargz-grpc" -config "${XDG_CONFIG_HOME}/containerd-stargz-grpc/config.toml"
 		ExecReload=/bin/kill -s HUP \$MAINPID
 		RestartSec=2
@@ -454,57 +452,6 @@ cmd_entrypoint_install_stargz() {
 	INFO "Set \`export CONTAINERD_SNAPSHOTTER=\"stargz\"\` to use the stargz snapshotter."
 }
 
-# CLI subcommand: "install-ipfs"
-cmd_entrypoint_install_ipfs() {
-	init
-	if ! command -v "ipfs" >/dev/null 2>&1; then
-		ERROR "ipfs needs to be present under \$PATH"
-		exit 1
-	fi
-	if ! systemctl --user --no-pager status "${SYSTEMD_CONTAINERD_UNIT}" >/dev/null 2>&1; then
-		ERROR "Install containerd first (\`$ARG0 install\`)"
-		exit 1
-	fi
-	IPFS_PATH="${XDG_DATA_HOME}/ipfs"
-	mkdir -p "${IPFS_PATH}"
-	cat <<-EOT | install_systemd_unit "${SYSTEMD_IPFS_UNIT}"
-		[Unit]
-		Description=ipfs daemon for rootless nerdctl
-		PartOf=${SYSTEMD_CONTAINERD_UNIT}
-
-		[Service]
-		Environment=PATH=$BIN:/sbin:/usr/sbin:$PATH
-		Environment=IPFS_PATH=${IPFS_PATH}
-		ExecStart="$REALPATH0" nsenter -- ipfs daemon $@
-		ExecReload=/bin/kill -s HUP \$MAINPID
-		RestartSec=2
-		Restart=always
-		Type=simple
-		KillMode=mixed
-
-		[Install]
-		WantedBy=default.target
-	EOT
-
-	# Avoid using 5001(api)/8080(gateway) which are reserved by tests.
-	# TODO: support unix socket
-	systemctl --user stop "${SYSTEMD_IPFS_UNIT}"
-	sleep 3
-	IPFS_PATH=${IPFS_PATH} ipfs config Addresses.API "/ip4/127.0.0.1/tcp/5888"
-	IPFS_PATH=${IPFS_PATH} ipfs config Addresses.Gateway "/ip4/127.0.0.1/tcp/5889"
-	systemctl --user restart "${SYSTEMD_IPFS_UNIT}"
-	sleep 3
-
-	INFO "If you use stargz-snapshotter, add the following line to \"${XDG_CONFIG_HOME}/containerd-stargz-grpc/config.toml\" manually, and then run \`systemctl --user restart ${SYSTEMD_STARGZ_UNIT}\`:"
-	cat <<-EOT
-		### BEGIN ###
-		ipfs = true
-		###  END  ###
-	EOT
-	INFO "If you want to expose the port 4001 of ipfs daemon, re-install rootless containerd with CONTAINERD_ROOTLESS_ROOTLESSKIT_FLAGS=\"--publish=0.0.0.0:4001:4001/tcp\" environment variable."
-	INFO "Set \`export IPFS_PATH=\"${IPFS_PATH}\"\` to use ipfs."
-}
-
 # CLI subcommand: "uninstall"
 cmd_entrypoint_uninstall() {
 	init
@@ -515,7 +462,6 @@ cmd_entrypoint_uninstall() {
 	uninstall_systemd_unit "${SYSTEMD_FUSE_OVERLAYFS_UNIT}"
 	uninstall_systemd_unit "${SYSTEMD_CONTAINERD_UNIT}"
 	uninstall_systemd_unit "${SYSTEMD_STARGZ_UNIT}"
-	uninstall_systemd_unit "${SYSTEMD_IPFS_UNIT}"
 	uninstall_systemd_unit "${SYSTEMD_BYPASS4NETNSD_UNIT}"
 
 	INFO "This uninstallation tool does NOT remove containerd binaries and data."
@@ -569,14 +515,6 @@ cmd_entrypoint_uninstall_stargz() {
 	INFO "To remove data, run: \`$BIN/rootlesskit rm -rf ${XDG_DATA_HOME}/containerd-stargz-grpc"
 }
 
-# CLI subcommand: "uninstall-ipfs"
-cmd_entrypoint_uninstall_ipfs() {
-	init
-	uninstall_systemd_unit "${SYSTEMD_IPFS_UNIT}"
-	INFO "This uninstallation tool does NOT remove data."
-	INFO "To remove data, run: \`$BIN/rootlesskit rm -rf ${XDG_DATA_HOME}/ipfs"
-}
-
 # text for --help
 usage() {
 	echo "Usage: ${ARG0} [OPTIONS] COMMAND"
@@ -604,10 +542,6 @@ usage() {
 	echo "Add-on commands (stargz):"
 	echo "  install-stargz              Install the systemd unit for stargz snapshotter"
 	echo "  uninstall-stargz            Uninstall the systemd unit for stargz snapshotter"
-	echo
-	echo "Add-on commands (ipfs):"
-	echo "  install-ipfs [ipfs-daemon-flags...]  Install the systemd unit for ipfs daemon. Specify \"--offline\" if run the daemon in offline mode. Specify \"--init\" to initialize IPFS repository as well."
-	echo "  uninstall-ipfs                       Uninstall the systemd unit for ipfs daemon"
 	echo
 	echo "Add-on commands (BuildKit containerd worker):"
 	echo "  install-buildkit-containerd   Install the systemd unit for BuildKit with CONTAINERD_NAMESPACE=${CONTAINERD_NAMESPACE:-} and CONTAINERD_SNAPSHOTTER=${CONTAINERD_SNAPSHOTTER:-}"

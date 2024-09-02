@@ -171,10 +171,6 @@ type ImagePushOptions struct {
 
 	// Estargz convert image to sStargz
 	Estargz bool
-	// IpfsEnsureImage ensure image is pushed to IPFS
-	IpfsEnsureImage bool
-	// IpfsAddress multiaddr of IPFS API (default uses $IPFS_PATH env variable if defined or local directory ~/.ipfs)
-	IpfsAddress string
 	// Suppress verbose output
 	Quiet bool
 	// AllowNondistributableArtifacts allow pushing non-distributable artifacts
@@ -202,8 +198,6 @@ type ImagePullOptions struct {
 	Mode string
 	// Suppress verbose output
 	Quiet bool
-	// multiaddr of IPFS API (default uses $IPFS_PATH env variable if defined or local directory ~/.ipfs)
-	IPFSAddress string
 	// Flags to pass into remote snapshotters
 	RFlags RemoteSnapshotterFlags
 }
