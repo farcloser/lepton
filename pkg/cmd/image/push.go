@@ -20,14 +20,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io"
+	"github.com/containerd/nerdctl/v2/pkg/referenceutil"
 	"net/http"
 
-	"github.com/opencontainers/go-digest"
-	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
-
 	containerd "github.com/containerd/containerd/v2/client"
-	"github.com/containerd/containerd/v2/core/content"
 	"github.com/containerd/containerd/v2/core/images"
 	"github.com/containerd/containerd/v2/core/images/converter"
 	"github.com/containerd/containerd/v2/core/remotes"
@@ -35,9 +31,6 @@ import (
 	dockerconfig "github.com/containerd/containerd/v2/core/remotes/docker/config"
 	"github.com/containerd/containerd/v2/pkg/reference"
 	"github.com/containerd/log"
-	"github.com/containerd/stargz-snapshotter/estargz"
-	"github.com/containerd/stargz-snapshotter/estargz/zstdchunked"
-	estargzconvert "github.com/containerd/stargz-snapshotter/nativeconverter/estargz"
 
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/errutil"
@@ -75,16 +68,6 @@ func Push(ctx context.Context, client *containerd.Client, rawRef string, options
 		}
 		defer client.ImageService().Delete(ctx, platImg.Name, images.SynchronousDelete())
 		log.G(ctx).Infof("pushing as a reduced-platform image (%s, %s)", platImg.Target.MediaType, platImg.Target.Digest)
-	}
-
-	if options.Estargz {
-		pushRef = ref + "-tmp-esgz"
-		esgzImg, err := converter.Convert(ctx, client, pushRef, ref, converter.WithPlatform(platMC), converter.WithLayerConvertFunc(eStargzConvertFunc()))
-		if err != nil {
-			return fmt.Errorf("failed to convert to eStargz: %v", err)
-		}
-		defer client.ImageService().Delete(ctx, esgzImg.Name, images.SynchronousDelete())
-		log.G(ctx).Infof("pushing as an eStargz image (%s, %s)", esgzImg.Target.MediaType, esgzImg.Target.Digest)
 	}
 
 	// In order to push images where most layers are the same but the
@@ -161,45 +144,4 @@ func Push(ctx context.Context, client *containerd.Client, rawRef string, options
 		fmt.Fprintln(options.Stdout, ref)
 	}
 	return nil
-}
-
-func eStargzConvertFunc() converter.ConvertFunc {
-	convertToESGZ := estargzconvert.LayerConvertFunc()
-	return func(ctx context.Context, cs content.Store, desc ocispec.Descriptor) (*ocispec.Descriptor, error) {
-		if isReusableESGZ(ctx, cs, desc) {
-			log.L.Infof("reusing estargz %s without conversion", desc.Digest)
-			return nil, nil
-		}
-		newDesc, err := convertToESGZ(ctx, cs, desc)
-		if err != nil {
-			return nil, err
-		}
-		log.L.Infof("converted %q to %s", desc.MediaType, newDesc.Digest)
-		return newDesc, err
-	}
-
-}
-
-func isReusableESGZ(ctx context.Context, cs content.Store, desc ocispec.Descriptor) bool {
-	dgstStr, ok := desc.Annotations[estargz.TOCJSONDigestAnnotation]
-	if !ok {
-		return false
-	}
-	tocdgst, err := digest.Parse(dgstStr)
-	if err != nil {
-		return false
-	}
-	ra, err := cs.ReaderAt(ctx, desc)
-	if err != nil {
-		return false
-	}
-	defer ra.Close()
-	r, err := estargz.Open(io.NewSectionReader(ra, 0, desc.Size), estargz.WithDecompressors(new(zstdchunked.Decompressor)))
-	if err != nil {
-		return false
-	}
-	if _, err := r.VerifyTOC(tocdgst); err != nil {
-		return false
-	}
-	return true
 }

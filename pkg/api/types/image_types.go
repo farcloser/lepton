@@ -67,23 +67,6 @@ type ImageConvertOptions struct {
 	// Format the output using the given Go template, e.g, 'json'
 	Format string
 
-	// #region estargz flags
-	// Estargz convert legacy tar(.gz) layers to eStargz for lazy pulling. Should be used in conjunction with '--oci'
-	Estargz bool
-	// EstargzRecordIn read 'ctr-remote optimize --record-out=<FILE>' record file (EXPERIMENTAL)
-	EstargzRecordIn string
-	// EstargzCompressionLevel eStargz compression level
-	EstargzCompressionLevel int
-	// EstargzChunkSize eStargz chunk size
-	EstargzChunkSize int
-	// EstargzMinChunkSize the minimal number of bytes of data must be written in one gzip stream. (requires stargz-snapshotter >= v0.13.0)
-	EstargzMinChunkSize int
-	// EstargzExternalToc separate TOC JSON into another image (called "TOC image"). The name of TOC image is the original + "-esgztoc" suffix. Both eStargz and the TOC image should be pushed to the same registry. (requires stargz-snapshotter >= v0.13.0) (EXPERIMENTAL)
-	EstargzExternalToc bool
-	// EstargzKeepDiffID convert to esgz without changing diffID (cannot be used in conjunction with '--estargz-record-in'. must be specified with '--estargz-external-toc')
-	EstargzKeepDiffID bool
-	// #endregion
-
 	// #region zstd flags
 	// Zstd convert legacy tar(.gz) layers to zstd. Should be used in conjunction with '--oci'
 	Zstd bool
@@ -146,8 +129,6 @@ type ImagePushOptions struct {
 	// AllPlatforms convert content for all platforms
 	AllPlatforms bool
 
-	// Estargz convert image to sStargz
-	Estargz bool
 	// Suppress verbose output
 	Quiet bool
 	// AllowNondistributableArtifacts allow pushing non-distributable artifacts
@@ -155,7 +136,7 @@ type ImagePushOptions struct {
 }
 
 // RemoteSnapshotterFlags are used for pulling with remote snapshotters
-// e.g. SOCI, stargz
+// e.g. SOCI
 type RemoteSnapshotterFlags struct {
 	SociIndexDigest string
 }

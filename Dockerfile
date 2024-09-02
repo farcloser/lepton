@@ -24,8 +24,6 @@ ARG CNI_PLUGINS_VERSION=v1.6.1
 
 # Extra deps: Build
 ARG BUILDKIT_VERSION=v0.18.1
-# Extra deps: Lazy-pulling
-ARG STARGZ_SNAPSHOTTER_VERSION=v0.16.2
 # Extra deps: Encryption
 ARG IMGCRYPT_VERSION=v2.0.0-rc.1
 # Extra deps: Rootless
@@ -146,16 +144,6 @@ RUN cd /out/lib/systemd/system && \
   sed -E "${sedcomm}" containerd.service > buildkit.service && \
   echo "" >> buildkit.service && \
   echo "# This file was converted from containerd.service, with \`sed -E '${sedcomm}'\`" >> buildkit.service
-ARG STARGZ_SNAPSHOTTER_VERSION
-RUN fname="stargz-snapshotter-${STARGZ_SNAPSHOTTER_VERSION}-${TARGETOS:-linux}-${TARGETARCH:-amd64}.tar.gz" && \
-  curl -o "${fname}" -fsSL --proto '=https' --tlsv1.2 "https://github.com/containerd/stargz-snapshotter/releases/download/${STARGZ_SNAPSHOTTER_VERSION}/${fname}" && \
-  curl -o "stargz-snapshotter.service" -fsSL --proto '=https' --tlsv1.2 "https://raw.githubusercontent.com/containerd/stargz-snapshotter/${STARGZ_SNAPSHOTTER_VERSION}/script/config/etc/systemd/system/stargz-snapshotter.service" && \
-  grep "${fname}" "/SHA256SUMS.d/stargz-snapshotter-${STARGZ_SNAPSHOTTER_VERSION}" | sha256sum -c - && \
-  grep "stargz-snapshotter.service" "/SHA256SUMS.d/stargz-snapshotter-${STARGZ_SNAPSHOTTER_VERSION}" | sha256sum -c - && \
-  tar xzf "${fname}" -C /out/bin && \
-  rm -f "${fname}" /out/bin/stargz-store && \
-  mv stargz-snapshotter.service /out/lib/systemd/system/stargz-snapshotter.service && \
-  echo "- Stargz Snapshotter: ${STARGZ_SNAPSHOTTER_VERSION}" >> /out/share/doc/nerdctl-full/README.md
 ARG IMGCRYPT_VERSION
 RUN git clone https://github.com/containerd/imgcrypt.git /go/src/github.com/containerd/imgcrypt && \
   cd /go/src/github.com/containerd/imgcrypt && \
@@ -230,20 +218,17 @@ FROM scratch AS out-full
 COPY --from=build-full /out /
 
 FROM ubuntu:${UBUNTU_VERSION} AS base
-# fuse3 is required by stargz snapshotter
 RUN apt-get update -qq && apt-get install -qq -y --no-install-recommends \
     apparmor \
     bash-completion \
     ca-certificates curl \
     iproute2 iptables \
-    dbus dbus-user-session systemd systemd-sysv \
-    fuse3
+    dbus dbus-user-session systemd systemd-sysv
 ARG CONTAINERIZED_SYSTEMD_VERSION
 RUN curl -o /docker-entrypoint.sh -fsSL --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/AkihiroSuda/containerized-systemd/${CONTAINERIZED_SYSTEMD_VERSION}/docker-entrypoint.sh && \
   chmod +x /docker-entrypoint.sh
 COPY --from=out-full / /usr/local/
 RUN perl -pi -e 's/multi-user.target/docker-entrypoint.target/g' /usr/local/lib/systemd/system/*.service && \
-  systemctl enable containerd buildkit stargz-snapshotter && \
   mkdir -p /etc/bash_completion.d && \
   nerdctl completion bash >/etc/bash_completion.d/nerdctl && \
   mkdir -p -m 0755 /etc/cni
@@ -251,7 +236,6 @@ COPY ./Dockerfile.d/etc_containerd_config.toml /etc/containerd/config.toml
 COPY ./Dockerfile.d/etc_buildkit_buildkitd.toml /etc/buildkit/buildkitd.toml
 VOLUME /var/lib/containerd
 VOLUME /var/lib/buildkit
-VOLUME /var/lib/containerd-stargz-grpc
 VOLUME /var/lib/nerdctl
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["bash", "--login", "-i"]

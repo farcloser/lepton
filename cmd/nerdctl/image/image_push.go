@@ -47,8 +47,6 @@ func NewPushCommand() *cobra.Command {
 	pushCommand.Flags().Bool("all-platforms", false, "Push content for all platforms")
 	// #endregion
 
-	pushCommand.Flags().Bool("estargz", false, "Convert the image into eStargz")
-
 	// #region sign flags
 	pushCommand.Flags().String("sign", "none", "Sign the image (none|cosign|notation")
 	pushCommand.RegisterFlagCompletionFunc("sign", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
@@ -83,10 +81,6 @@ func processImagePushOptions(cmd *cobra.Command) (types.ImagePushOptions, error)
 	if err != nil {
 		return types.ImagePushOptions{}, err
 	}
-	estargz, err := cmd.Flags().GetBool("estargz")
-	if err != nil {
-		return types.ImagePushOptions{}, err
-	}
 	quiet, err := cmd.Flags().GetBool("quiet")
 	if err != nil {
 		return types.ImagePushOptions{}, err
@@ -109,7 +103,6 @@ func processImagePushOptions(cmd *cobra.Command) (types.ImagePushOptions, error)
 		SociOptions:                    sociOptions,
 		Platforms:                      platform,
 		AllPlatforms:                   allPlatforms,
-		Estargz:                        estargz,
 		Quiet:                          quiet,
 		AllowNondistributableArtifacts: allowNonDist,
 		Stdout:                         cmd.OutOrStdout(),
