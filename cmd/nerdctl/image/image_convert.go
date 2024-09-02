@@ -75,12 +75,6 @@ func newImageConvertCommand() *cobra.Command {
 	imageConvertCommand.Flags().Int("zstdchunked-chunk-size", 0, "zstd:chunked chunk size")
 	// #endregion
 
-	// #region overlaybd flags
-	imageConvertCommand.Flags().Bool("overlaybd", false, "Convert tar.gz layers to overlaybd layers")
-	imageConvertCommand.Flags().String("overlaybd-fs-type", "ext4", "Filesystem type for overlaybd")
-	imageConvertCommand.Flags().String("overlaybd-dbstr", "", "Database config string for overlaybd")
-	// #endregion
-
 	// #region generic flags
 	imageConvertCommand.Flags().Bool("uncompress", false, "Convert tar.gz layers to uncompressed tar layers")
 	imageConvertCommand.Flags().Bool("oci", false, "Convert Docker media types to OCI media types")
@@ -167,21 +161,6 @@ func processImageConvertOptions(cmd *cobra.Command) (types.ImageConvertOptions, 
 	}
 	// #endregion
 
-	// #region overlaybd flags
-	overlaybd, err := cmd.Flags().GetBool("overlaybd")
-	if err != nil {
-		return types.ImageConvertOptions{}, err
-	}
-	overlaybdFsType, err := cmd.Flags().GetString("overlaybd-fs-type")
-	if err != nil {
-		return types.ImageConvertOptions{}, err
-	}
-	overlaybdDbstr, err := cmd.Flags().GetString("overlaybd-dbstr")
-	if err != nil {
-		return types.ImageConvertOptions{}, err
-	}
-	// #endregion
-
 	// #region generic flags
 	uncompress, err := cmd.Flags().GetBool("uncompress")
 	if err != nil {
@@ -224,11 +203,6 @@ func processImageConvertOptions(cmd *cobra.Command) (types.ImageConvertOptions, 
 		ZstdChunkedCompressionLevel: zstdChunkedCompressionLevel,
 		ZstdChunkedChunkSize:        zstdChunkedChunkSize,
 		ZstdChunkedRecordIn:         zstdChunkedRecordIn,
-		// #endregion
-		// #region overlaybd flags
-		Overlaybd:      overlaybd,
-		OverlayFsType:  overlaybdFsType,
-		OverlaydbDBStr: overlaybdDbstr,
 		// #endregion
 		// #region generic flags
 		Uncompress: uncompress,

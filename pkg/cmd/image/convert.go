@@ -28,7 +28,6 @@ import (
 	"github.com/klauspost/compress/zstd"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 
-	overlaybdconvert "github.com/containerd/accelerated-container-image/pkg/convertor"
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/content"
 	"github.com/containerd/containerd/v2/core/images"
@@ -76,9 +75,8 @@ func Convert(ctx context.Context, client *containerd.Client, srcRawRef, targetRa
 	estargz := options.Estargz
 	zstd := options.Zstd
 	zstdchunked := options.ZstdChunked
-	overlaybd := options.Overlaybd
 	var finalize func(ctx context.Context, cs content.Store, ref string, desc *ocispec.Descriptor) (*images.Image, error)
-	if estargz || zstd || zstdchunked || overlaybd {
+	if estargz || zstd || zstdchunked {
 		convertCount := 0
 		if estargz {
 			convertCount++
@@ -89,12 +87,8 @@ func Convert(ctx context.Context, client *containerd.Client, srcRawRef, targetRa
 		if zstdchunked {
 			convertCount++
 		}
-		if overlaybd {
-			convertCount++
-		}
-
 		if convertCount > 1 {
-			return errors.New("options --estargz, --zstdchunked and --overlaybd lead to conflict, only one of them can be used")
+			return errors.New("options --estargz, and --zstdchunked lead to conflict, only one of them can be used")
 		}
 
 		var convertFunc converter.ConvertFunc
@@ -118,27 +112,11 @@ func Convert(ctx context.Context, client *containerd.Client, srcRawRef, targetRa
 				return err
 			}
 			convertType = "zstdchunked"
-		case overlaybd:
-			obdOpts, err := getOBDConvertOpts(options)
-			if err != nil {
-				return err
-			}
-			obdOpts = append(obdOpts, overlaybdconvert.WithClient(client))
-			obdOpts = append(obdOpts, overlaybdconvert.WithImageRef(srcRef))
-			convertFunc = overlaybdconvert.IndexConvertFunc(obdOpts...)
-			convertOpts = append(convertOpts, converter.WithIndexConvertFunc(convertFunc))
-			convertType = "overlaybd"
 		}
 
-		if convertType != "overlaybd" {
-			convertOpts = append(convertOpts, converter.WithLayerConvertFunc(convertFunc))
-		}
+		convertOpts = append(convertOpts, converter.WithLayerConvertFunc(convertFunc))
 		if !options.Oci {
-			if overlaybd {
-				log.G(ctx).Warnf("option --%s should be used in conjunction with --oci, forcibly enabling on oci mediatype for %s conversion", convertType, convertType)
-			} else {
-				log.G(ctx).Warnf("option --%s should be used in conjunction with --oci", convertType)
-			}
+			log.G(ctx).Warnf("option --%s should be used in conjunction with --oci", convertType)
 		}
 		if options.Uncompress {
 			return fmt.Errorf("option --%s conflicts with --uncompress", convertType)
@@ -263,14 +241,6 @@ func getZstdchunkedConverter(options types.ImageConvertOptions) (converter.Conve
 		esgzOpts = append(esgzOpts, estargz.WithAllowPrioritizeNotFound(&ignored))
 	}
 	return zstdchunkedconvert.LayerConvertFuncWithCompressionLevel(zstd.EncoderLevelFromZstd(options.ZstdChunkedCompressionLevel), esgzOpts...), nil
-}
-
-func getOBDConvertOpts(options types.ImageConvertOptions) ([]overlaybdconvert.Option, error) {
-	obdOpts := []overlaybdconvert.Option{
-		overlaybdconvert.WithFsType(options.OverlayFsType),
-		overlaybdconvert.WithDbstr(options.OverlaydbDBStr),
-	}
-	return obdOpts, nil
 }
 
 func readPathsFromRecordFile(filename string) ([]string, error) {
