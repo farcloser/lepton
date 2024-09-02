@@ -31,10 +31,9 @@ import (
 )
 
 const (
-	snapshotterNameOverlaybd = "overlaybd"
-	snapshotterNameStargz    = "stargz"
-	snapshotterNameSoci      = "soci"
-	snapshotterNameCvmfs     = "cvmfs-snapshotter"
+	snapshotterNameStargz = "stargz"
+	snapshotterNameSoci   = "soci"
+	snapshotterNameCvmfs  = "cvmfs-snapshotter"
 
 	// prefetch size for stargz
 	prefetchSize = 10 * 1024 * 1024
@@ -42,10 +41,9 @@ const (
 
 // remote snapshotters explicitly handled by nerdctl
 var builtinRemoteSnapshotterOpts = map[string]snapshotterOpts{
-	snapshotterNameOverlaybd: &remoteSnapshotterOpts{snapshotter: "overlaybd"},
-	snapshotterNameStargz:    &remoteSnapshotterOpts{snapshotter: "stargz", extraLabels: stargzExtraLabels},
-	snapshotterNameSoci:      &remoteSnapshotterOpts{snapshotter: "soci", extraLabels: sociExtraLabels},
-	snapshotterNameCvmfs:     &remoteSnapshotterOpts{snapshotter: "cvmfs-snapshotter"},
+	snapshotterNameStargz: &remoteSnapshotterOpts{snapshotter: "stargz", extraLabels: stargzExtraLabels},
+	snapshotterNameSoci:   &remoteSnapshotterOpts{snapshotter: "soci", extraLabels: sociExtraLabels},
+	snapshotterNameCvmfs:  &remoteSnapshotterOpts{snapshotter: "cvmfs-snapshotter"},
 }
 
 // snapshotterOpts is used to update pull config

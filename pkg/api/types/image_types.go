@@ -101,16 +101,6 @@ type ImageConvertOptions struct {
 	// ZstdChunkedRecordIn read 'ctr-remote optimize --record-out=<FILE>' record file (EXPERIMENTAL)
 	ZstdChunkedRecordIn string
 	// #endregion
-
-	// #region overlaybd flags
-	// Overlaybd convert tar.gz layers to overlaybd layers
-	Overlaybd bool
-	// OverlayFsType filesystem type for overlaybd
-	OverlayFsType string
-	// OverlaydbDBStr database config string for overlaybd
-	OverlaydbDBStr string
-	// #endregion
-
 }
 
 // ImageCryptOptions specifies options for `nerdctl image encrypt` and `nerdctl image decrypt`.
@@ -165,7 +155,7 @@ type ImagePushOptions struct {
 }
 
 // RemoteSnapshotterFlags are used for pulling with remote snapshotters
-// e.g. SOCI, stargz, overlaybd
+// e.g. SOCI, stargz
 type RemoteSnapshotterFlags struct {
 	SociIndexDigest string
 }
