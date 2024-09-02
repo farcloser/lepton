@@ -1,9 +1,2 @@
-# artifacts
-/nerdctl
-_output
-
-# golangci-lint
-build
-
-# vagrant
-/.vagrant
+_*
+.idea
