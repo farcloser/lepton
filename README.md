@@ -15,7 +15,7 @@
 
  ✅ [Optional] Supports [rootless mode, without slirp overhead (bypass4netns)](./docs/rootless.md)
 
- ✅ [Optional] Supports lazy-pulling ([Stargz](./docs/stargz.md), [Nydus](./docs/nydus.md), [OverlayBD](./docs/overlaybd.md))
+ ✅ [Optional] Supports lazy-pulling ([Stargz](./docs/stargz.md), [OverlayBD](./docs/overlaybd.md))
 
  ✅ [Optional] Supports [encrypted images (ocicrypt)](./docs/ocicrypt.md)
 
@@ -182,7 +182,7 @@ Also, `nerdctl` might be potentially useful for debugging Kubernetes clusters, b
 
 Major:
 
-- On-demand image pulling (lazy-pulling) using [Stargz](./docs/stargz.md)/[Nydus](./docs/nydus.md)/[OverlayBD](./docs/overlaybd.md)/[SOCI](./docs/soci.md) Snapshotter: `nerdctl --snapshotter=stargz|nydus|overlaybd|soci run IMAGE` .
+- On-demand image pulling (lazy-pulling) using [Stargz](./docs/stargz.md)/[OverlayBD](./docs/overlaybd.md)/[SOCI](./docs/soci.md) Snapshotter: `nerdctl --snapshotter=stargz|overlaybd|soci run IMAGE` .
 - [Image encryption and decryption using ocicrypt (imgcrypt)](./docs/ocicrypt.md): `nerdctl image (encrypt|decrypt) SRC DST`
 - [Cosign integration](./docs/cosign.md): `nerdctl pull --verify=cosign` and `nerdctl push --sign=cosign`, and [in Compose](./docs/cosign.md#cosign-in-compose)
 - [Accelerated rootless containers using bypass4netns](./docs/rootless.md): `nerdctl run --annotation nerdctl/bypass4netns=true`
@@ -276,7 +276,6 @@ Basic features:
 Advanced features:
 
 - [`./docs/stargz.md`](./docs/stargz.md):     Lazy-pulling using Stargz Snapshotter
-- [`./docs/nydus.md`](./docs/nydus.md):       Lazy-pulling using Nydus Snapshotter
 - [`./docs/overlaybd.md`](./docs/overlaybd.md):       Lazy-pulling using OverlayBD Snapshotter
 - [`./docs/ocicrypt.md`](./docs/ocicrypt.md): Running encrypted images
 - [`./docs/gpu.md`](./docs/gpu.md):           Using GPUs inside containers

@@ -102,19 +102,6 @@ type ImageConvertOptions struct {
 	ZstdChunkedRecordIn string
 	// #endregion
 
-	// #region nydus flags
-	// Nydus convert legacy tar(.gz) layers to nydus for lazy pulling. Should be used in conjunction with '--oci'
-	Nydus bool
-	// NydusBuilderPath the nydus-image binary path, if unset, search in PATH environment
-	NydusBuilderPath string
-	// NydusWorkDir work directory path for image conversion, default is the nerdctl data root directory
-	NydusWorkDir string
-	// NydusPrefetchPatterns the file path pattern list want to prefetch
-	NydusPrefetchPatterns string
-	// NydusCompressor nydus blob compression algorithm, possible values: `none`, `lz4_block`, `zstd`, default is `lz4_block`
-	NydusCompressor string
-	// #endregion
-
 	// #region overlaybd flags
 	// Overlaybd convert tar.gz layers to overlaybd layers
 	Overlaybd bool

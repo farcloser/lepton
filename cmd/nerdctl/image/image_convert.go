@@ -75,14 +75,6 @@ func newImageConvertCommand() *cobra.Command {
 	imageConvertCommand.Flags().Int("zstdchunked-chunk-size", 0, "zstd:chunked chunk size")
 	// #endregion
 
-	// #region nydus flags
-	imageConvertCommand.Flags().Bool("nydus", false, "Convert an OCI image to Nydus image. Should be used in conjunction with '--oci'")
-	imageConvertCommand.Flags().String("nydus-builder-path", "nydus-image", "The nydus-image binary path, if unset, search in PATH environment")
-	imageConvertCommand.Flags().String("nydus-work-dir", "", "Work directory path for image conversion, default is the nerdctl data root directory")
-	imageConvertCommand.Flags().String("nydus-prefetch-patterns", "", "The file path pattern list want to prefetch")
-	imageConvertCommand.Flags().String("nydus-compressor", "lz4_block", "Nydus blob compression algorithm, possible values: `none`, `lz4_block`, `zstd`, default is `lz4_block`")
-	// #endregion
-
 	// #region overlaybd flags
 	imageConvertCommand.Flags().Bool("overlaybd", false, "Convert tar.gz layers to overlaybd layers")
 	imageConvertCommand.Flags().String("overlaybd-fs-type", "ext4", "Filesystem type for overlaybd")
@@ -175,29 +167,6 @@ func processImageConvertOptions(cmd *cobra.Command) (types.ImageConvertOptions, 
 	}
 	// #endregion
 
-	// #region nydus flags
-	nydus, err := cmd.Flags().GetBool("nydus")
-	if err != nil {
-		return types.ImageConvertOptions{}, err
-	}
-	nydusBuilderPath, err := cmd.Flags().GetString("nydus-builder-path")
-	if err != nil {
-		return types.ImageConvertOptions{}, err
-	}
-	nydusWorkDir, err := cmd.Flags().GetString("nydus-work-dir")
-	if err != nil {
-		return types.ImageConvertOptions{}, err
-	}
-	nydusPrefetchPatterns, err := cmd.Flags().GetString("nydus-prefetch-patterns")
-	if err != nil {
-		return types.ImageConvertOptions{}, err
-	}
-	nydusCompressor, err := cmd.Flags().GetString("nydus-compressor")
-	if err != nil {
-		return types.ImageConvertOptions{}, err
-	}
-	// #endregion
-
 	// #region overlaybd flags
 	overlaybd, err := cmd.Flags().GetBool("overlaybd")
 	if err != nil {
@@ -255,13 +224,6 @@ func processImageConvertOptions(cmd *cobra.Command) (types.ImageConvertOptions, 
 		ZstdChunkedCompressionLevel: zstdChunkedCompressionLevel,
 		ZstdChunkedChunkSize:        zstdChunkedChunkSize,
 		ZstdChunkedRecordIn:         zstdChunkedRecordIn,
-		// #endregion
-		// #region nydus flags
-		Nydus:                 nydus,
-		NydusBuilderPath:      nydusBuilderPath,
-		NydusWorkDir:          nydusWorkDir,
-		NydusPrefetchPatterns: nydusPrefetchPatterns,
-		NydusCompressor:       nydusCompressor,
 		// #endregion
 		// #region overlaybd flags
 		Overlaybd:      overlaybd,
