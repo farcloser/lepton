@@ -549,9 +549,9 @@ func NetworkFromNative(n *native.Network) (*Network, error) {
 	return &res, nil
 }
 
-func parseMounts(containersMounts string) ([]MountPoint, error) {
+func parseMounts(mountList string) ([]MountPoint, error) {
 	var mounts []MountPoint
-	err := json.Unmarshal([]byte(containersMounts), &mounts)
+	err := json.Unmarshal([]byte(mountList), &mounts)
 	if err != nil {
 		return nil, err
 	}

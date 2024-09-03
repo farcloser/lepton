@@ -540,8 +540,8 @@ func (c *Cmd) OutLines() []string {
 type Target = string
 
 const (
-	Nerdctl = Target("nerdctl")
 	Docker  = Target("docker")
+	Nerdctl = Target("nerdctl")
 )
 
 var (

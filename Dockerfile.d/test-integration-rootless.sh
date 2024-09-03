@@ -17,7 +17,7 @@
 set -eux -o pipefail
 if [[ "$(id -u)" = "0" ]]; then
 	if [ -e /sys/kernel/security/apparmor/profiles ]; then
-		# Load the "prefix-default" profile for TestRunApparmor
+		# Load the default profile for TestRunApparmor
 		nerdctl apparmor load
 	fi
 

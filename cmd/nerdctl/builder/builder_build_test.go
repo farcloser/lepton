@@ -205,7 +205,6 @@ func TestBuildFromContainerd(t *testing.T) {
 		Setup: func(data test.Data, helpers test.Helpers) {
 			helpers.Ensure("pull", "--quiet", testutil.CommonImage)
 			helpers.Ensure("tag", testutil.CommonImage, data.Identifier("first"))
-
 			dockerfile := fmt.Sprintf(`FROM %s
 RUN echo hello2 > /hello2
 CMD ["cat", "/hello2"]`, data.Identifier("first"))

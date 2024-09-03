@@ -44,11 +44,13 @@ type Info struct {
 	// Nfd is omitted because it does not make sense for us
 	OomKillDisable bool
 	// NGoroutines is omitted because it does not make sense for us
-	SystemTime    string
-	LoggingDriver string
-	CgroupDriver  cgroups.Manager
-	CgroupVersion string `json:",omitempty"`
-	// NEventsListener is omitted because it does not make sense for us
+	BridgeNfIptables  bool
+	BridgeNfIP6tables bool `json:"BridgeNfIp6tables"`
+	SystemTime        string
+	LoggingDriver     string
+	CgroupDriver      cgroups.Manager
+	CgroupVersion     string `json:",omitempty"`
+	// NEventsListener is omitted because it does not make sense here
 	KernelVersion   string
 	OperatingSystem string
 	OSType          string

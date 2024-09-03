@@ -49,6 +49,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/containerutil"
 	imgutil "github.com/containerd/nerdctl/v2/pkg/imgutil"
 	"github.com/containerd/nerdctl/v2/pkg/labels"
+	"github.com/containerd/nerdctl/v2/pkg/version"
 )
 
 type Changes struct {
@@ -106,7 +107,7 @@ func Commit(ctx context.Context, client *containerd.Client, container containerd
 	// to commit container created by moby.
 	baseImgWithoutPlatform, err := client.ImageService().Get(ctx, info.Image)
 	if err != nil {
-		return emptyDigest, fmt.Errorf("container %q lacks image (wasn't created by nerdctl?): %w", id, err)
+		return emptyDigest, fmt.Errorf("container %q lacks image (wasn't created by %s?): %w", id, version.RootName, err)
 	}
 	platformLabel := info.Labels[labels.Platform]
 	if platformLabel == "" {
