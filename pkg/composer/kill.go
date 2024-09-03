@@ -42,7 +42,7 @@ func (c *Composer) Kill(ctx context.Context, opts KillOptions, services []string
 		container := container
 		eg.Go(func() error {
 			args := []string{"kill", "-s", opts.Signal, container.ID()}
-			if err := c.runNerdctlCmd(ctx, args...); err != nil {
+			if err := c.runBinaryCmd(ctx, args...); err != nil {
 				log.G(ctx).Warn(err)
 				return err
 			}

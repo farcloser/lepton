@@ -26,6 +26,10 @@ var (
 	Version = ""
 	// Revision is filled via Makefile
 	Revision = ""
+	// RootName is used to locate configuration, prefix labels, and generally inside the library
+	// Changing this can be done at build time with -X, and is mostly of interest for people looking to build their
+	// own cli, leveraging nerdctl as a library.
+	RootName = "nerdctl"
 )
 
 const unknown = "<unknown>"

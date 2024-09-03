@@ -42,8 +42,8 @@ type Options struct {
 	Profiles         []string
 	Services         []string
 	EnvFile          string
-	NerdctlCmd       string
-	NerdctlArgs      []string
+	BinaryCmd        string
+	BinaryArgs       []string
 	NetworkInUse     func(ctx context.Context, netName string) (bool, error)
 	NetworkExists    func(string) (bool, error)
 	VolumeExists     func(string) (bool, error)
@@ -54,8 +54,8 @@ type Options struct {
 }
 
 func New(o Options, client *containerd.Client) (*Composer, error) {
-	if o.NerdctlCmd == "" {
-		return nil, errors.New("got empty nerdctl cmd")
+	if o.BinaryCmd == "" {
+		return nil, errors.New("got empty cmd")
 	}
 	if o.NetworkExists == nil || o.VolumeExists == nil || o.EnsureImage == nil {
 		return nil, errors.New("got empty functions")
@@ -141,12 +141,12 @@ type Composer struct {
 	client  *containerd.Client
 }
 
-func (c *Composer) createNerdctlCmd(ctx context.Context, args ...string) *exec.Cmd {
-	return exec.CommandContext(ctx, c.NerdctlCmd, append(c.NerdctlArgs, args...)...)
+func (c *Composer) createBinaryCmd(ctx context.Context, args ...string) *exec.Cmd {
+	return exec.CommandContext(ctx, c.BinaryCmd, append(c.BinaryArgs, args...)...)
 }
 
-func (c *Composer) runNerdctlCmd(ctx context.Context, args ...string) error {
-	cmd := c.createNerdctlCmd(ctx, args...)
+func (c *Composer) runBinaryCmd(ctx context.Context, args ...string) error {
+	cmd := c.createBinaryCmd(ctx, args...)
 	if c.DebugPrintFull {
 		log.G(ctx).Debugf("Running %v", cmd.Args)
 	}

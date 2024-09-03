@@ -81,8 +81,8 @@ func CanApplySpecificExistingProfile(profileName string) bool {
 }
 
 type Profile struct {
-	Name string `json:"Name"`           // e.g., "nerdctl-default"
-	Mode string `json:"Mode,omitempty"` // e.g., "enforce"
+	Name string `json:"Name"`
+	Mode string `json:"Mode,omitempty"`
 }
 
 // Profiles return profiles.

@@ -60,7 +60,7 @@ func (c *Composer) pushServiceImage(ctx context.Context, image string, platform 
 
 	args = append(args, image)
 
-	cmd := c.createNerdctlCmd(ctx, append([]string{"push"}, args...)...)
+	cmd := c.createBinaryCmd(ctx, append([]string{"push"}, args...)...)
 	if c.DebugPrintFull {
 		log.G(ctx).Debugf("Running %v", cmd.Args)
 	}

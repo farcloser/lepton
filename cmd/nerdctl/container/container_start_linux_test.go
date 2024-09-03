@@ -41,7 +41,7 @@ func TestStartDetachKeys(t *testing.T) {
 		// Maybe `unbuffer` exits too early in that case?
 		testutil.WithStdin(testutil.NewDelayOnceReader(strings.NewReader("exit\n"))),
 	}
-	// unbuffer(1) emulates tty, which is required by `nerdctl run -t`.
+	// unbuffer(1) emulates tty, which is required by `run -t`.
 	// unbuffer(1) can be installed with `apt-get install expect`.
 	//
 	// "-p" is needed because we need unbuffer to read from stdin, and from [1]:

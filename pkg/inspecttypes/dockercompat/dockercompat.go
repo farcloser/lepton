@@ -259,23 +259,23 @@ func ContainerFromNative(n *native.Container) (*Container, error) {
 		}
 		hostname = sp.Hostname
 	}
-	if nerdctlStateDir := n.Labels[labels.StateDir]; nerdctlStateDir != "" {
-		resolvConfPath := filepath.Join(nerdctlStateDir, "resolv.conf")
+	if stateDir := n.Labels[labels.StateDir]; stateDir != "" {
+		resolvConfPath := filepath.Join(stateDir, "resolv.conf")
 		if _, err := os.Stat(resolvConfPath); err == nil {
 			c.ResolvConfPath = resolvConfPath
 		}
-		hostnamePath := filepath.Join(nerdctlStateDir, "hostname")
+		hostnamePath := filepath.Join(stateDir, "hostname")
 		if _, err := os.Stat(hostnamePath); err == nil {
 			c.HostnamePath = hostnamePath
 		}
-		c.LogPath = filepath.Join(nerdctlStateDir, n.ID+"-json.log")
+		c.LogPath = filepath.Join(stateDir, n.ID+"-json.log")
 		if _, err := os.Stat(c.LogPath); err != nil {
 			c.LogPath = ""
 		}
 	}
 
-	if nerdctlMounts := n.Labels[labels.Mounts]; nerdctlMounts != "" {
-		mounts, err := parseMounts(nerdctlMounts)
+	if mountList := n.Labels[labels.Mounts]; mountList != "" {
+		mounts, err := parseMounts(mountList)
 		if err != nil {
 			return nil, err
 		}
@@ -506,7 +506,7 @@ type IPAM struct {
 // From https://github.com/moby/moby/blob/v20.10.7/api/types/types.go#L430-L448
 type Network struct {
 	Name   string            `json:"Name"`
-	ID     string            `json:"Id,omitempty"` // optional in nerdctl
+	ID     string            `json:"Id,omitempty"` // optional here
 	IPAM   IPAM              `json:"IPAM,omitempty"`
 	Labels map[string]string `json:"Labels"`
 	// Scope, Driver, etc. are omitted
@@ -548,9 +548,9 @@ func NetworkFromNative(n *native.Network) (*Network, error) {
 	return &res, nil
 }
 
-func parseMounts(nerdctlMounts string) ([]MountPoint, error) {
+func parseMounts(mountList string) ([]MountPoint, error) {
 	var mounts []MountPoint
-	err := json.Unmarshal([]byte(nerdctlMounts), &mounts)
+	err := json.Unmarshal([]byte(mountList), &mounts)
 	if err != nil {
 		return nil, err
 	}

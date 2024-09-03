@@ -80,7 +80,7 @@ func Info(ctx context.Context, client *containerd.Client, snapshotter, cgroupMan
 
 	var info dockercompat.Info
 	info.ID = daemonIntro.UUID
-	// Storage drivers and logging drivers are not really Server concept for nerdctl, but mimics `docker info` output
+	// Storage drivers and logging drivers are not really Server concept, but mimics `docker info` output
 	info.Driver = snapshotter
 	info.Plugins.Log = logging.Drivers()
 	info.Plugins.Storage = snapshotterPlugins

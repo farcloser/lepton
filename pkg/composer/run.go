@@ -264,7 +264,7 @@ func (c *Composer) runServices(ctx context.Context, parsedServices []*servicepar
 		return nil
 	}
 
-	// TODO: fix it when `nerdctl logs` supports `nerdctl run` without detach
+	// TODO: fix it when `logs` supports `run` without detach
 	// https://github.com/containerd/nerdctl/blob/v0.22.2/pkg/taskutil/taskutil.go#L55
 	if !ro.Interactive && !ro.Tty {
 		log.G(ctx).Info("Attaching to logs")

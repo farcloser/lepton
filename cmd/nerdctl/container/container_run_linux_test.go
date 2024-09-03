@@ -307,12 +307,12 @@ func TestRunWithInit(t *testing.T) {
 func TestRunTTY(t *testing.T) {
 	t.Parallel()
 	base := testutil.NewBase(t)
-	if testutil.GetTarget() == testutil.Nerdctl {
+	if testutil.GetTarget() == testutil.Nerdishctl {
 		testutil.RequireDaemonVersion(base, ">= 1.6.0-0")
 	}
 
 	const sttyPartialOutput = "speed 38400 baud"
-	// unbuffer(1) emulates tty, which is required by `nerdctl run -t`.
+	// unbuffer(1) emulates tty, which is required by `run -t`.
 	// unbuffer(1) can be installed with `apt-get install expect`.
 	unbuffer := []string{"unbuffer"}
 	base.CmdWithHelper(unbuffer, "run", "--rm", "-it", testutil.CommonImage, "stty").AssertOutContains(sttyPartialOutput)
@@ -485,7 +485,7 @@ func TestRunWithDetachKeys(t *testing.T) {
 		testutil.WithStdin(testutil.NewDelayOnceReader(bytes.NewReader([]byte{1, 2}))), // https://www.physics.udel.edu/~watson/scen103/ascii.html
 	}
 	defer base.Cmd("container", "rm", "-f", containerName).AssertOK()
-	// unbuffer(1) emulates tty, which is required by `nerdctl run -t`.
+	// unbuffer(1) emulates tty, which is required by `run -t`.
 	// unbuffer(1) can be installed with `apt-get install expect`.
 	//
 	// "-p" is needed because we need unbuffer to read from stdin, and from [1]:

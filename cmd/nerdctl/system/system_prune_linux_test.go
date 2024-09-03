@@ -69,7 +69,7 @@ func TestSystemPrune(t *testing.T) {
 	base.Cmd("network", "ls").AssertOutNotContains(nID)
 	base.Cmd("images").AssertOutNotContains(testutil.ImageRepo(testutil.CommonImage))
 
-	if testutil.GetTarget() != testutil.Nerdctl {
+	if testutil.GetTarget() != testutil.Nerdishctl {
 		t.Skip("test skipped for buildkitd is not available with docker-compatible tests")
 	}
 

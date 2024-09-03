@@ -53,7 +53,7 @@ func TestExecWithUser(t *testing.T) {
 func TestExecTTY(t *testing.T) {
 	t.Parallel()
 	base := testutil.NewBase(t)
-	if testutil.GetTarget() == testutil.Nerdctl {
+	if testutil.GetTarget() == testutil.Nerdishctl {
 		testutil.RequireDaemonVersion(base, ">= 1.6.0-0")
 	}
 
@@ -62,7 +62,7 @@ func TestExecTTY(t *testing.T) {
 	base.Cmd("run", "-d", "--name", testContainer, testutil.CommonImage, "sleep", "infinity").AssertOK()
 
 	const sttyPartialOutput = "speed 38400 baud"
-	// unbuffer(1) emulates tty, which is required by `nerdctl run -t`.
+	// unbuffer(1) emulates tty, which is required by `run -t`.
 	// unbuffer(1) can be installed with `apt-get install expect`.
 	unbuffer := []string{"unbuffer"}
 	base.CmdWithHelper(unbuffer, "exec", "-it", testContainer, "stty").AssertOutContains(sttyPartialOutput)

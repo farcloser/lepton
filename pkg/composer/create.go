@@ -45,7 +45,7 @@ const (
 	RecreateDiverged = "diverged"
 )
 
-// CreateOptions stores all option input from `nerdctl compose create`
+// CreateOptions stores all option input from `compose create`
 type CreateOptions struct {
 	Build         bool
 	NoBuild       bool
@@ -170,7 +170,7 @@ func (c *Composer) createServiceContainer(ctx context.Context, service *servicep
 		}
 
 		log.G(ctx).Debugf("Container %q already exists and force-created is enabled, deleting", container.Name)
-		delCmd := c.createNerdctlCmd(ctx, "rm", "-f", container.Name)
+		delCmd := c.createBinaryCmd(ctx, "rm", "-f", container.Name)
 		if err = delCmd.Run(); err != nil {
 			return "", fmt.Errorf("could not delete container %q: %s", container.Name, err)
 		}
@@ -193,7 +193,7 @@ func (c *Composer) createServiceContainer(ctx context.Context, service *servicep
 		fmt.Sprintf("-l=%s=%s", labels.ComposeService, service.Unparsed.Name),
 	}, container.RunArgs...)
 
-	cmd := c.createNerdctlCmd(ctx, append([]string{"create"}, container.RunArgs...)...)
+	cmd := c.createBinaryCmd(ctx, append([]string{"create"}, container.RunArgs...)...)
 	if c.DebugPrintFull {
 		log.G(ctx).Debugf("Running %v", cmd.Args)
 	}

@@ -56,7 +56,7 @@ services:
 
 	defer base.Cmd("rm", "-f", "-v", containerName).Run()
 	const sttyPartialOutput = "speed 38400 baud"
-	// unbuffer(1) emulates tty, which is required by `nerdctl run -t`.
+	// unbuffer(1) emulates tty, which is required by `run -t`.
 	// unbuffer(1) can be installed with `apt-get install expect`.
 	unbuffer := []string{"unbuffer"}
 	base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(),
@@ -86,7 +86,7 @@ services:
 
 	defer base.Cmd("rm", "-f", "-v", containerName).Run()
 	const sttyPartialOutput = "speed 38400 baud"
-	// unbuffer(1) emulates tty, which is required by `nerdctl run -t`.
+	// unbuffer(1) emulates tty, which is required by `run -t`.
 	// unbuffer(1) can be installed with `apt-get install expect`.
 	unbuffer := []string{"unbuffer"}
 	base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(),
@@ -126,7 +126,7 @@ services:
 
 	defer base.Cmd("rm", "-f", "-v", containerName).Run()
 	go func() {
-		// unbuffer(1) emulates tty, which is required by `nerdctl run -t`.
+		// unbuffer(1) emulates tty, which is required by `run -t`.
 		// unbuffer(1) can be installed with `apt-get install expect`.
 		unbuffer := []string{"unbuffer"}
 		base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(),
@@ -186,7 +186,7 @@ services:
 
 	defer base.Cmd("rm", "-f", "-v", containerName).Run()
 	go func() {
-		// unbuffer(1) emulates tty, which is required by `nerdctl run -t`.
+		// unbuffer(1) emulates tty, which is required by `run -t`.
 		// unbuffer(1) can be installed with `apt-get install expect`.
 		unbuffer := []string{"unbuffer"}
 		base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(),
@@ -250,7 +250,7 @@ services:
 
 	defer base.Cmd("rm", "-f", "-v", containerName).Run()
 	const partialOutput = "bar"
-	// unbuffer(1) emulates tty, which is required by `nerdctl run -t`.
+	// unbuffer(1) emulates tty, which is required by `run -t`.
 	// unbuffer(1) can be installed with `apt-get install expect`.
 	unbuffer := []string{"unbuffer"}
 	base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(),
@@ -281,7 +281,7 @@ services:
 
 	defer base.Cmd("rm", "-f", "-v", containerName).Run()
 	const partialOutput = "5000"
-	// unbuffer(1) emulates tty, which is required by `nerdctl run -t`.
+	// unbuffer(1) emulates tty, which is required by `run -t`.
 	// unbuffer(1) can be installed with `apt-get install expect`.
 	unbuffer := []string{"unbuffer"}
 	base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(),
@@ -311,7 +311,7 @@ services:
 	defer base.ComposeCmd("-f", comp.YAMLFullPath(), "down", "-v").Run()
 
 	defer base.Cmd("rm", "-f", "-v", containerName).Run()
-	// unbuffer(1) emulates tty, which is required by `nerdctl run -t`.
+	// unbuffer(1) emulates tty, which is required by `run -t`.
 	// unbuffer(1) can be installed with `apt-get install expect`.
 	unbuffer := []string{"unbuffer"}
 	base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(),
@@ -347,7 +347,7 @@ services:
 
 	defer base.Cmd("rm", "-f", "-v", containerName).Run()
 	const partialOutput = "hello world"
-	// unbuffer(1) emulates tty, which is required by `nerdctl run -t`.
+	// unbuffer(1) emulates tty, which is required by `run -t`.
 	// unbuffer(1) can be installed with `apt-get install expect`.
 	unbuffer := []string{"unbuffer"}
 	base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(),
@@ -377,7 +377,7 @@ services:
 
 	defer base.Cmd("rm", "-f", "-v", containerName).Run()
 	const partialOutput = "hello world"
-	// unbuffer(1) emulates tty, which is required by `nerdctl run -t`.
+	// unbuffer(1) emulates tty, which is required by `run -t`.
 	// unbuffer(1) can be installed with `apt-get install expect`.
 	unbuffer := []string{"unbuffer"}
 	base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(),
@@ -409,7 +409,7 @@ services:
 	volumeFlagStr := fmt.Sprintf("%s:%s", tmpDir, destinationDir)
 
 	defer base.Cmd("rm", "-f", "-v", containerName).Run()
-	// unbuffer(1) emulates tty, which is required by `nerdctl run -t`.
+	// unbuffer(1) emulates tty, which is required by `run -t`.
 	// unbuffer(1) can be installed with `apt-get install expect`.
 	unbuffer := []string{"unbuffer"}
 	base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(),
@@ -499,7 +499,7 @@ services:
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "pull", "svc2").AssertOK()   // verify passed
 	// 4. compose run
 	const sttyPartialOutput = "speed 38400 baud"
-	// unbuffer(1) emulates tty, which is required by `nerdctl run -t`.
+	// unbuffer(1) emulates tty, which is required by `run -t`.
 	// unbuffer(1) can be installed with `apt-get install expect`.
 	unbuffer := []string{"unbuffer"}
 	base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(), "run", "svc0").AssertOutContains(sttyPartialOutput) // key match

@@ -56,7 +56,7 @@ func (c *Composer) upVolume(ctx context.Context, shortName string) error {
 			fmt.Sprintf("--label=%s=%s", labels.ComposeVolume, shortName),
 			fullName,
 		}
-		if err := c.runNerdctlCmd(ctx, append([]string{"volume", "create"}, createArgs...)...); err != nil {
+		if err := c.runBinaryCmd(ctx, append([]string{"volume", "create"}, createArgs...)...); err != nil {
 			return err
 		}
 	}

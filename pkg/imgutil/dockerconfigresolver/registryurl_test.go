@@ -17,9 +17,12 @@
 package dockerconfigresolver
 
 import (
+	"fmt"
 	"testing"
 
 	"gotest.tools/v3/assert"
+
+	"github.com/containerd/nerdctl/v2/pkg/version"
 )
 
 func TestURLParsingAndID(t *testing.T) {
@@ -144,9 +147,9 @@ func TestURLParsingAndID(t *testing.T) {
 		},
 		{
 			address:    "https://registry-host.com/subpath/something?bar=bar&ns=registry-namespace.com&foo=foo",
-			identifier: "nerdctl-experimental://registry-namespace.com:443/host/registry-host.com:443/subpath/something",
+			identifier: fmt.Sprintf("%s-experimental://registry-namespace.com:443/host/registry-host.com:443/subpath/something", version.RootName),
 			allIDs: []string{
-				"nerdctl-experimental://registry-namespace.com:443/host/registry-host.com:443/subpath/something",
+				fmt.Sprintf("%s-experimental://registry-namespace.com:443/host/registry-host.com:443/subpath/something", version.RootName),
 			},
 		},
 		{

@@ -18,7 +18,7 @@ package types
 
 import "io"
 
-// VolumeCreateOptions specifies options for `nerdctl volume create`.
+// VolumeCreateOptions specifies options for `volume create`.
 type VolumeCreateOptions struct {
 	Stdout   io.Writer
 	GOptions GlobalCommandOptions
@@ -26,7 +26,7 @@ type VolumeCreateOptions struct {
 	Labels []string
 }
 
-// VolumeInspectOptions specifies options for `nerdctl volume inspect`.
+// VolumeInspectOptions specifies options for `volume inspect`.
 type VolumeInspectOptions struct {
 	Stdout   io.Writer
 	GOptions GlobalCommandOptions
@@ -36,7 +36,7 @@ type VolumeInspectOptions struct {
 	Size bool
 }
 
-// VolumeListOptions specifies options for `nerdctl volume ls`.
+// VolumeListOptions specifies options for `volume ls`.
 type VolumeListOptions struct {
 	Stdout   io.Writer
 	GOptions GlobalCommandOptions
@@ -50,7 +50,7 @@ type VolumeListOptions struct {
 	Filters []string
 }
 
-// VolumePruneOptions specifies options for `nerdctl volume prune`.
+// VolumePruneOptions specifies options for `volume prune`.
 type VolumePruneOptions struct {
 	Stdout   io.Writer
 	GOptions GlobalCommandOptions
@@ -60,7 +60,7 @@ type VolumePruneOptions struct {
 	Force bool
 }
 
-// VolumeRemoveOptions specifies options for `nerdctl volume rm`.
+// VolumeRemoveOptions specifies options for `volume rm`.
 type VolumeRemoveOptions struct {
 	Stdout   io.Writer
 	GOptions GlobalCommandOptions

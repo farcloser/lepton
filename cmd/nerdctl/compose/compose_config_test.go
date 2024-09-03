@@ -70,7 +70,7 @@ services:
 	defer comp.CleanUp()
 
 	// `--hash=*` is broken in Docker Compose v2.23.0: https://github.com/docker/compose/issues/11145
-	if base.Target == testutil.Nerdctl {
+	if base.Target == testutil.Nerdishctl {
 		base.ComposeCmd("-f", comp.YAMLFullPath(), "config", "--hash=*").AssertOutContains("hello1")
 	}
 

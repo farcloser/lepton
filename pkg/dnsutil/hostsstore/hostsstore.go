@@ -134,7 +134,7 @@ func (x *hostsStore) Acquire(meta Meta) (err error) {
 func (x *hostsStore) Release(id string) (err error) {
 	// We remove "meta.json" but we still retain the "hosts" file
 	// because it is needed for restarting. The "hosts" is removed on
-	// `nerdctl rm`.
+	// `rm`.
 	// https://github.com/rootless-containers/rootlesskit/issues/220#issuecomment-783224610
 	defer func() {
 		if err != nil {

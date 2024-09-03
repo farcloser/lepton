@@ -43,7 +43,7 @@ func TestRemoveImage(t *testing.T) {
 func TestRemoveRunningImage(t *testing.T) {
 	// If an image is associated with a running/paused containers, `docker rmi -f imageName`
 	// untags `imageName` (left a `<none>` image) without deletion; `docker rmi -rf imageID` fails.
-	// In both cases, `nerdctl rmi -f` will fail.
+	// In both cases, `rmi -f` will fail.
 	testutil.DockerIncompatible(t)
 	base := testutil.NewBase(t)
 	tID := testutil.Identifier(t)
@@ -64,7 +64,7 @@ func TestRemoveRunningImage(t *testing.T) {
 func TestRemovePausedImage(t *testing.T) {
 	// If an image is associated with a running/paused containers, `docker rmi -f imageName`
 	// untags `imageName` (left a `<none>` image) without deletion; `docker rmi -rf imageID` fails.
-	// In both cases, `nerdctl rmi -f` will fail.
+	// In both cases, `rmi -f` will fail.
 	testutil.DockerIncompatible(t)
 	base := testutil.NewBase(t)
 	switch base.Info().CgroupDriver {

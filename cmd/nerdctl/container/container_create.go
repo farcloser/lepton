@@ -35,7 +35,7 @@ func NewCreateCommand() *cobra.Command {
 	switch runtime.GOOS {
 	case "windows":
 		longHelp += "\n"
-		longHelp += "WARNING: `nerdctl create` is experimental on Windows and currently broken (https://github.com/containerd/nerdctl/issues/28)"
+		longHelp += "WARNING: `create` is experimental on Windows and currently broken (https://github.com/containerd/nerdctl/issues/28)"
 	}
 	var createCommand = &cobra.Command{
 		Use:               "create [flags] IMAGE [COMMAND] [ARG...]",
@@ -64,7 +64,7 @@ func processContainerCreateOptions(cmd *cobra.Command) (types.ContainerCreateOpt
 		return opt, err
 	}
 
-	opt.NerdctlCmd, opt.NerdctlArgs = helpers.GlobalFlags(cmd)
+	opt.BinaryCmd, opt.BinaryArgs = helpers.GlobalFlags(cmd)
 
 	// #region for basic flags
 	// The command `container start` doesn't support the flag `--interactive`. Set the default value of `opt.Interactive` false.

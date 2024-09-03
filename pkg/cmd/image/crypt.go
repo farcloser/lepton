@@ -114,8 +114,8 @@ func parseImgcryptFlags(options types.ImageCryptOptions, encrypt bool) (parsehel
 			return a, errors.New("at least one recipient must be specified (e.g., --recipient=jwe:mypubkey.pem)")
 		}
 	}
-	// While --recipient can be specified only for `nerdctl image encrypt`,
-	// --dec-recipient can be specified for both `nerdctl image encrypt` and `nerdctl image decrypt`.
+	// While --recipient can be specified only for `image encrypt`,
+	// --dec-recipient can be specified for both `image encrypt` and `image decrypt`.
 	a.DecRecipient = options.DecRecipients
 	return a, nil
 }

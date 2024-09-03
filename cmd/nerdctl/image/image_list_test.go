@@ -103,7 +103,7 @@ LABEL version=0.1`, testutil.CommonImage)
 	defer base.Cmd("rmi", busyboxUclibc).AssertOK()
 
 	// before/since filters are not compatible with DOCKER_BUILDKIT=1? (but still compatible with DOCKER_BUILDKIT=0)
-	if base.Target == testutil.Nerdctl {
+	if base.Target == testutil.Nerdishctl {
 		base.Cmd("images", "--filter", fmt.Sprintf("before=%s:%s", tempName, "latest")).AssertOutContains(testutil.ImageRepo(testutil.CommonImage))
 		base.Cmd("images", "--filter", fmt.Sprintf("before=%s:%s", tempName, "latest")).AssertOutNotContains(tempName)
 		base.Cmd("images", "--filter", fmt.Sprintf("since=%s", testutil.CommonImage)).AssertOutContains(tempName)

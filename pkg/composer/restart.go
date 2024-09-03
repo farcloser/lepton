@@ -29,13 +29,13 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/labels"
 )
 
-// RestartOptions stores all option input from `nerdctl compose restart`
+// RestartOptions stores all option input from `compose restart`
 type RestartOptions struct {
 	Timeout *uint
 }
 
 // Restart restarts running/stopped containers in `services`. It calls
-// `nerdctl restart CONTAINER_ID` to do the actual job.
+// `restart CONTAINER_ID` to do the actual job.
 func (c *Composer) Restart(ctx context.Context, opt RestartOptions, services []string) error {
 	// in dependency order
 	return c.project.ForEachService(services, func(name string, svc *types.ServiceConfig) error {
@@ -51,7 +51,7 @@ func (c *Composer) Restart(ctx context.Context, opt RestartOptions, services []s
 func (c *Composer) restartContainers(ctx context.Context, containers []containerd.Container, opt RestartOptions) error {
 	var timeoutArg string
 	if opt.Timeout != nil {
-		// `nerdctl restart` uses `--time` instead of `--timeout`
+		// `restart` uses `--time` instead of `--timeout`
 		timeoutArg = fmt.Sprintf("--time=%d", *opt.Timeout)
 	}
 
@@ -68,7 +68,7 @@ func (c *Composer) restartContainers(ctx context.Context, containers []container
 				args = append(args, timeoutArg)
 			}
 			args = append(args, container.ID())
-			if err := c.runNerdctlCmd(ctx, args...); err != nil {
+			if err := c.runBinaryCmd(ctx, args...); err != nil {
 				log.G(ctx).Warn(err)
 			}
 		}()

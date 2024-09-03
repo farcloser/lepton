@@ -131,7 +131,7 @@ func TestBuildFromContainerd(t *testing.T) {
 	defer base.Cmd("rmi", imageName2).Run()
 
 	// FIXME: BuildKit sometimes tries to use base image manifests of platforms that hasn't been
-	//        pulled by `nerdctl pull`. This leads to "not found" error for the base image.
+	//        pulled by `pull`. This leads to "not found" error for the base image.
 	//        To avoid this issue, images shared to BuildKit should always be pulled by manifest
 	//        digest or `--all-platforms` needs to be added.
 	base.Cmd("pull", "--all-platforms", testutil.CommonImage).AssertOK()

@@ -228,7 +228,7 @@ func Create(ctx context.Context, client *containerd.Client, args []string, netMa
 	// perform network setup and teardown when using CNI networking.
 	// On Windows, we are forced to set up and tear down the networking from within nerdctl.
 	if runtime.GOOS != "windows" {
-		hookOpt, err := withNerdctlOCIHook(options.NerdctlCmd, options.NerdctlArgs)
+		hookOpt, err := withNerdctlOCIHook(options.BinaryCmd, options.BinaryArgs)
 		if err != nil {
 			return nil, nil, err
 		}

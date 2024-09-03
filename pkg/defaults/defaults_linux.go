@@ -27,23 +27,27 @@ import (
 	"github.com/containerd/log"
 
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
+	"github.com/containerd/nerdctl/v2/pkg/version"
 )
 
 const (
-	AppArmorProfileName = "nerdctl-default"
-	SeccompProfileName  = "builtin"
-	Runtime             = plugins.RuntimeRuncV2
+	SeccompProfileName = "builtin"
+	Runtime            = plugins.RuntimeRuncV2
+)
+
+var (
+	AppArmorProfileName = fmt.Sprintf("%s-default", version.RootName)
 )
 
 func DataRoot() string {
 	if !rootlessutil.IsRootless() {
-		return "/var/lib/nerdctl"
+		return filepath.Join("/var/lib", version.RootName)
 	}
 	xdh, err := rootlessutil.XDGDataHome()
 	if err != nil {
 		panic(err)
 	}
-	return filepath.Join(xdh, "nerdctl")
+	return filepath.Join(xdh, version.RootName)
 }
 
 func CNIPath() string {

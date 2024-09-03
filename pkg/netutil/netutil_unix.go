@@ -211,8 +211,8 @@ func (e *CNIEnv) generateIPAM(driver string, subnets []string, gatewayStr, ipRan
 			log.L.Warnf("cannot access dhcp socket %q (hint: try running with `dhcp daemon --socketpath=%s &` in CNI_PATH to launch the dhcp daemon)", ipamConf.DaemonSocketPath, ipamConf.DaemonSocketPath)
 		}
 
-		// Set the host-name option to the value of passed argument NERDCTL_CNI_DHCP_HOSTNAME
-		opts["host-name"] = `{"type": "provide", "fromArg": "NERDCTL_CNI_DHCP_HOSTNAME"}`
+		// Set the host-name option to the value of passed argument CNI_DHCP_HOSTNAME
+		opts["host-name"] = `{"type": "provide", "fromArg": "CNI_DHCP_HOSTNAME"}`
 
 		// Convert all user-defined ipam-options into serializable options
 		for optName, optValue := range opts {

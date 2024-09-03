@@ -65,7 +65,7 @@ func (c *Composer) buildServiceImage(ctx context.Context, image string, b *servi
 	}
 	args = append(args, b.BuildArgs...)
 
-	cmd := c.createNerdctlCmd(ctx, append([]string{"build"}, args...)...)
+	cmd := c.createBinaryCmd(ctx, append([]string{"build"}, args...)...)
 	if c.DebugPrintFull {
 		log.G(ctx).Debugf("Running %v", cmd.Args)
 	}

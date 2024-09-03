@@ -18,7 +18,7 @@ package types
 
 import "io"
 
-// ImageLoadOptions specifies options for `nerdctl (image) load`.
+// ImageLoadOptions specifies options for `(image) load`.
 type ImageLoadOptions struct {
 	Stdout   io.Writer
 	Stdin    io.Reader

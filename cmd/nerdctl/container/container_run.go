@@ -53,7 +53,7 @@ func NewRunCommand() *cobra.Command {
 	switch runtime.GOOS {
 	case "windows":
 		longHelp += "\n"
-		longHelp += "WARNING: `nerdctl run` is experimental on Windows and currently broken (https://github.com/containerd/nerdctl/issues/28)"
+		longHelp += "WARNING: `run` is experimental on Windows and currently broken (https://github.com/containerd/nerdctl/issues/28)"
 	}
 	var runCommand = &cobra.Command{
 		Use:               "run [flags] IMAGE [COMMAND] [ARG...]",
@@ -219,7 +219,7 @@ func setCreateFlags(cmd *cobra.Command) {
 
 	// #region env flags
 	// entrypoint needs to be StringArray, not StringSlice, to prevent "FOO=foo1,foo2" from being split to {"FOO=foo1", "foo2"}
-	// entrypoint StringArray is an internal implementation to support `nerdctl compose` entrypoint yaml filed with multiple strings
+	// entrypoint StringArray is an internal implementation to support `compose` entrypoint yaml filed with multiple strings
 	// users are not expected to specify multiple --entrypoint flags manually.
 	cmd.Flags().StringArray("entrypoint", nil, "Overwrite the default ENTRYPOINT of the image")
 	cmd.Flags().StringP("workdir", "w", "", "Working directory inside the container")

@@ -78,9 +78,10 @@ func NewClientWithPlatform(ctx context.Context, namespace, address, platform str
 	return NewClient(ctx, namespace, address, clientOpts...)
 }
 
-// DataStore returns a string like "/var/lib/nerdctl/1935db59".
+// DataStore returns a string like "/var/lib/version.RootName/1935db59".
 // "1935db9" is from `$(echo -n "/run/containerd/containerd.sock" | sha256sum | cut -c1-8)`
-// on Windows it will return "%PROGRAMFILES%/nerdctl/1935db59"
+// on Windows it will return "%PROGRAMFILES%/version.RootName/1935db59"
+// where `version.RootName` is defined at build time
 func DataStore(dataRoot, address string) (string, error) {
 	if err := os.MkdirAll(dataRoot, 0700); err != nil {
 		return "", err

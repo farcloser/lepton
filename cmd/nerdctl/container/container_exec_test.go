@@ -53,7 +53,7 @@ func TestExecWithDoubleDash(t *testing.T) {
 func TestExecStdin(t *testing.T) {
 	t.Parallel()
 	base := testutil.NewBase(t)
-	if testutil.GetTarget() == testutil.Nerdctl {
+	if testutil.GetTarget() == testutil.Nerdishctl {
 		testutil.RequireDaemonVersion(base, ">= 1.6.0-0")
 	}
 

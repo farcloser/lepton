@@ -33,7 +33,7 @@ import (
 )
 
 // For the test matrix, see https://docs.docker.com/engine/reference/commandline/cp/
-// Obviously, none of this is fully windows ready - obviously `nerdctl cp` itself is not either, so, ok for now.
+// Obviously, none of this is fully windows ready - obviously `cp` itself is not either, so, ok for now.
 const (
 	// Use this to poke the testing rig for improper path handling
 	// TODO: fuzz this more seriously
@@ -938,7 +938,7 @@ func cpTestHelper(t *testing.T, tg *testgroup) {
 					cmd = base.Cmd("cp", containerStopped+":"+sourceSpec, destinationSpec)
 				}
 
-				if rootlessutil.IsRootless() && testutil.GetTarget() == testutil.Nerdctl {
+				if rootlessutil.IsRootless() && testutil.GetTarget() == testutil.Nerdishctl {
 					cmd.Assert(
 						icmd.Expected{
 							ExitCode: 1,

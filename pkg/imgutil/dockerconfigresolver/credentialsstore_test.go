@@ -24,6 +24,8 @@ import (
 	"testing"
 
 	"gotest.tools/v3/assert"
+
+	"github.com/containerd/nerdctl/v2/pkg/version"
 )
 
 func createTempDir(t *testing.T, mode os.FileMode) string {
@@ -355,13 +357,13 @@ func TestWorkingCredentialsStore(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		content := `{
+		content := fmt.Sprintf(`{
 				"auths": {
-					"nerdctl-experimental://namespace.example:443/host/host.example:443/path": {
+					"%s-experimental://namespace.example:443/host/host.example:443/path": {
 						"username": "username"
 					}
 				}
-			}`
+			}`, version.RootName)
 		dir := writeContent(t, content)
 		cs, err := NewCredentialsStore(dir)
 		if err != nil {

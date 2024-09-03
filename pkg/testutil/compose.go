@@ -24,6 +24,8 @@ import (
 
 	"github.com/compose-spec/compose-go/v2/loader"
 	compose "github.com/compose-spec/compose-go/v2/types"
+
+	"github.com/containerd/nerdctl/v2/pkg/version"
 )
 
 type ComposeDir struct {
@@ -55,7 +57,7 @@ func (cd *ComposeDir) CleanUp() {
 }
 
 func NewComposeDir(t testing.TB, dockerComposeYAML string) *ComposeDir {
-	tmpDir, err := os.MkdirTemp("", "nerdctl-compose-test")
+	tmpDir, err := os.MkdirTemp("", version.RootName+"-compose-test")
 	if err != nil {
 		t.Fatal(err)
 	}

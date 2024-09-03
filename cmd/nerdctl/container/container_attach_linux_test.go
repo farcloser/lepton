@@ -46,7 +46,7 @@ func prepareContainerToAttach(base *testutil.Base, containerName string) {
 			[]byte{16, 17}, // ctrl+p,ctrl+q, see https://www.physics.udel.edu/~watson/scen103/ascii.html
 		))),
 	}
-	// unbuffer(1) emulates tty, which is required by `nerdctl run -t`.
+	// unbuffer(1) emulates tty, which is required by `run -t`.
 	// unbuffer(1) can be installed with `apt-get install expect`.
 	//
 	// "-p" is needed because we need unbuffer to read from stdin, and from [1]:

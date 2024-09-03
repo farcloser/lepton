@@ -143,7 +143,7 @@ func psAction(cmd *cobra.Command, args []string) error {
 	return formatAndPrintContainerInfo(containers, fpOpts)
 }
 
-// FormattingAndPrintingOptions specifies options for formatting and printing of `nerdctl (container) list`.
+// FormattingAndPrintingOptions specifies options for formatting and printing of `(container) list`.
 type FormattingAndPrintingOptions struct {
 	Stdout io.Writer
 	// Only display container IDs.

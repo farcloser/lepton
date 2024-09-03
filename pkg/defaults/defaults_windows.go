@@ -19,6 +19,8 @@ package defaults
 import (
 	"os"
 	"path/filepath"
+
+	"github.com/containerd/nerdctl/v2/pkg/version"
 )
 
 const (
@@ -28,7 +30,7 @@ const (
 )
 
 func DataRoot() string {
-	return filepath.Join(os.Getenv("ProgramData"), "nerdctl")
+	return filepath.Join(os.Getenv("ProgramData"), version.RootName)
 }
 
 func CNIPath() string {
@@ -60,7 +62,7 @@ func NerdctlTOML() string {
 	if err != nil {
 		panic(err)
 	}
-	return filepath.Join(ucd, "nerdctl\\nerdctl.toml")
+	return filepath.Join(ucd, fmt.Sprintf("%s\\%s.toml", version.RootName, version.RootName))
 }
 
 func HostsDirs() []string {

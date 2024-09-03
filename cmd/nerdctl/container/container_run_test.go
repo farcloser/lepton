@@ -236,7 +236,7 @@ func TestRunHostnameEnv(t *testing.T) {
 func TestRunStdin(t *testing.T) {
 	t.Parallel()
 	base := testutil.NewBase(t)
-	if testutil.GetTarget() == testutil.Nerdctl {
+	if testutil.GetTarget() == testutil.Nerdishctl {
 		testutil.RequireDaemonVersion(base, ">= 1.6.0-0")
 	}
 

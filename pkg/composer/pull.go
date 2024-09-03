@@ -77,7 +77,7 @@ func (c *Composer) pullServiceImage(ctx context.Context, image string, platform 
 
 	args = append(args, image)
 
-	cmd := c.createNerdctlCmd(ctx, append([]string{"pull"}, args...)...)
+	cmd := c.createBinaryCmd(ctx, append([]string{"pull"}, args...)...)
 	if c.DebugPrintFull {
 		log.G(ctx).Debugf("Running %v", cmd.Args)
 	}

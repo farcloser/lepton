@@ -47,6 +47,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/lockutil"
 	"github.com/containerd/nerdctl/v2/pkg/platformutil"
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
+	"github.com/containerd/nerdctl/v2/pkg/version"
 )
 
 type Base struct {
@@ -81,7 +82,7 @@ func (b *Base) Cmd(args ...string) *Cmd {
 	return cmd
 }
 
-// ComposeCmd executes `nerdctl -n nerdctl-test compose` or `docker-compose`
+// ComposeCmd executes `-n nerdctl-test compose` or `docker-compose`
 func (b *Base) ComposeCmd(args ...string) *Cmd {
 	binary := b.Binary
 	binaryArgs := append(b.Args, append([]string{"compose"}, args...)...)
@@ -135,7 +136,7 @@ func (b *Base) CmdWithHelper(helper []string, args ...string) *Cmd {
 
 func (b *Base) systemctlTarget() string {
 	switch b.Target {
-	case Nerdctl:
+	case Nerdishctl:
 		return "containerd.service"
 	case Docker:
 		return "docker.service"
@@ -275,8 +276,8 @@ func (b *Base) Info() dockercompat.Info {
 
 func (b *Base) InfoNative() native.Info {
 	b.T.Helper()
-	if GetTarget() != Nerdctl {
-		b.T.Skip("InfoNative() should not be called for non-nerdctl target")
+	if GetTarget() != Nerdishctl {
+		b.T.Skip("InfoNative() should not be called for non-nerdishctl target")
 	}
 	cmdResult := b.Cmd("info", "--mode", "native", "--format", "{{ json . }}").Run()
 	assert.Equal(b.T, cmdResult.ExitCode, 0)
@@ -289,8 +290,8 @@ func (b *Base) InfoNative() native.Info {
 
 func (b *Base) ContainerdAddress() string {
 	b.T.Helper()
-	if GetTarget() != Nerdctl {
-		b.T.Skip("ContainerdAddress() should not be called for non-nerdctl target")
+	if GetTarget() != Nerdishctl {
+		b.T.Skip("ContainerdAddress() should not be called for non-nerdishctl target")
 	}
 	if os.Geteuid() == 0 {
 		return defaults.DefaultAddress
@@ -540,11 +541,12 @@ func (c *Cmd) OutLines() []string {
 type Target = string
 
 const (
-	Nerdctl = Target("nerdctl")
-	Docker  = Target("docker")
+	Docker = Target("docker")
 )
 
 var (
+	Nerdishctl = version.RootName
+
 	flagTestTarget     Target
 	flagTestKillDaemon bool
 	flagTestIPv6       bool
@@ -552,11 +554,11 @@ var (
 )
 
 var (
-	testLockFile = filepath.Join(os.TempDir(), "nerdctl-test-prevent-concurrency", ".lock")
+	testLockFile = filepath.Join(os.TempDir(), version.RootName+"-test-prevent-concurrency", ".lock")
 )
 
 func M(m *testing.M) {
-	flag.StringVar(&flagTestTarget, "test.target", Nerdctl, "target to test")
+	flag.StringVar(&flagTestTarget, "test.target", Nerdishctl, "target to test")
 	flag.BoolVar(&flagTestKillDaemon, "test.allow-kill-daemon", false, "enable tests that kill the daemon")
 	flag.BoolVar(&flagTestIPv6, "test.only-ipv6", false, "enable tests on IPv6")
 	flag.BoolVar(&flagTestKube, "test.only-kubernetes", false, "enable tests on Kubernetes")
@@ -640,7 +642,7 @@ func DockerIncompatible(t testing.TB) {
 }
 
 func RequiresBuild(t testing.TB) {
-	if GetTarget() == Nerdctl {
+	if GetTarget() == Nerdishctl {
 		buildkitHost, err := buildkitutil.GetBuildkitHost(Namespace)
 		if err != nil {
 			t.Skipf("test requires buildkitd: %+v", err)
@@ -742,7 +744,7 @@ func RequireExecutable(t testing.TB, name string) {
 	}
 }
 
-const Namespace = "nerdctl-test"
+var Namespace = version.RootName + "-test"
 
 func NewBaseWithNamespace(t *testing.T, ns string) *Base {
 	if ns == "" || ns == "default" || ns == Namespace {
@@ -790,8 +792,8 @@ func newBase(t *testing.T, ns string, ipv6Compatible bool, kubernetesCompatible 
 	}
 	var err error
 	switch base.Target {
-	case Nerdctl:
-		base.Binary, err = exec.LookPath("nerdctl")
+	case Nerdishctl:
+		base.Binary, err = exec.LookPath(version.RootName)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -816,15 +818,15 @@ func Identifier(t testing.TB) string {
 	s = strings.ReplaceAll(s, " ", "_")
 	s = strings.ReplaceAll(s, "/", "-")
 	s = strings.ToLower(s)
-	s = "nerdctl-" + s
+	s = version.RootName + "-" + s
 	if len(s) > 76 {
-		s = "nerdctl-" + digest.SHA256.FromString(t.Name()).Encoded()
+		s = version.RootName + "-" + digest.SHA256.FromString(t.Name()).Encoded()
 	}
 	return s
 }
 
 // ImageRepo returns the image repo that can be used to, e.g, validate output
-// from `nerdctl images`.
+// from `images`.
 func ImageRepo(s string) string {
 	repo, _ := imgutil.ParseRepoTag(s)
 	return repo

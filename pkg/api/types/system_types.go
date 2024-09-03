@@ -18,7 +18,7 @@ package types
 
 import "io"
 
-// SystemInfoOptions specifies options for `nerdctl (system) info`.
+// SystemInfoOptions specifies options for `(system) info`.
 type SystemInfoOptions struct {
 	Stdout io.Writer
 	Stderr io.Writer
@@ -30,7 +30,7 @@ type SystemInfoOptions struct {
 	Format string
 }
 
-// SystemEventsOptions specifies options for `nerdctl (system) events`.
+// SystemEventsOptions specifies options for `(system) events`.
 type SystemEventsOptions struct {
 	Stdout io.Writer
 	// GOptions is the global options
@@ -41,7 +41,7 @@ type SystemEventsOptions struct {
 	Filters []string
 }
 
-// SystemPruneOptions specifies options for `nerdctl system prune`.
+// SystemPruneOptions specifies options for `system prune`.
 type SystemPruneOptions struct {
 	Stdout io.Writer
 	Stderr io.Writer

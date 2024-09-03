@@ -434,7 +434,7 @@ func applyNetworkSettings(opts *handlerOpts) error {
 		gocni.WithLabels(map[string]string{
 			"IgnoreUnknown": "1",
 		}),
-		gocni.WithArgs("NERDCTL_CNI_DHCP_HOSTNAME", opts.state.Annotations[labels.Hostname]),
+		gocni.WithArgs("CNI_DHCP_HOSTNAME", opts.state.Annotations[labels.Hostname]),
 	)
 	hsMeta := hostsstore.Meta{
 		ID:         opts.state.ID,

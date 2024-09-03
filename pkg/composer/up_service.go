@@ -128,7 +128,7 @@ func (c *Composer) upServiceContainer(ctx context.Context, service *serviceparse
 	// delete container if it already exists
 	if exists {
 		log.G(ctx).Debugf("Container %q already exists, deleting", container.Name)
-		delCmd := c.createNerdctlCmd(ctx, "rm", "-f", container.Name)
+		delCmd := c.createBinaryCmd(ctx, "rm", "-f", container.Name)
 		if err = delCmd.Run(); err != nil {
 			return "", fmt.Errorf("could not delete container %q: %s", container.Name, err)
 		}
@@ -164,7 +164,7 @@ func (c *Composer) upServiceContainer(ctx context.Context, service *serviceparse
 		fmt.Sprintf("-l=%s=%s", labels.ComposeService, service.Unparsed.Name),
 	}, container.RunArgs...)
 
-	cmd := c.createNerdctlCmd(ctx, append([]string{"run"}, container.RunArgs...)...)
+	cmd := c.createBinaryCmd(ctx, append([]string{"run"}, container.RunArgs...)...)
 	if c.DebugPrintFull {
 		log.G(ctx).Debugf("Running %v", cmd.Args)
 	}

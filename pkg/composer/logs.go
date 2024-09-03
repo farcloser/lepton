@@ -86,7 +86,7 @@ func (c *Composer) logs(ctx context.Context, containers []containerd.Container, 
 
 	logsEOFChan := make(chan string) // value: container name
 	for id, state := range containerStates {
-		// TODO: show logs without executing `nerdctl logs`
+		// TODO: show logs without executing `logs`
 		args := []string{"logs"}
 		if lo.Follow {
 			args = append(args, "-f")
@@ -104,7 +104,7 @@ func (c *Composer) logs(ctx context.Context, containers []containerd.Container, 
 		}
 
 		args = append(args, id)
-		state.logCmd = c.createNerdctlCmd(ctx, args...)
+		state.logCmd = c.createBinaryCmd(ctx, args...)
 		stdout, err := state.logCmd.StdoutPipe()
 		if err != nil {
 			return err
@@ -140,14 +140,14 @@ func (c *Composer) logs(ctx context.Context, containers []containerd.Container, 
 	var containerError error
 selectLoop:
 	for {
-		// Wait for Ctrl-C, or `nerdctl compose down` in another terminal
+		// Wait for Ctrl-C, or `compose down` in another terminal
 		select {
 		case sig := <-interruptChan:
 			log.G(ctx).Debugf("Received signal: %s", sig)
 			break selectLoop
 		case containerName := <-logsEOFChan:
 			if lo.Follow {
-				// When `nerdctl logs -f` has exited, we can assume that the container has exited
+				// When `logs -f` has exited, we can assume that the container has exited
 				log.G(ctx).Infof("Container %q exited", containerName)
 				// In case a container has exited and the parameter --abort-on-container-exit,
 				// we break the loop and set an error, so we can exit the program with 1

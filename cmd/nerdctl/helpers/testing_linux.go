@@ -143,7 +143,7 @@ func RmiAll(base *testutil.Base) {
 
 	// For BuildKit >= 0.11, pruning cache isn't enough to remove manifest blobs that are referred by build history blobs
 	// https://github.com/containerd/nerdctl/pull/1833
-	if base.Target == testutil.Nerdctl {
+	if base.Target == testutil.Nerdishctl {
 		base.T.Logf("Pruning all content blobs")
 		addr := base.ContainerdAddress()
 		client, err := containerd.New(addr, containerd.WithDefaultNamespace(testutil.Namespace))
