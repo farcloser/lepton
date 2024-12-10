@@ -42,6 +42,7 @@ type Config struct {
 	Experimental     bool            `toml:"experimental"`
 	HostGatewayIP    string          `toml:"host_gateway_ip"`
 	BridgeIP         string          `toml:"bridge_ip, omitempty"`
+	KubeHideDupe     bool            `toml:"kube_hide_dupe"`
 }
 
 // New creates a default Config object statically,
@@ -61,5 +62,6 @@ func New() *Config {
 		HostsDir:         ncdefaults.HostsDirs(),
 		Experimental:     true,
 		HostGatewayIP:    ncdefaults.HostGatewayIP(),
+		KubeHideDupe:     false,
 	}
 }
