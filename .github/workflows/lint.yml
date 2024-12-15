@@ -22,9 +22,6 @@ jobs:
             goos: linux
             goversion: latest-stable
           - os: ubuntu-24.04
-            goos: freebsd
-            goversion: latest-stable
-          - os: ubuntu-24.04
             goos: windows
             goversion: latest-stable
           - os: ubuntu-24.04
@@ -61,7 +58,7 @@ jobs:
           make lint-imports
           make lint-headers
           make lint-commits
-          make lint-licenses
+          make lint-licenses-all
 
           make lint-mod
 
