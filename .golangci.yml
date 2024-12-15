@@ -5,7 +5,7 @@ run:
 linters:
   disable-all: true
   enable:
-    # - depguard
+    - depguard
     - gofmt
     - goimports
     - govet
@@ -134,6 +134,23 @@ linters-settings:
       - typeUnparen
       - unnamedResult
       - unnecessaryBlock
+
+  depguard:
+    rules:
+      main:
+        files:
+          - "$all"
+        deny:
+          - pkg: "github.com/hashicorp/golang-lru"
+            desc: "Do not allow direct use of IBM patented NewARC"
+      pkg:
+        files:
+          - "**/pkg/**/*.go"
+        deny:
+          - pkg: "github.com/spf13"
+            desc: "pkg must not depend on cobra or pflag"
+          - pkg: "github.com/containerd/nerdctl/v2/cmd"
+            desc: "pkg must not depend on cmd files"
 
 issues:
   exclude-rules:
