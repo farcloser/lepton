@@ -43,6 +43,10 @@ ifdef VERBOSE
 	VERBOSE_FLAG_LONG := --verbose
 endif
 
+ifndef LINT_COMMIT_RANGE
+	LINT_COMMIT_RANGE := main..HEAD
+endif
+
 GO_BUILD_LDFLAGS ?= -s -w
 GO_BUILD_FLAGS ?=
 export GO_BUILD=CGO_ENABLED=0 GOOS=$(GOOS) $(GO) -C $(MAKEFILE_DIR) build -ldflags "$(GO_BUILD_LDFLAGS) $(VERBOSE_FLAG) -X $(PACKAGE)/pkg/version.Version=$(VERSION) -X $(PACKAGE)/pkg/version.Revision=$(REVISION)"
@@ -67,27 +71,70 @@ clean:
 	find . -name \#\* -delete
 	rm -rf $(CURDIR)/_output/* $(MAKEFILE_DIR)/vendor
 
-lint: lint-go-all lint-imports lint-yaml lint-shell
+lint-install-golangci:
+	@cd $(MAKEFILE_DIR) \
+		&& go install github.com/golangci/golangci-lint/cmd/golangci-lint@89476e7a1eaa0a8a06c17343af960a5fd9e7edb7 # v1.62.2
 
-lint-go-all:
-	cd $(MAKEFILE_DIR) && GOOS=linux golangci-lint run $(VERBOSE_FLAG_LONG) ./... && \
-		GOOS=windows golangci-lint run $(VERBOSE_FLAG_LONG) ./... && \
-		GOOS=freebsd golangci-lint run $(VERBOSE_FLAG_LONG) ./...
-
-lint-go:
-	cd $(MAKEFILE_DIR) && golangci-lint run $(VERBOSE_FLAG_LONG) ./...
-
-lint-imports:
-	cd $(MAKEFILE_DIR) && ./hack/lint-imports.sh
+lint-install-tools:
+	# git-validation: main from 2023/11
+	# ltag: v0.2.5
+	# go-licenses: v2.0.0-alpha.1
+	# goimports-reviser: v3.8.2
+	@cd $(MAKEFILE_DIR) \
+		&& go install github.com/vbatts/git-validation@679e5cad8c50f1605ab3d8a0a947aaf72fb24c07 \
+		&& go install github.com/kunalkushwaha/ltag@b0cfa33e4cc9383095dc584d3990b62c95096de0 \
+		&& go install github.com/google/go-licenses/v2@d01822334fba5896920a060f762ea7ecdbd086e8 \
+		&& go install github.com/incu6us/goimports-reviser/v3@f034195cc8a7ffc7cc70d60aa3a25500874eaf04
 
 lint-fix-imports:
 	cd $(MAKEFILE_DIR) && goimports-reviser -company-prefixes "github.com/containerd" ./...
 
+lint: lint-go-all lint-imports lint-yaml lint-shell lint-dco lint-headers lint-mod lint-licenses-all
+
+lint-go-all:
+	@cd $(MAKEFILE_DIR) \
+		&& GOOS=linux golangci-lint run $(VERBOSE_FLAG_LONG) ./... \
+		&& GOOS=windows golangci-lint run $(VERBOSE_FLAG_LONG) ./... \
+		&& GOOS=freebsd golangci-lint run $(VERBOSE_FLAG_LONG) ./...
+
+lint-go:
+	@cd $(MAKEFILE_DIR) && golangci-lint run $(VERBOSE_FLAG_LONG) ./...
+
+lint-imports:
+	@cd $(MAKEFILE_DIR) && ./hack/lint-imports.sh
+
 lint-yaml:
-	cd $(MAKEFILE_DIR) && yamllint .
+	@cd $(MAKEFILE_DIR) && yamllint .
 
 lint-shell: $(call recursive_wildcard,$(MAKEFILE_DIR)/,*.sh)
-	shellcheck -a -x $^
+	@shellcheck -a -x $^
+
+lint-commits:
+	@cd $(MAKEFILE_DIR) && git-validation -v -run DCO,short-subject,dangling-whitespace -range "$(LINT_COMMIT_RANGE)"
+
+lint-headers:
+	@cd $(MAKEFILE_DIR) && ltag -t "./hack/headers" --check -v
+
+lint-mod:
+	@cd $(MAKEFILE_DIR) && go mod tidy --diff
+
+lint-licenses-all:
+	@cd $(MAKEFILE_DIR) \
+		&& GOOS=linux make lint-licenses \
+		&& GOOS=windows make lint-licenses \
+		&& GOOS=freebsd make lint-licenses
+
+# FIXME: go-licenses cannot find LICENSE from root of repo when submodule is imported:
+# https://github.com/google/go-licenses/issues/186
+# This is impacting gotest.tools and stargz
+# Also, go-base36 uses a double stack license (MIT or Apache), so, it is fine, but cannot be detected by go-licenses
+lint-licenses:
+	@cd $(MAKEFILE_DIR) && go-licenses check --include_tests --allowed_licenses=Apache-2.0,BSD-2-Clause,BSD-3-Clause,MIT \
+	  --ignore gotest.tools \
+	  --ignore github.com/containerd/stargz-snapshotter \
+	  --ignore github.com/multiformats/go-base36 \
+	  ./...
+	@echo "WARNING: you need to manually verify licenses for:\n- gotest.tools\n- stargz-snapshotter\n- go-base36"
 
 test-unit:
 	go test -v $(MAKEFILE_DIR)/pkg/...
