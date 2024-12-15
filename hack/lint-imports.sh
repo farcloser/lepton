@@ -18,7 +18,7 @@
 # Specifically, it will ignore arguments, and will return exit 0 regardless
 # This here is a workaround, until they fix it upstream: https://github.com/incu6us/goimports-reviser/pull/157
 
-# shellcheck disable=SC2034,SC2015
+# shellcheck disable=SC2034
 set -o errexit -o errtrace -o functrace -o nounset -o pipefail
 
 ex=0

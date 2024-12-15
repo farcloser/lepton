@@ -1,3 +1,8 @@
+# Lepton
+
+lepton is an experimental containerd cli started as a friendly fork of nerdctl.
+
+<!--
 [[⬇️ **Download]**](https://github.com/containerd/nerdctl/releases)
 [[📖 **Command reference]**](./docs/command-reference.md)
 [[❓**FAQs & Troubleshooting]**](./docs/faq.md)
@@ -288,3 +293,5 @@ Implementation details:
 Misc:
 
 - [`./docs/faq.md`](./docs/faq.md): FAQs and Troubleshooting
+
+-->
