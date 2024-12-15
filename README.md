@@ -160,10 +160,6 @@ $ limactl start
 $ lima nerdctl run -d --name nginx -p 127.0.0.1:8080:80 nginx:alpine
 ```
 
-### FreeBSD
-
-See [`./docs/freebsd.md`](docs/freebsd.md).
-
 ### Windows
 
 - Linux containers: Known to work on WSL2
@@ -205,7 +201,6 @@ Minor:
 - Importing OCI archives as well as Docker archives: `nerdctl load` .
 - Specifying a non-image rootfs: `nerdctl run -it --rootfs <ROOTFS> /bin/sh` . The CLI syntax conforms to Podman convention.
 - Connecting a container to multiple networks at once: `nerdctl run --net foo --net bar`
-- Running [FreeBSD jails](./docs/freebsd.md).
 - Better multi-platform support, e.g., `nerdctl pull --all-platforms IMAGE`
 - Applying an (existing) AppArmor profile to rootless containers: `nerdctl run --security-opt apparmor=<PROFILE>`.
   Use `sudo nerdctl apparmor load` to load the `nerdctl-default` profile.
@@ -295,7 +290,6 @@ Advanced features:
 Experimental features:
 
 - [`./docs/experimental.md`](./docs/experimental.md):  Experimental features
-- [`./docs/freebsd.md`](./docs/freebsd.md):  Running FreeBSD jails
 - [`./docs/ipfs.md`](./docs/ipfs.md): Distributing images on IPFS
 - [`./docs/builder-debug.md`](./docs/builder-debug.md): Interactive debugging of Dockerfile
 

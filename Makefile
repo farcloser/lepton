@@ -94,8 +94,7 @@ lint: lint-go-all lint-imports lint-yaml lint-shell lint-dco lint-headers lint-m
 lint-go-all:
 	@cd $(MAKEFILE_DIR) \
 		&& GOOS=linux golangci-lint run $(VERBOSE_FLAG_LONG) ./... \
-		&& GOOS=windows golangci-lint run $(VERBOSE_FLAG_LONG) ./... \
-		&& GOOS=freebsd golangci-lint run $(VERBOSE_FLAG_LONG) ./...
+		&& GOOS=windows golangci-lint run $(VERBOSE_FLAG_LONG) ./...
 
 lint-go:
 	@cd $(MAKEFILE_DIR) && golangci-lint run $(VERBOSE_FLAG_LONG) ./...
@@ -121,8 +120,7 @@ lint-mod:
 lint-licenses-all:
 	@cd $(MAKEFILE_DIR) \
 		&& GOOS=linux make lint-licenses \
-		&& GOOS=windows make lint-licenses \
-		&& GOOS=freebsd make lint-licenses
+		&& GOOS=windows make lint-licenses
 
 # FIXME: go-licenses cannot find LICENSE from root of repo when submodule is imported:
 # https://github.com/google/go-licenses/issues/186
@@ -177,9 +175,6 @@ artifacts: clean
 
 	GOOS=windows GOARCH=amd64     make -C $(CURDIR) -f $(MAKEFILE_DIR)/Makefile binaries
 	tar $(TAR_OWNER0_FLAGS) $(TAR_FLATTEN_FLAGS) -czvf $(CURDIR)/_output/nerdctl-$(VERSION_TRIMMED)-windows-amd64.tar.gz $(CURDIR)/_output/nerdctl.exe
-
-	GOOS=freebsd GOARCH=amd64     make -C $(CURDIR) -f $(MAKEFILE_DIR)/Makefile binaries
-	tar $(TAR_OWNER0_FLAGS) $(TAR_FLATTEN_FLAGS) -czvf $(CURDIR)/_output/nerdctl-$(VERSION_TRIMMED)-freebsd-amd64.tar.gz $(CURDIR)/_output/nerdctl
 
 	rm -f $(CURDIR)/_output/nerdctl $(CURDIR)/_output/nerdctl.exe
 
