@@ -144,10 +144,6 @@ func (nc *nerdCommand) prep() {
 			nc.PrependArgs("--namespace=" + string(nc.Config.Read(Namespace)))
 		}
 
-		if nc.Config.Read(stargz) == enabled {
-			nc.Env["CONTAINERD_SNAPSHOTTER"] = "stargz"
-		}
-
 		// If no NERDCTL_TOML was explicitly provided, set it to the private dir
 		if nc.Env["NERDCTL_TOML"] == "" {
 			nc.Env["NERDCTL_TOML"] = filepath.Join(nc.GenericCommand.TempDir, "nerdctl.toml")

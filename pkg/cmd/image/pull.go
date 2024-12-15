@@ -40,11 +40,6 @@ func Pull(ctx context.Context, client *containerd.Client, rawRef string, options
 func EnsureImage(ctx context.Context, client *containerd.Client, rawRef string, options types.ImagePullOptions) (*imgutil.EnsuredImage, error) {
 	var ensured *imgutil.EnsuredImage
 
-	parsedReference, err := referenceutil.Parse(rawRef)
-	if err != nil {
-		return nil, err
-	}
-
 	ref, err := signutil.Verify(ctx, rawRef, options.GOptions.HostsDir, options.GOptions.Experimental, options.VerifyOptions)
 	if err != nil {
 		return nil, err

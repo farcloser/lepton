@@ -229,6 +229,7 @@ RUN curl -o /docker-entrypoint.sh -fsSL --proto '=https' --tlsv1.2 https://raw.g
   chmod +x /docker-entrypoint.sh
 COPY --from=out-full / /usr/local/
 RUN perl -pi -e 's/multi-user.target/docker-entrypoint.target/g' /usr/local/lib/systemd/system/*.service && \
+  systemctl enable containerd buildkit && \
   mkdir -p /etc/bash_completion.d && \
   nerdctl completion bash >/etc/bash_completion.d/nerdctl && \
   mkdir -p -m 0755 /etc/cni
@@ -268,12 +269,12 @@ ARG SOCI_SNAPSHOTTER_VERSION
 RUN fname="soci-snapshotter-${SOCI_SNAPSHOTTER_VERSION}-${TARGETOS:-linux}-${TARGETARCH:-amd64}.tar.gz" && \
   curl -o "${fname}" -fsSL --proto '=https' --tlsv1.2 "https://github.com/awslabs/soci-snapshotter/releases/download/v${SOCI_SNAPSHOTTER_VERSION}/${fname}" && \
   tar -C /usr/local/bin -xvf "${fname}" soci soci-snapshotter-grpc
-COPY ./Dockerfile.d/test-integration-etc_containerd-stargz-grpc_config.toml /etc/containerd-stargz-grpc/config.toml
 COPY ./Dockerfile.d/test-integration-buildkit-nerdctl-test.service /usr/local/lib/systemd/system/
 COPY ./Dockerfile.d/test-integration-soci-snapshotter.service /usr/local/lib/systemd/system/
 RUN cp /usr/local/bin/tini /usr/local/bin/tini-custom
 # using test integration containerd config
 COPY ./Dockerfile.d/test-integration-etc_containerd_config.toml /etc/containerd/config.toml
+RUN systemctl enable test-integration-buildkit-nerdctl-test test-integration-soci-snapshotter
 CMD ["./hack/test-integration.sh"]
 
 FROM test-integration AS test-integration-rootless

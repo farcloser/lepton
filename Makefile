@@ -89,7 +89,7 @@ lint-install-tools:
 lint-fix-imports:
 	cd $(MAKEFILE_DIR) && goimports-reviser -company-prefixes "github.com/containerd" ./...
 
-lint: lint-go-all lint-imports lint-yaml lint-shell lint-dco lint-headers lint-mod lint-licenses-all
+lint: lint-go-all lint-imports lint-yaml lint-shell lint-commits lint-headers lint-mod lint-licenses-all
 
 lint-go-all:
 	@cd $(MAKEFILE_DIR) \
@@ -124,15 +124,13 @@ lint-licenses-all:
 
 # FIXME: go-licenses cannot find LICENSE from root of repo when submodule is imported:
 # https://github.com/google/go-licenses/issues/186
-# This is impacting gotest.tools and stargz
-# Also, go-base36 uses a double stack license (MIT or Apache), so, it is fine, but cannot be detected by go-licenses
+# This is impacting gotest.tools and estargz
 lint-licenses:
 	@cd $(MAKEFILE_DIR) && go-licenses check --include_tests --allowed_licenses=Apache-2.0,BSD-2-Clause,BSD-3-Clause,MIT \
 	  --ignore gotest.tools \
-	  --ignore github.com/containerd/stargz-snapshotter \
-	  --ignore github.com/multiformats/go-base36 \
+	  --ignore github.com/containerd/stargz-snapshotter/estargz \
 	  ./...
-	@echo "WARNING: you need to manually verify licenses for:\n- gotest.tools\n- stargz-snapshotter\n- go-base36"
+	@echo "WARNING: you need to manually verify licenses for:\n- gotest.tools\n- github.com/containerd/stargz-snapshotter/estargz"
 
 test-unit:
 	go test -v $(MAKEFILE_DIR)/pkg/...

@@ -42,7 +42,6 @@ var only test.ConfigValue = "Only"
 
 // These are used for down the road configuration and custom behavior inside command
 var modePrivate test.ConfigKey = "PrivateMode"
-var stargz test.ConfigKey = "Stargz"
 var enabled test.ConfigValue = "Enabled"
 
 // OnlyIPv6 marks a test as suitable to be run exclusively inside an ipv6 environment
@@ -202,27 +201,6 @@ var Soci = &test.Requirement{
 				mess = "soci is enabled"
 			}
 		}
-		return ret, mess
-	},
-}
-
-var Stargz = &test.Requirement{
-	Check: func(data test.Data, helpers test.Helpers) (ret bool, mess string) {
-		ret = false
-		mess = "stargz is not enabled"
-		stdout := helpers.Capture("info", "--format", "{{ json . }}")
-		var dinf dockercompat.Info
-		err := json.Unmarshal([]byte(stdout), &dinf)
-		assert.NilError(helpers.T(), err, "failed to parse docker info")
-		for _, p := range dinf.Plugins.Storage {
-			if p == "stargz" {
-				ret = true
-				mess = "stargz is enabled"
-			}
-		}
-		// Need this to happen now for Cleanups to work
-		// FIXME: we should be able to access the env (at least through helpers.Command().) instead of this gym
-		helpers.Write(stargz, enabled)
 		return ret, mess
 	},
 }

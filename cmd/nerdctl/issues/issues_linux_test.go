@@ -121,7 +121,7 @@ func TestIssue3425(t *testing.T) {
 					helpers.Anyhow("rmi", "-f", data.Identifier())
 				},
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-					return helpers.Command("image", "convert", "--oci", "--estargz", testutil.CommonImage, data.Identifier())
+					return helpers.Command("image", "convert", "--oci", testutil.CommonImage, data.Identifier())
 				},
 				Expected: test.Expects(0, nil, nil),
 			},

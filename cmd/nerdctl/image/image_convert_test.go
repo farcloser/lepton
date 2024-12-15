@@ -17,50 +17,49 @@
 package image
 
 import (
-	"runtime"
 	"testing"
 
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
+	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
+	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
 )
 
 func TestImageConvert(t *testing.T) {
-	if runtime.GOOS == "windows" {
-		t.Skip("no windows support yet")
-	}
-	testutil.DockerIncompatible(t)
-	base := testutil.NewBase(t)
-	t.Parallel()
+	nerdtest.Setup()
 
-	base.Cmd("pull", testutil.CommonImage).AssertOK()
-
-	testCases := []struct {
-		identifier string
-		args       []string
-	}{
-		{
-			"zstd",
-			[]string{"--zstd", "--zstd-compression-level", "3"},
+	testCase := &test.Case{
+		Require: test.Require(
+			test.Not(nerdtest.Docker),
+		),
+		Setup: func(data test.Data, helpers test.Helpers) {
+			helpers.Ensure("pull", "--quiet", testutil.CommonImage)
 		},
-		{
-			"zstdchunked",
-			[]string{"--zstdchunked", "--zstdchunked-compression-level", "3"},
+		SubTests: []*test.Case{
+			{
+				Description: "zstd",
+				Cleanup: func(data test.Data, helpers test.Helpers) {
+					helpers.Anyhow("rmi", "-f", data.Identifier("converted-image"))
+				},
+				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
+					return helpers.Command("image", "convert", "--oci", "--zstd", "--zstd-compression-level", "3",
+						testutil.CommonImage, data.Identifier("converted-image"))
+				},
+				Expected: test.Expects(0, nil, nil),
+			},
+			{
+				Description: "zstdchunked",
+				Cleanup: func(data test.Data, helpers test.Helpers) {
+					helpers.Anyhow("rmi", "-f", data.Identifier("converted-image"))
+				},
+				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
+					return helpers.Command("image", "convert", "--oci", "--zstdchunked", "--zstdchunked-compression-level", "3",
+						testutil.CommonImage, data.Identifier("converted-image"))
+				},
+				Expected: test.Expects(0, nil, nil),
+			},
 		},
 	}
 
-	for _, tc := range testCases {
-		convertedImage := testutil.Identifier(t) + ":" + tc.identifier
-		args := append([]string{"image", "convert", "--oci"}, tc.args...)
-		args = append(args, testutil.CommonImage, convertedImage)
+	testCase.Run(t)
 
-		t.Run(tc.identifier, func(t *testing.T) {
-			t.Parallel()
-
-			base.Cmd("rmi", convertedImage).Run()
-			t.Cleanup(func() {
-				base.Cmd("rmi", convertedImage).Run()
-			})
-
-			base.Cmd(args...).AssertOK()
-		})
-	}
 }

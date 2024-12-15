@@ -1,6 +1,6 @@
 version = 2
 
-# Enable soci snapshotter
+[proxy_plugins]
   [proxy_plugins.soci]
     type = "snapshot"
     address = "/run/soci-snapshotter-grpc/soci-snapshotter-grpc.sock"

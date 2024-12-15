@@ -20,6 +20,7 @@ import (
 	"context"
 	"errors"
 	"io"
+	"os"
 
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 
