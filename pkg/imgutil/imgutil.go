@@ -52,7 +52,7 @@ type EnsuredImage struct {
 	Image       containerd.Image
 	ImageConfig ocispec.ImageConfig
 	Snapshotter string
-	Remote      bool // true for stargz or overlaybd
+	Remote      bool // true for stargz
 }
 
 // PullMode is either one of "always", "missing", "never"

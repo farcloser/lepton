@@ -67,23 +67,6 @@ type ImageConvertOptions struct {
 	// Format the output using the given Go template, e.g, 'json'
 	Format string
 
-	// #region estargz flags
-	// Estargz convert legacy tar(.gz) layers to eStargz for lazy pulling. Should be used in conjunction with '--oci'
-	Estargz bool
-	// EstargzRecordIn read 'ctr-remote optimize --record-out=<FILE>' record file (EXPERIMENTAL)
-	EstargzRecordIn string
-	// EstargzCompressionLevel eStargz compression level
-	EstargzCompressionLevel int
-	// EstargzChunkSize eStargz chunk size
-	EstargzChunkSize int
-	// EstargzMinChunkSize the minimal number of bytes of data must be written in one gzip stream. (requires stargz-snapshotter >= v0.13.0)
-	EstargzMinChunkSize int
-	// EstargzExternalToc separate TOC JSON into another image (called "TOC image"). The name of TOC image is the original + "-esgztoc" suffix. Both eStargz and the TOC image should be pushed to the same registry. (requires stargz-snapshotter >= v0.13.0) (EXPERIMENTAL)
-	EstargzExternalToc bool
-	// EstargzKeepDiffID convert to esgz without changing diffID (cannot be used in conjunction with '--estargz-record-in'. must be specified with '--estargz-external-toc')
-	EstargzKeepDiffID bool
-	// #endregion
-
 	// #region zstd flags
 	// Zstd convert legacy tar(.gz) layers to zstd. Should be used in conjunction with '--oci'
 	Zstd bool
@@ -101,29 +84,6 @@ type ImageConvertOptions struct {
 	// ZstdChunkedRecordIn read 'ctr-remote optimize --record-out=<FILE>' record file (EXPERIMENTAL)
 	ZstdChunkedRecordIn string
 	// #endregion
-
-	// #region nydus flags
-	// Nydus convert legacy tar(.gz) layers to nydus for lazy pulling. Should be used in conjunction with '--oci'
-	Nydus bool
-	// NydusBuilderPath the nydus-image binary path, if unset, search in PATH environment
-	NydusBuilderPath string
-	// NydusWorkDir work directory path for image conversion, default is the nerdctl data root directory
-	NydusWorkDir string
-	// NydusPrefetchPatterns the file path pattern list want to prefetch
-	NydusPrefetchPatterns string
-	// NydusCompressor nydus blob compression algorithm, possible values: `none`, `lz4_block`, `zstd`, default is `lz4_block`
-	NydusCompressor string
-	// #endregion
-
-	// #region overlaybd flags
-	// Overlaybd convert tar.gz layers to overlaybd layers
-	Overlaybd bool
-	// OverlayFsType filesystem type for overlaybd
-	OverlayFsType string
-	// OverlaydbDBStr database config string for overlaybd
-	OverlaydbDBStr string
-	// #endregion
-
 }
 
 // ImageCryptOptions specifies options for `nerdctl image encrypt` and `nerdctl image decrypt`.
@@ -169,12 +129,6 @@ type ImagePushOptions struct {
 	// AllPlatforms convert content for all platforms
 	AllPlatforms bool
 
-	// Estargz convert image to sStargz
-	Estargz bool
-	// IpfsEnsureImage ensure image is pushed to IPFS
-	IpfsEnsureImage bool
-	// IpfsAddress multiaddr of IPFS API (default uses $IPFS_PATH env variable if defined or local directory ~/.ipfs)
-	IpfsAddress string
 	// Suppress verbose output
 	Quiet bool
 	// AllowNondistributableArtifacts allow pushing non-distributable artifacts
@@ -182,7 +136,7 @@ type ImagePushOptions struct {
 }
 
 // RemoteSnapshotterFlags are used for pulling with remote snapshotters
-// e.g. SOCI, stargz, overlaybd
+// e.g. SOCI
 type RemoteSnapshotterFlags struct {
 	SociIndexDigest string
 }
@@ -202,8 +156,6 @@ type ImagePullOptions struct {
 	Mode string
 	// Suppress verbose output
 	Quiet bool
-	// multiaddr of IPFS API (default uses $IPFS_PATH env variable if defined or local directory ~/.ipfs)
-	IPFSAddress string
 	// Flags to pass into remote snapshotters
 	RFlags RemoteSnapshotterFlags
 }

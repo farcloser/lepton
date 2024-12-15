@@ -17,8 +17,6 @@
 package image
 
 import (
-	"compress/gzip"
-
 	"github.com/spf13/cobra"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
@@ -30,7 +28,7 @@ import (
 
 const imageConvertHelp = `Convert an image format.
 
-e.g., 'nerdctl image convert --estargz --oci example.com/foo:orig example.com/foo:esgz'
+e.g., 'nerdctl image convert --oci example.com/foo:orig example.com/foo:esgz'
 
 Use '--platform' to define the output platform.
 When '--all-platforms' is given all images in a manifest list must be available.
@@ -53,16 +51,6 @@ func newImageConvertCommand() *cobra.Command {
 
 	imageConvertCommand.Flags().String("format", "", "Format the output using the given Go template, e.g, 'json'")
 
-	// #region estargz flags
-	imageConvertCommand.Flags().Bool("estargz", false, "Convert legacy tar(.gz) layers to eStargz for lazy pulling. Should be used in conjunction with '--oci'")
-	imageConvertCommand.Flags().String("estargz-record-in", "", "Read 'ctr-remote optimize --record-out=<FILE>' record file (EXPERIMENTAL)")
-	imageConvertCommand.Flags().Int("estargz-compression-level", gzip.BestCompression, "eStargz compression level")
-	imageConvertCommand.Flags().Int("estargz-chunk-size", 0, "eStargz chunk size")
-	imageConvertCommand.Flags().Int("estargz-min-chunk-size", 0, "The minimal number of bytes of data must be written in one gzip stream. (requires stargz-snapshotter >= v0.13.0)")
-	imageConvertCommand.Flags().Bool("estargz-external-toc", false, "Separate TOC JSON into another image (called \"TOC image\"). The name of TOC image is the original + \"-esgztoc\" suffix. Both eStargz and the TOC image should be pushed to the same registry. (requires stargz-snapshotter >= v0.13.0) (EXPERIMENTAL)")
-	imageConvertCommand.Flags().Bool("estargz-keep-diff-id", false, "Convert to esgz without changing diffID (cannot be used in conjunction with '--estargz-record-in'. must be specified with '--estargz-external-toc')")
-	// #endregion
-
 	// #region zstd flags
 	imageConvertCommand.Flags().Bool("zstd", false, "Convert legacy tar(.gz) layers to zstd. Should be used in conjunction with '--oci'")
 	imageConvertCommand.Flags().Int("zstd-compression-level", 3, "zstd compression level")
@@ -73,20 +61,6 @@ func newImageConvertCommand() *cobra.Command {
 	imageConvertCommand.Flags().String("zstdchunked-record-in", "", "Read 'ctr-remote optimize --record-out=<FILE>' record file (EXPERIMENTAL)")
 	imageConvertCommand.Flags().Int("zstdchunked-compression-level", 3, "zstd:chunked compression level") // SpeedDefault; see also https://pkg.go.dev/github.com/klauspost/compress/zstd#EncoderLevel
 	imageConvertCommand.Flags().Int("zstdchunked-chunk-size", 0, "zstd:chunked chunk size")
-	// #endregion
-
-	// #region nydus flags
-	imageConvertCommand.Flags().Bool("nydus", false, "Convert an OCI image to Nydus image. Should be used in conjunction with '--oci'")
-	imageConvertCommand.Flags().String("nydus-builder-path", "nydus-image", "The nydus-image binary path, if unset, search in PATH environment")
-	imageConvertCommand.Flags().String("nydus-work-dir", "", "Work directory path for image conversion, default is the nerdctl data root directory")
-	imageConvertCommand.Flags().String("nydus-prefetch-patterns", "", "The file path pattern list want to prefetch")
-	imageConvertCommand.Flags().String("nydus-compressor", "lz4_block", "Nydus blob compression algorithm, possible values: `none`, `lz4_block`, `zstd`, default is `lz4_block`")
-	// #endregion
-
-	// #region overlaybd flags
-	imageConvertCommand.Flags().Bool("overlaybd", false, "Convert tar.gz layers to overlaybd layers")
-	imageConvertCommand.Flags().String("overlaybd-fs-type", "ext4", "Filesystem type for overlaybd")
-	imageConvertCommand.Flags().String("overlaybd-dbstr", "", "Database config string for overlaybd")
 	// #endregion
 
 	// #region generic flags
@@ -113,37 +87,6 @@ func processImageConvertOptions(cmd *cobra.Command) (types.ImageConvertOptions, 
 	if err != nil {
 		return types.ImageConvertOptions{}, err
 	}
-
-	// #region estargz flags
-	estargz, err := cmd.Flags().GetBool("estargz")
-	if err != nil {
-		return types.ImageConvertOptions{}, err
-	}
-	estargzRecordIn, err := cmd.Flags().GetString("estargz-record-in")
-	if err != nil {
-		return types.ImageConvertOptions{}, err
-	}
-	estargzCompressionLevel, err := cmd.Flags().GetInt("estargz-compression-level")
-	if err != nil {
-		return types.ImageConvertOptions{}, err
-	}
-	estargzChunkSize, err := cmd.Flags().GetInt("estargz-chunk-size")
-	if err != nil {
-		return types.ImageConvertOptions{}, err
-	}
-	estargzMinChunkSize, err := cmd.Flags().GetInt("estargz-min-chunk-size")
-	if err != nil {
-		return types.ImageConvertOptions{}, err
-	}
-	estargzExternalTOC, err := cmd.Flags().GetBool("estargz-external-toc")
-	if err != nil {
-		return types.ImageConvertOptions{}, err
-	}
-	estargzKeepDiffID, err := cmd.Flags().GetBool("estargz-keep-diff-id")
-	if err != nil {
-		return types.ImageConvertOptions{}, err
-	}
-	// #endregion
 
 	// #region zstd flags
 	zstd, err := cmd.Flags().GetBool("zstd")
@@ -175,44 +118,6 @@ func processImageConvertOptions(cmd *cobra.Command) (types.ImageConvertOptions, 
 	}
 	// #endregion
 
-	// #region nydus flags
-	nydus, err := cmd.Flags().GetBool("nydus")
-	if err != nil {
-		return types.ImageConvertOptions{}, err
-	}
-	nydusBuilderPath, err := cmd.Flags().GetString("nydus-builder-path")
-	if err != nil {
-		return types.ImageConvertOptions{}, err
-	}
-	nydusWorkDir, err := cmd.Flags().GetString("nydus-work-dir")
-	if err != nil {
-		return types.ImageConvertOptions{}, err
-	}
-	nydusPrefetchPatterns, err := cmd.Flags().GetString("nydus-prefetch-patterns")
-	if err != nil {
-		return types.ImageConvertOptions{}, err
-	}
-	nydusCompressor, err := cmd.Flags().GetString("nydus-compressor")
-	if err != nil {
-		return types.ImageConvertOptions{}, err
-	}
-	// #endregion
-
-	// #region overlaybd flags
-	overlaybd, err := cmd.Flags().GetBool("overlaybd")
-	if err != nil {
-		return types.ImageConvertOptions{}, err
-	}
-	overlaybdFsType, err := cmd.Flags().GetString("overlaybd-fs-type")
-	if err != nil {
-		return types.ImageConvertOptions{}, err
-	}
-	overlaybdDbstr, err := cmd.Flags().GetString("overlaybd-dbstr")
-	if err != nil {
-		return types.ImageConvertOptions{}, err
-	}
-	// #endregion
-
 	// #region generic flags
 	uncompress, err := cmd.Flags().GetBool("uncompress")
 	if err != nil {
@@ -237,15 +142,6 @@ func processImageConvertOptions(cmd *cobra.Command) (types.ImageConvertOptions, 
 	return types.ImageConvertOptions{
 		GOptions: globalOptions,
 		Format:   format,
-		// #region estargz flags
-		Estargz:                 estargz,
-		EstargzRecordIn:         estargzRecordIn,
-		EstargzCompressionLevel: estargzCompressionLevel,
-		EstargzChunkSize:        estargzChunkSize,
-		EstargzMinChunkSize:     estargzMinChunkSize,
-		EstargzExternalToc:      estargzExternalTOC,
-		EstargzKeepDiffID:       estargzKeepDiffID,
-		// #endregion
 		// #region zstd flags
 		Zstd:                 zstd,
 		ZstdCompressionLevel: zstdCompressionLevel,
@@ -255,18 +151,6 @@ func processImageConvertOptions(cmd *cobra.Command) (types.ImageConvertOptions, 
 		ZstdChunkedCompressionLevel: zstdChunkedCompressionLevel,
 		ZstdChunkedChunkSize:        zstdChunkedChunkSize,
 		ZstdChunkedRecordIn:         zstdChunkedRecordIn,
-		// #endregion
-		// #region nydus flags
-		Nydus:                 nydus,
-		NydusBuilderPath:      nydusBuilderPath,
-		NydusWorkDir:          nydusWorkDir,
-		NydusPrefetchPatterns: nydusPrefetchPatterns,
-		NydusCompressor:       nydusCompressor,
-		// #endregion
-		// #region overlaybd flags
-		Overlaybd:      overlaybd,
-		OverlayFsType:  overlaybdFsType,
-		OverlaydbDBStr: overlaybdDbstr,
 		// #endregion
 		// #region generic flags
 		Uncompress: uncompress,

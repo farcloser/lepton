@@ -42,7 +42,7 @@
 
 The goal of nerdctl is to facilitate experimenting the cutting-edge features of containerd that are not present in Docker.
 
-Such features include, but not limited to, [on-demand image pulling (lazy-pulling)](./stargz.md) and [image encryption/decryption](./ocicrypt.md).
+Such features include, but not limited to, [image encryption/decryption](./ocicrypt.md).
 See also [`../README.md`](../README.md) for the list of the features present in nerdctl but not present in Docker (and vice versa).
 
 Note that competing with Docker is _not_ the goal of nerdctl. Those cutting-edge features are expected to be eventually available in Docker as well.

@@ -385,7 +385,6 @@ test.Require(req ...Requirement) // a test runs only if all requirements are ful
 
 nerdtest.Docker // a test only run on Docker - normally used with test.Not(nerdtest.Docker)
 nerdtest.Soci // a test requires the soci snapshotter
-nerdtest.Stargz // a test requires the stargz snapshotter
 nerdtest.Rootless // a test requires Rootless
 nerdtest.Rootful // a test requires Rootful
 nerdtest.Build // a test requires buildkit

@@ -65,7 +65,6 @@ func EnsureImages(base *testutil.Base) {
 	}
 	base.Cmd("pull", "--quiet", registryImage).AssertOK()
 	base.Cmd("pull", "--quiet", platform.DockerAuthImage).AssertOK()
-	base.Cmd("pull", "--quiet", platform.KuboImage).AssertOK()
 }
 
 func NewAuthServer(base *testutil.Base, ca *testca.CA, port int, user, pass string, tls bool) *TokenAuthServer {

@@ -20,16 +20,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
-	"os"
-	"path/filepath"
-
-	"github.com/opencontainers/go-digest"
-	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 
 	containerd "github.com/containerd/containerd/v2/client"
-	"github.com/containerd/containerd/v2/core/content"
 	"github.com/containerd/containerd/v2/core/images"
 	"github.com/containerd/containerd/v2/core/images/converter"
 	"github.com/containerd/containerd/v2/core/remotes"
@@ -37,15 +30,11 @@ import (
 	dockerconfig "github.com/containerd/containerd/v2/core/remotes/docker/config"
 	"github.com/containerd/containerd/v2/pkg/reference"
 	"github.com/containerd/log"
-	"github.com/containerd/stargz-snapshotter/estargz"
-	"github.com/containerd/stargz-snapshotter/estargz/zstdchunked"
-	estargzconvert "github.com/containerd/stargz-snapshotter/nativeconverter/estargz"
 
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/errutil"
 	"github.com/containerd/nerdctl/v2/pkg/imgutil/dockerconfigresolver"
 	"github.com/containerd/nerdctl/v2/pkg/imgutil/push"
-	"github.com/containerd/nerdctl/v2/pkg/ipfs"
 	"github.com/containerd/nerdctl/v2/pkg/platformutil"
 	"github.com/containerd/nerdctl/v2/pkg/referenceutil"
 	"github.com/containerd/nerdctl/v2/pkg/signutil"
@@ -55,50 +44,6 @@ import (
 // Push pushes an image specified by `rawRef`.
 func Push(ctx context.Context, client *containerd.Client, rawRef string, options types.ImagePushOptions) error {
 	parsedReference, err := referenceutil.Parse(rawRef)
-	if err != nil {
-		return err
-	}
-
-	if parsedReference.Protocol != "" {
-		if parsedReference.Protocol != referenceutil.IPFSProtocol {
-			return fmt.Errorf("ipfs scheme is only supported but got %q", parsedReference.Protocol)
-		}
-		log.G(ctx).Infof("pushing image %q to IPFS", parsedReference)
-
-		// Ensure all the layers are here: https://github.com/containerd/nerdctl/issues/3489
-		// XXX what if the image is a CID, or only otherwise available on ipfs?
-		err = EnsureAllContent(ctx, client, parsedReference.String(), options.GOptions)
-		if err != nil {
-			return err
-		}
-
-		var ipfsPath string
-		if options.IpfsAddress != "" {
-			dir, err := os.MkdirTemp("", "apidirtmp")
-			if err != nil {
-				return err
-			}
-			defer os.RemoveAll(dir)
-			if err := os.WriteFile(filepath.Join(dir, "api"), []byte(options.IpfsAddress), 0600); err != nil {
-				return err
-			}
-			ipfsPath = dir
-		}
-
-		var layerConvert converter.ConvertFunc
-		if options.Estargz {
-			layerConvert = eStargzConvertFunc()
-		}
-		c, err := ipfs.Push(ctx, client, parsedReference.String(), layerConvert, options.AllPlatforms, options.Platforms, options.IpfsEnsureImage, ipfsPath)
-		if err != nil {
-			log.G(ctx).WithError(err).Warnf("ipfs push failed")
-			return err
-		}
-		fmt.Fprintln(options.Stdout, c)
-		return nil
-	}
-
-	parsedReference, err = referenceutil.Parse(rawRef)
 	if err != nil {
 		return err
 	}
@@ -123,16 +68,6 @@ func Push(ctx context.Context, client *containerd.Client, rawRef string, options
 		}
 		defer client.ImageService().Delete(ctx, platImg.Name, images.SynchronousDelete())
 		log.G(ctx).Infof("pushing as a reduced-platform image (%s, %s)", platImg.Target.MediaType, platImg.Target.Digest)
-	}
-
-	if options.Estargz {
-		pushRef = ref + "-tmp-esgz"
-		esgzImg, err := converter.Convert(ctx, client, pushRef, ref, converter.WithPlatform(platMC), converter.WithLayerConvertFunc(eStargzConvertFunc()))
-		if err != nil {
-			return fmt.Errorf("failed to convert to eStargz: %v", err)
-		}
-		defer client.ImageService().Delete(ctx, esgzImg.Name, images.SynchronousDelete())
-		log.G(ctx).Infof("pushing as an eStargz image (%s, %s)", esgzImg.Target.MediaType, esgzImg.Target.Digest)
 	}
 
 	// In order to push images where most layers are the same but the
@@ -209,45 +144,4 @@ func Push(ctx context.Context, client *containerd.Client, rawRef string, options
 		fmt.Fprintln(options.Stdout, ref)
 	}
 	return nil
-}
-
-func eStargzConvertFunc() converter.ConvertFunc {
-	convertToESGZ := estargzconvert.LayerConvertFunc()
-	return func(ctx context.Context, cs content.Store, desc ocispec.Descriptor) (*ocispec.Descriptor, error) {
-		if isReusableESGZ(ctx, cs, desc) {
-			log.L.Infof("reusing estargz %s without conversion", desc.Digest)
-			return nil, nil
-		}
-		newDesc, err := convertToESGZ(ctx, cs, desc)
-		if err != nil {
-			return nil, err
-		}
-		log.L.Infof("converted %q to %s", desc.MediaType, newDesc.Digest)
-		return newDesc, err
-	}
-
-}
-
-func isReusableESGZ(ctx context.Context, cs content.Store, desc ocispec.Descriptor) bool {
-	dgstStr, ok := desc.Annotations[estargz.TOCJSONDigestAnnotation]
-	if !ok {
-		return false
-	}
-	tocdgst, err := digest.Parse(dgstStr)
-	if err != nil {
-		return false
-	}
-	ra, err := cs.ReaderAt(ctx, desc)
-	if err != nil {
-		return false
-	}
-	defer ra.Close()
-	r, err := estargz.Open(io.NewSectionReader(ra, 0, desc.Size), estargz.WithDecompressors(new(zstdchunked.Decompressor)))
-	if err != nil {
-		return false
-	}
-	if _, err := r.VerifyTOC(tocdgst); err != nil {
-		return false
-	}
-	return true
 }

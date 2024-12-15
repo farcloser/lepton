@@ -39,14 +39,11 @@ dependencies=(
   containers/fuse-overlayfs
   containerd/fuse-overlayfs-snapshotter
   gotestyourself/gotestsum
-  ipfs/kubo
-  containerd/nydus-snapshotter
   containernetworking/plugins
   rootless-containers/rootlesskit
   opencontainers/runc
   rootless-containers/slirp4netns
   awslabs/soci-snapshotter
-  containerd/stargz-snapshotter
   krallin/tini
 )
 
@@ -64,7 +61,6 @@ FUSE_OVERLAYFS_CHECKSUM=linux
 BUILDG_CHECKSUM=buildg-v
 ROOTLESSKIT_CHECKSUM=linux
 SLIRP4NETNS_CHECKSUM=linux
-STARGZ_SNAPSHOTTER_CHECKSUM=linux
 # We specifically want the static ones
 TINI_CHECKSUM=static
 
@@ -260,11 +256,6 @@ canary::build::integration(){
 
         [ "${#assets[@]}" != 0 ] || candidate="$(assets::get "" "source")"
         [ "$candidate" == "" ] || assets+=("$candidate")
-
-        # XXX very special...
-        if [ "$shortsafename" == "STARGZ_SNAPSHOTTER" ]; then
-          assets+=("https://raw.githubusercontent.com/containerd/stargz-snapshotter/${higher_readable}/script/config/etc/systemd/system/stargz-snapshotter.service")
-        fi
 
         # Write the checksum for what we found
         if [ "${#assets[@]}" == 0 ]; then

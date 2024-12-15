@@ -29,11 +29,6 @@ updates:
         patterns:
           - "github.com/containerd/containerd"
           - "github.com/containerd/containerd/api"
-      stargz:
-        patterns:
-          - "github.com/containerd/stargz-snapshotter"
-          - "github.com/containerd/stargz-snapshotter/estargz"
-          - "github.com/containerd/stargz-snapshotter/ipfs"
 
   # Dependencies listed in .github/workflows/*.yml
   - package-ecosystem: "github-actions"

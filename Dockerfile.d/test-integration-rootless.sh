@@ -40,21 +40,10 @@ else
 	else
 		CONTAINERD_NAMESPACE="nerdctl-test" containerd-rootless-setuptool.sh install-buildkit-containerd
 	fi
-	containerd-rootless-setuptool.sh install-stargz
 	if [ ! -f "/home/rootless/.config/containerd/config.toml" ] ; then
 		echo "version = 2" > /home/rootless/.config/containerd/config.toml
 	fi
-	cat <<EOF >>/home/rootless/.config/containerd/config.toml
-[proxy_plugins]
-  [proxy_plugins."stargz"]
-    type = "snapshot"
-    address = "/run/user/$(id -u)/containerd-stargz-grpc/containerd-stargz-grpc.sock"
-EOF
 	systemctl --user restart containerd.service
-	containerd-rootless-setuptool.sh -- install-ipfs --init --offline # offline ipfs daemon for testing
-	echo "ipfs = true" >>/home/rootless/.config/containerd-stargz-grpc/config.toml
-	systemctl --user restart stargz-snapshotter.service
-	export IPFS_PATH="/home/rootless/.local/share/ipfs"
 	containerd-rootless-setuptool.sh install-bypass4netnsd
 	# Once ssh-ed, we lost the Dockerfile working dir, so, get back in the nerdctl checkout
 	cd /go/src/github.com/containerd/nerdctl

@@ -22,14 +22,11 @@ import (
 	"strings"
 
 	"github.com/distribution/reference"
-	"github.com/ipfs/go-cid"
 	"github.com/opencontainers/go-digest"
 )
 
 type Protocol string
 
-const IPFSProtocol Protocol = "ipfs"
-const IPNSProtocol Protocol = "ipns"
 const shortIDLength = 5
 
 var ErrLoadOCIArchiveRequired = errors.New("image must be loaded from archive before parsing image reference")
@@ -94,22 +91,10 @@ func (ir *ImageReference) SuggestContainerName(suffix string) string {
 func Parse(rawRef string) (*ImageReference, error) {
 	ir := &ImageReference{}
 
-	if strings.HasPrefix(rawRef, "ipfs://") {
-		ir.Protocol = IPFSProtocol
-		rawRef = rawRef[7:]
-	} else if strings.HasPrefix(rawRef, "ipns://") {
-		ir.Protocol = IPNSProtocol
-		rawRef = rawRef[7:]
-	} else if strings.HasPrefix(rawRef, "oci-archive://") {
+	if strings.HasPrefix(rawRef, "oci-archive://") {
 		// The image must be loaded from the specified archive path first
 		// before parsing the image reference specified in its OCI image manifest.
 		return nil, ErrLoadOCIArchiveRequired
-	}
-	if decodedCID, err := cid.Decode(rawRef); err == nil {
-		ir.Protocol = IPFSProtocol
-		rawRef = decodedCID.String()
-		ir.Path = rawRef
-		return ir, nil
 	}
 
 	if dgst, err := digest.Parse(rawRef); err == nil {

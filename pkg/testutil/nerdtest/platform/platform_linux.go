@@ -28,6 +28,5 @@ func DataHome() (string, error) {
 var (
 	RegistryImageStable = testutil.RegistryImageStable
 	RegistryImageNext   = testutil.RegistryImageNext
-	KuboImage           = testutil.KuboImage
 	DockerAuthImage     = testutil.DockerAuthImage
 )
