@@ -24,12 +24,6 @@ jobs:
       matrix:
         include:
           - runner: ubuntu-24.04
-            containerd: v1.6.36
-            arch: amd64
-          - runner: ubuntu-24.04
-            containerd: v1.7.24
-            arch: amd64
-          - runner: ubuntu-24.04
             containerd: v2.0.0
             arch: amd64
     env:
@@ -100,14 +94,6 @@ jobs:
       matrix:
         # ubuntu-20.04: cgroup v1, ubuntu-22.04 and later: cgroup v2
         include:
-          - ubuntu: 20.04
-            containerd: v1.6.36
-            runner: "ubuntu-20.04"
-            arch: amd64
-          - ubuntu: 22.04
-            containerd: v1.7.24
-            runner: "ubuntu-22.04"
-            arch: amd64
           - ubuntu: 24.04
             containerd: v2.0.0
             runner: "ubuntu-24.04"
@@ -220,25 +206,10 @@ jobs:
       matrix:
         # ubuntu-20.04: cgroup v1, ubuntu-22.04 and later: cgroup v2
         include:
-          - ubuntu: 20.04
-            containerd: v1.6.36
-            rootlesskit: v1.1.1  # Deprecated
-            target: rootless
-            arch: amd64
-          - ubuntu: 22.04
-            containerd: v1.7.24
-            rootlesskit: v2.3.1
-            target: rootless
-            arch: amd64
           - ubuntu: 24.04
             containerd: v2.0.0
             rootlesskit: v2.3.1
             target: rootless
-            arch: amd64
-          - ubuntu: 24.04
-            containerd: v1.7.24
-            rootlesskit: v2.3.1
-            target: rootless-port-slirp4netns
             arch: amd64
     env:
       CONTAINERD_VERSION: "${{ matrix.containerd }}"
