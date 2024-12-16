@@ -109,26 +109,12 @@ var Docker = &test.Requirement{
 	},
 }
 
-// NerdctlNeedsFixing marks a test as unsuitable to be run for Nerdctl, because of a specific known issue which
+// NerdishctlNeedsFixing marks a test as unsuitable to be run for Nerdctl, because of a specific known issue which
 // url must be passed as an argument
-var NerdctlNeedsFixing = func(issueLink string) *test.Requirement {
-	return &test.Requirement{
-		Check: func(data test.Data, helpers test.Helpers) (ret bool, mess string) {
-			ret = getTarget() != targetNerdctl
-			if ret {
-				mess = "current target is not " + getTarget()
-			} else {
-				mess = "current target is " + getTarget() + ", but we will skip as it currently has issue: " + issueLink
-			}
-			return ret, mess
-		},
-	}
-}
-
 var NerdishctlNeedsFixing = func(issueLink string) *test.Requirement {
 	return &test.Requirement{
 		Check: func(data test.Data, helpers test.Helpers) (ret bool, mess string) {
-			ret = getTarget() != targetNerdishctl && getTarget() != targetNerdctl
+			ret = getTarget() == targetDocker
 			if ret {
 				mess = "current target is not " + getTarget()
 			} else {

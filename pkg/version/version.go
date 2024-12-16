@@ -22,7 +22,7 @@ import (
 	"strings"
 )
 
-var (
+const (
 	// Version is filled via Makefile
 	Version = ""
 	// Revision is filled via Makefile
@@ -30,7 +30,10 @@ var (
 	// RootName is used to locate configuration, prefix labels, and more generally, inside the library
 	// Changing this can be done at build time with -X (from Makefile), and is mostly of interest for people looking
 	// to build their own cli, leveraging the codebase as a library.
-	RootName  = "nerdctl"
+	RootName = "lepton"
+)
+
+var (
 	EnvPrefix = strings.ToUpper(RootName)
 )
 

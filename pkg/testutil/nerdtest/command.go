@@ -40,11 +40,10 @@ var defaultNamespace = testutil.Namespace
 type target = string
 
 const (
-	targetNerdctl = target("nerdctl")
-	targetDocker  = target("docker")
+	targetNerdctl    = target("nerdctl")
+	targetNerdishctl = target(version.RootName)
+	targetDocker     = target("docker")
 )
-
-var targetNerdishctl = version.RootName
 
 func getTarget() string {
 	// Indirecting to testutil for now
@@ -154,10 +153,10 @@ func (nc *nerdCommand) prep() {
 		}
 
 		// If we have custom toml content, write it if it does not exist already
-		if nc.Config.Read(NerdishctlToml) != "" {
+		if nc.Config.Read(CLIToml) != "" {
 			if !nc.hasWrittenToml {
 				dest := nc.Env[envPrefix+"_TOML"]
-				err := os.WriteFile(dest, []byte(nc.Config.Read(NerdishctlToml)), 0o400)
+				err := os.WriteFile(dest, []byte(nc.Config.Read(CLIToml)), 0o400)
 				assert.NilError(nc.T(), err, "failed to write cli toml config file")
 				nc.hasWrittenToml = true
 			}

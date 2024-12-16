@@ -393,7 +393,7 @@ func (e *CNIEnv) GetDefaultNetworkConfig() (*NetworkConfig, error) {
 			log.L.Warnf("returning the first network bearing the %q default network name out of the multiple found: %#v", DefaultNetworkName, nameMatches)
 		}
 
-		// Warn the user if the default network was not created by us.
+		// Warn the user if the default network was not created by the cli.
 		match := nameMatches[0]
 		_, statErr := os.Stat(e.getConfigPathForNetworkName(DefaultNetworkName))
 		if match.CliID == nil || statErr != nil {

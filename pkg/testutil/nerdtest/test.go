@@ -23,12 +23,12 @@ import (
 )
 
 var (
-	DockerConfig   test.ConfigKey = "DockerConfig"
-	Namespace      test.ConfigKey = "Namespace"
-	NerdishctlToml test.ConfigKey = "NerdishctlToml"
-	HostsDir       test.ConfigKey = "HostsDir"
-	DataRoot       test.ConfigKey = "DataRoot"
-	Debug          test.ConfigKey = "Debug"
+	DockerConfig test.ConfigKey = "DockerConfig"
+	Namespace    test.ConfigKey = "Namespace"
+	CLIToml      test.ConfigKey = "CLIToml"
+	HostsDir     test.ConfigKey = "HostsDir"
+	DataRoot     test.ConfigKey = "DataRoot"
+	Debug        test.ConfigKey = "Debug"
 )
 
 func Setup() *test.Case {

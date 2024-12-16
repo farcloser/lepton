@@ -26,7 +26,7 @@ ifeq ($(GOOS),windows)
 endif
 
 PACKAGE := github.com/containerd/nerdctl/v2
-BINARY := nerdctl
+BINARY := lepton
 
 # distro builders might wanna override these
 PREFIX  ?= /usr/local
@@ -37,7 +37,6 @@ DOCDIR  ?= $(DATADIR)/doc
 GO_BUILD_LDFLAGS ?= -s -w
 GO_BUILD_FLAGS ?=
 export GO_BUILD=CGO_ENABLED=0 GOOS=$(GOOS) $(GO) -C $(MAKEFILE_DIR) build -ldflags "$(GO_BUILD_LDFLAGS) $(VERBOSE_FLAG) -X $(PACKAGE)/pkg/version.Version=$(VERSION) -X $(PACKAGE)/pkg/version.Revision=$(REVISION) -X $(PACKAGE)/pkg/version.RootName=$(BINARY)"
-
 # Variables
 COMPANY_PREFIXES := "github.com/containerd"
 
@@ -61,7 +60,6 @@ ifndef DC_NO_FANCY
     RED := \033[1;31m
 endif
 
-# Helpers
 recursive_wildcard=$(wildcard $1$2) $(foreach e,$(wildcard $1*),$(call recursive_wildcard,$e/,$2))
 
 define title
