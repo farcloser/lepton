@@ -17,7 +17,7 @@
 set -eux -o pipefail
 if [[ "$(id -u)" = "0" ]]; then
 	if [ -e /sys/kernel/security/apparmor/profiles ]; then
-		# Load the "prefix-default" profile for TestRunApparmor
+		# Load the default profile for TestRunApparmor
 		nerdctl apparmor load
 	fi
 
@@ -38,7 +38,7 @@ else
 	if [[ -e /workaround-issue-622 ]]; then
 		echo "WORKAROUND_ISSUE_622: Not enabling BuildKit (https://github.com/containerd/nerdctl/issues/622)" >&2
 	else
-		CONTAINERD_NAMESPACE="nerdctl-test" containerd-rootless-setuptool.sh install-buildkit-containerd
+		CONTAINERD_NAMESPACE="lepton-test" containerd-rootless-setuptool.sh install-buildkit-containerd
 	fi
 	if [ ! -f "/home/rootless/.config/containerd/config.toml" ] ; then
 		echo "version = 2" > /home/rootless/.config/containerd/config.toml

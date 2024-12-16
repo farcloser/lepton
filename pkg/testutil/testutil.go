@@ -136,7 +136,7 @@ func (b *Base) CmdWithHelper(helper []string, args ...string) *Cmd {
 
 func (b *Base) systemctlTarget() string {
 	switch b.Target {
-	case Nerdctl:
+	case Nerdishctl:
 		return "containerd.service"
 	case Docker:
 		return "docker.service"
@@ -271,8 +271,8 @@ func (b *Base) Info() dockercompat.Info {
 
 func (b *Base) InfoNative() native.Info {
 	b.T.Helper()
-	if GetTarget() != Nerdctl {
-		b.T.Skip("InfoNative() should not be called for non-nerdctl target")
+	if GetTarget() != Nerdishctl && GetTarget() != Nerdctl {
+		b.T.Skip("InfoNative() should not be called for non-nerdishctl target")
 	}
 	cmdResult := b.Cmd("info", "--mode", "native", "--format", "{{ json . }}").Run()
 	assert.Equal(b.T, cmdResult.ExitCode, 0)
@@ -285,8 +285,8 @@ func (b *Base) InfoNative() native.Info {
 
 func (b *Base) ContainerdAddress() string {
 	b.T.Helper()
-	if GetTarget() != Nerdctl {
-		b.T.Skip("ContainerdAddress() should not be called for non-nerdctl target")
+	if GetTarget() != Nerdishctl && GetTarget() != Nerdctl {
+		b.T.Skip("ContainerdAddress() should not be called for non-nerdishctl target")
 	}
 	if os.Geteuid() == 0 {
 		return defaults.DefaultAddress
@@ -536,8 +536,9 @@ func (c *Cmd) OutLines() []string {
 type Target = string
 
 const (
-	Nerdctl = Target("nerdctl")
-	Docker  = Target("docker")
+	Nerdishctl = version.RootName
+	Nerdctl    = Target("nerdctl")
+	Docker     = Target("docker")
 )
 
 var (
@@ -554,7 +555,7 @@ var (
 )
 
 func M(m *testing.M) {
-	flag.StringVar(&flagTestTarget, "test.target", Nerdctl, "target to test")
+	flag.StringVar(&flagTestTarget, "test.target", Nerdishctl, "target to test")
 	flag.BoolVar(&flagTestKillDaemon, "test.allow-kill-daemon", false, "enable tests that kill the daemon")
 	flag.BoolVar(&flagTestIPv6, "test.only-ipv6", false, "enable tests on IPv6")
 	flag.BoolVar(&flagTestKube, "test.only-kubernetes", false, "enable tests on Kubernetes")
@@ -648,7 +649,7 @@ func DockerIncompatible(t testing.TB) {
 }
 
 func RequiresBuild(t testing.TB) {
-	if GetTarget() == Nerdctl {
+	if GetTarget() != Nerdishctl && GetTarget() != Nerdctl {
 		buildkitHost, err := buildkitutil.GetBuildkitHost(Namespace)
 		if err != nil {
 			t.Skipf("test requires buildkitd: %+v", err)
@@ -793,7 +794,7 @@ func newBase(t *testing.T, ns string, ipv6Compatible bool, kubernetesCompatible 
 	}
 	var err error
 	switch base.Target {
-	case Nerdctl:
+	case Nerdctl, Nerdishctl:
 		base.Binary, err = exec.LookPath(base.Target)
 		if err != nil {
 			t.Fatal(err)

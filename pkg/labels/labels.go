@@ -51,7 +51,7 @@ var (
 	// ExtraHosts are HostIPs to appended to /etc/hosts
 	ExtraHosts = Prefix + "extraHosts"
 
-	// StateDir is "/var/lib/nerdctl/<ADDRHASH>/containers/<NAMESPACE>/<ID>"
+	// StateDir is "/var/lib/cli_name/<ADDRHASH>/containers/<NAMESPACE>/<ID>"
 	StateDir = Prefix + "state-dir"
 
 	// Networks is a JSON-marshalled string of []string, e.g. []string{"bridge"}.

@@ -328,7 +328,7 @@ jobs:
           fetch-depth: 1
       - name: "Install go"
         uses: ./.github/actions/install-go
-      - run: go install ./cmd/nerdctl
+      - run: go install ./cmd/lepton
       - run: go install -v gotest.tools/gotestsum@v1
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
         with:

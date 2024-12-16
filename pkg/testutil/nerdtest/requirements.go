@@ -105,9 +105,9 @@ var Docker = &test.Requirement{
 	},
 }
 
-// NerdctlNeedsFixing marks a test as unsuitable to be run for Nerdctl, because of a specific known issue which
+// NerdishctlNeedsFixing marks a test as unsuitable to be run for Nerdctl, because of a specific known issue which
 // url must be passed as an argument
-var NerdctlNeedsFixing = func(issueLink string) *test.Requirement {
+var NerdishctlNeedsFixing = func(issueLink string) *test.Requirement {
 	return &test.Requirement{
 		Check: func(data test.Data, helpers test.Helpers) (ret bool, mess string) {
 			ret = getTarget() == targetDocker
@@ -138,7 +138,7 @@ var BrokenTest = func(message string, req *test.Requirement) *test.Requirement {
 var Rootless = &test.Requirement{
 	Check: func(data test.Data, helpers test.Helpers) (ret bool, mess string) {
 		// Make sure we DO not return "IsRootless true" for docker
-		ret = getTarget() == targetNerdctl && rootlessutil.IsRootless()
+		ret = (getTarget() == targetNerdishctl || getTarget() == targetNerdctl) && rootlessutil.IsRootless()
 		if ret {
 			mess = "environment is root-less"
 		} else {
@@ -173,7 +173,7 @@ var CgroupsAccessible = test.Require(
 	CGroup,
 	&test.Requirement{
 		Check: func(data test.Data, helpers test.Helpers) (ret bool, mess string) {
-			isRootLess := getTarget() == targetNerdctl && rootlessutil.IsRootless()
+			isRootLess := (getTarget() == targetNerdishctl || getTarget() == targetNerdctl) && rootlessutil.IsRootless()
 			if isRootLess {
 				stdout := helpers.Capture("info", "--format", "{{ json . }}")
 				var dinf dockercompat.Info
@@ -250,7 +250,7 @@ var Build = &test.Requirement{
 		ret := true
 		mess := "buildkitd is enabled"
 
-		if getTarget() == targetNerdctl {
+		if getTarget() == targetNerdishctl || getTarget() == targetNerdctl {
 			bkHostAddr, err := buildkitutil.GetBuildkitHost(defaultNamespace)
 			if err != nil {
 				ret = false
@@ -292,7 +292,7 @@ var Private = &test.Requirement{
 	},
 
 	Cleanup: func(data test.Data, helpers test.Helpers) {
-		if getTarget() == targetNerdctl {
+		if getTarget() == targetNerdishctl || getTarget() == targetNerdctl {
 			// FIXME: there are conditions where we still have some stuff in there and this fails...
 			containerList := strings.TrimSpace(helpers.Capture("ps", "-aq"))
 			if containerList != "" {

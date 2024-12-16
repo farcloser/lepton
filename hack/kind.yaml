@@ -4,11 +4,11 @@ apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
   - role: control-plane
     extraMounts:
-      - hostPath: _output/nerdctl
-        containerPath: /usr/local/bin/nerdctl
+      - hostPath: _output/lepton
+        containerPath: /usr/local/bin/lepton
       - hostPath: /tmp/go
         containerPath: /usr/local/go
       - hostPath: .
-        containerPath: /nerdctl-source
+        containerPath: /source
       - hostPath: /opt/cni
         containerPath: /opt/cni

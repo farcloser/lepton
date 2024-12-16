@@ -525,7 +525,7 @@ func Unpause(ctx context.Context, client *containerd.Client, id string) error {
 	}
 }
 
-// ContainerStateDirPath returns the path to the Nerdctl-managed state directory for the container with the given ID.
+// ContainerStateDirPath returns the path to the cli-managed state directory for the container with the given ID.
 func ContainerStateDirPath(ns, dataStore, id string) (string, error) {
 	return filepath.Join(dataStore, "containers", ns, id), nil
 }

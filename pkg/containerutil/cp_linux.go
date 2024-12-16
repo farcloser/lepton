@@ -36,6 +36,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
 	"github.com/containerd/nerdctl/v2/pkg/tarutil"
+	"github.com/containerd/nerdctl/v2/pkg/version"
 )
 
 // See https://docs.docker.com/engine/reference/commandline/cp/ for the specification.

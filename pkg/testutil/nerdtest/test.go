@@ -24,7 +24,7 @@ import (
 
 var DockerConfig test.ConfigKey = "DockerConfig"
 var Namespace test.ConfigKey = "Namespace"
-var NerdctlToml test.ConfigKey = "NerdctlToml"
+var CLIToml test.ConfigKey = "CLIToml"
 var HostsDir test.ConfigKey = "HostsDir"
 var DataRoot test.ConfigKey = "DataRoot"
 var Debug test.ConfigKey = "Debug"

@@ -651,7 +651,7 @@ func validateUtsSettings(netOpts types.NetworkOptions) error {
 }
 
 // Writes the provided hostname string in a "hostname" file in the Container's
-// Nerdctl-managed datastore and returns the oci.SpecOpts required in the container
+// cli-managed datastore and returns the oci.SpecOpts required in the container
 // spec for the file to be mounted under /etc/hostname in the new container.
 // If the hostname is empty, the leading 12 characters of the containerID
 // This sets world readable permissions on /etc/hostname, ignoring umask
