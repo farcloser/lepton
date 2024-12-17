@@ -40,7 +40,7 @@ type Config struct {
 	// RemoteOpts, e.g. containerd.WithPullUnpack.
 	//
 	// Regardless to RemoteOpts, the following opts are always set:
-	// WithResolver, WithImageHandler, WithSchema1Conversion
+	// WithResolver, WithImageHandler
 	//
 	// RemoteOpts related to unpacking can be set only when len(Platforms) is 1.
 	RemoteOpts []containerd.RemoteOpt
@@ -62,9 +62,7 @@ func Fetch(ctx context.Context, client *containerd.Client, ref string, config *C
 	}()
 
 	h := images.HandlerFunc(func(ctx context.Context, desc ocispec.Descriptor) ([]ocispec.Descriptor, error) {
-		if desc.MediaType != images.MediaTypeDockerSchema1Manifest {
-			ongoing.Add(desc)
-		}
+		ongoing.Add(desc)
 		return nil, nil
 	})
 
@@ -73,8 +71,6 @@ func Fetch(ctx context.Context, client *containerd.Client, ref string, config *C
 	opts := []containerd.RemoteOpt{
 		containerd.WithResolver(config.Resolver),
 		containerd.WithImageHandler(h),
-		//nolint:staticcheck
-		containerd.WithSchema1Conversion, //lint:ignore SA1019 nerdctl should support schema1 as well.
 		containerd.WithPlatformMatcher(platformMC),
 	}
 	opts = append(opts, config.RemoteOpts...)
