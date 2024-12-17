@@ -52,7 +52,7 @@ var (
 	ErrSourceIsNotADir            = errors.New("source is not a directory")                                      // cp SOMEFILE/ foo:/
 	ErrDestinationIsNotADir       = errors.New("destination is not a directory")                                 // * cp ./ foo:/etc/issue/bah
 	ErrSourceDoesNotExist         = errors.New("source does not exist")                                          // cp NONEXISTENT foo:/
-	ErrDestinationParentMustExist = errors.New("destination parent does not exist")                              // nerdctl cp VALID_PATH foo:/NONEXISTENT/NONEXISTENT
+	ErrDestinationParentMustExist = errors.New("destination parent does not exist")                              // cp VALID_PATH foo:/NONEXISTENT/NONEXISTENT
 	ErrDestinationDirMustExist    = errors.New("the destination directory must exist to be able to copy a file") // * cp SOMEFILE foo:/NONEXISTENT/
 	ErrCannotCopyDirToFile        = errors.New("cannot copy a directory to a file")                              // cp SOMEDIR foo:/etc/issue
 )

@@ -92,7 +92,7 @@ func TestStats(t *testing.T) {
 				return helpers.Command("stats", "--no-stream")
 			},
 			// https://github.com/containerd/nerdctl/issues/1240
-			// nerdctl used to print UINT64_MAX as the memory limit, so, ensure it does no more
+			// used to print UINT64_MAX as the memory limit, so, ensure it does no more
 			Expected: test.Expects(0, nil, test.DoesNotContain("16EiB")),
 		},
 		{

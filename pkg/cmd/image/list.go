@@ -123,7 +123,7 @@ type imagePrintable struct {
 	Size         string // the size of the unpacked snapshots.
 	BlobSize     string // the size of the blobs in the content store (nerdctl extension)
 	// TODO: "SharedSize", "UniqueSize"
-	Platform string // nerdctl extension
+	Platform string // extension
 }
 
 func printImages(ctx context.Context, client *containerd.Client, imageList []images.Image, options *types.ImageListOptions) error {

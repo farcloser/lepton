@@ -46,7 +46,7 @@ const (
 	DefaultIPAMDriver  = "host-local"
 
 	// When creating non-default network without passing in `--subnet` option,
-	// nerdctl assigns subnet address for the creation starting from `StartingCIDR`
+	// the cli assigns subnet address for the creation starting from `StartingCIDR`
 	// This prevents subnet address overlapping with `DefaultCIDR` used by the default network
 	StartingCIDR = "10.4.1.0/24"
 )

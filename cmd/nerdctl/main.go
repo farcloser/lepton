@@ -136,7 +136,7 @@ func xmain() error {
 		// "binary://BIN?KEY=VALUE" URI is parsed into Args {BIN, KEY, VALUE}.
 		return logging.Main(os.Args[2])
 	}
-	// nerdctl CLI mode
+	// CLI mode
 	app, err := newApp()
 	if err != nil {
 		return err
