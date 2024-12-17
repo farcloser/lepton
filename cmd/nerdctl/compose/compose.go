@@ -97,8 +97,8 @@ func getComposeOptions(cmd *cobra.Command, debugFull, experimental bool) (compos
 		ConfigPaths:      files,
 		Profiles:         profiles,
 		EnvFile:          envFile,
-		NerdctlCmd:       nerdctlCmd,
-		NerdctlArgs:      nerdctlArgs,
+		CliCmd:           nerdctlCmd,
+		CliArgs:          nerdctlArgs,
 		DebugPrintFull:   debugFull,
 		Experimental:     experimental,
 	}, nil

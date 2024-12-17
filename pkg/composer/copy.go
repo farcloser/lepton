@@ -88,7 +88,7 @@ func (c *Composer) Copy(ctx context.Context, co CopyOptions) error {
 			return err
 		}
 		if !co.DryRun {
-			if err := c.runNerdctlCmd(ctx, args...); err != nil {
+			if err := c.runCliCmd(ctx, args...); err != nil {
 				return err
 			}
 		}

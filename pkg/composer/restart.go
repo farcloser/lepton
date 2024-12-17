@@ -68,7 +68,7 @@ func (c *Composer) restartContainers(ctx context.Context, containers []container
 				args = append(args, timeoutArg)
 			}
 			args = append(args, container.ID())
-			if err := c.runNerdctlCmd(ctx, args...); err != nil {
+			if err := c.runCliCmd(ctx, args...); err != nil {
 				log.G(ctx).Warn(err)
 			}
 		}()

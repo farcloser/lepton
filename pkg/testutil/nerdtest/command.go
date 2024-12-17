@@ -154,7 +154,7 @@ func (nc *nerdCommand) prep() {
 			if !nc.hasWrittenToml {
 				dest := nc.Env["NERDCTL_TOML"]
 				err := os.WriteFile(dest, []byte(nc.Config.Read(NerdctlToml)), 0400)
-				assert.NilError(nc.T(), err, "failed to write NerdctlToml")
+				assert.NilError(nc.T(), err, "failed to write cli toml config file")
 				nc.hasWrittenToml = true
 			}
 		}

@@ -55,10 +55,10 @@ func Inspect(ctx context.Context, options types.NetworkInspectOptions) error {
 		}
 		network := netList[0]
 		r := &native.Network{
-			CNI:           json.RawMessage(network.Bytes),
-			NerdctlID:     network.NerdctlID,
-			NerdctlLabels: network.NerdctlLabels,
-			File:          network.File,
+			CNI:       json.RawMessage(network.Bytes),
+			CliID:     network.CliID,
+			CliLabels: network.CliLabels,
+			File:      network.File,
 		}
 		switch options.Mode {
 		case "native":

@@ -189,7 +189,7 @@ func initRootCmdFlags(rootCmd *cobra.Command, tomlPath string) (*pflag.FlagSet, 
 
 func newApp() (*cobra.Command, error) {
 
-	tomlPath := ncdefaults.NerdctlTOML()
+	tomlPath := ncdefaults.CliTOML()
 	if v, ok := os.LookupEnv("NERDCTL_TOML"); ok {
 		tomlPath = v
 	}

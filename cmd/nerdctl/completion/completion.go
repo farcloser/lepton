@@ -127,9 +127,9 @@ func NetworkNames(cmd *cobra.Command, exclude []string) ([]string, cobra.ShellCo
 	for netName, network := range netConfigs {
 		if _, ok := excludeMap[netName]; !ok {
 			candidates = append(candidates, netName)
-			if network.NerdctlID != nil {
-				candidates = append(candidates, *network.NerdctlID)
-				candidates = append(candidates, (*network.NerdctlID)[0:12])
+			if network.CliID != nil {
+				candidates = append(candidates, *network.CliID)
+				candidates = append(candidates, (*network.CliID)[0:12])
 			}
 		}
 	}

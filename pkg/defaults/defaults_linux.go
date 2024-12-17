@@ -100,7 +100,7 @@ func CNIRuntimeDir() string {
 	return fmt.Sprintf("%s/cni", xdr)
 }
 
-func NerdctlTOML() string {
+func CliTOML() string {
 	if !rootlessutil.IsRootless() {
 		return "/etc/nerdctl/nerdctl.toml"
 	}

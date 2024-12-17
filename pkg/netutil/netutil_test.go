@@ -177,8 +177,8 @@ func testDefaultNetworkCreation(t *testing.T) {
 	firstConfigModTime := stat.ModTime()
 
 	// Check default network label present.
-	assert.Assert(t, defaultNetConf.NerdctlLabels != nil)
-	lstr, ok := (*defaultNetConf.NerdctlLabels)[labels.NerdctlDefaultNetwork]
+	assert.Assert(t, defaultNetConf.CliLabels != nil)
+	lstr, ok := (*defaultNetConf.CliLabels)[labels.DefaultNetwork]
 	assert.Assert(t, ok)
 	boolv, err := strconv.ParseBool(lstr)
 	assert.NilError(t, err)
@@ -244,8 +244,8 @@ func testDefaultNetworkCreationWithBridgeIP(t *testing.T) {
 	firstConfigModTime := stat.ModTime()
 
 	// Check default network label present.
-	assert.Assert(t, defaultNetConf.NerdctlLabels != nil)
-	lstr, ok := (*defaultNetConf.NerdctlLabels)[labels.NerdctlDefaultNetwork]
+	assert.Assert(t, defaultNetConf.CliLabels != nil)
+	lstr, ok := (*defaultNetConf.CliLabels)[labels.DefaultNetwork]
 	assert.Assert(t, ok)
 	boolv, err := strconv.ParseBool(lstr)
 	assert.NilError(t, err)

@@ -97,7 +97,7 @@ func (c *Composer) exec(ctx context.Context, container containerd.Container, eo 
 	}
 	args = append(args, container.ID())
 	args = append(args, eo.Args...)
-	cmd := c.createNerdctlCmd(ctx, args...)
+	cmd := c.createCliCmd(ctx, args...)
 
 	if eo.Interactive {
 		cmd.Stdin = os.Stdin

@@ -49,10 +49,10 @@ type ContainerCreateOptions struct {
 	// GOptions is the global options
 	GOptions GlobalCommandOptions
 
-	// NerdctlCmd is the command name of nerdctl
-	NerdctlCmd string
-	// NerdctlArgs is the arguments of nerdctl
-	NerdctlArgs []string
+	// CliCmd is the command name of nerdctl
+	CliCmd string
+	// CliArgs is the arguments of nerdctl
+	CliArgs []string
 
 	// InRun is true when it's generated in the `run` command
 	InRun bool

@@ -55,7 +55,7 @@ func CgroupnsMode() string {
 	return ""
 }
 
-func NerdctlTOML() string {
+func CliTOML() string {
 	ucd, err := os.UserConfigDir()
 	if err != nil {
 		panic(err)
