@@ -26,9 +26,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/docker/go-units"
 	"github.com/fahedouch/go-logrotate"
 	"github.com/fsnotify/fsnotify"
+	"go.farcloser.world/core/units"
 
 	"github.com/containerd/containerd/v2/core/runtime/v2/logging"
 	"github.com/containerd/errdefs"

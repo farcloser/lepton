@@ -23,7 +23,7 @@ import (
 	"sync"
 	"time"
 
-	units "github.com/docker/go-units"
+	"go.farcloser.world/core/units"
 )
 
 // StatsEntry represents the statistics data collected from a container

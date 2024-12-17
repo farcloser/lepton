@@ -27,6 +27,7 @@ import (
 	"github.com/pelletier/go-toml/v2"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"go.farcloser.world/core/filesystem"
 
 	"github.com/containerd/log"
 
@@ -48,7 +49,6 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/errutil"
 	"github.com/containerd/nerdctl/v2/pkg/logging"
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
-	"github.com/containerd/nerdctl/v2/pkg/store"
 	"github.com/containerd/nerdctl/v2/pkg/version"
 )
 
@@ -246,7 +246,7 @@ Config file ($%s_TOML): %s
 		// (containerd treats namespaces as valid identifiers - eg: alphanumericals + dash, starting with a letter)
 		// See https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#path-segment-names for
 		// considerations about path segments identifiers.
-		if err = store.ValidatePathComponent(globalOptions.Namespace); err != nil {
+		if err = filesystem.ValidatePathComponent(globalOptions.Namespace); err != nil {
 			return err
 		}
 		if appNeedsRootlessParentMain(cmd, args) {

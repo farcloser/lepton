@@ -25,9 +25,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/docker/go-units"
 	mobymount "github.com/moby/sys/mount"
 	"github.com/opencontainers/runtime-spec/specs-go"
+	"go.farcloser.world/core/units"
 	"golang.org/x/sys/unix"
 
 	"github.com/containerd/containerd/v2/core/containers"

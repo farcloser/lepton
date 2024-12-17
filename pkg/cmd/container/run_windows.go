@@ -22,8 +22,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/docker/go-units"
 	"github.com/opencontainers/runtime-spec/specs-go"
+	"go.farcloser.world/core/units"
 
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/containers"

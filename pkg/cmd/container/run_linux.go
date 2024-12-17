@@ -23,6 +23,7 @@ import (
 
 	"github.com/moby/sys/userns"
 	"github.com/opencontainers/runtime-spec/specs-go"
+	"go.farcloser.world/core/utils"
 
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/contrib/nvidia"
@@ -62,7 +63,7 @@ func setPlatformOptions(ctx context.Context, client *containerd.Client, id, uts 
 	}
 	opts = append(opts, cgOpts...)
 
-	annotations := strutil.ConvertKVStringsToMap(options.Annotations)
+	annotations := utils.KeyValueStringsToMap(options.Annotations)
 
 	capOpts, err := generateCapOpts(
 		strutil.DedupeStrSlice(options.CapAdd),
@@ -71,7 +72,7 @@ func setPlatformOptions(ctx context.Context, client *containerd.Client, id, uts 
 		return nil, err
 	}
 	opts = append(opts, capOpts...)
-	securityOptsMaps := strutil.ConvertKVStringsToMap(strutil.DedupeStrSlice(options.SecurityOpt))
+	securityOptsMaps := utils.KeyValueStringsToMap(strutil.DedupeStrSlice(options.SecurityOpt))
 	secOpts, err := generateSecurityOpts(options.Privileged, securityOptsMaps)
 	if err != nil {
 		return nil, err
@@ -97,7 +98,7 @@ func setPlatformOptions(ctx context.Context, client *containerd.Client, id, uts 
 
 	opts = append(opts, ulimitOpts...)
 	if options.Sysctl != nil {
-		opts = append(opts, WithSysctls(strutil.ConvertKVStringsToMap(options.Sysctl)))
+		opts = append(opts, WithSysctls(utils.KeyValueStringsToMap(options.Sysctl)))
 	}
 	gpuOpt, err := parseGPUOpts(options.GPUs)
 	if err != nil {

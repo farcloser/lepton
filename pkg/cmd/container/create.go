@@ -32,6 +32,7 @@ import (
 	dockercliopts "github.com/docker/cli/opts"
 	dockeropts "github.com/docker/docker/opts"
 	"github.com/opencontainers/runtime-spec/specs-go"
+	"go.farcloser.world/core/utils"
 
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/containers"
@@ -350,7 +351,7 @@ func Create(ctx context.Context, client *containerd.Client, args []string, netMa
 	cOpts = append(cOpts, ilOpt)
 
 	opts = append(opts, propagateInternalContainerdLabelsToOCIAnnotations(),
-		oci.WithAnnotations(strutil.ConvertKVStringsToMap(options.Annotations)))
+		oci.WithAnnotations(utils.KeyValueStringsToMap(options.Annotations)))
 
 	var s specs.Spec
 	spec := containerd.WithSpec(&s, opts...)
@@ -445,7 +446,7 @@ func generateRootfsOpts(args []string, id string, ensured *imgutil.EnsuredImage,
 
 	if options.Systemd == "always" || (options.Systemd == "true" && isEntryPointSystemd) {
 		if options.Privileged {
-			securityOptsMap := strutil.ConvertKVStringsToMap(strutil.DedupeStrSlice(options.SecurityOpt))
+			securityOptsMap := utils.KeyValueStringsToMap(strutil.DedupeStrSlice(options.SecurityOpt))
 			privilegedWithoutHostDevices, err := maputil.MapBoolValueAsOpt(securityOptsMap, "privileged-without-host-devices")
 			if err != nil {
 				return nil, nil, err
@@ -593,13 +594,13 @@ func readKVStringsMapfFromLabel(label, labelFile []string) (map[string]string, e
 	if err != nil {
 		return nil, err
 	}
-	return strutil.ConvertKVStringsToMap(kvStrings), nil
+	return utils.KeyValueStringsToMap(kvStrings), nil
 }
 
 // parseKVStringsMapFromLogOpt parse log options KV entries and convert to Map
 func parseKVStringsMapFromLogOpt(logOpt []string, logDriver string) (map[string]string, error) {
 	logOptArray := strutil.DedupeStrSlice(logOpt)
-	logOptMap := strutil.ConvertKVStringsToMap(logOptArray)
+	logOptMap := utils.KeyValueStringsToMap(logOptArray)
 	if logDriver == "json-file" {
 		if _, ok := logOptMap[logging.MaxSize]; !ok {
 			delete(logOptMap, logging.MaxFile)

@@ -25,12 +25,13 @@ import (
 	"fmt"
 	"path/filepath"
 
+	"go.farcloser.world/core/utils"
+
 	"github.com/containerd/log"
 
 	"github.com/containerd/nerdctl/v2/pkg/identifiers"
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/native"
 	"github.com/containerd/nerdctl/v2/pkg/store"
-	"github.com/containerd/nerdctl/v2/pkg/strutil"
 )
 
 const (
@@ -348,7 +349,7 @@ func (vs *volumeStore) rawCreate(name string, labels []string) (vol *native.Volu
 	}{}
 
 	if len(labels) > 0 {
-		volOpts.Labels = strutil.ConvertKVStringsToMap(labels)
+		volOpts.Labels = utils.KeyValueStringsToMap(labels)
 	}
 
 	// Failure here must exit, no need to clean-up
