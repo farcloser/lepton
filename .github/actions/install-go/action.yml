@@ -19,7 +19,7 @@ inputs:
     default: "1.23.x"
     description: "The latest major.minor version we support"
   _old_stable:
-    default: "1.22.x"
+    default: "1.23.x"
     description: "The minimum major.minor go version that we still support"
 
 runs:

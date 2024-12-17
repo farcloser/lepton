@@ -1,6 +1,6 @@
 module github.com/containerd/nerdctl/v2
 
-go 1.22.7
+go 1.23.0
 
 // FIXME:
 // github.com/docker/docker/pkg/sysinfo has been replaced by a fork kept under ./pkg2/sysinfo
