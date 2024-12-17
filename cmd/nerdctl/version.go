@@ -71,7 +71,7 @@ func versionAction(cmd *cobra.Command, args []string) error {
 	}
 
 	address := globalOptions.Address
-	// rootless `nerdctl version` runs in the host namespaces, so the address is different
+	// rootless `version` runs in the host namespaces, so the address is different
 	if rootlessutil.IsRootless() {
 		address, err = rootlessutil.RootlessContainredSockAddress()
 		if err != nil {

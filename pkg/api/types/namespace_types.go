@@ -18,17 +18,17 @@ package types
 
 import "io"
 
-// NamespaceCreateOptions specifies options for `nerdctl namespace create`.
+// NamespaceCreateOptions specifies options for `namespace create`.
 type NamespaceCreateOptions struct {
 	GOptions GlobalCommandOptions
 	// Labels are the namespace labels
 	Labels []string
 }
 
-// NamespaceUpdateOptions specifies options for `nerdctl namespace update`.
+// NamespaceUpdateOptions specifies options for `namespace update`.
 type NamespaceUpdateOptions NamespaceCreateOptions
 
-// NamespaceRemoveOptions specifies options for `nerdctl namespace rm`.
+// NamespaceRemoveOptions specifies options for `namespace rm`.
 type NamespaceRemoveOptions struct {
 	Stdout   io.Writer
 	GOptions GlobalCommandOptions
@@ -36,7 +36,7 @@ type NamespaceRemoveOptions struct {
 	CGroup bool
 }
 
-// NamespaceInspectOptions specifies options for `nerdctl namespace inspect`.
+// NamespaceInspectOptions specifies options for `namespace inspect`.
 type NamespaceInspectOptions struct {
 	Stdout   io.Writer
 	GOptions GlobalCommandOptions

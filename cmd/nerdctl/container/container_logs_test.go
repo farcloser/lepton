@@ -66,7 +66,7 @@ bar`
 	base.Cmd("rm", "-f", containerName).AssertOK()
 }
 
-// Tests whether `nerdctl logs` properly separates stdout/stderr output
+// Tests whether `logs` properly separates stdout/stderr output
 // streams for containers using the jsonfile logging driver:
 func TestLogsOutStreamsSeparated(t *testing.T) {
 	t.Parallel()
@@ -159,7 +159,7 @@ func TestLogsWithForegroundContainers(t *testing.T) {
 	base := testutil.NewBase(t)
 	tid := testutil.Identifier(t)
 
-	// unbuffer(1) emulates tty, which is required by `nerdctl run -t`.
+	// unbuffer(1) emulates tty, which is required by `run -t`.
 	// unbuffer(1) can be installed with `apt-get install expect`.
 	unbuffer := []string{"unbuffer"}
 

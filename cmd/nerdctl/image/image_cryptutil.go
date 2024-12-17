@@ -45,8 +45,8 @@ func registerImgcryptFlags(cmd *cobra.Command, encrypt bool) {
 	flags.String("gpg-homedir", "", "The GPG homedir to use; by default gpg uses ~/.gnupg")
 	flags.String("gpg-version", "", "The GPG version (\"v1\" or \"v2\"), default will make an educated guess")
 	flags.StringSlice("key", []string{}, "A secret key's filename and an optional password separated by colon; this option may be provided multiple times")
-	// While --recipient can be specified only for `nerdctl image encrypt`,
-	// --dec-recipient can be specified for both `nerdctl image encrypt` and `nerdctl image decrypt`.
+	// While --recipient can be specified only for `image encrypt`,
+	// --dec-recipient can be specified for both `image encrypt` and `image decrypt`.
 	flags.StringSlice("dec-recipient", []string{}, "Recipient of the image; used only for PKCS7 and must be an x509 certificate")
 
 	if encrypt {

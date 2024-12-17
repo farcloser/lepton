@@ -148,7 +148,7 @@ func TestHnsEndpointsExistDuringContainerLifecycle(t *testing.T) {
 // Note: currently hardcoded to return the default network, as `network create`
 // does not work on Windows.
 func getTestingNetwork() (*netutil.NetworkConfig, error) {
-	// NOTE: cannot currently `nerdctl network create` on Windows so we use a pre-existing network:
+	// NOTE: cannot currently `network create` on Windows so we use a pre-existing network:
 	cniEnv, err := netutil.NewCNIEnv(defaults.CNIPath(), defaults.CNINetConfPath())
 	if err != nil {
 		return nil, err

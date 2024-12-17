@@ -133,7 +133,7 @@ func NewTask(ctx context.Context, client *containerd.Client, container container
 			if sv, err := infoutil.ServerSemVer(ctx, client); err != nil {
 				log.G(ctx).Warn(err)
 			} else if sv.LessThan(semver.MustParse("1.6.0-0")) {
-				log.G(ctx).Warnf("`nerdctl (run|exec) -i` without `-t` expects containerd 1.6 or later, got containerd %v", sv)
+				log.G(ctx).Warnf("`(run|exec) -i` without `-t` expects containerd 1.6 or later, got containerd %v", sv)
 			}
 			var stdinC io.ReadCloser = &StdinCloser{
 				Stdin: os.Stdin,

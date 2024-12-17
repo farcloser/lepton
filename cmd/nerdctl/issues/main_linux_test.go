@@ -29,7 +29,7 @@ func TestMain(m *testing.M) {
 }
 
 // TestIssue108 tests https://github.com/containerd/nerdctl/issues/108
-// ("`nerdctl run --net=host -it` fails while `nerdctl run -it --net=host` works")
+// ("`run --net=host -it` fails while `run -it --net=host` works")
 func TestIssue108(t *testing.T) {
 	testCase := nerdtest.Setup()
 

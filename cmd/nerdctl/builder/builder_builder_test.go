@@ -71,7 +71,7 @@ CMD ["echo", "test-builder-prune"]`, testutil.CommonImage)
 			},
 			{
 				Description: "Debug",
-				// `nerdctl builder debug` is currently incompatible with `docker buildx debug`.
+				// `builder debug` is currently incompatible with `docker buildx debug`.
 				Require:    test.Require(test.Not(nerdtest.Docker)),
 				NoParallel: true,
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {

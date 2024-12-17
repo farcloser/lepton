@@ -26,6 +26,8 @@ var (
 	Version = ""
 	// Revision is filled via Makefile
 	Revision = ""
+	// RootName governs
+	RootName = "nerdctl"
 )
 
 const unknown = "<unknown>"

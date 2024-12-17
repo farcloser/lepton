@@ -33,7 +33,7 @@ import (
 )
 
 // For the test matrix, see https://docs.docker.com/engine/reference/commandline/cp/
-// Obviously, none of this is fully windows ready - obviously `nerdctl cp` itself is not either, so, ok for now.
+// Obviously, none of this is fully windows ready - obviously `cp` itself is not either, so, ok for now.
 const (
 	// Use this to poke the testing rig for improper path handling
 	// TODO: fuzz this more seriously

@@ -42,7 +42,7 @@ type RootlessCNIPortManager struct {
 }
 
 func (rlcpm *RootlessCNIPortManager) ExposePort(ctx context.Context, cpm cni.PortMapping) error {
-	// NOTE: When `nerdctl run -p 8080:80` is being launched, cpm.HostPort is set to 8080 and cpm.ContainerPort is set to 80.
+	// NOTE: When `run -p 8080:80` is being launched, cpm.HostPort is set to 8080 and cpm.ContainerPort is set to 80.
 	// We want to forward the port 8080 of the parent namespace into the port 8080 of the child namespace (which is the "host"
 	// from the point of view of CNI). So we do NOT set sp.ChildPort to cpm.ContainerPort here.
 	sp := port.Spec{

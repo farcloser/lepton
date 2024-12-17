@@ -22,7 +22,7 @@ import (
 
 // createLine returns a line string slice.
 // line is like "foo foo.nw0 bar bar.nw0\n"
-// for `nerdctl --name=foo --hostname=bar --network=n0`.
+// for `--name=foo --hostname=bar --network=n0`.
 //
 // May return an empty string slice
 func createLine(thatNetwork string, meta *Meta, myNetworks map[string]struct{}) []string {

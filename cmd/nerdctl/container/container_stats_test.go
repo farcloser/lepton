@@ -32,7 +32,7 @@ func TestStats(t *testing.T) {
 	testCase.Require = test.Not(test.Windows)
 
 	if runtime.GOOS == "linux" {
-		// this comment is for `nerdctl ps` but it also valid for `nerdctl stats` :
+		// this comment is for `ps` but it also valid for `stats` :
 		// https://github.com/containerd/nerdctl/pull/223#issuecomment-851395178
 		testCase.Require = test.Require(
 			testCase.Require,
