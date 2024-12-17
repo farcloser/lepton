@@ -33,6 +33,7 @@ import (
 
 	"github.com/Masterminds/semver/v3"
 	"github.com/opencontainers/go-digest"
+	"go.farcloser.world/core/filesystem"
 	"gotest.tools/v3/assert"
 	"gotest.tools/v3/icmd"
 
@@ -44,7 +45,6 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/infoutil"
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/native"
-	"github.com/containerd/nerdctl/v2/pkg/lockutil"
 	"github.com/containerd/nerdctl/v2/pkg/platformutil"
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
 	"github.com/containerd/nerdctl/v2/pkg/version"
@@ -584,14 +584,14 @@ func M(m *testing.M) {
 		os.Chmod(filepath.Dir(testLockFile), 0o777)
 
 		// Acquire lock
-		lock, err := lockutil.Lock(filepath.Dir(testLockFile))
+		lock, err := filesystem.Lock(filepath.Dir(testLockFile))
 		if err != nil {
 			log.L.WithError(err).Errorf("failed acquiring testing lock %q", filepath.Dir(testLockFile))
 			return 1
 		}
 
 		// Release...
-		defer lockutil.Unlock(lock)
+		defer filesystem.Unlock(lock)
 
 		// Create marker file
 		err = os.WriteFile(testLockFile, []byte("prevent testing from running in parallel for subpackages integration tests"), 0o666)

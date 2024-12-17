@@ -31,6 +31,7 @@ import (
 	"strings"
 
 	"github.com/containernetworking/cni/libcni"
+	"go.farcloser.world/core/filesystem"
 
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/pkg/namespaces"
@@ -39,7 +40,6 @@ import (
 
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/labels"
-	"github.com/containerd/nerdctl/v2/pkg/lockutil"
 	"github.com/containerd/nerdctl/v2/pkg/netutil/nettype"
 	subnetutil "github.com/containerd/nerdctl/v2/pkg/netutil/subnet"
 	"github.com/containerd/nerdctl/v2/pkg/strutil"
@@ -58,7 +58,7 @@ func (e *CNIEnv) ListNetworksMatch(reqs []string, allowPseudoNetwork bool) (list
 	var err error
 
 	var networkConfigs []*NetworkConfig
-	err = lockutil.WithDirLock(e.NetconfPath, func() error {
+	err = filesystem.WithLock(e.NetconfPath, func() error {
 		networkConfigs, err = e.networkConfigList()
 		return err
 	})
@@ -222,7 +222,7 @@ func (e *CNIEnv) NetworkList() ([]*NetworkConfig, error) {
 		netConfigList, err = e.networkConfigList()
 		return err
 	}
-	err = lockutil.WithDirLock(e.NetconfPath, fn)
+	err = filesystem.WithLock(e.NetconfPath, fn)
 
 	return netConfigList, err
 }
@@ -338,7 +338,7 @@ func (e *CNIEnv) CreateNetwork(opts types.NetworkCreateOptions) (*NetworkConfig,
 		}
 		return e.writeNetworkConfig(netConf)
 	}
-	err := lockutil.WithDirLock(e.NetconfPath, fn)
+	err := filesystem.WithLock(e.NetconfPath, fn)
 	if err != nil {
 		return nil, err
 	}
@@ -352,7 +352,7 @@ func (e *CNIEnv) RemoveNetwork(net *NetworkConfig) error {
 		}
 		return net.clean()
 	}
-	return lockutil.WithDirLock(e.NetconfPath, fn)
+	return filesystem.WithLock(e.NetconfPath, fn)
 }
 
 // GetDefaultNetworkConfig checks whether the default network exists
