@@ -29,6 +29,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
 	"github.com/containerd/nerdctl/v2/pkg/sysinfo"
+	"github.com/containerd/nerdctl/v2/pkg/version"
 )
 
 const UnameO = "GNU/Linux"
@@ -47,8 +48,8 @@ func fulfillSecurityOptions(info *dockercompat.Info) {
 		if rootlessutil.IsRootless() && !apparmorutil.CanApplySpecificExistingProfile(defaults.AppArmorProfileName) {
 			info.Warnings = append(info.Warnings, fmt.Sprintf(strings.TrimSpace(`
 WARNING: AppArmor profile %q is not loaded.
-         Use 'sudo nerdctl apparmor load' if you prefer to use AppArmor with rootless mode.
-         This warning is negligible if you do not intend to use AppArmor.`), defaults.AppArmorProfileName))
+         Use 'sudo %s apparmor load' if you prefer to use AppArmor with rootless mode.
+         This warning is negligible if you do not intend to use AppArmor.`), defaults.AppArmorProfileName, version.RootName))
 		}
 	}
 	info.SecurityOptions = append(info.SecurityOptions, "name=seccomp,profile="+defaults.SeccompProfileName)

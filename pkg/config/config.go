@@ -23,7 +23,7 @@ import (
 	ncdefaults "github.com/containerd/nerdctl/v2/pkg/defaults"
 )
 
-// Config corresponds to nerdctl.toml .
+// Config corresponds to `version.RootName`.toml .
 // See docs/config.md .
 type Config struct {
 	Debug            bool     `toml:"debug"`

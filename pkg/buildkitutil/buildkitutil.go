@@ -43,7 +43,7 @@ import (
 )
 
 const (
-	// DefaultDockerfileName is the Default filename, read by nerdctl build
+	// DefaultDockerfileName is the Default filename, read by `build`
 	DefaultDockerfileName string = "Dockerfile"
 	ContainerfileName     string = "Containerfile"
 

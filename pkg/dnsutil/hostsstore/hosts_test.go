@@ -18,10 +18,13 @@ package hostsstore
 
 import (
 	"bytes"
+	"fmt"
 	"strings"
 	"testing"
 
 	"gotest.tools/v3/assert"
+
+	"github.com/containerd/nerdctl/v2/pkg/version"
 )
 
 func TestParseHostsButSkipMarkedRegion(t *testing.T) {
@@ -31,27 +34,27 @@ func TestParseHostsButSkipMarkedRegion(t *testing.T) {
 	}
 	testCases := []testCase{
 		{
-			hostsFileContent: `
+			hostsFileContent: fmt.Sprintf(`
 10.4.1.6        outOfMarkedRegion
-# <nerdctl>
+# <%s>
 127.0.0.1       localhost localhost.localdomain
 ::1             localhost localhost.localdomain
 10.4.1.5        35af3f0922a9 35af3f0922a9.etcd-0 alpine-35af3 alpine-35af3.etcd-0
 10.4.1.3        993208adcae8 993208adcae8.etcd-0 alpine-99320 alpine-99320.etcd-0
-# </nerdctl>
-`,
+# </%s>
+`, version.RootName, version.RootName),
 			want: `10.4.1.6        outOfMarkedRegion
 `,
 		},
 		{
-			hostsFileContent: `
-		# <nerdctl>
+			hostsFileContent: fmt.Sprintf(`
+		# <%s>
 		127.0.0.1       localhost localhost.localdomain
 		::1             localhost localhost.localdomain
 		10.4.1.5        35af3f0922a9 35af3f0922a9.etcd-0 alpine-35af3 alpine-35af3.etcd-0
 		10.4.1.3        993208adcae8 993208adcae8.etcd-0 alpine-99320 alpine-99320.etcd-0
-		# </nerdctl>
-		`,
+		# </%s>
+		`, version.RootName, version.RootName),
 			want: "",
 		},
 	}

@@ -17,7 +17,7 @@
 
 # TODO: verify commit hash
 
-ARG BINARY_NAME=nerdctl
+ARG BINARY_NAME=lepton
 
 # Basic deps
 ARG CONTAINERD_VERSION=v2.0.1
@@ -114,6 +114,7 @@ FROM build-base AS build-dependencies
 ARG TARGETARCH
 ARG BINARY_NAME
 ENV GOARCH=${TARGETARCH}
+ARG BINARY
 COPY ./Dockerfile.d/SHA256SUMS.d/ /SHA256SUMS.d
 WORKDIR /nowhere
 RUN echo "${TARGETARCH:-amd64}" | sed -e s/amd64/x86_64/ -e s/arm64/aarch64/ | tee /target_uname_m

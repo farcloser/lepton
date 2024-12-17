@@ -33,7 +33,7 @@ const (
 	snapshotterNameSoci = "soci"
 )
 
-// remote snapshotters explicitly handled
+// remote snapshotters that are explicitly handled
 var builtinRemoteSnapshotterOpts = map[string]snapshotterOpts{
 	snapshotterNameSoci: &remoteSnapshotterOpts{snapshotter: "soci", extraLabels: sociExtraLabels},
 }

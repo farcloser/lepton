@@ -26,18 +26,18 @@ Be sure to first `make && sudo make install`
 
 ```bash
 # Test all with nerdctl (rootless mode, if running go as a non-root user)
-go test -p 1 ./cmd/nerdctl/...
+go test -p 1 ./cmd/lepton/...
 
 # Test all with nerdctl rootful
-go test -p 1 -exec sudo ./cmd/nerdctl/...
+go test -p 1 -exec sudo ./cmd/lepton/...
 
 # Test all with docker
-go test -p 1 ./cmd/nerdctl/... -args -test.target=docker
+go test -p 1 ./cmd/lepton/... -args -test.target=docker
 
 # Test just the tests(s) which names match TestVolume.*
-go test -p 1 ./cmd/nerdctl/... -run "TestVolume.*"
+go test -p 1 ./cmd/lepton/... -run "TestVolume.*"
 # Or alternatively, just test the subpackage
-go test ./cmd/nerdctl/volume
+go test ./cmd/lepton/volume
 ```
 
 ### About parallelization

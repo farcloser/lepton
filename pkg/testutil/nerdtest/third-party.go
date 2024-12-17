@@ -17,6 +17,7 @@
 package nerdtest
 
 import (
+	"fmt"
 	"os/exec"
 
 	"gotest.tools/v3/assert"
@@ -24,6 +25,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest/ca"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest/registry"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
+	"github.com/containerd/nerdctl/v2/pkg/version"
 )
 
 func BuildCtlCommand(helpers test.Helpers, args ...string) test.TestableCommand {
@@ -38,7 +40,7 @@ func BuildCtlCommand(helpers test.Helpers, args ...string) test.TestableCommand 
 func KubeCtlCommand(helpers test.Helpers, args ...string) test.TestableCommand {
 	kubectl, _ := exec.LookPath("kubectl")
 	cmd := helpers.Custom(kubectl)
-	cmd.WithArgs("--namespace=nerdctl-test-k8s")
+	cmd.WithArgs(fmt.Sprintf("--namespace=%s-test-k8s", version.RootName))
 	cmd.WithArgs(args...)
 	return cmd
 }

@@ -65,7 +65,7 @@ func Remove(ctx context.Context, client *containerd.Client, options types.Networ
 			continue
 		}
 		if network.CliID == nil {
-			errs = append(errs, fmt.Errorf("%s is managed outside nerdctl and cannot be removed", req))
+			errs = append(errs, fmt.Errorf("%s is managed outside and cannot be removed", req))
 			continue
 		}
 		if err := cniEnv.RemoveNetwork(network); err != nil {

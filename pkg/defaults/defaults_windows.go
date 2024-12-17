@@ -17,6 +17,7 @@
 package defaults
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 

@@ -153,7 +153,7 @@ func prettyPrintInfoDockerCompat(stdout io.Writer, stderr io.Writer, info *docke
 	fmt.Fprintln(w)
 	fmt.Fprintf(w, "Server:\n")
 	fmt.Fprintf(w, " Server Version: %s\n", info.ServerVersion)
-	// Storage Driver is not really Server concept for nerdctl, but mimics `docker info` output
+	// Storage Driver is not really a server concept, but mimics `docker info` output
 	fmt.Fprintf(w, " Storage Driver: %s\n", info.Driver)
 	fmt.Fprintf(w, " Logging Driver: %s\n", info.LoggingDriver)
 	printF(w, " Cgroup Driver: ", info.CgroupDriver)

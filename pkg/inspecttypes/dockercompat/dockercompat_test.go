@@ -49,7 +49,7 @@ func TestContainerFromNative(t *testing.T) {
 	}{
 		// container, mount /mnt/foo:/mnt/foo:rw,rslave; ResolvConfPath; hostname
 		{
-			name: "container from nerdctl",
+			name: "container from cli",
 			n: &native.Container{
 				Container: containers.Container{
 					Labels: map[string]string{
