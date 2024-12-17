@@ -29,13 +29,13 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/strutil"
 )
 
-// StopOptions stores all option input from `nerdctl compose stop`
+// StopOptions stores all option input from `compose stop`
 type StopOptions struct {
 	Timeout *uint
 }
 
 // Stop stops containers in `services` without removing them. It calls
-// `nerdctl stop CONTAINER_ID` to do the actual job.
+// `stop CONTAINER_ID` to do the actual job.
 func (c *Composer) Stop(ctx context.Context, opt StopOptions, services []string) error {
 	serviceNames, err := c.ServiceNames(services...)
 	if err != nil {
@@ -57,7 +57,7 @@ func (c *Composer) Stop(ctx context.Context, opt StopOptions, services []string)
 func (c *Composer) stopContainers(ctx context.Context, containers []containerd.Container, opt StopOptions) error {
 	var timeoutArg string
 	if opt.Timeout != nil {
-		// `nerdctl stop` uses `--time` instead of `--timeout`
+		// `stop` uses `--time` instead of `--timeout`
 		timeoutArg = fmt.Sprintf("--time=%d", *opt.Timeout)
 	}
 

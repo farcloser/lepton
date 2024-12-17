@@ -32,7 +32,7 @@ func NewComposeCommand() *cobra.Command {
 		SilenceErrors:    true,
 		TraverseChildren: true, // required for global short hands like -f
 	}
-	// `-f` is a nonPersistentAlias, as it conflicts with `nerdctl compose logs --follow`
+	// `-f` is a nonPersistentAlias, as it conflicts with `compose logs --follow`
 	helpers.AddPersistentStringArrayFlag(composeCommand, "file", nil, []string{"f"}, nil, "", "Specify an alternate compose file")
 	composeCommand.PersistentFlags().String("project-directory", "", "Specify an alternate working directory")
 	composeCommand.PersistentFlags().StringP("project-name", "p", "", "Specify an alternate project name")

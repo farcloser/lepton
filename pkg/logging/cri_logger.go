@@ -168,7 +168,7 @@ func ReadLogs(opts *LogViewOptions, stdout, stderr io.Writer, stopChannel chan o
 						if err != nil {
 							if errors.Is(err, os.ErrNotExist) {
 								//If the user application outputs logs too quickly,
-								//There is a slight possibility that nerdctl has just rotated the log file,
+								//There is a slight possibility that the log file has just been rotated,
 								//try opening it once more.
 								time.Sleep(10 * time.Millisecond)
 							}

@@ -33,7 +33,7 @@ const (
 	snapshotterNameSoci = "soci"
 )
 
-// remote snapshotters explicitly handled by nerdctl
+// remote snapshotters explicitly handled
 var builtinRemoteSnapshotterOpts = map[string]snapshotterOpts{
 	snapshotterNameSoci: &remoteSnapshotterOpts{snapshotter: "soci", extraLabels: sociExtraLabels},
 }

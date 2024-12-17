@@ -18,7 +18,7 @@ package types
 
 import "io"
 
-// ApparmorListOptions specifies options for `nerdctl apparmor ls`.
+// ApparmorListOptions specifies options for `apparmor ls`.
 type ApparmorListOptions struct {
 	Stdout io.Writer
 	// Only display profile names
@@ -27,7 +27,7 @@ type ApparmorListOptions struct {
 	Format string
 }
 
-// ApparmorInspectOptions specifies options for `nerdctl apparmor inspect`
+// ApparmorInspectOptions specifies options for `apparmor inspect`
 type ApparmorInspectOptions struct {
 	Stdout io.Writer
 }

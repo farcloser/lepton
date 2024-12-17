@@ -186,7 +186,7 @@ func TestContainerInspectState(t *testing.T) {
 		name, containerName, cmd string
 		want                     dockercompat.ContainerState
 	}
-	// nerdctl: run error produces a nil Task, so the Status is empty because Status comes from Task.
+	// nerdish-cli: run error produces a nil Task, so the Status is empty because Status comes from Task.
 	// docker : run error gives => `Status=created` as  in docker there is no a separation between container and Task.
 	errStatus := ""
 	if base.Target == testutil.Docker {

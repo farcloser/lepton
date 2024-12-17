@@ -35,7 +35,7 @@ import (
 type ExecOptions struct {
 	ServiceName string
 	Index       int
-	// params to be passed to `nerdctl exec`
+	// params to be passed to `exec`
 	Detach      bool
 	Interactive bool
 	Tty         bool
@@ -77,7 +77,7 @@ func (c *Composer) Exec(ctx context.Context, eo ExecOptions) error {
 	return c.exec(ctx, containers[eo.Index-1], eo)
 }
 
-// exec constructs/executes the `nerdctl exec` command to be executed on the given container.
+// exec constructs/executes the `exec` command to be executed on the given container.
 func (c *Composer) exec(ctx context.Context, container containerd.Container, eo ExecOptions) error {
 	args := []string{
 		"exec",

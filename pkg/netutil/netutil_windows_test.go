@@ -18,7 +18,7 @@ package netutil
 
 import "testing"
 
-// Tests whether nerdctl properly creates the default network when required.
+// Tests whether the default network is properly created when required.
 // On Windows, the default driver used will be "nat". (netutil.DefaultNetworkName)
 func TestDefaultNetworkCreation(t *testing.T) {
 	testDefaultNetworkCreation(t)

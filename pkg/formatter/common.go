@@ -37,7 +37,7 @@ type Flusher interface {
 // --format="" (default): JSON
 // --format='{{json .}}': JSON lines
 //
-// FormatSlice is expected to be only used for `nerdctl OBJECT inspect` commands.
+// FormatSlice is expected to be only used for `OBJECT inspect` commands.
 func FormatSlice(format string, writer io.Writer, x []interface{}) error {
 	var tmpl *template.Template
 	switch format {

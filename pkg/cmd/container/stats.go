@@ -131,7 +131,7 @@ func Stats(ctx context.Context, client *containerd.Client, containerIDs []string
 
 	}
 
-	// getContainerList get all existing containers (only used when calling `nerdctl stats` without arguments).
+	// getContainerList get all existing containers (only used when calling `stats` without arguments).
 	getContainerList := func() {
 		containers, err := client.Containers(ctx)
 		if err != nil {

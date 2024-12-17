@@ -116,11 +116,11 @@ type ListItem struct {
 	CreatedAt time.Time
 	ID        string
 	Image     string
-	Platform  string // nerdctl extension
+	Platform  string // extension
 	Names     string
 	Ports     string
 	Status    string
-	Runtime   string // nerdctl extension
+	Runtime   string // extension
 	Size      string
 	Labels    string
 	LabelsMap map[string]string `json:"-"`

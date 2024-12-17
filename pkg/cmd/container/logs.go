@@ -44,7 +44,7 @@ func Logs(ctx context.Context, client *containerd.Client, container string, opti
 
 	switch options.GOptions.Namespace {
 	case "moby":
-		log.G(ctx).Warn("Currently, `nerdctl logs` only supports containers created with `nerdctl run -d` or CRI")
+		log.G(ctx).Warn("Currently, `logs` only supports containers created with `run -d` or CRI")
 	}
 
 	stopChannel := make(chan os.Signal, 1)

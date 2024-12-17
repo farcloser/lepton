@@ -29,8 +29,8 @@ func TestCreateLine(t *testing.T) {
 	type testCase struct {
 		thatIP       string
 		thatNetwork  string
-		thatHostname string // nerdctl run --hostname
-		thatName     string // nerdctl run --name
+		thatHostname string // run --hostname
+		thatName     string // run --name
 		myNetwork    string
 		expected     string
 	}

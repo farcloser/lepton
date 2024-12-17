@@ -32,7 +32,7 @@ func TestStats(t *testing.T) {
 	testCase.Require = test.Not(test.Windows)
 
 	if runtime.GOOS == "linux" {
-		// this comment is for `nerdctl ps` but it also valid for `nerdctl stats` :
+		// this comment is for `ps` but it also valid for `stats` :
 		// https://github.com/containerd/nerdctl/pull/223#issuecomment-851395178
 		testCase.Require = test.Require(
 			testCase.Require,
@@ -92,7 +92,7 @@ func TestStats(t *testing.T) {
 				return helpers.Command("stats", "--no-stream")
 			},
 			// https://github.com/containerd/nerdctl/issues/1240
-			// nerdctl used to print UINT64_MAX as the memory limit, so, ensure it does no more
+			// used to print UINT64_MAX as the memory limit, so, ensure it does no more
 			Expected: test.Expects(0, nil, test.DoesNotContain("16EiB")),
 		},
 		{

@@ -64,7 +64,7 @@ type Info struct {
 
 type PluginsInfo struct {
 	Log     []string
-	Storage []string // nerdctl extension
+	Storage []string // extension
 }
 
 // VersionInfo mimics a `docker version` object.
@@ -81,7 +81,7 @@ type ClientVersion struct {
 	GoVersion  string
 	Os         string             // GOOS
 	Arch       string             // GOARCH
-	Components []ComponentVersion // nerdctl extension
+	Components []ComponentVersion // extension
 }
 
 // ComponentVersion describes the version information for a specific component.

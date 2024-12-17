@@ -45,7 +45,7 @@ const (
 	RecreateDiverged = "diverged"
 )
 
-// CreateOptions stores all option input from `nerdctl compose create`
+// CreateOptions stores all option input from `compose create`
 type CreateOptions struct {
 	Build         bool
 	NoBuild       bool

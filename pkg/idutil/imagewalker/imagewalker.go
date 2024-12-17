@@ -36,7 +36,7 @@ type Found struct {
 	MatchIndex     int    // Begins with 0, up to MatchCount - 1.
 	MatchCount     int    // 1 on exact match. > 1 on ambiguous match. Never be <= 0.
 	UniqueImages   int    // Number of unique images in all found images.
-	NameMatchIndex int    // Image index with a name matching the argument for `nerdctl rmi`.
+	NameMatchIndex int    // Image index with a name matching the argument for `rmi`.
 }
 
 type OnFound func(ctx context.Context, found Found) error
@@ -76,7 +76,7 @@ func (w *ImageWalker) Walk(ctx context.Context, req string) (int, error) {
 	nameMatchIndex := -1
 	for i, image := range images {
 		uniqueImages[image.Target.Digest] = true
-		// to get target image index for `nerdctl rmi <short digest ids of another images>`.
+		// to get target image index for `rmi <short digest ids of another images>`.
 		if (parsedReferenceStr != "" && image.Name == parsedReferenceStr) || image.Name == req {
 			nameMatchIndex = i
 		}

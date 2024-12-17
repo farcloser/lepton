@@ -35,7 +35,7 @@ func NewCreateCommand() *cobra.Command {
 	switch runtime.GOOS {
 	case "windows":
 		longHelp += "\n"
-		longHelp += "WARNING: `nerdctl create` is experimental on Windows and currently broken (https://github.com/containerd/nerdctl/issues/28)"
+		longHelp += "WARNING: `create` is experimental on Windows and currently broken (https://github.com/containerd/nerdctl/issues/28)"
 	}
 	var createCommand = &cobra.Command{
 		Use:               "create [flags] IMAGE [COMMAND] [ARG...]",

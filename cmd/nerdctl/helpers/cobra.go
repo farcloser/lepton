@@ -29,7 +29,7 @@ import (
 	"github.com/containerd/log"
 )
 
-// UnknownSubcommandAction is needed to let `nerdctl system non-existent-command` fail
+// UnknownSubcommandAction is needed to let `system non-existent-command` fail
 // https://github.com/containerd/nerdctl/issues/487
 //
 // Ideally this should be implemented in Cobra itself.

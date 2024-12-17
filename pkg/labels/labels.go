@@ -19,7 +19,7 @@
 package labels
 
 const (
-	// Prefix is the common prefix of nerdctl labels
+	// Prefix is the common prefix for labels
 	Prefix = "nerdctl/"
 
 	// Namespace is the containerd namespace such as "default", "k8s.io"
@@ -66,7 +66,7 @@ const (
 	// LogURI is the log URI
 	LogURI = Prefix + "log-uri"
 
-	// PIDFile is the `nerdctl run --pidfile`
+	// PIDFile is the `run --pidfile`
 	// (CLI flag is "pidfile", not "pid-file", for Podman compatibility)
 	PIDFile = Prefix + "pid-file"
 
@@ -84,7 +84,7 @@ const (
 
 	MACAddress = Prefix + "mac-address"
 
-	// PIDContainer is the `nerdctl run --pid` for restarting
+	// PIDContainer is the `run --pid` for restarting
 	PIDContainer = Prefix + "pid-container"
 
 	// IPC is the `nerectl run --ipc` for restrating

@@ -197,7 +197,7 @@ type Container struct {
 type Build struct {
 	Force     bool     // force build even if already present
 	BuildArgs []string // {"-t", "example.com/foo", "--target", "foo", "/path/to/ctx"}
-	// TODO: call BuildKit API directly without executing `nerdctl build`
+	// TODO: call BuildKit API directly without executing `build`
 }
 
 type Service struct {
@@ -314,7 +314,7 @@ func getGPUs(svc types.ServiceConfig) (reqs []string, _ error) {
 
 var restartFailurePat = regexp.MustCompile(`^on-failure:\d+$`)
 
-// getRestart returns `nerdctl run --restart` flag string
+// getRestart returns `run --restart` flag string
 //
 // restart:                         {"no" (default), "always", "on-failure", "unless-stopped"} (https://github.com/compose-spec/compose-spec/blob/167f207d0a8967df87c5ed757dbb1a2bb6025a1e/spec.md#restart)
 // deploy.restart_policy.condition: {"none", "on-failure", "any" (default)}                    (https://github.com/compose-spec/compose-spec/blob/167f207d0a8967df87c5ed757dbb1a2bb6025a1e/deploy.md#restart_policy)
@@ -477,7 +477,7 @@ func newContainer(project *types.Project, parsed *Service, i int) (*Container, e
 
 	c.RunArgs = []string{
 		"--name=" + c.Name,
-		"--pull=never", // because image will be ensured before running replicas with `nerdctl run`.
+		"--pull=never", // because image will be ensured before running replicas with `run`.
 	}
 
 	for k, v := range svc.Annotations {

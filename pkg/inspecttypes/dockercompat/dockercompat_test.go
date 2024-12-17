@@ -46,7 +46,7 @@ func TestContainerFromNative(t *testing.T) {
 		n        *native.Container
 		expected *Container
 	}{
-		// nerdctl container, mount /mnt/foo:/mnt/foo:rw,rslave; ResolvConfPath; hostname
+		// container, mount /mnt/foo:/mnt/foo:rw,rslave; ResolvConfPath; hostname
 		{
 			name: "container from nerdctl",
 			n: &native.Container{

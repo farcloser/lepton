@@ -81,7 +81,7 @@ func (b *Base) Cmd(args ...string) *Cmd {
 	return cmd
 }
 
-// ComposeCmd executes `nerdctl -n nerdctl-test compose` or `docker-compose`
+// ComposeCmd executes `-n nerdctl-test compose` or `docker-compose`
 func (b *Base) ComposeCmd(args ...string) *Cmd {
 	binary := b.Binary
 	binaryArgs := append(b.Args, append([]string{"compose"}, args...)...)
@@ -826,7 +826,7 @@ func Identifier(t testing.TB) string {
 }
 
 // ImageRepo returns the image repo that can be used to, e.g, validate output
-// from `nerdctl images`.
+// from `images`.
 func ImageRepo(s string) string {
 	repo, _ := imgutil.ParseRepoTag(s)
 	return repo
