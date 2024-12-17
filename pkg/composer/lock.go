@@ -19,8 +19,9 @@ package composer
 import (
 	"os"
 
+	"go.farcloser.world/core/filesystem"
+
 	"github.com/containerd/nerdctl/v2/pkg/clientutil"
-	"github.com/containerd/nerdctl/v2/pkg/lockutil"
 )
 
 //nolint:unused
@@ -39,10 +40,10 @@ func Lock(dataRoot string, address string) error {
 	if err != nil {
 		return err
 	}
-	locked, err = lockutil.Lock(dataStore)
+	locked, err = filesystem.Lock(dataStore)
 	return err
 }
 
 func Unlock() error {
-	return lockutil.Unlock(locked)
+	return filesystem.Unlock(locked)
 }

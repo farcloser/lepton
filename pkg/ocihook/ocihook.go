@@ -32,6 +32,7 @@ import (
 	"github.com/opencontainers/runtime-spec/specs-go"
 	b4nndclient "github.com/rootless-containers/bypass4netns/pkg/api/daemon/client"
 	rlkclient "github.com/rootless-containers/rootlesskit/v2/pkg/api/client"
+	"go.farcloser.world/core/filesystem"
 
 	"github.com/containerd/go-cni"
 	"github.com/containerd/log"
@@ -39,7 +40,6 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/bypass4netnsutil"
 	"github.com/containerd/nerdctl/v2/pkg/dnsutil/hostsstore"
 	"github.com/containerd/nerdctl/v2/pkg/labels"
-	"github.com/containerd/nerdctl/v2/pkg/lockutil"
 	"github.com/containerd/nerdctl/v2/pkg/namestore"
 	"github.com/containerd/nerdctl/v2/pkg/netutil"
 	"github.com/containerd/nerdctl/v2/pkg/netutil/nettype"
@@ -108,11 +108,11 @@ func Run(stdin io.Reader, stderr io.Writer, event, dataStore, cniPath, cniNetcon
 	if err != nil {
 		return err
 	}
-	lock, err := lockutil.Lock(cniNetconfPath)
+	lock, err := filesystem.Lock(cniNetconfPath)
 	if err != nil {
 		return err
 	}
-	defer lockutil.Unlock(lock)
+	defer filesystem.Unlock(lock)
 
 	opts, err := newHandlerOpts(&state, dataStore, cniPath, cniNetconfPath, bridgeIP)
 	if err != nil {

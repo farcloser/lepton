@@ -24,10 +24,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/containerd/nerdctl/v2/pkg/lockutil"
+	"go.farcloser.world/core/filesystem"
 )
 
-// TODO: implement a read-lock in lockutil, in addition to the current exclusive write-lock
 // This might improve performance in case of (mostly read) massively parallel concurrent scenarios
 
 const (
@@ -75,9 +74,9 @@ type fileStore struct {
 func (vs *fileStore) Lock() error {
 	vs.mutex.Lock()
 
-	dirFile, err := lockutil.Lock(vs.dir)
+	dirFile, err := filesystem.Lock(vs.dir)
 	if err != nil {
-		return errors.Join(ErrLockFailure, err)
+		return err
 	}
 
 	vs.locked = dirFile
@@ -86,18 +85,18 @@ func (vs *fileStore) Lock() error {
 }
 
 func (vs *fileStore) Release() error {
-	if vs.locked == nil {
-		return errors.Join(ErrFaultyImplementation, fmt.Errorf("cannot unlock already unlocked volume store %q", vs.dir))
-	}
-
 	defer vs.mutex.Unlock()
 
 	defer func() {
 		vs.locked = nil
 	}()
 
-	if err := lockutil.Unlock(vs.locked); err != nil {
-		return errors.Join(ErrLockFailure, err)
+	if err := filesystem.Unlock(vs.locked); err != nil {
+		if errors.Is(err, filesystem.ErrLockIsNil) {
+			return errors.Join(ErrFaultyImplementation, fmt.Errorf("cannot unlock already unlocked volume store %q", vs.dir))
+		}
+
+		return err
 	}
 
 	return nil
