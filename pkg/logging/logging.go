@@ -226,7 +226,7 @@ func loggerFunc(dataStore string) (logging.LoggerFunc, error) {
 
 			return loggingProcessAdapter(ctx, driver, dataStore, config)
 		} else if !errors.Is(err, os.ErrNotExist) {
-			// the file does not exist if the container was created with nerdctl < 0.20
+			// the file does not exist if the container was created before < 0.20
 			return err
 		}
 		return nil

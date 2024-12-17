@@ -64,7 +64,7 @@ type LogViewOptions struct {
 	ContainerID string
 	Namespace   string
 
-	// Absolute path to the nerdctl datastore's root.
+	// Absolute path to the datastore's root.
 	DatastoreRootPath string
 
 	// LogPath specify the log path for container created via CRI
@@ -132,7 +132,7 @@ func InitContainerLogViewer(containerLabels map[string]string, lvopts LogViewOpt
 	}
 
 	if lcfg.Driver == "cri" && !experimental {
-		return nil, fmt.Errorf("the `cri` log viewer requires nerdctl to be running in experimental mode")
+		return nil, fmt.Errorf("the `cri` log viewer requires experimental mode to be enabled")
 	}
 
 	if lcfg.Driver == "none" {

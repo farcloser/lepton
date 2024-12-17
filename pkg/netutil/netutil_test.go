@@ -132,7 +132,7 @@ func TestParseIPAMRange(t *testing.T) {
 	}
 }
 
-// Tests whether nerdctl properly creates the default network when required.
+// Tests whether the default network was properly created when required.
 // Note that this test will require a CNI driver bearing the same name as
 // the type of the default network. (denoted by netutil.DefaultNetworkName,
 // which is used as both the name of the default network and its Driver)
@@ -201,7 +201,7 @@ func testDefaultNetworkCreation(t *testing.T) {
 	assert.Assert(t, firstConfigModTime == files[1].ModTime())
 }
 
-// Tests whether nerdctl properly creates the default network
+// Tests whether the default network was properly created when required
 // with a custom bridge IP and subnet.
 // nolint:unused
 func testDefaultNetworkCreationWithBridgeIP(t *testing.T) {
@@ -300,9 +300,9 @@ func testDefaultNetworkCreationWithBridgeIP(t *testing.T) {
 	assert.Assert(t, firstConfigModTime == files[1].ModTime())
 }
 
-// Tests whether nerdctl skips the creation of the default network if a
+// Tests whether the default network creation has been skipped if a
 // network bearing the default network name already exists in a
-// non-nerdctl-managed network config file.
+// non-managed network config file.
 func TestNetworkWithDefaultNameAlreadyExists(t *testing.T) {
 	// We create a tempdir for the CNI conf path to ensure an empty env for this test.
 	cniConfTestDir := t.TempDir()

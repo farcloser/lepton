@@ -19,7 +19,7 @@
 package labels
 
 const (
-	// Prefix is the common prefix of nerdctl labels
+	// Prefix is the common prefix for labels
 	Prefix = "nerdctl/"
 
 	// Namespace is the containerd namespace such as "default", "k8s.io"
