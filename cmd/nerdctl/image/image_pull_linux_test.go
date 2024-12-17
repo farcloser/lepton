@@ -55,7 +55,7 @@ func TestImagePullWithCosign(t *testing.T) {
 			registry = testregistry.NewWithNoAuth(base, 0, false)
 			testImageRef := fmt.Sprintf("%s:%d/%s", "127.0.0.1", registry.Port, data.Identifier())
 			dockerfile := fmt.Sprintf(`FROM %s
-CMD ["echo", "nerdctl-build-test-string"]
+CMD ["echo", "build-test-string"]
 	`, testutil.CommonImage)
 
 			buildCtx := data.TempDir()
@@ -121,7 +121,7 @@ func TestImagePullPlainHttpWithDefaultPort(t *testing.T) {
 			testImageRef := fmt.Sprintf("%s/%s:%s",
 				registry.IP.String(), data.Identifier(), strings.Split(testutil.CommonImage, ":")[1])
 			dockerfile := fmt.Sprintf(`FROM %s
-CMD ["echo", "nerdctl-build-test-string"]
+CMD ["echo", "build-test-string"]
 	`, testutil.CommonImage)
 
 			buildCtx := data.TempDir()

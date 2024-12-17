@@ -340,7 +340,7 @@ type ContainerCommitOptions struct {
 	Stdout io.Writer
 	// GOptions is the global options
 	GOptions GlobalCommandOptions
-	// Author (e.g., "nerdctl contributor <nerdctl-dev@example.com>")
+	// Author (e.g., "contributor <dev@example.com>")
 	Author string
 	// Commit message
 	Message string

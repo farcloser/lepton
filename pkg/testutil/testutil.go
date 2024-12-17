@@ -549,7 +549,7 @@ var (
 )
 
 var (
-	testLockFile = filepath.Join(os.TempDir(), "nerdctl-test-prevent-concurrency", ".lock")
+	testLockFile = filepath.Join(os.TempDir(), "test-prevent-concurrency", ".lock")
 )
 
 func M(m *testing.M) {

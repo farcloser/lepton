@@ -46,7 +46,7 @@ func TestBuilder(t *testing.T) {
 				NoParallel:  true,
 				Setup: func(data test.Data, helpers test.Helpers) {
 					dockerfile := fmt.Sprintf(`FROM %s
-CMD ["echo", "nerdctl-test-builder-prune"]`, testutil.CommonImage)
+CMD ["echo", "test-builder-prune"]`, testutil.CommonImage)
 					buildCtx := data.TempDir()
 					err := os.WriteFile(filepath.Join(buildCtx, "Dockerfile"), []byte(dockerfile), 0o600)
 					assert.NilError(helpers.T(), err)
@@ -60,7 +60,7 @@ CMD ["echo", "nerdctl-test-builder-prune"]`, testutil.CommonImage)
 				NoParallel:  true,
 				Setup: func(data test.Data, helpers test.Helpers) {
 					dockerfile := fmt.Sprintf(`FROM %s
-CMD ["echo", "nerdctl-test-builder-prune"]`, testutil.CommonImage)
+CMD ["echo", "test-builder-prune"]`, testutil.CommonImage)
 					buildCtx := data.TempDir()
 					err := os.WriteFile(filepath.Join(buildCtx, "Dockerfile"), []byte(dockerfile), 0o600)
 					assert.NilError(helpers.T(), err)
@@ -76,7 +76,7 @@ CMD ["echo", "nerdctl-test-builder-prune"]`, testutil.CommonImage)
 				NoParallel: true,
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 					dockerfile := fmt.Sprintf(`FROM %s
-CMD ["echo", "nerdctl-builder-debug-test-string"]`, testutil.CommonImage)
+CMD ["echo", "builder-debug-test-string"]`, testutil.CommonImage)
 					buildCtx := data.TempDir()
 					err := os.WriteFile(filepath.Join(buildCtx, "Dockerfile"), []byte(dockerfile), 0o600)
 					assert.NilError(helpers.T(), err)

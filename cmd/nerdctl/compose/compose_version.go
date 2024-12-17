@@ -58,7 +58,7 @@ func composeVersionAction(cmd *cobra.Command, args []string) error {
 	}
 	switch format {
 	case "pretty":
-		fmt.Fprintln(cmd.OutOrStdout(), "nerdctl Compose version "+version.GetVersion())
+		fmt.Fprintln(cmd.OutOrStdout(), "Compose version "+version.GetVersion())
 	case "json":
 		fmt.Fprintf(cmd.OutOrStdout(), "{\"version\":\"%v\"}\n", version.Version)
 	default:
