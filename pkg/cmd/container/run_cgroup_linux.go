@@ -33,6 +33,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/infoutil"
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
+	"github.com/containerd/nerdctl/v2/pkg/version"
 )
 
 type customMemoryOptions struct {
@@ -216,7 +217,7 @@ func generateCgroupPath(id, cgroupManager, cgroupParent string) (string, error) 
 		path         string
 		usingSystemd = cgroupManager == "systemd"
 		slice        = "system.slice"
-		scopePrefix  = ":nerdctl:"
+		scopePrefix  = fmt.Sprintf(":%s:", version.RootName)
 	)
 	if rootlessutil.IsRootlessChild() {
 		slice = "user.slice"
@@ -234,7 +235,7 @@ func generateCgroupPath(id, cgroupManager, cgroupParent string) (string, error) 
 
 	// If the user asked for a cgroup parent, we will use systemd,
 	// Docker uses the following:
-	// parent + prefix (in our case, nerdctl) + containerID.
+	// parent + prefix (in our case, RootName) + containerID.
 	//
 	// In the non systemd case, it's just /parent/containerID
 	if usingSystemd {

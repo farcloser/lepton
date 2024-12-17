@@ -27,6 +27,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
+	"github.com/containerd/nerdctl/v2/pkg/version"
 )
 
 func testInfoComparator(stdout string, info string, t *testing.T) {
@@ -55,7 +56,7 @@ func TestInfo(t *testing.T) {
 			Description: "info with namespace",
 			Require:     test.Not(nerdtest.Docker),
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-				return helpers.Custom("nerdctl", "info")
+				return helpers.Custom(version.RootName, "info")
 			},
 			Expected: test.Expects(0, nil, test.Contains("Namespace:	default")),
 		},
@@ -66,7 +67,7 @@ func TestInfo(t *testing.T) {
 			},
 			Require: test.Not(nerdtest.Docker),
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-				return helpers.Custom("nerdctl", "info")
+				return helpers.Custom(version.RootName, "info")
 			},
 			Expected: test.Expects(0, nil, test.Contains("Namespace:	test")),
 		},

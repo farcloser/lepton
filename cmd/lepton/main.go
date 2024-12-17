@@ -145,8 +145,6 @@ func xmain() error {
 }
 
 func initRootCmdFlags(rootCmd *cobra.Command, tomlPath string) (*pflag.FlagSet, error) {
-	upper := strings.ToUpper(version.RootName)
-
 	cfg := config.New()
 	if r, err := os.Open(tomlPath); err == nil {
 		log.L.Debugf("Loading config from %q", tomlPath)
@@ -190,8 +188,6 @@ func initRootCmdFlags(rootCmd *cobra.Command, tomlPath string) (*pflag.FlagSet, 
 }
 
 func newApp() (*cobra.Command, error) {
-	upper := strings.ToUpper(version.RootName)
-
 	tomlPath := ncdefaults.CliTOML()
 	if v, ok := os.LookupEnv(version.EnvPrefix + "_TOML"); ok {
 		tomlPath = v

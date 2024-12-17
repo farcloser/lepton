@@ -31,7 +31,7 @@ import (
 )
 
 type networkPrintable struct {
-	ID     string // empty for non-nerdctl networks
+	ID     string // empty for non-managed networks
 	Name   string
 	Labels string
 	// TODO: "CreatedAt", "Driver", "IPv6", "Internal", "Scope"

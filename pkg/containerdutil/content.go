@@ -16,7 +16,7 @@
 
 // Package containerdutil provides "caching" versions of containerd native snapshotter and content store.
 // NOTE: caching should only be used for single, atomic operations, like `images`, and NOT kept
-// across successive, distincts operations. As such, caching is not persistent across invocations of nerdctl,
+// across successive, distincts operations. As such, caching is not persistent across invocations,
 // and only lasts as long as the lifetime of the Snapshotter or ContentStore.
 package containerdutil
 

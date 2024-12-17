@@ -20,7 +20,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
 	"testing"
 	"time"
 
@@ -33,8 +32,6 @@ import (
 
 var defaultNamespace = testutil.Namespace
 
-var upperRootName = strings.ToUpper(version.RootName)
-
 // IMPORTANT note on file writing here:
 // Inside the context of a single test, there is no concurrency, as setup, command and cleanup operate in sequence
 // Furthermore, the tempdir is private by definition.
@@ -42,9 +39,8 @@ var upperRootName = strings.ToUpper(version.RootName)
 type target = string
 
 const (
-	targetNerdctl    = target("nerdctl")
-	targetNerdishctl = target(version.RootName)
-	targetDocker     = target("docker")
+	targetNerdctl = target("nerdctl")
+	targetDocker  = target("docker")
 )
 
 var (
@@ -124,7 +120,7 @@ func (nc *nerdCommand) Background(timeout time.Duration) {
 	nc.GenericCommand.Background(timeout)
 }
 
-// Run does override the generic command run, as we are testing both docker and nerdctl
+// Run does override the generic command run, as we are testing both docker and nerdishctl
 func (nc *nerdCommand) prep() {
 	nc.T().Helper()
 
@@ -162,7 +158,7 @@ func (nc *nerdCommand) prep() {
 		if nc.Config.Read(CLIToml) != "" {
 			if !nc.hasWrittenToml {
 				dest := nc.Env[version.EnvPrefix+"_TOML"]
-				err := os.WriteFile(dest, []byte(nc.Config.Read(NerdctlToml)), 0400)
+				err := os.WriteFile(dest, []byte(nc.Config.Read(CLIToml)), 0400)
 				assert.NilError(nc.T(), err, "failed to write cli toml config file")
 				nc.hasWrittenToml = true
 			}

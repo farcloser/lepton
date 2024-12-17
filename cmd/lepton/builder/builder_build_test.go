@@ -151,7 +151,7 @@ CMD ["echo", "build-test-string"]`, testutil.CommonImage)
 }
 
 // TestBuildBaseImage tests if an image can be built on the previously built image.
-// This isn't currently supported by nerdctl with BuildKit OCI worker.
+// This isn't currently supported with BuildKit OCI worker.
 func TestBuildBaseImage(t *testing.T) {
 	nerdtest.Setup()
 
@@ -185,8 +185,8 @@ CMD ["cat", "/hello2"]`, data.Identifier("first"))
 	testCase.Run(t)
 }
 
-// TestBuildFromContainerd tests if an image can be built on an image pulled by nerdctl.
-// This isn't currently supported by nerdctl with BuildKit OCI worker.
+// TestBuildFromContainerd tests if an image can be built on an image pulled.
+// This isn't currently supported with BuildKit OCI worker.
 func TestBuildFromContainerd(t *testing.T) {
 	nerdtest.Setup()
 

@@ -18,7 +18,7 @@ set -eux -o pipefail
 if [[ "$(id -u)" = "0" ]]; then
 	if [ -e /sys/kernel/security/apparmor/profiles ]; then
 		# Load the default profile for TestRunApparmor
-		nerdctl apparmor load
+		lepton apparmor load
 	fi
 
 	: "${WORKAROUND_ISSUE_622:=}"

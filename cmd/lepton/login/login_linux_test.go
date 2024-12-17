@@ -34,6 +34,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/testca"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/testregistry"
+	"github.com/containerd/nerdctl/v2/pkg/version"
 )
 
 type Client struct {
@@ -75,7 +76,7 @@ func (ag *Client) Run(base *testutil.Base, host string) *testutil.Cmd {
 		ag.configPath, _ = os.MkdirTemp(base.T.TempDir(), "docker-config")
 	}
 	args := []string{"login"}
-	if base.Target == "nerdctl" {
+	if base.Target == "nerdctl" || base.Target == version.RootName {
 		args = append(args, "--debug-full")
 	}
 	args = append(args, ag.args...)

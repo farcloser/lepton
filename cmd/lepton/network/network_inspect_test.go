@@ -27,6 +27,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
+	"github.com/containerd/nerdctl/v2/pkg/version"
 )
 
 func TestNetworkInspect(t *testing.T) {
@@ -244,7 +245,7 @@ func TestNetworkInspect(t *testing.T) {
 				return &test.Expected{
 					ExitCode: 0,
 					Output: func(stdout string, info string, t *testing.T) {
-						cmd := helpers.Custom("nerdctl", "--namespace", data.Identifier())
+						cmd := helpers.Custom(version.RootName, "--namespace", data.Identifier())
 
 						com := cmd.Clone()
 						com.WithArgs("network", "inspect", data.Identifier())
