@@ -27,23 +27,27 @@ import (
 	"github.com/containerd/log"
 
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
+	"github.com/containerd/nerdctl/v2/pkg/version"
 )
 
 const (
-	AppArmorProfileName = "nerdctl-default"
-	SeccompProfileName  = "builtin"
-	Runtime             = plugins.RuntimeRuncV2
+	SeccompProfileName = "builtin"
+	Runtime            = plugins.RuntimeRuncV2
+)
+
+var (
+	AppArmorProfileName = version.RootName + "-default"
 )
 
 func DataRoot() string {
 	if !rootlessutil.IsRootless() {
-		return "/var/lib/nerdctl"
+		return "/var/lib/" + version.RootName
 	}
 	xdh, err := rootlessutil.XDGDataHome()
 	if err != nil {
 		panic(err)
 	}
-	return filepath.Join(xdh, "nerdctl")
+	return filepath.Join(xdh, version.RootName)
 }
 
 func CNIPath() string {
@@ -102,13 +106,13 @@ func CNIRuntimeDir() string {
 
 func CliTOML() string {
 	if !rootlessutil.IsRootless() {
-		return "/etc/nerdctl/nerdctl.toml"
+		return fmt.Sprintf("/etc/%s/%s.toml", version.RootName, version.RootName)
 	}
 	xch, err := rootlessutil.XDGConfigHome()
 	if err != nil {
 		panic(err)
 	}
-	return filepath.Join(xch, "nerdctl/nerdctl.toml")
+	return filepath.Join(xch, version.RootName, version.RootName+".toml")
 }
 
 func HostsDirs() []string {

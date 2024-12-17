@@ -27,6 +27,8 @@ import (
 	"syscall"
 
 	"github.com/containerd/log"
+
+	"github.com/containerd/nerdctl/v2/pkg/version"
 )
 
 func IsRootlessParent() bool {
@@ -121,6 +123,6 @@ func ParentMain(hostGatewayIP string) error {
 	os.Setenv("ROOTLESSKIT_STATE_DIR", stateDir)
 	os.Setenv("ROOTLESSKIT_PARENT_EUID", strconv.Itoa(os.Geteuid()))
 	os.Setenv("ROOTLESSKIT_PARENT_EGID", strconv.Itoa(os.Getegid()))
-	os.Setenv("NERDCTL_HOST_GATEWAY_IP", hostGatewayIP)
+	os.Setenv(version.EnvPrefix+"_HOST_GATEWAY_IP", hostGatewayIP)
 	return syscall.Exec(arg0, args, os.Environ())
 }

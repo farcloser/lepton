@@ -38,6 +38,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
 	"github.com/containerd/nerdctl/v2/pkg/strutil"
 	"github.com/containerd/nerdctl/v2/pkg/systemutil"
+	"github.com/containerd/nerdctl/v2/pkg/version"
 )
 
 const (
@@ -117,7 +118,7 @@ func (e *CNIEnv) generateCNIPlugins(driver string, name string, ipam map[string]
 		}
 		var bridge *bridgeConfig
 		if name == DefaultNetworkName {
-			bridge = newBridgePlugin("nerdctl0")
+			bridge = newBridgePlugin(version.RootName + "0")
 		} else {
 			bridge = newBridgePlugin("br-" + networkID(name)[:12])
 		}
@@ -211,8 +212,8 @@ func (e *CNIEnv) generateIPAM(driver string, subnets []string, gatewayStr, ipRan
 			log.L.Warnf("cannot access dhcp socket %q (hint: try running with `dhcp daemon --socketpath=%s &` in CNI_PATH to launch the dhcp daemon)", ipamConf.DaemonSocketPath, ipamConf.DaemonSocketPath)
 		}
 
-		// Set the host-name option to the value of passed argument NERDCTL_CNI_DHCP_HOSTNAME
-		opts["host-name"] = `{"type": "provide", "fromArg": "NERDCTL_CNI_DHCP_HOSTNAME"}`
+		// Set the host-name option to the value of passed argument PREFIX_CNI_DHCP_HOSTNAME
+		opts["host-name"] = fmt.Sprintf(`{"type": "provide", "fromArg": "%s_CNI_DHCP_HOSTNAME"}`, version.EnvPrefix)
 
 		// Convert all user-defined ipam-options into serializable options
 		for optName, optValue := range opts {

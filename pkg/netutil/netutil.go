@@ -43,6 +43,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/netutil/nettype"
 	subnetutil "github.com/containerd/nerdctl/v2/pkg/netutil/subnet"
 	"github.com/containerd/nerdctl/v2/pkg/strutil"
+	"github.com/containerd/nerdctl/v2/pkg/version"
 )
 
 type CNIEnv struct {
@@ -276,9 +277,9 @@ func (e *CNIEnv) filterNetworks(filterf func(*NetworkConfig) bool) ([]*NetworkCo
 
 func (e *CNIEnv) getConfigPathForNetworkName(netName string) string {
 	if netName == DefaultNetworkName || e.Namespace == "" {
-		return filepath.Join(e.NetconfPath, "nerdctl-"+netName+".conflist")
+		return filepath.Join(e.NetconfPath, version.RootName+"-"+netName+".conflist")
 	}
-	return filepath.Join(e.NetconfPath, e.Namespace, "nerdctl-"+netName+".conflist")
+	return filepath.Join(e.NetconfPath, e.Namespace, version.RootName+"-"+netName+".conflist")
 }
 
 func (e *CNIEnv) usedSubnets() ([]*net.IPNet, error) {

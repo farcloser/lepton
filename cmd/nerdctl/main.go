@@ -181,26 +181,26 @@ func initRootCmdFlags(rootCmd *cobra.Command, tomlPath string) (*pflag.FlagSet, 
 	// hosts-dir is defined as StringSlice, not StringArray, to allow specifying "--hosts-dir=/etc/containerd/certs.d,/etc/docker/certs.d"
 	rootCmd.PersistentFlags().StringSlice("hosts-dir", cfg.HostsDir, "A directory that contains <HOST:PORT>/hosts.toml (containerd style) or <HOST:PORT>/{ca.cert, cert.pem, key.pem} (docker style)")
 	// Experimental enable experimental feature, see in https://github.com/containerd/nerdctl/blob/main/docs/experimental.md
-	helpers.AddPersistentBoolFlag(rootCmd, "experimental", nil, nil, cfg.Experimental, "NERDCTL_EXPERIMENTAL", "Control experimental: https://github.com/containerd/nerdctl/blob/main/docs/experimental.md")
-	helpers.AddPersistentStringFlag(rootCmd, "host-gateway-ip", nil, nil, nil, aliasToBeInherited, cfg.HostGatewayIP, "NERDCTL_HOST_GATEWAY_IP", "IP address that the special 'host-gateway' string in --add-host resolves to. Defaults to the IP address of the host. It has no effect without setting --add-host")
-	helpers.AddPersistentStringFlag(rootCmd, "bridge-ip", nil, nil, nil, aliasToBeInherited, cfg.BridgeIP, "NERDCTL_BRIDGE_IP", "IP address for the default nerdctl bridge network")
+	helpers.AddPersistentBoolFlag(rootCmd, "experimental", nil, nil, cfg.Experimental, version.EnvPrefix+"_EXPERIMENTAL", "Control experimental: https://github.com/containerd/nerdctl/blob/main/docs/experimental.md")
+	helpers.AddPersistentStringFlag(rootCmd, "host-gateway-ip", nil, nil, nil, aliasToBeInherited, cfg.HostGatewayIP, version.EnvPrefix+"_HOST_GATEWAY_IP", "IP address that the special 'host-gateway' string in --add-host resolves to. Defaults to the IP address of the host. It has no effect without setting --add-host")
+	helpers.AddPersistentStringFlag(rootCmd, "bridge-ip", nil, nil, nil, aliasToBeInherited, cfg.BridgeIP, version.EnvPrefix+"_BRIDGE_IP", "IP address for the default nerdctl bridge network")
 	return aliasToBeInherited, nil
 }
 
 func newApp() (*cobra.Command, error) {
 
 	tomlPath := ncdefaults.CliTOML()
-	if v, ok := os.LookupEnv("NERDCTL_TOML"); ok {
+	if v, ok := os.LookupEnv(version.EnvPrefix + "_TOML"); ok {
 		tomlPath = v
 	}
 
-	short := "nerdctl is a command line interface for containerd"
+	short := version.RootName + " is a command line interface for containerd"
 	long := fmt.Sprintf(`%s
 
-Config file ($NERDCTL_TOML): %s
-`, short, tomlPath)
+Config file ($%s_TOML): %s
+`, short, version.EnvPrefix, tomlPath)
 	var rootCmd = &cobra.Command{
-		Use:              "nerdctl",
+		Use:              version.RootName,
 		Short:            short,
 		Long:             long,
 		Version:          strings.TrimPrefix(version.GetVersion(), "v"),

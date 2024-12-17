@@ -128,8 +128,7 @@ func UpdateExplicitlyStoppedLabel(ctx context.Context, container containerd.Cont
 	return container.Update(ctx, containerd.UpdateContainerOpts(opt))
 }
 
-// UpdateErrorLabel updates the "nerdctl/error"
-// label of the container according to the container error.
+// UpdateErrorLabel updates the "prefix/error" label of the container according to the container error.
 func UpdateErrorLabel(ctx context.Context, container containerd.Container, err error) error {
 	opt := containerd.WithAdditionalContainerLabels(map[string]string{
 		labels.Error: err.Error(),

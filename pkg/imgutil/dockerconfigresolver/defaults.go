@@ -16,7 +16,11 @@
 
 package dockerconfigresolver
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/containerd/nerdctl/v2/pkg/version"
+)
 
 type scheme string
 
@@ -24,10 +28,6 @@ const (
 	standardHTTPSPort        = "443"
 	schemeHTTP        scheme = "http"
 	schemeHTTPS       scheme = "https"
-	// schemeNerdctlExperimental is currently provisional, to unlock namespace based host authentication
-	// This may change or break without notice, and you should have no expectations that credentials saved like that
-	// will be supported in the future
-	schemeNerdctlExperimental scheme = "nerdctl-experimental"
 	// See https://github.com/moby/moby/blob/v27.1.1/registry/config.go#L42-L48
 	//nolint:misspell
 	// especially Sebastiaan comments on future domain consolidation
@@ -38,6 +38,11 @@ const (
 
 // Errors returned by the credentials store
 var (
+	// schemeNerdctlExperimental is currently provisional, to unlock namespace based host authentication
+	// This may change or break without notice, and you should have no expectations that credentials saved like that
+	// will be supported in the future
+	schemeNerdctlExperimental scheme = scheme(version.RootName + "-experimental")
+
 	ErrUnableToInstantiate = errors.New("unable to instantiate docker credentials store")
 	ErrUnableToErase       = errors.New("unable to erase credentials")
 	ErrUnableToStore       = errors.New("unable to store credentials")
