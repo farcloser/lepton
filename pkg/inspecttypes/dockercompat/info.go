@@ -35,12 +35,14 @@ type Info struct {
 	MemoryLimit bool
 	SwapLimit   bool
 	// KernelMemory is omitted because it is deprecated in the Moby
-	CPUCfsPeriod   bool `json:"CpuCfsPeriod"`
-	CPUCfsQuota    bool `json:"CpuCfsQuota"`
-	CPUShares      bool
-	CPUSet         bool
-	PidsLimit      bool
-	IPv4Forwarding bool
+	CPUCfsPeriod      bool `json:"CpuCfsPeriod"`
+	CPUCfsQuota       bool `json:"CpuCfsQuota"`
+	CPUShares         bool
+	CPUSet            bool
+	PidsLimit         bool
+	IPv4Forwarding    bool
+	BridgeNfIptables  bool
+	BridgeNfIP6tables bool `json:"BridgeNfIp6tables"`
 	// Nfd is omitted because it does not make sense for us
 	OomKillDisable bool
 	// NGoroutines is omitted because it does not make sense for us

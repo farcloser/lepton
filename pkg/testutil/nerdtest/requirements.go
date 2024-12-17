@@ -246,7 +246,7 @@ var Registry = test.Require(
 	})(),
 )
 
-// Build marks a test as suitable only if buildkitd is enabled (only tested for nerdishctl obviously)
+// Build marks a test as suitable only if buildkitd is enabled (only tested for nerdish clis obviously)
 var Build = &test.Requirement{
 	Check: func(data test.Data, helpers test.Helpers) (bool, string) {
 		// FIXME: shouldn't we run buildkitd in a container? At least for testing, that would be so much easier than
@@ -292,7 +292,7 @@ var Private = &test.Requirement{
 		data.Set("_deletenamespace", namespace)
 		// FIXME: is this necessary? Should NoParallel be subsumed into config?
 		helpers.Write(modePrivate, enabled)
-		return true, "private mode creates a dedicated namespace for nerdishctl, and disable parallelism for docker"
+		return true, "private mode creates a dedicated namespace for nerdish-clis, and disable parallelism for docker"
 	},
 
 	Cleanup: func(data test.Data, helpers test.Helpers) {

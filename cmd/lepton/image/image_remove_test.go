@@ -316,7 +316,7 @@ func TestIssue3016(t *testing.T) {
 
 	testCase.SubTests = []*test.Case{
 		{
-			Description: "Issue #3016 - Tags created using the short digest ids of container images cannot be deleted using the nerdctl rmi command.",
+			Description: "Issue #3016 - Tags created using the short digest ids of container images cannot be deleted using rmi.",
 			Setup: func(data test.Data, helpers test.Helpers) {
 				helpers.Ensure("pull", testutil.CommonImage)
 				helpers.Ensure("pull", testutil.NginxAlpineImage)

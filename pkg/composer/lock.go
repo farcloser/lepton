@@ -27,7 +27,7 @@ import (
 var locked *os.File
 
 func Lock(dataRoot string, address string) error {
-	// Compose right now cannot be made safe to use concurrently, as we shell out to nerdctl for multiple operations,
+	// Compose right now cannot be made safe to use concurrently, as we shell out for multiple operations,
 	// preventing us from using the lock mechanisms from the API.
 	// This here allows to impose a global lock, effectively preventing multiple compose commands from being run in parallel and
 	// preventing some of the problems with concurrent execution.

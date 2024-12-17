@@ -34,7 +34,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/reflectutil"
 )
 
-// Options groups the command line options recommended for a Compose implementation (ProjectOptions) and extra options for nerdctl
+// Options groups the command line options recommended for a Compose implementation (ProjectOptions) and extra options
 type Options struct {
 	Project          string // empty for default
 	ProjectDirectory string
@@ -55,7 +55,7 @@ type Options struct {
 
 func New(o Options, client *containerd.Client) (*Composer, error) {
 	if o.CliCmd == "" {
-		return nil, errors.New("got empty nerdctl cmd")
+		return nil, errors.New("got empty cmd")
 	}
 	if o.NetworkExists == nil || o.VolumeExists == nil || o.EnsureImage == nil {
 		return nil, errors.New("got empty functions")

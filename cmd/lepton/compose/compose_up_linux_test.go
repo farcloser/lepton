@@ -34,6 +34,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nettestutil"
+	"github.com/containerd/nerdctl/v2/pkg/version"
 )
 
 func TestComposeUp(t *testing.T) {
@@ -474,7 +475,7 @@ services:
     volumes:
       - wordpress:/var/www/html
     annotations:
-      - nerdctl/bypass4netns=1
+      - %s/bypass4netns=1
 
   db:
     image: %s
@@ -487,12 +488,12 @@ services:
     volumes:
       - db:/var/lib/mysql
     annotations:
-      - nerdctl/bypass4netns=1
+      - %s/bypass4netns=1
 
 volumes:
   wordpress:
   db:
-`, testutil.WordpressImage, testutil.MariaDBImage))
+`, testutil.WordpressImage, version.RootName, testutil.MariaDBImage, version.RootName))
 }
 
 func TestComposeUpProfile(t *testing.T) {

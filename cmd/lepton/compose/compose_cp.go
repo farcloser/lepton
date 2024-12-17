@@ -18,6 +18,7 @@ package compose
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/spf13/cobra"
 
@@ -26,11 +27,12 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/cmd/compose"
 	"github.com/containerd/nerdctl/v2/pkg/composer"
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
+	"github.com/containerd/nerdctl/v2/pkg/version"
 )
 
 func newComposeCopyCommand() *cobra.Command {
-	usage := `cp [OPTIONS] SERVICE:SRC_PATH DEST_PATH|-
-       nerdctl compose cp [OPTIONS] SRC_PATH|- SERVICE:DEST_PATH`
+	usage := fmt.Sprintf(`cp [OPTIONS] SERVICE:SRC_PATH DEST_PATH|-
+       %s compose cp [OPTIONS] SRC_PATH|- SERVICE:DEST_PATH`, version.RootName)
 	var composeCpCommand = &cobra.Command{
 		Use:           usage,
 		Short:         "Copy files/folders between a service container and the local filesystem",
