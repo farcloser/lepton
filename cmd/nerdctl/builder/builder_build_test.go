@@ -40,7 +40,7 @@ func TestBuildBasics(t *testing.T) {
 		Require: nerdtest.Build,
 		Setup: func(data test.Data, helpers test.Helpers) {
 			dockerfile := fmt.Sprintf(`FROM %s
-CMD ["echo", "nerdctl-build-test-string"]`, testutil.CommonImage)
+CMD ["echo", "build-test-string"]`, testutil.CommonImage)
 			err := os.WriteFile(filepath.Join(data.TempDir(), "Dockerfile"), []byte(dockerfile), 0o600)
 			assert.NilError(helpers.T(), err)
 			data.Set("buildCtx", data.TempDir())
@@ -60,7 +60,7 @@ CMD ["echo", "nerdctl-build-test-string"]`, testutil.CommonImage)
 				Cleanup: func(data test.Data, helpers test.Helpers) {
 					helpers.Anyhow("rmi", "-f", data.Identifier())
 				},
-				Expected: test.Expects(0, nil, test.Equals("nerdctl-build-test-string\n")),
+				Expected: test.Expects(0, nil, test.Equals("build-test-string\n")),
 			},
 			{
 				Description: "Successfully build with 'buildctx first', 'tag second'",
@@ -73,7 +73,7 @@ CMD ["echo", "nerdctl-build-test-string"]`, testutil.CommonImage)
 				Cleanup: func(data test.Data, helpers test.Helpers) {
 					helpers.Anyhow("rmi", "-f", data.Identifier())
 				},
-				Expected: test.Expects(0, nil, test.Equals("nerdctl-build-test-string\n")),
+				Expected: test.Expects(0, nil, test.Equals("build-test-string\n")),
 			},
 			{
 				Description: "Successfully build with output docker, main tag still works",
@@ -86,7 +86,7 @@ CMD ["echo", "nerdctl-build-test-string"]`, testutil.CommonImage)
 				Cleanup: func(data test.Data, helpers test.Helpers) {
 					helpers.Anyhow("rmi", "-f", data.Identifier())
 				},
-				Expected: test.Expects(0, nil, test.Equals("nerdctl-build-test-string\n")),
+				Expected: test.Expects(0, nil, test.Equals("build-test-string\n")),
 			},
 			{
 				Description: "Successfully build with output docker, name cannot be used",
@@ -133,7 +133,7 @@ func TestCanBuildOnOtherPlatform(t *testing.T) {
 		Setup: func(data test.Data, helpers test.Helpers) {
 			dockerfile := fmt.Sprintf(`FROM %s
 RUN echo hello > /hello
-CMD ["echo", "nerdctl-build-test-string"]`, testutil.CommonImage)
+CMD ["echo", "build-test-string"]`, testutil.CommonImage)
 			err := os.WriteFile(filepath.Join(data.TempDir(), "Dockerfile"), []byte(dockerfile), 0o600)
 			assert.NilError(helpers.T(), err)
 			data.Set("buildCtx", data.TempDir())
@@ -164,7 +164,7 @@ func TestBuildBaseImage(t *testing.T) {
 		Setup: func(data test.Data, helpers test.Helpers) {
 			dockerfile := fmt.Sprintf(`FROM %s
 RUN echo hello > /hello
-CMD ["echo", "nerdctl-build-test-string"]`, testutil.CommonImage)
+CMD ["echo", "build-test-string"]`, testutil.CommonImage)
 			err := os.WriteFile(filepath.Join(data.TempDir(), "Dockerfile"), []byte(dockerfile), 0o600)
 			assert.NilError(helpers.T(), err)
 			helpers.Ensure("build", "-t", data.Identifier("first"), data.TempDir())
@@ -229,7 +229,7 @@ func TestBuildFromStdin(t *testing.T) {
 		},
 		Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 			dockerfile := fmt.Sprintf(`FROM %s
-CMD ["echo", "nerdctl-build-test-stdin"]`, testutil.CommonImage)
+CMD ["echo", "build-test-stdin"]`, testutil.CommonImage)
 			cmd := helpers.Command("build", "-t", data.Identifier(), "-f", "-", ".")
 			cmd.WithStdin(strings.NewReader(dockerfile))
 			return cmd
@@ -254,7 +254,7 @@ func TestBuildWithDockerfile(t *testing.T) {
 		},
 		Setup: func(data test.Data, helpers test.Helpers) {
 			dockerfile := fmt.Sprintf(`FROM %s
-CMD ["echo", "nerdctl-build-test-dockerfile"]
+CMD ["echo", "build-test-dockerfile"]
 	`, testutil.CommonImage)
 			buildCtx := filepath.Join(data.TempDir(), "test")
 			err := os.MkdirAll(buildCtx, 0755)
@@ -306,7 +306,7 @@ CMD ["echo", "nerdctl-build-test-dockerfile"]
 func TestBuildLocal(t *testing.T) {
 	nerdtest.Setup()
 
-	const testFileName = "nerdctl-build-test"
+	const testFileName = "build-test"
 	const testContent = "nerdctl"
 
 	testCase := &test.Case{
@@ -486,7 +486,7 @@ func TestBuildWithIIDFile(t *testing.T) {
 		},
 		Setup: func(data test.Data, helpers test.Helpers) {
 			dockerfile := fmt.Sprintf(`FROM %s
-CMD ["echo", "nerdctl-build-test-string"]
+CMD ["echo", "build-test-string"]
 	`, testutil.CommonImage)
 			buildCtx := data.TempDir()
 			err := os.WriteFile(filepath.Join(buildCtx, "Dockerfile"), []byte(dockerfile), 0o600)
@@ -499,7 +499,7 @@ CMD ["echo", "nerdctl-build-test-string"]
 			return helpers.Command("run", "--rm", string(imageID))
 		},
 
-		Expected: test.Expects(0, nil, test.Equals("nerdctl-build-test-string\n")),
+		Expected: test.Expects(0, nil, test.Equals("build-test-string\n")),
 	}
 
 	testCase.Run(t)
@@ -515,7 +515,7 @@ func TestBuildWithLabels(t *testing.T) {
 		},
 		Setup: func(data test.Data, helpers test.Helpers) {
 			dockerfile := fmt.Sprintf(`FROM %s
-LABEL name=nerdctl-build-test-label
+LABEL name=build-test-label
 	`, testutil.CommonImage)
 			buildCtx := data.TempDir()
 			err := os.WriteFile(filepath.Join(buildCtx, "Dockerfile"), []byte(dockerfile), 0o600)
@@ -526,7 +526,7 @@ LABEL name=nerdctl-build-test-label
 			return helpers.Command("inspect", data.Identifier(), "--format", "{{json .Config.Labels }}")
 		},
 
-		Expected: test.Expects(0, nil, test.Equals("{\"label\":\"test\",\"name\":\"nerdctl-build-test-label\"}\n")),
+		Expected: test.Expects(0, nil, test.Equals("{\"label\":\"test\",\"name\":\"build-test-label\"}\n")),
 	}
 
 	testCase.Run(t)
@@ -547,7 +547,7 @@ func TestBuildMultipleTags(t *testing.T) {
 		},
 		Setup: func(data test.Data, helpers test.Helpers) {
 			dockerfile := fmt.Sprintf(`FROM %s
-CMD ["echo", "nerdctl-build-test-string"]
+CMD ["echo", "build-test-string"]
 	`, testutil.CommonImage)
 			buildCtx := data.TempDir()
 			err := os.WriteFile(filepath.Join(buildCtx, "Dockerfile"), []byte(dockerfile), 0o600)
@@ -561,7 +561,7 @@ CMD ["echo", "nerdctl-build-test-string"]
 					return helpers.Command("run", "--rm", data.Get("i1"))
 				},
 
-				Expected: test.Expects(0, nil, test.Equals("nerdctl-build-test-string\n")),
+				Expected: test.Expects(0, nil, test.Equals("build-test-string\n")),
 			},
 			{
 				Description: "i2",
@@ -569,7 +569,7 @@ CMD ["echo", "nerdctl-build-test-string"]
 					return helpers.Command("run", "--rm", data.Get("i2"))
 				},
 
-				Expected: test.Expects(0, nil, test.Equals("nerdctl-build-test-string\n")),
+				Expected: test.Expects(0, nil, test.Equals("build-test-string\n")),
 			},
 			{
 				Description: "i3",
@@ -577,7 +577,7 @@ CMD ["echo", "nerdctl-build-test-string"]
 					return helpers.Command("run", "--rm", data.Get("i3"))
 				},
 
-				Expected: test.Expects(0, nil, test.Equals("nerdctl-build-test-string\n")),
+				Expected: test.Expects(0, nil, test.Equals("build-test-string\n")),
 			},
 		},
 	}
@@ -598,7 +598,7 @@ func TestBuildWithContainerfile(t *testing.T) {
 		},
 		Setup: func(data test.Data, helpers test.Helpers) {
 			dockerfile := fmt.Sprintf(`FROM %s
-CMD ["echo", "nerdctl-build-test-string"]
+CMD ["echo", "build-test-string"]
 	`, testutil.CommonImage)
 			buildCtx := data.TempDir()
 			err := os.WriteFile(filepath.Join(buildCtx, "Containerfile"), []byte(dockerfile), 0o600)
@@ -608,7 +608,7 @@ CMD ["echo", "nerdctl-build-test-string"]
 		Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 			return helpers.Command("run", "--rm", data.Identifier())
 		},
-		Expected: test.Expects(0, nil, test.Equals("nerdctl-build-test-string\n")),
+		Expected: test.Expects(0, nil, test.Equals("build-test-string\n")),
 	}
 
 	testCase.Run(t)
@@ -657,7 +657,7 @@ func TestBuildNoTag(t *testing.T) {
 		},
 		Setup: func(data test.Data, helpers test.Helpers) {
 			dockerfile := fmt.Sprintf(`FROM %s
-CMD ["echo", "nerdctl-build-test-string"]
+CMD ["echo", "build-test-string"]
 	`, testutil.CommonImage)
 			buildCtx := data.TempDir()
 			err := os.WriteFile(filepath.Join(buildCtx, "Dockerfile"), []byte(dockerfile), 0o600)
@@ -681,7 +681,7 @@ func TestBuildContextDockerImageAlias(t *testing.T) {
 		},
 		Setup: func(data test.Data, helpers test.Helpers) {
 			dockerfile := `FROM myorg/myapp
-CMD ["echo", "nerdctl-build-myorg/myapp"]`
+CMD ["echo", "build-myorg/myapp"]`
 			buildCtx := data.TempDir()
 			err := os.WriteFile(filepath.Join(buildCtx, "Dockerfile"), []byte(dockerfile), 0o600)
 			assert.NilError(helpers.T(), err)

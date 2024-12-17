@@ -716,7 +716,7 @@ Usage: `nerdctl commit [OPTIONS] CONTAINER [REPOSITORY[:TAG]]`
 
 Flags:
 
-- :whale: `-a, --author`: Author (e.g., "nerdctl contributor <nerdctl-dev@example.com>")
+- :whale: `-a, --author`: Author (e.g., "contributor <dev@example.com>")
 - :whale: `-m, --message`: Commit message
 - :whale: `-c, --change`: Apply Dockerfile instruction to the created image (supported directives: [CMD, ENTRYPOINT])
 - :whale: `-p, --pause`: Pause container during commit (default: true)

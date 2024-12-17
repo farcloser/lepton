@@ -59,7 +59,7 @@ func TestImagePrune(t *testing.T) {
 			Setup: func(data test.Data, helpers test.Helpers) {
 				identifier := data.Identifier()
 				dockerfile := fmt.Sprintf(`FROM %s
-				CMD ["echo", "nerdctl-test-image-prune"]
+				CMD ["echo", "test-image-prune"]
 					`, testutil.CommonImage)
 
 				buildCtx := data.TempDir()
@@ -107,7 +107,7 @@ func TestImagePrune(t *testing.T) {
 			Setup: func(data test.Data, helpers test.Helpers) {
 				identifier := data.Identifier()
 				dockerfile := fmt.Sprintf(`FROM %s
-				CMD ["echo", "nerdctl-test-image-prune"]
+				CMD ["echo", "test-image-prune"]
 					`, testutil.CommonImage)
 
 				buildCtx := data.TempDir()
@@ -151,7 +151,7 @@ func TestImagePrune(t *testing.T) {
 			},
 			Setup: func(data test.Data, helpers test.Helpers) {
 				dockerfile := fmt.Sprintf(`FROM %s
-CMD ["echo", "nerdctl-test-image-prune-filter-label"]
+CMD ["echo", "test-image-prune-filter-label"]
 LABEL foo=bar
 LABEL version=0.1`, testutil.CommonImage)
 				buildCtx := data.TempDir()
@@ -193,7 +193,7 @@ LABEL version=0.1`, testutil.CommonImage)
 			Setup: func(data test.Data, helpers test.Helpers) {
 				dockerfile := fmt.Sprintf(`FROM %s
 RUN echo "Anything, so that we create actual content for docker to set the current time for CreatedAt"
-CMD ["echo", "nerdctl-test-image-prune-until"]`, testutil.CommonImage)
+CMD ["echo", "test-image-prune-until"]`, testutil.CommonImage)
 				buildCtx := data.TempDir()
 				err := os.WriteFile(filepath.Join(buildCtx, "Dockerfile"), []byte(dockerfile), 0o600)
 				assert.NilError(helpers.T(), err)

@@ -140,7 +140,7 @@ func TestImagesFilter(t *testing.T) {
 			helpers.Ensure("tag", testutil.CommonImage, "taggedimage:two-fragment-two")
 
 			dockerfile := fmt.Sprintf(`FROM %s
-CMD ["echo", "nerdctl-build-test-string"] \n
+CMD ["echo", "build-test-string"] \n
 LABEL foo=bar
 LABEL version=0.1
 RUN echo "actually creating a layer so that docker sets the createdAt time"
@@ -291,7 +291,7 @@ func TestImagesFilterDangling(t *testing.T) {
 		Require:    nerdtest.Build,
 		Setup: func(data test.Data, helpers test.Helpers) {
 			dockerfile := fmt.Sprintf(`FROM %s
-CMD ["echo", "nerdctl-build-notag-string"]
+CMD ["echo", "build-notag-string"]
 	`, testutil.CommonImage)
 			buildCtx := data.TempDir()
 			err := os.WriteFile(filepath.Join(buildCtx, "Dockerfile"), []byte(dockerfile), 0o600)

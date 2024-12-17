@@ -214,7 +214,7 @@ func CopyFiles(ctx context.Context, client *containerd.Client, container contain
 		}
 	} else {
 		// Prepare a single-file directory to create an archive of the source file
-		td, err := os.MkdirTemp("", "nerdctl-cp")
+		td, err := os.MkdirTemp("", "cp")
 		if err != nil {
 			return err
 		}
@@ -328,7 +328,7 @@ func mountSnapshotForContainer(ctx context.Context, client *containerd.Client, c
 		return "", nil, err
 	}
 
-	tempDir, err := os.MkdirTemp("", "nerdctl-cp-")
+	tempDir, err := os.MkdirTemp("", "cp-")
 	if err != nil {
 		return "", nil, err
 	}

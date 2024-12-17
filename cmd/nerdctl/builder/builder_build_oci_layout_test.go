@@ -59,7 +59,7 @@ func TestBuildContextWithOCILayout(t *testing.T) {
 
 			dockerfile := fmt.Sprintf(`FROM %s
 LABEL layer=oci-layout-parent
-CMD ["echo", "test-nerdctl-build-context-oci-layout-parent"]`, testutil.CommonImage)
+CMD ["echo", "test-build-context-oci-layout-parent"]`, testutil.CommonImage)
 
 			buildCtx := data.TempDir()
 			err := os.WriteFile(filepath.Join(buildCtx, "Dockerfile"), []byte(dockerfile), 0o600)
@@ -75,7 +75,7 @@ CMD ["echo", "test-nerdctl-build-context-oci-layout-parent"]`, testutil.CommonIm
 
 		Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 			dockerfile := `FROM parent
-CMD ["echo", "test-nerdctl-build-context-oci-layout"]`
+CMD ["echo", "test-build-context-oci-layout"]`
 
 			buildCtx := data.TempDir()
 			err := os.WriteFile(filepath.Join(buildCtx, "Dockerfile"), []byte(dockerfile), 0o600)
@@ -97,7 +97,7 @@ CMD ["echo", "test-nerdctl-build-context-oci-layout"]`
 		Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 			return &test.Expected{
 				Output: func(stdout string, info string, t *testing.T) {
-					assert.Assert(t, strings.Contains(helpers.Capture("run", "--rm", data.Identifier("-child")), "test-nerdctl-build-context-oci-layout"), info)
+					assert.Assert(t, strings.Contains(helpers.Capture("run", "--rm", data.Identifier("-child")), "test-build-context-oci-layout"), info)
 				},
 			}
 		},

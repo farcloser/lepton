@@ -45,7 +45,7 @@ func TestRunVerifyCosign(t *testing.T) {
 	tID := testutil.Identifier(t)
 	testImageRef := fmt.Sprintf("127.0.0.1:%d/%s", reg.Port, tID)
 	dockerfile := fmt.Sprintf(`FROM %s
-CMD ["echo", "nerdctl-build-test-string"]
+CMD ["echo", "build-test-string"]
 	`, testutil.CommonImage)
 
 	buildCtx := helpers.CreateBuildContext(t, dockerfile)
