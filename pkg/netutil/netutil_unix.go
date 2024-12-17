@@ -306,7 +306,7 @@ func firewallPluginGEQ110(firewallPath string) (bool, error) {
 	if err != nil {
 		return guessed, fmt.Errorf("failed to guess the version of %q: %w", firewallPath, err)
 	}
-	ver110 := semver.MustParse("v1.1.0")
+	ver110 := semver.MustParse("v1.6.0")
 	return ver.GreaterThan(ver110) || ver.Equal(ver110), nil
 }
 

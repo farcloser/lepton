@@ -2,16 +2,17 @@
 
 lepton is an experimental containerd cli started as a friendly fork of nerdctl.
 
-Supports:
-- containerd v2 only
+Requires:
+- containerd 2.0+
 - golang 1.23+
+- cni plugins 1.6+
 
 Enhanced:
 - rewritten cp
 
-Dropped:
+Removed:
 - freebsd
-- stargz
+- stargz (partly)
 - cvmfs
 - overlaybd
 - nydus
