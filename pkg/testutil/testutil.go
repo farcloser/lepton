@@ -47,6 +47,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/lockutil"
 	"github.com/containerd/nerdctl/v2/pkg/platformutil"
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
+	"github.com/containerd/nerdctl/v2/pkg/version"
 )
 
 type Base struct {
@@ -749,7 +750,7 @@ func RequireExecutable(t testing.TB, name string) {
 	}
 }
 
-const Namespace = "nerdctl-test"
+var Namespace = version.RootName + "-test"
 
 func NewBaseWithNamespace(t *testing.T, ns string) *Base {
 	if ns == "" || ns == "default" || ns == Namespace {
@@ -793,13 +794,13 @@ func newBase(t *testing.T, ns string, ipv6Compatible bool, kubernetesCompatible 
 	var err error
 	switch base.Target {
 	case Nerdctl:
-		base.Binary, err = exec.LookPath("nerdctl")
+		base.Binary, err = exec.LookPath(base.Target)
 		if err != nil {
 			t.Fatal(err)
 		}
 		base.Args = []string{"--namespace=" + ns}
 	case Docker:
-		base.Binary, err = exec.LookPath("docker")
+		base.Binary, err = exec.LookPath(base.Target)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -818,9 +819,9 @@ func Identifier(t testing.TB) string {
 	s = strings.ReplaceAll(s, " ", "_")
 	s = strings.ReplaceAll(s, "/", "-")
 	s = strings.ToLower(s)
-	s = "nerdctl-" + s
+	s = version.RootName + "-" + s
 	if len(s) > 76 {
-		s = "nerdctl-" + digest.SHA256.FromString(t.Name()).Encoded()
+		s = version.RootName + "-" + digest.SHA256.FromString(t.Name()).Encoded()
 	}
 	return s
 }

@@ -307,7 +307,7 @@ func TestBuildLocal(t *testing.T) {
 	nerdtest.Setup()
 
 	const testFileName = "build-test"
-	const testContent = "nerdctl"
+	const testContent = "test content"
 
 	testCase := &test.Case{
 		Require: nerdtest.Build,

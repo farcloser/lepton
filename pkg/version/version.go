@@ -26,8 +26,11 @@ var (
 	Version = ""
 	// Revision is filled via Makefile
 	Revision = ""
-	// RootName governs
-	RootName = "nerdctl"
+	// RootName is used to locate configuration, prefix labels, and more generally, inside the library
+	// Changing this can be done at build time with -X (from Makefile), and is mostly of interest for people looking
+	// to build their own cli, leveraging the codebase as a library.
+	RootName  = "nerdctl"
+	EnvPrefix = "NERDCTL_"
 )
 
 const unknown = "<unknown>"

@@ -91,7 +91,7 @@ func NewTask(ctx context.Context, client *containerd.Client, container container
 			}
 		}
 
-		// args[0]: _NERDCTL_INTERNAL_LOGGING
+		// args[0]: _PREFIX_INTERNAL_LOGGING
 		// args[1]: /var/lib/nerdctl/1935db59
 		if len(args) != 2 {
 			return nil, errors.New("parse logging path error")

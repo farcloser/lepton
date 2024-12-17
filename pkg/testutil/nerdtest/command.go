@@ -27,9 +27,10 @@ import (
 
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
+	"github.com/containerd/nerdctl/v2/pkg/version"
 )
 
-const defaultNamespace = testutil.Namespace
+var defaultNamespace = testutil.Namespace
 
 // IMPORTANT note on file writing here:
 // Inside the context of a single test, there is no concurrency, as setup, command and cleanup operate in sequence
@@ -40,6 +41,10 @@ type target = string
 const (
 	targetNerdctl = target("nerdctl")
 	targetDocker  = target("docker")
+)
+
+var (
+	targetNerdishctl = version.RootName
 )
 
 func getTarget() string {
@@ -53,14 +58,14 @@ func newNerdCommand(conf test.Config, t *testing.T) *nerdCommand {
 	var binary string
 	trgt := getTarget()
 	switch trgt {
-	case targetNerdctl:
+	case targetNerdctl, targetNerdishctl:
 		binary, err = exec.LookPath(trgt)
 		if err != nil {
 			t.Fatalf("unable to find binary %q: %v", trgt, err)
 		}
 		// Set the default namespace if we do not have something already
 		if conf.Read(Namespace) == "" {
-			conf.Write(Namespace, defaultNamespace)
+			conf.Write(Namespace, test.ConfigValue(defaultNamespace))
 		}
 	case targetDocker:
 		binary, err = exec.LookPath(trgt)
@@ -82,12 +87,12 @@ func newNerdCommand(conf test.Config, t *testing.T) *nerdCommand {
 		"LS_COLORS",
 		"DOCKER_CONFIG",
 		"CONTAINERD_SNAPSHOTTER",
-		"NERDCTL_TOML",
+		version.EnvPrefix + "_TOML",
 		"CONTAINERD_ADDRESS",
 		"CNI_PATH",
 		"NETCONFPATH",
-		"NERDCTL_EXPERIMENTAL",
-		"NERDCTL_HOST_GATEWAY_IP",
+		version.EnvPrefix + "_EXPERIMENTAL",
+		version.EnvPrefix + "_HOST_GATEWAY_IP",
 	})
 	return ret
 }
@@ -144,15 +149,15 @@ func (nc *nerdCommand) prep() {
 			nc.PrependArgs("--namespace=" + string(nc.Config.Read(Namespace)))
 		}
 
-		// If no NERDCTL_TOML was explicitly provided, set it to the private dir
-		if nc.Env["NERDCTL_TOML"] == "" {
-			nc.Env["NERDCTL_TOML"] = filepath.Join(nc.GenericCommand.TempDir, "nerdctl.toml")
+		// If no PREFIX_TOML was explicitly provided, set it to the private dir
+		if nc.Env[version.EnvPrefix+"_TOML"] == "" {
+			nc.Env[version.EnvPrefix+"_TOML"] = filepath.Join(nc.GenericCommand.TempDir, version.RootName+".toml")
 		}
 
 		// If we have custom toml content, write it if it does not exist already
 		if nc.Config.Read(NerdctlToml) != "" {
 			if !nc.hasWrittenToml {
-				dest := nc.Env["NERDCTL_TOML"]
+				dest := nc.Env[version.EnvPrefix+"_TOML"]
 				err := os.WriteFile(dest, []byte(nc.Config.Read(NerdctlToml)), 0400)
 				assert.NilError(nc.T(), err, "failed to write cli toml config file")
 				nc.hasWrittenToml = true

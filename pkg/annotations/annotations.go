@@ -17,13 +17,15 @@
 // Package annotations defines OCI annotations
 package annotations
 
-const (
+import "github.com/containerd/nerdctl/v2/pkg/version"
+
+var (
 	// Prefix is the common prefix of nerdctl annotations
-	Prefix = "nerdctl/"
+	Prefix = version.RootName + "/"
 
 	// Bypass4netns is the flag for acceleration with bypass4netns
 	// Boolean value which can be parsed with strconv.ParseBool() is required.
-	// (like "nerdctl/bypass4netns=true" or "nerdctl/bypass4netns=false")
+	// (like "prefix/bypass4netns=true" or "prefix/bypass4netns=false")
 	Bypass4netns = Prefix + "bypass4netns"
 
 	// Bypass4netnsIgnoreSubnets is a JSON of []string that is appended to

@@ -18,17 +18,9 @@
 // The labels defined in this package are also passed to OCI containers as annotations.
 package labels
 
+import "github.com/containerd/nerdctl/v2/pkg/version"
+
 const (
-	// Prefix is the common prefix for labels
-	Prefix = "nerdctl/"
-
-	// Namespace is the containerd namespace such as "default", "k8s.io"
-	Namespace = Prefix + "namespace"
-
-	// Name is a human-friendly name.
-	// WARNING: multiple containers may have same the name label
-	Name = Prefix + "name"
-
 	//Compose Project Name
 	ComposeProject = "com.docker.compose.project"
 
@@ -40,6 +32,18 @@ const (
 
 	//Compose Volume Name
 	ComposeVolume = "com.docker.compose.volume"
+)
+
+var (
+	// Prefix is the common prefix for labels
+	Prefix = version.RootName + "/"
+
+	// Namespace is the containerd namespace such as "default", "k8s.io"
+	Namespace = Prefix + "namespace"
+
+	// Name is a human-friendly name.
+	// WARNING: multiple containers may have same the name label
+	Name = Prefix + "name"
 
 	// Hostname
 	Hostname = Prefix + "hostname"
@@ -98,7 +102,7 @@ const (
 	// DefaultNetwork indicates whether a network is the default network
 	// created and owned by the cli.
 	// Boolean value which can be parsed with strconv.ParseBool() is required.
-	// (like "nerdctl/default-network=true" or "nerdctl/default-network=false")
+	// (like "prefix/default-network=true" or "prefix/default-network=false")
 	DefaultNetwork = Prefix + "default-network"
 
 	// ContainerAutoRemove is to check whether the --rm option is specified.
