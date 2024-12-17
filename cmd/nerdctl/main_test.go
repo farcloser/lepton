@@ -78,8 +78,8 @@ func TestUnknownCommand(t *testing.T) {
 	testCase.Run(t)
 }
 
-// TestNerdctlConfig validates the configuration precedence [CLI, Env, TOML, Default] and broken config rejection
-func TestNerdctlConfig(t *testing.T) {
+// TestConfig validates the configuration precedence [CLI, Env, TOML, Default] and broken config rejection
+func TestConfig(t *testing.T) {
 	testCase := nerdtest.Setup()
 
 	// Docker does not support nerdctl.toml obviously

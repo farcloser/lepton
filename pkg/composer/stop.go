@@ -74,7 +74,7 @@ func (c *Composer) stopContainers(ctx context.Context, containers []containerd.C
 				args = append(args, timeoutArg)
 			}
 			args = append(args, container.ID())
-			if err := c.runNerdctlCmd(ctx, args...); err != nil {
+			if err := c.runCliCmd(ctx, args...); err != nil {
 				log.G(ctx).Warn(err)
 			}
 		}()
@@ -93,7 +93,7 @@ func (c *Composer) stopContainersFromParsedServices(ctx context.Context, contain
 		go func() {
 			defer rmWG.Done()
 			log.G(ctx).Infof("Stopping container %s", container.Name)
-			if err := c.runNerdctlCmd(ctx, "stop", id); err != nil {
+			if err := c.runCliCmd(ctx, "stop", id); err != nil {
 				log.G(ctx).Warn(err)
 			}
 		}()

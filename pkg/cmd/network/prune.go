@@ -49,7 +49,7 @@ func Prune(ctx context.Context, client *containerd.Client, options types.Network
 		if strutil.InStringSlice(options.NetworkDriversToKeep, net.Name) {
 			continue
 		}
-		if net.NerdctlID == nil || net.File == "" {
+		if net.CliID == nil || net.File == "" {
 			continue
 		}
 		if _, ok := usedNetworks[net.Name]; ok {

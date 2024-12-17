@@ -82,8 +82,8 @@ func (e *CNIEnv) ListNetworksMatch(reqs []string, allowPseudoNetwork bool) (list
 		// If nothing, try to match the id
 		if len(result) == 0 {
 			for _, networkConfig := range networkConfigs {
-				if networkConfig.NerdctlID != nil {
-					if len(req) <= len((*networkConfig.NerdctlID)) && (*networkConfig.NerdctlID)[0:len(req)] == req {
+				if networkConfig.CliID != nil {
+					if len(req) <= len((*networkConfig.CliID)) && (*networkConfig.CliID)[0:len(req)] == req {
 						result = append(result, networkConfig)
 					}
 				}
@@ -252,7 +252,7 @@ func (e *CNIEnv) NetworkByNameOrID(key string) (*NetworkConfig, error) {
 		if n.Name == key {
 			return n, nil
 		}
-		if n.NerdctlID != nil && (*n.NerdctlID == key || (*n.NerdctlID)[0:12] == key) {
+		if n.CliID != nil && (*n.CliID == key || (*n.CliID)[0:12] == key) {
 			return n, nil
 		}
 	}
@@ -298,16 +298,16 @@ func (e *CNIEnv) usedSubnets() ([]*net.IPNet, error) {
 
 type NetworkConfig struct {
 	*libcni.NetworkConfigList
-	NerdctlID     *string
-	NerdctlLabels *map[string]string
-	File          string
+	CliID     *string
+	CliLabels *map[string]string
+	File      string
 }
 
 type cniNetworkConfig struct {
 	CNIVersion string            `json:"cniVersion"`
 	Name       string            `json:"name"`
-	ID         string            `json:"nerdctlID"`
-	Labels     map[string]string `json:"nerdctlLabels"`
+	ID         string            `json:"cliID"`
+	Labels     map[string]string `json:"cliLabels"`
 	Plugins    []CNIPlugin       `json:"plugins"`
 }
 
@@ -355,15 +355,15 @@ func (e *CNIEnv) RemoveNetwork(net *NetworkConfig) error {
 }
 
 // GetDefaultNetworkConfig checks whether the default network exists
-// by first searching for if any network bears the `labels.NerdctlDefaultNetwork`
+// by first searching for if any network bears the `labels.DefaultNetwork`
 // label, or falls back to checking whether any network bears the
 // `DefaultNetworkName` name.
 func (e *CNIEnv) GetDefaultNetworkConfig() (*NetworkConfig, error) {
-	// Search for networks bearing the `labels.NerdctlDefaultNetwork` label.
+	// Search for networks bearing the `labels.DefaultNetwork` label.
 	defaultLabelFilterF := func(nc *NetworkConfig) bool {
-		if nc.NerdctlLabels == nil {
+		if nc.CliLabels == nil {
 			return false
-		} else if _, ok := (*nc.NerdctlLabels)[labels.NerdctlDefaultNetwork]; ok {
+		} else if _, ok := (*nc.CliLabels)[labels.DefaultNetwork]; ok {
 			return true
 		}
 		return false
@@ -374,7 +374,7 @@ func (e *CNIEnv) GetDefaultNetworkConfig() (*NetworkConfig, error) {
 	}
 	if len(labelMatches) >= 1 {
 		if len(labelMatches) > 1 {
-			log.L.Warnf("returning the first network bearing the %q label out of the multiple found: %#v", labels.NerdctlDefaultNetwork, labelMatches)
+			log.L.Warnf("returning the first network bearing the %q label out of the multiple found: %#v", labels.DefaultNetwork, labelMatches)
 		}
 		return labelMatches[0], nil
 	}
@@ -395,7 +395,7 @@ func (e *CNIEnv) GetDefaultNetworkConfig() (*NetworkConfig, error) {
 		// Warn the user if the default network was not created by nerdctl.
 		match := nameMatches[0]
 		_, statErr := os.Stat(e.getConfigPathForNetworkName(DefaultNetworkName))
-		if match.NerdctlID == nil || statErr != nil {
+		if match.CliID == nil || statErr != nil {
 			log.L.Warnf("default network named %q does not have an internal nerdctl ID or nerdctl-managed config file, it was most likely NOT created by nerdctl", DefaultNetworkName)
 		}
 
@@ -440,7 +440,7 @@ func (e *CNIEnv) createDefaultNetworkConfig(bridgeIP string) error {
 		Subnets:    []string{bridgeCIDR},
 		Gateway:    bridgeGatewayIP,
 		IPAMDriver: "default",
-		Labels:     []string{fmt.Sprintf("%s=true", labels.NerdctlDefaultNetwork)},
+		Labels:     []string{fmt.Sprintf("%s=true", labels.DefaultNetwork)},
 	}
 
 	_, err := e.CreateNetwork(opts)
@@ -484,8 +484,8 @@ func (e *CNIEnv) generateNetworkConfig(name string, labels []string, plugins []C
 	}
 	return &NetworkConfig{
 		NetworkConfigList: l,
-		NerdctlID:         &id,
-		NerdctlLabels:     &labelsMap,
+		CliID:             &id,
+		CliLabels:         &labelsMap,
 		File:              "",
 	}, nil
 }
@@ -549,11 +549,11 @@ func cniLoad(fileNames []string) (configList []*NetworkConfig, err error) {
 				return nil, wrapCNIError(fileName, err)
 			}
 		}
-		id, nerdctlLabels := nerdctlIDLabels(netConfigList.Bytes)
+		id, cliLabels := cliIDLabels(netConfigList.Bytes)
 		configList = append(configList, &NetworkConfig{
 			NetworkConfigList: netConfigList,
-			NerdctlID:         id,
-			NerdctlLabels:     nerdctlLabels,
+			CliID:             id,
+			CliLabels:         cliLabels,
 			File:              fileName,
 		})
 	}
@@ -561,10 +561,10 @@ func cniLoad(fileNames []string) (configList []*NetworkConfig, err error) {
 	return configList, nil
 }
 
-func nerdctlIDLabels(b []byte) (*string, *map[string]string) {
+func cliIDLabels(b []byte) (*string, *map[string]string) {
 	type idLabels struct {
-		ID     *string            `json:"nerdctlID,omitempty"`
-		Labels *map[string]string `json:"nerdctlLabels,omitempty"`
+		ID     *string            `json:"cliID,omitempty"`
+		Labels *map[string]string `json:"cliLabels,omitempty"`
 	}
 	var idl idLabels
 	if err := json.Unmarshal(b, &idl); err != nil {

@@ -91,7 +91,7 @@ var IsFlaky = func(issueLink string) *test.Requirement {
 	}
 }
 
-// Docker marks a test as suitable solely for Docker and not Nerdctl
+// Docker marks a test as suitable exclusively for Docker
 // Generally used as test.Not(nerdtest.Docker), which of course it the opposite
 var Docker = &test.Requirement{
 	Check: func(data test.Data, helpers test.Helpers) (ret bool, mess string) {

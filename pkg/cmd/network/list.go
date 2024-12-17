@@ -94,14 +94,14 @@ func List(ctx context.Context, options types.NetworkListOptions) error {
 			Name: n.Name,
 			file: n.File,
 		}
-		if n.NerdctlID != nil {
-			p.ID = *n.NerdctlID
+		if n.CliID != nil {
+			p.ID = *n.CliID
 			if len(p.ID) > 12 {
 				p.ID = p.ID[:12]
 			}
 		}
-		if n.NerdctlLabels != nil {
-			p.Labels = formatter.FormatLabels(*n.NerdctlLabels)
+		if n.CliLabels != nil {
+			p.Labels = formatter.FormatLabels(*n.CliLabels)
 		}
 		pp[i] = p
 	}
@@ -181,7 +181,7 @@ func getNetworkFilterFuncs(filters []string) ([]func(*map[string]string) bool, [
 
 func networkMatchesFilter(net *netutil.NetworkConfig, labelFilterFuncs []func(*map[string]string) bool, nameFilterFuncs []func(string) bool) bool {
 	for _, labelFilterFunc := range labelFilterFuncs {
-		if !labelFilterFunc(net.NerdctlLabels) {
+		if !labelFilterFunc(net.CliLabels) {
 			return false
 		}
 	}

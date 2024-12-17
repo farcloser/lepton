@@ -45,6 +45,6 @@ func Create(options types.NetworkCreateOptions, stdout io.Writer) error {
 		}
 		return err
 	}
-	_, err = fmt.Fprintln(stdout, *net.NerdctlID)
+	_, err = fmt.Fprintln(stdout, *net.CliID)
 	return err
 }

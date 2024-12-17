@@ -123,7 +123,7 @@ func (c *Composer) logs(ctx context.Context, containers []containerd.Container, 
 		}
 
 		args = append(args, id)
-		state.logCmd = c.createNerdctlCmd(ctx, args...)
+		state.logCmd = c.createCliCmd(ctx, args...)
 		stdout, err := state.logCmd.StdoutPipe()
 		if err != nil {
 			return err

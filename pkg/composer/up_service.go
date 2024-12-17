@@ -145,7 +145,7 @@ func (c *Composer) upServiceContainer(ctx context.Context, service *serviceparse
 
 	// start the existing container and exit early
 	if existingCid != "" && recreate == RecreateNever {
-		cmd := c.createNerdctlCmd(ctx, append([]string{"start"}, existingCid)...)
+		cmd := c.createCliCmd(ctx, append([]string{"start"}, existingCid)...)
 		if err := c.executeUpCmd(ctx, cmd, container.Name, runFlagD, service.Unparsed.StdinOpen); err != nil {
 			return "", fmt.Errorf("error while starting existing container %s: %w", container.Name, err)
 		}
@@ -155,7 +155,7 @@ func (c *Composer) upServiceContainer(ctx context.Context, service *serviceparse
 	// delete container if it already exists
 	if existingCid != "" {
 		log.G(ctx).Debugf("Container %q already exists, deleting", container.Name)
-		delCmd := c.createNerdctlCmd(ctx, "rm", "-f", container.Name)
+		delCmd := c.createCliCmd(ctx, "rm", "-f", container.Name)
 		if err = delCmd.Run(); err != nil {
 			return "", fmt.Errorf("could not delete container %q: %s", container.Name, err)
 		}
@@ -189,7 +189,7 @@ func (c *Composer) upServiceContainer(ctx context.Context, service *serviceparse
 		fmt.Sprintf("-l=%s=%s", labels.ComposeService, service.Unparsed.Name),
 	}, container.RunArgs...)
 
-	cmd := c.createNerdctlCmd(ctx, append([]string{"run"}, container.RunArgs...)...)
+	cmd := c.createCliCmd(ctx, append([]string{"run"}, container.RunArgs...)...)
 	if c.DebugPrintFull {
 		log.G(ctx).Debugf("Running %v", cmd.Args)
 	}

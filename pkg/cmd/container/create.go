@@ -262,7 +262,7 @@ func Create(ctx context.Context, client *containerd.Client, args []string, netMa
 	// perform network setup and teardown when using CNI networking.
 	// On Windows, we are forced to set up and tear down the networking from within nerdctl.
 	if runtime.GOOS != "windows" {
-		hookOpt, err := withNerdctlOCIHook(options.NerdctlCmd, options.NerdctlArgs)
+		hookOpt, err := withOCIHook(options.CliCmd, options.CliArgs)
 		if err != nil {
 			return nil, generateRemoveOrphanedDirsFunc(ctx, id, dataStore, internalLabels), err
 		}
@@ -514,7 +514,7 @@ func GenerateLogURI(dataStore string) (*url.URL, error) {
 	return cio.LogURIGenerator("binary", selfExe, args)
 }
 
-func withNerdctlOCIHook(cmd string, args []string) (oci.SpecOpts, error) {
+func withOCIHook(cmd string, args []string) (oci.SpecOpts, error) {
 	if rootlessutil.IsRootless() {
 		detachedNetNS, err := rootlessutil.DetachedNetNS()
 		if err != nil {

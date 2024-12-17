@@ -95,11 +95,11 @@ const (
 	// that describes container error.
 	Error = Prefix + "error"
 
-	// NerdctlDefaultNetwork indicates whether a network is the default network
-	// created and owned by Nerdctl.
+	// DefaultNetwork indicates whether a network is the default network
+	// created and owned by the cli.
 	// Boolean value which can be parsed with strconv.ParseBool() is required.
 	// (like "nerdctl/default-network=true" or "nerdctl/default-network=false")
-	NerdctlDefaultNetwork = Prefix + "default-network"
+	DefaultNetwork = Prefix + "default-network"
 
 	// ContainerAutoRemove is to check whether the --rm option is specified.
 	ContainerAutoRemove = Prefix + "auto-remove"

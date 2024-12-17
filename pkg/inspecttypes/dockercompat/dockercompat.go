@@ -537,12 +537,12 @@ func NetworkFromNative(n *native.Network) (*Network, error) {
 		}
 	}
 
-	if n.NerdctlID != nil {
-		res.ID = *n.NerdctlID
+	if n.CliID != nil {
+		res.ID = *n.CliID
 	}
 
-	if n.NerdctlLabels != nil {
-		res.Labels = *n.NerdctlLabels
+	if n.CliLabels != nil {
+		res.Labels = *n.CliLabels
 	}
 
 	return &res, nil
