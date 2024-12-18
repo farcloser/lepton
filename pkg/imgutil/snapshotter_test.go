@@ -21,8 +21,8 @@ import (
 	"reflect"
 	"testing"
 
-	digest "github.com/opencontainers/go-digest"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
+	"go.farcloser.world/containers/digest"
 	"gotest.tools/v3/assert"
 
 	containerd "github.com/containerd/containerd/v2/client"

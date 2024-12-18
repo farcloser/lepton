@@ -32,7 +32,7 @@ import (
 	"time"
 
 	"github.com/Masterminds/semver/v3"
-	"github.com/opencontainers/go-digest"
+	"go.farcloser.world/containers/digest"
 	"go.farcloser.world/core/filesystem"
 	"gotest.tools/v3/assert"
 	"gotest.tools/v3/icmd"
@@ -821,7 +821,7 @@ func Identifier(t testing.TB) string {
 	s = strings.ToLower(s)
 	s = version.RootName + "-" + s
 	if len(s) > 76 {
-		s = version.RootName + "-" + digest.SHA256.FromString(t.Name()).Encoded()
+		s = version.RootName + "-" + digest.FromString(t.Name()).Encoded()
 	}
 	return s
 }
