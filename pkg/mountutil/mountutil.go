@@ -23,7 +23,7 @@ import (
 	"strings"
 
 	"github.com/moby/sys/userns"
-	"github.com/opencontainers/runtime-spec/specs-go"
+	"go.farcloser.world/containers/specs"
 
 	"github.com/containerd/containerd/v2/pkg/oci"
 	"github.com/containerd/log"

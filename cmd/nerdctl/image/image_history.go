@@ -28,8 +28,8 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/opencontainers/image-spec/identity"
 	"github.com/spf13/cobra"
+	"go.farcloser.world/containers/specs"
 	"go.farcloser.world/core/units"
 
 	containerd "github.com/containerd/containerd/v2/client"
@@ -118,7 +118,7 @@ func historyAction(cmd *cobra.Command, args []string) error {
 						return fmt.Errorf("too many non-empty layers in History section")
 					}
 					diffIDs := diffIDs[0 : layerCounter+1]
-					chainID := identity.ChainID(diffIDs).String()
+					chainID := specs.ChainID(diffIDs).String()
 
 					s := client.SnapshotService(globalOptions.Snapshotter)
 					stat, err := s.Stat(ctx, chainID)

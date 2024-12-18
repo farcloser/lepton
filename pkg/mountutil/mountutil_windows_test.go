@@ -21,7 +21,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/opencontainers/runtime-spec/specs-go"
+	"go.farcloser.world/containers/specs"
 	"gotest.tools/v3/assert"
 	is "gotest.tools/v3/assert/cmp"
 )

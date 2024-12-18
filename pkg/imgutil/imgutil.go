@@ -24,7 +24,6 @@ import (
 	"net/http"
 	"reflect"
 
-	"github.com/opencontainers/image-spec/identity"
 	"go.farcloser.world/containers/specs"
 
 	containerd "github.com/containerd/containerd/v2/client"
@@ -407,7 +406,7 @@ func UnpackedImageSize(ctx context.Context, s snapshots.Snapshotter, img contain
 		return 0, err
 	}
 
-	chainID := identity.ChainID(diffIDs).String()
+	chainID := specs.ChainID(diffIDs).String()
 	_, total, err := ResourceUsage(ctx, s, chainID)
 
 	return total.Size, err

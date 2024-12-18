@@ -22,7 +22,7 @@ import (
 	"strings"
 
 	"github.com/moby/sys/userns"
-	"github.com/opencontainers/runtime-spec/specs-go"
+	"go.farcloser.world/containers/specs"
 	"go.farcloser.world/core/utils"
 
 	containerd "github.com/containerd/containerd/v2/client"

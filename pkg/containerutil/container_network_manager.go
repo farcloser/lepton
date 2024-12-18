@@ -27,7 +27,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/opencontainers/runtime-spec/specs-go"
+	"go.farcloser.world/containers/specs"
 
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/containers"

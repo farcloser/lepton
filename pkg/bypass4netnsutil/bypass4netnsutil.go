@@ -23,8 +23,8 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"github.com/opencontainers/runtime-spec/specs-go"
 	b4nnoci "github.com/rootless-containers/bypass4netns/pkg/oci"
+	"go.farcloser.world/containers/specs"
 
 	"github.com/containerd/containerd/v2/core/containers"
 	"github.com/containerd/containerd/v2/pkg/oci"
