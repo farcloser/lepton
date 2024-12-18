@@ -72,7 +72,7 @@ func PrintHostPort(ctx context.Context, writer io.Writer, container containerd.C
 	}
 
 	for _, p := range ports {
-		if p.ContainerPort == int32(containerPort) && strings.ToLower(p.Protocol) == proto {
+		if int(p.ContainerPort) == containerPort && strings.ToLower(p.Protocol) == proto {
 			fmt.Fprintf(writer, "%s:%d\n", p.HostIP, p.HostPort)
 			return nil
 		}
