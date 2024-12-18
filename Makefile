@@ -33,6 +33,13 @@ BINDIR  ?= $(PREFIX)/bin
 DATADIR ?= $(PREFIX)/share
 DOCDIR  ?= $(DATADIR)/doc
 
+GO_BUILD_LDFLAGS ?= -s -w
+GO_BUILD_FLAGS ?=
+export GO_BUILD=CGO_ENABLED=0 GOOS=$(GOOS) $(GO) -C $(MAKEFILE_DIR) build -ldflags "$(GO_BUILD_LDFLAGS) $(VERBOSE_FLAG) -X $(PACKAGE)/pkg/version.Version=$(VERSION) -X $(PACKAGE)/pkg/version.Revision=$(REVISION)"
+
+# Variables
+COMPANY_PREFIXES := "github.com/containerd"
+
 MAKEFILE_DIR := $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 VERSION ?= $(shell git -C $(MAKEFILE_DIR) describe --match 'v[0-9]*' --dirty='.m' --always --tags)
 VERSION_TRIMMED := $(VERSION:v%=%)
@@ -43,16 +50,159 @@ ifdef VERBOSE
 	VERBOSE_FLAG_LONG := --verbose
 endif
 
-ifndef LINT_COMMIT_RANGE
-	LINT_COMMIT_RANGE := main..HEAD
+LINT_COMMIT_RANGE ?= main..HEAD
+
+ifndef DC_NO_FANCY
+    NC := \033[0m
+    GREEN := \033[1;32m
+    ORANGE := \033[1;33m
+    BLUE := \033[1;34m
+    RED := \033[1;31m
 endif
 
-GO_BUILD_LDFLAGS ?= -s -w
-GO_BUILD_FLAGS ?=
-export GO_BUILD=CGO_ENABLED=0 GOOS=$(GOOS) $(GO) -C $(MAKEFILE_DIR) build -ldflags "$(GO_BUILD_LDFLAGS) $(VERBOSE_FLAG) -X $(PACKAGE)/pkg/version.Version=$(VERSION) -X $(PACKAGE)/pkg/version.Revision=$(REVISION)"
-
+# Helpers
 recursive_wildcard=$(wildcard $1$2) $(foreach e,$(wildcard $1*),$(call recursive_wildcard,$e/,$2))
 
+define title
+	@printf "$(GREEN)----------------------------------------------------------------------------------------------------\n"
+	@printf "$(GREEN)%*s\n" $$(( ( $(shell echo "☆ $(1) ☆" | wc -c ) + 100 ) / 2 )) "☆ $(1) ☆"
+	@printf "$(GREEN)----------------------------------------------------------------------------------------------------\n$(ORANGE)"
+endef
+
+define footer
+	@printf "$(GREEN)> %s: done!\n" "$(1)"
+	@printf "$(GREEN)____________________________________________________________________________________________________\n$(NC)"
+endef
+
+# Tasks
+lint: lint-go-all lint-imports lint-yaml lint-shell lint-commits lint-headers lint-mod lint-licenses-all
+test: test-unit race-unit bench-unit
+unit: test-unit race-unit bench-unit
+fix: fix-go fix-mod fix-imports
+
+lint-go:
+	$(call title, $@)
+	@cd $(MAKEFILE_DIR) && golangci-lint run --max-issues-per-linter=0 --max-same-issues=0 --sort-results $(VERBOSE_FLAG_LONG) ./...
+	$(call footer, $@)
+
+#	&& GOOS=darwin make lint-go
+lint-go-all:
+	$(call title, $@)
+	@cd $(MAKEFILE_DIR) \
+		&& GOOS=linux make lint-go \
+		&& GOOS=windows make lint-go
+	$(call footer, $@)
+
+lint-imports:
+	$(call title, $@)
+	@cd $(MAKEFILE_DIR) \
+		&& ./hack/lint-imports.sh
+	$(call footer, $@)
+
+lint-yaml:
+	$(call title, $@)
+	@cd $(MAKEFILE_DIR) && yamllint .
+	$(call footer, $@)
+
+lint-shell: $(call recursive_wildcard,$(MAKEFILE_DIR)/,*.sh)
+	$(call title, $@)
+	@shellcheck -a -x $^
+	$(call footer, $@)
+
+lint-commits:
+	$(call title, $@)
+	@cd $(MAKEFILE_DIR) && git-validation $(VERBOSE_FLAG) -run DCO,short-subject,dangling-whitespace -range "$(LINT_COMMIT_RANGE)"
+	$(call footer, $@)
+
+lint-headers:
+	$(call title, $@)
+	@cd $(MAKEFILE_DIR) && ltag -t "./hack/headers" --check $(VERBOSE_FLAG)
+	$(call footer, $@)
+
+lint-mod:
+	$(call title, $@)
+	@cd $(MAKEFILE_DIR) && go mod tidy --diff
+	$(call footer, $@)
+
+# FIXME: go-licenses cannot find LICENSE from root of repo when submodule is imported:
+# https://github.com/google/go-licenses/issues/186
+# This is impacting gotest.tools
+lint-licenses:
+	$(call title, $@)
+	@cd $(MAKEFILE_DIR) && go-licenses check --include_tests --allowed_licenses=Apache-2.0,BSD-2-Clause,BSD-3-Clause,MIT \
+	  --ignore gotest.tools \
+	  --ignore github.com/containerd/stargz-snapshotter/estargz \
+	  ./...
+	@echo "WARNING: you need to manually verify licenses for:\n- gotest.tools\n- github.com/containerd/stargz-snapshotter/estargz"
+	$(call footer, $@)
+
+#	&& GOOS=darwin make lint-licenses
+lint-licenses-all:
+	$(call title, $@)
+	@cd $(MAKEFILE_DIR) \
+		&& GOOS=linux make lint-licenses \
+		&& GOOS=windows make lint-licenses
+	$(call footer, $@)
+
+fix-go:
+	$(call title, $@)
+	@cd $(MAKEFILE_DIR) \
+		&& golangci-lint run --fix
+	$(call footer, $@)
+
+fix-imports:
+	$(call title, $@)
+	@cd $(MAKEFILE_DIR) \
+		&& goimports-reviser -company-prefixes $(COMPANY_PREFIXES) ./...
+	$(call footer, $@)
+
+fix-mod:
+	$(call title, $@)
+	@cd $(MAKEFILE_DIR) \
+		&& go mod tidy
+	$(call footer, $@)
+
+update:
+	$(call title, $@)
+	@cd $(MAKEFILE_DIR) \
+		&& go get -u ./...
+	$(call footer, $@)
+
+install-golangci:
+	$(call title, $@)
+	@cd $(MAKEFILE_DIR) \
+		&& go install github.com/golangci/golangci-lint/cmd/golangci-lint@89476e7a1eaa0a8a06c17343af960a5fd9e7edb7 # v1.62.2
+	$(call footer, $@)
+
+install-linters:
+	$(call title, $@)
+	# git-validation: main from 2023/11
+	# ltag: v0.2.5
+	# go-licenses: v2.0.0-alpha.1
+	# goimports-reviser: v3.8.2
+	@cd $(MAKEFILE_DIR) \
+		&& go install github.com/vbatts/git-validation@679e5cad8c50f1605ab3d8a0a947aaf72fb24c07 \
+		&& go install github.com/kunalkushwaha/ltag@b0cfa33e4cc9383095dc584d3990b62c95096de0 \
+		&& go install github.com/google/go-licenses/v2@d01822334fba5896920a060f762ea7ecdbd086e8 \
+		&& go install github.com/incu6us/goimports-reviser/v3@f034195cc8a7ffc7cc70d60aa3a25500874eaf04
+	$(call footer, $@)
+
+test-unit:
+	$(call title, $@)
+	@go test $(VERBOSE_FLAG) -count 1 $(MAKEFILE_DIR)/pkg/...
+	$(call footer, $@)
+
+bench-unit:
+	$(call title, $@)
+	@go test $(VERBOSE_FLAG) -count 1 $(MAKEFILE_DIR)/pkg/... -bench=.
+	$(call footer, $@)
+
+race-unit:
+	$(call title, $@)
+	@go test $(VERBOSE_FLAG) -count 1 $(MAKEFILE_DIR)/pkg/... -race
+	$(call footer, $@)
+
+############################################
 all: binaries
 
 help:
@@ -70,70 +220,6 @@ clean:
 	find . -name \*~ -delete
 	find . -name \#\* -delete
 	rm -rf $(CURDIR)/_output/* $(MAKEFILE_DIR)/vendor
-
-lint-install-golangci:
-	@cd $(MAKEFILE_DIR) \
-		&& go install github.com/golangci/golangci-lint/cmd/golangci-lint@89476e7a1eaa0a8a06c17343af960a5fd9e7edb7 # v1.62.2
-
-lint-install-tools:
-	# git-validation: main from 2023/11
-	# ltag: v0.2.5
-	# go-licenses: v2.0.0-alpha.1
-	# goimports-reviser: v3.8.2
-	@cd $(MAKEFILE_DIR) \
-		&& go install github.com/vbatts/git-validation@679e5cad8c50f1605ab3d8a0a947aaf72fb24c07 \
-		&& go install github.com/kunalkushwaha/ltag@b0cfa33e4cc9383095dc584d3990b62c95096de0 \
-		&& go install github.com/google/go-licenses/v2@d01822334fba5896920a060f762ea7ecdbd086e8 \
-		&& go install github.com/incu6us/goimports-reviser/v3@f034195cc8a7ffc7cc70d60aa3a25500874eaf04
-
-lint-fix-imports:
-	cd $(MAKEFILE_DIR) && goimports-reviser -company-prefixes "github.com/containerd" ./...
-
-lint: lint-go-all lint-imports lint-yaml lint-shell lint-commits lint-headers lint-mod lint-licenses-all
-
-lint-go-all:
-	@cd $(MAKEFILE_DIR) \
-		&& GOOS=linux golangci-lint run $(VERBOSE_FLAG_LONG) ./... \
-		&& GOOS=windows golangci-lint run $(VERBOSE_FLAG_LONG) ./...
-
-lint-go:
-	@cd $(MAKEFILE_DIR) && golangci-lint run $(VERBOSE_FLAG_LONG) ./...
-
-lint-imports:
-	@cd $(MAKEFILE_DIR) && ./hack/lint-imports.sh
-
-lint-yaml:
-	@cd $(MAKEFILE_DIR) && yamllint .
-
-lint-shell: $(call recursive_wildcard,$(MAKEFILE_DIR)/,*.sh)
-	@shellcheck -a -x $^
-
-lint-commits:
-	@cd $(MAKEFILE_DIR) && git-validation -v -run DCO,short-subject,dangling-whitespace -range "$(LINT_COMMIT_RANGE)"
-
-lint-headers:
-	@cd $(MAKEFILE_DIR) && ltag -t "./hack/headers" --check -v
-
-lint-mod:
-	@cd $(MAKEFILE_DIR) && go mod tidy --diff
-
-lint-licenses-all:
-	@cd $(MAKEFILE_DIR) \
-		&& GOOS=linux make lint-licenses \
-		&& GOOS=windows make lint-licenses
-
-# FIXME: go-licenses cannot find LICENSE from root of repo when submodule is imported:
-# https://github.com/google/go-licenses/issues/186
-# This is impacting gotest.tools and estargz
-lint-licenses:
-	@cd $(MAKEFILE_DIR) && go-licenses check --include_tests --allowed_licenses=Apache-2.0,BSD-2-Clause,BSD-3-Clause,MIT \
-	  --ignore gotest.tools \
-	  --ignore github.com/containerd/stargz-snapshotter/estargz \
-	  ./...
-	@echo "WARNING: you need to manually verify licenses for:\n- gotest.tools\n- github.com/containerd/stargz-snapshotter/estargz"
-
-test-unit:
-	go test -v $(MAKEFILE_DIR)/pkg/...
 
 binaries: nerdctl
 
@@ -188,8 +274,11 @@ artifacts: clean
 	clean \
 	binaries \
 	install \
-	artifacts
-	lint \
-	lint-yaml \
-	lint-go \
-	lint-shell
+	artifacts \
+	\
+	lint lint-commits lint-go lint-go-all lint-headers lint-imports lint-licenses lint-licenses-all lint-mod lint-shell lint-yaml \
+	install-golangci install-linters \
+	fix fix-go fix-imports fix-mod \
+	update \
+	test test-unit race-unit bench-unit \
+	unit

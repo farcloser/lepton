@@ -32,6 +32,7 @@ import (
 
 	"github.com/containernetworking/cni/libcni"
 	"go.farcloser.world/core/filesystem"
+	"go.farcloser.world/core/utils"
 
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/pkg/namespaces"
@@ -42,7 +43,6 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/labels"
 	"github.com/containerd/nerdctl/v2/pkg/netutil/nettype"
 	subnetutil "github.com/containerd/nerdctl/v2/pkg/netutil/subnet"
-	"github.com/containerd/nerdctl/v2/pkg/strutil"
 	"github.com/containerd/nerdctl/v2/pkg/version"
 )
 
@@ -464,7 +464,7 @@ func (e *CNIEnv) generateNetworkConfig(name string, labels []string, plugins []C
 		}
 	}
 	id := networkID(name)
-	labelsMap := strutil.ConvertKVStringsToMap(labels)
+	labelsMap := utils.KeyValueStringsToMap(labels)
 
 	conf := &cniNetworkConfig{
 		CNIVersion: "1.0.0",

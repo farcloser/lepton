@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/docker/go-units"
+	"go.farcloser.world/core/units"
 	"golang.org/x/sys/unix"
 )
 

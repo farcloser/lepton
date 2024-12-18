@@ -20,6 +20,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"go.farcloser.world/core/utils"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
@@ -104,9 +105,9 @@ func networkCreateAction(cmd *cobra.Command, args []string) error {
 		GOptions:    globalOptions,
 		Name:        name,
 		Driver:      driver,
-		Options:     strutil.ConvertKVStringsToMap(opts),
+		Options:     utils.KeyValueStringsToMap(opts),
 		IPAMDriver:  ipamDriver,
-		IPAMOptions: strutil.ConvertKVStringsToMap(ipamOpts),
+		IPAMOptions: utils.KeyValueStringsToMap(ipamOpts),
 		Subnets:     subnets,
 		Gateway:     gatewayStr,
 		IPRange:     ipRangeStr,

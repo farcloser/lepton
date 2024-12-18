@@ -39,28 +39,13 @@ jobs:
       - name: "Install golangci"
         run: |
           echo "::group:: make lint-install-golangci"
-          make lint-install-golangci
+          make install-golangci
+          make install-linters
           echo "::endgroup::"
-      - name: "`make lint-go`"
+      - name: "`make lint`"
         env:
           VERBOSE: true
           GOOS: ${{ matrix.goos }}
         run: |
-          make lint-go
-      - name: "Other linters"
-        # These are not influenced by GOOS - running them multiple times is thus unnecessary
-        if: ${{ matrix.goos=='linux' &&  matrix.goversion=='latest-stable' }}
-        run: |
           export LINT_COMMIT_RANGE="$(jq -r '.after + "..HEAD"' ${GITHUB_EVENT_PATH})"
-
-          make lint-install-tools
-
-          make lint-imports
-          make lint-headers
-          make lint-commits
-          make lint-licenses-all
-
-          make lint-mod
-
-          make lint-yaml
-          make lint-shell
+          make lint

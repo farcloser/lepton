@@ -24,7 +24,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/docker/go-units"
+	"go.farcloser.world/core/units"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 

@@ -29,9 +29,9 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/docker/go-units"
 	"github.com/opencontainers/image-spec/identity"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
+	"go.farcloser.world/core/units"
 
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/content"
