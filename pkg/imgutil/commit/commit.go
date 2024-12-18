@@ -28,9 +28,8 @@ import (
 	"time"
 
 	"github.com/opencontainers/image-spec/identity"
-	"github.com/opencontainers/image-spec/specs-go"
-	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 	"go.farcloser.world/containers/digest"
+	"go.farcloser.world/containers/specs"
 
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/content"
@@ -220,15 +219,15 @@ func Commit(ctx context.Context, client *containerd.Client, container containerd
 }
 
 // generateCommitImageConfig returns commit oci image config based on the container's image.
-func generateCommitImageConfig(ctx context.Context, container containerd.Container, img containerd.Image, diffID digest.Digest, opts *Opts) (ocispec.Image, error) {
+func generateCommitImageConfig(ctx context.Context, container containerd.Container, img containerd.Image, diffID digest.Digest, opts *Opts) (specs.Image, error) {
 	spec, err := container.Spec(ctx)
 	if err != nil {
-		return ocispec.Image{}, err
+		return specs.Image{}, err
 	}
 
 	baseConfig, _, err := imgutil.ReadImageConfig(ctx, img) // aware of img.platform
 	if err != nil {
-		return ocispec.Image{}, err
+		return specs.Image{}, err
 	}
 
 	// TODO(fuweid): support updating the USER/ENV/... fields?
@@ -259,8 +258,8 @@ func generateCommitImageConfig(ctx context.Context, container containerd.Contain
 		log.G(ctx).Warnf("assuming os=%q", os)
 	}
 	log.G(ctx).Debugf("generateCommitImageConfig(): arch=%q, os=%q", arch, os)
-	return ocispec.Image{
-		Platform: ocispec.Platform{
+	return specs.Image{
+		Platform: specs.Platform{
 			Architecture: arch,
 			OS:           os,
 		},
@@ -268,11 +267,11 @@ func generateCommitImageConfig(ctx context.Context, container containerd.Contain
 		Created: &createdTime,
 		Author:  opts.Author,
 		Config:  baseConfig.Config,
-		RootFS: ocispec.RootFS{
+		RootFS: specs.RootFS{
 			Type:    "layers",
 			DiffIDs: append(baseConfig.RootFS.DiffIDs, diffID),
 		},
-		History: append(baseConfig.History, ocispec.History{
+		History: append(baseConfig.History, specs.History{
 			Created:    &createdTime,
 			CreatedBy:  createdBy,
 			Author:     opts.Author,
@@ -283,13 +282,13 @@ func generateCommitImageConfig(ctx context.Context, container containerd.Contain
 }
 
 // writeContentsForImage will commit oci image config and manifest into containerd's content store.
-func writeContentsForImage(ctx context.Context, snName string, baseImg containerd.Image, newConfig ocispec.Image, diffLayerDesc ocispec.Descriptor) (ocispec.Descriptor, digest.Digest, error) {
+func writeContentsForImage(ctx context.Context, snName string, baseImg containerd.Image, newConfig specs.Image, diffLayerDesc specs.Descriptor) (specs.Descriptor, digest.Digest, error) {
 	newConfigJSON, err := json.Marshal(newConfig)
 	if err != nil {
-		return ocispec.Descriptor{}, emptyDigest, err
+		return specs.Descriptor{}, emptyDigest, err
 	}
 
-	configDesc := ocispec.Descriptor{
+	configDesc := specs.Descriptor{
 		MediaType: images.MediaTypeDockerSchema2Config,
 		Digest:    digest.FromBytes(newConfigJSON),
 		Size:      int64(len(newConfigJSON)),
@@ -298,19 +297,16 @@ func writeContentsForImage(ctx context.Context, snName string, baseImg container
 	cs := baseImg.ContentStore()
 	baseMfst, _, err := imgutil.ReadManifest(ctx, baseImg)
 	if err != nil {
-		return ocispec.Descriptor{}, emptyDigest, err
+		return specs.Descriptor{}, emptyDigest, err
 	}
 	layers := append(baseMfst.Layers, diffLayerDesc)
 
 	newMfst := struct {
 		MediaType string `json:"mediaType,omitempty"`
-		ocispec.Manifest
+		specs.Manifest
 	}{
 		MediaType: images.MediaTypeDockerSchema2Manifest,
-		Manifest: ocispec.Manifest{
-			Versioned: specs.Versioned{
-				SchemaVersion: 2,
-			},
+		Manifest: specs.Manifest{
 			Config: configDesc,
 			Layers: layers,
 		},
@@ -318,10 +314,10 @@ func writeContentsForImage(ctx context.Context, snName string, baseImg container
 
 	newMfstJSON, err := json.MarshalIndent(newMfst, "", "    ")
 	if err != nil {
-		return ocispec.Descriptor{}, emptyDigest, err
+		return specs.Descriptor{}, emptyDigest, err
 	}
 
-	newMfstDesc := ocispec.Descriptor{
+	newMfstDesc := specs.Descriptor{
 		MediaType: images.MediaTypeDockerSchema2Manifest,
 		Digest:    digest.FromBytes(newMfstJSON),
 		Size:      int64(len(newMfstJSON)),
@@ -337,7 +333,7 @@ func writeContentsForImage(ctx context.Context, snName string, baseImg container
 
 	err = content.WriteBlob(ctx, cs, newMfstDesc.Digest.String(), bytes.NewReader(newMfstJSON), newMfstDesc, content.WithLabels(labels))
 	if err != nil {
-		return ocispec.Descriptor{}, emptyDigest, err
+		return specs.Descriptor{}, emptyDigest, err
 	}
 
 	// config should reference to snapshotter
@@ -346,35 +342,35 @@ func writeContentsForImage(ctx context.Context, snName string, baseImg container
 	})
 	err = content.WriteBlob(ctx, cs, configDesc.Digest.String(), bytes.NewReader(newConfigJSON), configDesc, labelOpt)
 	if err != nil {
-		return ocispec.Descriptor{}, emptyDigest, err
+		return specs.Descriptor{}, emptyDigest, err
 	}
 
 	return newMfstDesc, configDesc.Digest, nil
 }
 
 // createDiff creates a layer diff into containerd's content store.
-func createDiff(ctx context.Context, name string, sn snapshots.Snapshotter, cs content.Store, comparer diff.Comparer) (ocispec.Descriptor, digest.Digest, error) {
+func createDiff(ctx context.Context, name string, sn snapshots.Snapshotter, cs content.Store, comparer diff.Comparer) (specs.Descriptor, digest.Digest, error) {
 	newDesc, err := rootfs.CreateDiff(ctx, name, sn, comparer)
 	if err != nil {
-		return ocispec.Descriptor{}, digest.Digest(""), err
+		return specs.Descriptor{}, digest.Digest(""), err
 	}
 
 	info, err := cs.Info(ctx, newDesc.Digest)
 	if err != nil {
-		return ocispec.Descriptor{}, digest.Digest(""), err
+		return specs.Descriptor{}, digest.Digest(""), err
 	}
 
 	diffIDStr, ok := info.Labels["containerd.io/uncompressed"]
 	if !ok {
-		return ocispec.Descriptor{}, digest.Digest(""), fmt.Errorf("invalid differ response with no diffID")
+		return specs.Descriptor{}, digest.Digest(""), fmt.Errorf("invalid differ response with no diffID")
 	}
 
 	diffID, err := digest.Parse(diffIDStr)
 	if err != nil {
-		return ocispec.Descriptor{}, digest.Digest(""), err
+		return specs.Descriptor{}, digest.Digest(""), err
 	}
 
-	return ocispec.Descriptor{
+	return specs.Descriptor{
 		MediaType: images.MediaTypeDockerSchema2LayerGzip,
 		Digest:    newDesc.Digest,
 		Size:      info.Size,
@@ -382,7 +378,7 @@ func createDiff(ctx context.Context, name string, sn snapshots.Snapshotter, cs c
 }
 
 // applyDiffLayer will apply diff layer content created by createDiff into the snapshotter.
-func applyDiffLayer(ctx context.Context, name string, baseImg ocispec.Image, sn snapshots.Snapshotter, differ diff.Applier, diffDesc ocispec.Descriptor) (retErr error) {
+func applyDiffLayer(ctx context.Context, name string, baseImg specs.Image, sn snapshots.Snapshotter, differ diff.Applier, diffDesc specs.Descriptor) (retErr error) {
 	var (
 		key    = uniquePart() + "-" + name
 		parent = identity.ChainID(baseImg.RootFS.DiffIDs).String()

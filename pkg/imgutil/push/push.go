@@ -25,7 +25,7 @@ import (
 	"text/tabwriter"
 	"time"
 
-	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
+	"go.farcloser.world/containers/specs"
 	"golang.org/x/sync/errgroup"
 
 	containerd "github.com/containerd/containerd/v2/client"
@@ -60,7 +60,7 @@ func Push(ctx context.Context, client *containerd.Client, resolver remotes.Resol
 
 		log.G(ctx).WithField("image", remoteRef).WithField("digest", desc.Digest).Debug("pushing")
 
-		jobHandler := images.HandlerFunc(func(ctx context.Context, desc ocispec.Descriptor) ([]ocispec.Descriptor, error) {
+		jobHandler := images.HandlerFunc(func(ctx context.Context, desc specs.Descriptor) ([]specs.Descriptor, error) {
 			if allowNonDist || !images.IsNonDistributable(desc.MediaType) {
 				ongoing.add(remotes.MakeRefKey(ctx, desc))
 			}

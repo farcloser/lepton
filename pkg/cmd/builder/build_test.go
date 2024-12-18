@@ -23,7 +23,7 @@ import (
 	"runtime"
 	"testing"
 
-	specs "github.com/opencontainers/image-spec/specs-go/v1"
+	"go.farcloser.world/containers/specs"
 	"go.uber.org/mock/gomock"
 	"gotest.tools/v3/assert"
 )

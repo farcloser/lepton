@@ -21,7 +21,7 @@ import (
 	"errors"
 	"fmt"
 
-	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
+	"go.farcloser.world/containers/specs"
 
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/content"
@@ -71,7 +71,7 @@ func Crypt(ctx context.Context, client *containerd.Client, srcRawRef, targetRawR
 	if err != nil {
 		return err
 	}
-	layerFilter := func(desc ocispec.Descriptor) bool {
+	layerFilter := func(desc specs.Descriptor) bool {
 		return true
 	}
 	var convertFunc converter.ConvertFunc
@@ -121,7 +121,7 @@ func parseImgcryptFlags(options types.ImageCryptOptions, encrypt bool) (parsehel
 }
 
 func composeConvertFunc(a, b converter.ConvertFunc) converter.ConvertFunc {
-	return func(ctx context.Context, cs content.Store, desc ocispec.Descriptor) (*ocispec.Descriptor, error) {
+	return func(ctx context.Context, cs content.Store, desc specs.Descriptor) (*specs.Descriptor, error) {
 		newDesc, err := a(ctx, cs, desc)
 		if err != nil {
 			return newDesc, err

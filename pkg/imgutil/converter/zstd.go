@@ -22,7 +22,7 @@ import (
 	"io"
 
 	"github.com/klauspost/compress/zstd"
-	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
+	"go.farcloser.world/containers/specs"
 
 	"github.com/containerd/containerd/v2/core/content"
 	"github.com/containerd/containerd/v2/core/images"
@@ -37,7 +37,7 @@ import (
 // ZstdLayerConvertFunc converts legacy tar.gz layers into zstd layers with
 // the specified compression level.
 func ZstdLayerConvertFunc(options types.ImageConvertOptions) (converter.ConvertFunc, error) {
-	return func(ctx context.Context, cs content.Store, desc ocispec.Descriptor) (*ocispec.Descriptor, error) {
+	return func(ctx context.Context, cs content.Store, desc specs.Descriptor) (*specs.Descriptor, error) {
 		if !images.IsLayerType(desc.MediaType) {
 			// No conversion. No need to return an error here.
 			return nil, nil
@@ -117,7 +117,7 @@ func ZstdLayerConvertFunc(options types.ImageConvertOptions) (converter.ConvertF
 		newDesc := desc
 		newDesc.Digest = w.Digest()
 		newDesc.Size = n
-		newDesc.MediaType = ocispec.MediaTypeImageLayerZstd
+		newDesc.MediaType = specs.MediaTypeImageLayerZstd
 		return &newDesc, nil
 	}, nil
 }

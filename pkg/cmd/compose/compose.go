@@ -22,7 +22,7 @@ import (
 	"io"
 	"os"
 
-	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
+	"go.farcloser.world/containers/specs"
 
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/errdefs"
@@ -101,13 +101,13 @@ func New(client *containerd.Client, globalOptions types.GlobalCommandOptions, op
 	}
 
 	options.EnsureImage = func(ctx context.Context, imageName, pullMode, platform string, ps *serviceparser.Service, quiet bool) error {
-		ocispecPlatforms := []ocispec.Platform{platforms.DefaultSpec()}
+		ocispecPlatforms := []specs.Platform{platforms.DefaultSpec()}
 		if platform != "" {
 			parsed, err := platforms.Parse(platform)
 			if err != nil {
 				return err
 			}
-			ocispecPlatforms = []ocispec.Platform{parsed} // no append
+			ocispecPlatforms = []specs.Platform{parsed} // no append
 		}
 
 		imgPullOpts := types.ImagePullOptions{

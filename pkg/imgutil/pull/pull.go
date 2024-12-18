@@ -21,7 +21,7 @@ import (
 	"context"
 	"io"
 
-	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
+	"go.farcloser.world/containers/specs"
 
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/images"
@@ -45,7 +45,7 @@ type Config struct {
 	//
 	// RemoteOpts related to unpacking can be set only when len(Platforms) is 1.
 	RemoteOpts []containerd.RemoteOpt
-	Platforms  []ocispec.Platform // empty for all-platforms
+	Platforms  []specs.Platform // empty for all-platforms
 }
 
 // Pull loads all resources into the content store and returns the image
@@ -63,7 +63,7 @@ func Pull(ctx context.Context, client *containerd.Client, ref string, config *Co
 		close(progress)
 	}()
 
-	h := images.HandlerFunc(func(ctx context.Context, desc ocispec.Descriptor) ([]ocispec.Descriptor, error) {
+	h := images.HandlerFunc(func(ctx context.Context, desc specs.Descriptor) ([]specs.Descriptor, error) {
 		ongoing.Add(desc)
 		return nil, nil
 	})

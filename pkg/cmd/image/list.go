@@ -30,7 +30,7 @@ import (
 	"time"
 
 	"github.com/opencontainers/image-spec/identity"
-	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
+	"go.farcloser.world/containers/specs"
 	"go.farcloser.world/core/units"
 
 	containerd "github.com/containerd/containerd/v2/client"
@@ -198,10 +198,10 @@ type image struct {
 	blobSize int64
 	size     int64
 	platform platforms.Platform
-	config   *ocispec.Descriptor
+	config   *specs.Descriptor
 }
 
-func readManifest(ctx context.Context, provider content.Provider, snapshotter snapshots.Snapshotter, desc ocispec.Descriptor) (*image, error) {
+func readManifest(ctx context.Context, provider content.Provider, snapshotter snapshots.Snapshotter, desc specs.Descriptor) (*image, error) {
 	// Read the manifest blob from the descriptor
 	manifestData, err := containerdutil.ReadBlob(ctx, provider, desc)
 	if err != nil {
@@ -209,7 +209,7 @@ func readManifest(ctx context.Context, provider content.Provider, snapshotter sn
 	}
 
 	// Unmarshal as Manifest
-	var manifest ocispec.Manifest
+	var manifest specs.Manifest
 	if err := json.Unmarshal(manifestData, &manifest); err != nil {
 		return nil, err
 	}
@@ -221,7 +221,7 @@ func readManifest(ctx context.Context, provider content.Provider, snapshotter sn
 	}
 
 	// Unmarshal as Image
-	var config ocispec.Image
+	var config specs.Image
 	if err := json.Unmarshal(configData, &config); err != nil {
 		log.G(ctx).Error("Error unmarshaling config")
 		return nil, err
@@ -236,7 +236,7 @@ func readManifest(ctx context.Context, provider content.Provider, snapshotter sn
 	}
 
 	// Get the platform
-	plt := platforms.Normalize(ocispec.Platform{OS: config.OS, Architecture: config.Architecture, Variant: config.Variant})
+	plt := platforms.Normalize(specs.Platform{OS: config.OS, Architecture: config.Architecture, Variant: config.Variant})
 
 	// Get the filesystem size for all layers
 	chainID := identity.ChainID(config.RootFS.DiffIDs).String()
@@ -253,7 +253,7 @@ func readManifest(ctx context.Context, provider content.Provider, snapshotter sn
 	}, nil
 }
 
-func readIndex(ctx context.Context, provider content.Provider, snapshotter snapshots.Snapshotter, desc ocispec.Descriptor) (map[string]*image, error) {
+func readIndex(ctx context.Context, provider content.Provider, snapshotter snapshots.Snapshotter, desc specs.Descriptor) (map[string]*image, error) {
 	descs := map[string]*image{}
 
 	// Read the index
@@ -263,7 +263,7 @@ func readIndex(ctx context.Context, provider content.Provider, snapshotter snaps
 	}
 
 	// Unmarshal as Index
-	var index ocispec.Index
+	var index specs.Index
 	if err := json.Unmarshal(indexData, &index); err != nil {
 		return nil, err
 	}
@@ -279,7 +279,7 @@ func readIndex(ctx context.Context, provider content.Provider, snapshotter snaps
 	return descs, err
 }
 
-func read(ctx context.Context, provider content.Provider, snapshotter snapshots.Snapshotter, desc ocispec.Descriptor) (map[string]*image, error) {
+func read(ctx context.Context, provider content.Provider, snapshotter snapshots.Snapshotter, desc specs.Descriptor) (map[string]*image, error) {
 	if images.IsManifestType(desc.MediaType) {
 		manifest, err := readManifest(ctx, provider, snapshotter, desc)
 		if err != nil {
@@ -310,7 +310,7 @@ func (x *imagePrinter) printImage(ctx context.Context, img images.Image) error {
 	return nil
 }
 
-func (x *imagePrinter) printImageSinglePlatform(desc ocispec.Descriptor, img images.Image, blobSize int64, size int64, plt platforms.Platform) error {
+func (x *imagePrinter) printImageSinglePlatform(desc specs.Descriptor, img images.Image, blobSize int64, size int64, plt platforms.Platform) error {
 	var (
 		repository string
 		tag        string

@@ -21,8 +21,8 @@ import (
 	"reflect"
 	"testing"
 
-	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 	"go.farcloser.world/containers/digest"
+	"go.farcloser.world/containers/specs"
 	"gotest.tools/v3/assert"
 
 	containerd "github.com/containerd/containerd/v2/client"
@@ -107,8 +107,8 @@ func TestDefaultSnapshotterOpts(t *testing.T) {
 // see https://github.com/containerd/containerd/blob/77d53d2d230c3bcd3f02e6f493019a72905c875b/images/mediatypes.go#L115
 type dummyImageHandler struct{}
 
-func (dih *dummyImageHandler) Handle(_ctx context.Context, _desc ocispec.Descriptor) (subdescs []ocispec.Descriptor, err error) {
-	return []ocispec.Descriptor{
+func (dih *dummyImageHandler) Handle(_ctx context.Context, _desc specs.Descriptor) (subdescs []specs.Descriptor, err error) {
+	return []specs.Descriptor{
 		{
 			MediaType: "application/vnd.oci.image.layer.dummy",
 			Digest:    digest.FromString("dummy"),
@@ -136,8 +136,8 @@ func TestRemoteSnapshotterOpts(t *testing.T) {
 			rc := getAndApplyRemoteOpts(t, sn)
 			assert.Equal(t, rc.Snapshotter, sn)
 
-			desc := ocispec.Descriptor{
-				MediaType: ocispec.MediaTypeImageManifest,
+			desc := specs.Descriptor{
+				MediaType: specs.MediaTypeImageManifest,
 			}
 
 			h := &dummyImageHandler{}

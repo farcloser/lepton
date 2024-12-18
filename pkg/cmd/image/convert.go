@@ -26,7 +26,7 @@ import (
 	"strings"
 
 	"github.com/klauspost/compress/zstd"
-	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
+	"go.farcloser.world/containers/specs"
 
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/content"
@@ -78,7 +78,7 @@ func Convert(ctx context.Context, client *containerd.Client, srcRawRef, targetRa
 
 	zstd := options.Zstd
 	zstdchunked := options.ZstdChunked
-	var finalize func(ctx context.Context, cs content.Store, ref string, desc *ocispec.Descriptor) (*images.Image, error)
+	var finalize func(ctx context.Context, cs content.Store, ref string, desc *specs.Descriptor) (*images.Image, error)
 	if zstd || zstdchunked {
 		convertCount := 0
 		if zstd {

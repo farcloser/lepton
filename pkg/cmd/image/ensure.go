@@ -22,7 +22,7 @@ import (
 	"net/http"
 	"os"
 
-	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
+	"go.farcloser.world/containers/specs"
 
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/images"
@@ -60,12 +60,12 @@ func EnsureAllContent(ctx context.Context, client *containerd.Client, srcName st
 	return nil
 }
 
-func ensureOne(ctx context.Context, client *containerd.Client, rawRef string, target ocispec.Descriptor, platform ocispec.Platform, options types.GlobalCommandOptions) error {
+func ensureOne(ctx context.Context, client *containerd.Client, rawRef string, target specs.Descriptor, platform specs.Platform, options types.GlobalCommandOptions) error {
 	parsedReference, err := referenceutil.Parse(rawRef)
 	if err != nil {
 		return err
 	}
-	pltf := []ocispec.Platform{platform}
+	pltf := []specs.Platform{platform}
 	platformComparer := platformutil.NewMatchComparerFromOCISpecPlatformSlice(pltf)
 
 	_, _, _, missing, err := images.Check(ctx, client.ContentStore(), target, platformComparer)
