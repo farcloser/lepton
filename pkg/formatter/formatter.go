@@ -25,7 +25,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/docker/go-units"
+	"go.farcloser.world/core/duration"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 
@@ -132,7 +132,7 @@ func FormatPorts(labelMap map[string]string) string {
 }
 
 func TimeSinceInHuman(since time.Time) string {
-	return fmt.Sprintf("%s ago", units.HumanDuration(time.Since(since)))
+	return fmt.Sprintf("%s ago", duration.HumanDuration(time.Since(since)))
 }
 
 func FormatLabels(labelMap map[string]string) string {

@@ -25,8 +25,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/klauspost/compress/zstd"
 	"go.farcloser.world/containers/specs"
+	"go.farcloser.world/core/compression/zstd"
 
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/content"

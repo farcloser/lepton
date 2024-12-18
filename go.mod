@@ -41,7 +41,6 @@ require (
 	github.com/fluent/fluent-logger-golang v1.9.0
 	github.com/fsnotify/fsnotify v1.8.0
 	github.com/go-viper/mapstructure/v2 v2.2.1
-	github.com/klauspost/compress v1.17.11
 	github.com/moby/sys/mount v0.3.4
 	github.com/moby/sys/mountinfo v0.7.2
 	github.com/moby/sys/signal v0.7.1
@@ -57,7 +56,7 @@ require (
 	github.com/vishvananda/netns v0.0.5
 	github.com/yuchanns/srslog v1.1.0
 	go.farcloser.world/containers v0.0.0-20241218222123-7d33d08bddcd
-	go.farcloser.world/core v0.0.0-20241218222542-7d037cf6ac05
+	go.farcloser.world/core v0.0.0-20241218231132-78a573634019
 	go.uber.org/mock v0.5.0
 	golang.org/x/crypto v0.31.0
 	golang.org/x/net v0.33.0
@@ -92,6 +91,7 @@ require (
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
+	github.com/klauspost/compress v1.17.11 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-shellwords v1.0.12 // indirect
