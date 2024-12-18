@@ -24,7 +24,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/opencontainers/go-digest"
+	"go.farcloser.world/containers/digest"
 
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/pkg/namespaces"
@@ -109,7 +109,7 @@ func getAddrHash(addr string) (string, error) {
 		}
 	}
 
-	d := digest.SHA256.FromString(addr)
+	d := digest.FromString(addr)
 	h := d.Encoded()[0:addrHashLen]
 	return h, nil
 }

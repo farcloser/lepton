@@ -22,7 +22,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/opencontainers/go-digest"
+	"go.farcloser.world/containers/digest"
 
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/images"

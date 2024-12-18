@@ -19,7 +19,7 @@ package referenceutil
 import (
 	"testing"
 
-	"github.com/opencontainers/go-digest"
+	"go.farcloser.world/containers/digest"
 	"gotest.tools/v3/assert"
 )
 

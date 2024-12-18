@@ -31,7 +31,7 @@ import (
 	"strings"
 
 	"github.com/compose-spec/compose-go/v2/types"
-	"github.com/opencontainers/go-digest"
+	"go.farcloser.world/containers/digest"
 	"gopkg.in/yaml.v3"
 )
 
@@ -87,5 +87,6 @@ func ServiceHash(o types.ServiceConfig) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return digest.SHA256.FromBytes(bytes).Encoded(), nil
+	// FIXME: drop this and just use crypto
+	return digest.FromBytes(bytes).Encoded(), nil
 }

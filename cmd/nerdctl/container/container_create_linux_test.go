@@ -24,7 +24,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/opencontainers/go-digest"
+	"go.farcloser.world/containers/digest"
 	"gotest.tools/v3/assert"
 
 	"github.com/containerd/containerd/v2/defaults"
@@ -188,7 +188,7 @@ func TestIssue2993(t *testing.T) {
 	getAddrHash := func(addr string) string {
 		const addrHashLen = 8
 
-		d := digest.SHA256.FromString(addr)
+		d := digest.FromString(addr)
 		h := d.Encoded()[0:addrHashLen]
 
 		return h
