@@ -23,7 +23,7 @@ package containerdutil
 import (
 	"context"
 
-	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
+	"go.farcloser.world/containers/specs"
 
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/content"
@@ -42,7 +42,7 @@ type providerWithCache struct {
 	cache  map[string]*readerAtWithCache
 }
 
-func (provider *providerWithCache) ReaderAt(ctx context.Context, desc ocispec.Descriptor) (content.ReaderAt, error) {
+func (provider *providerWithCache) ReaderAt(ctx context.Context, desc specs.Descriptor) (content.ReaderAt, error) {
 	key := desc.Digest.String()
 	// If we had en entry already, get the size over
 	value, ok := provider.cache[key]

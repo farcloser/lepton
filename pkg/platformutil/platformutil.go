@@ -19,7 +19,7 @@ package platformutil
 import (
 	"fmt"
 
-	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
+	"go.farcloser.world/containers/specs"
 
 	"github.com/containerd/platforms"
 
@@ -28,7 +28,7 @@ import (
 
 // NewMatchComparerFromOCISpecPlatformSlice returns MatchComparer.
 // If platformz is empty, NewMatchComparerFromOCISpecPlatformSlice returns All (not DefaultStrict).
-func NewMatchComparerFromOCISpecPlatformSlice(platformz []ocispec.Platform) platforms.MatchComparer {
+func NewMatchComparerFromOCISpecPlatformSlice(platformz []specs.Platform) platforms.MatchComparer {
 	if len(platformz) == 0 {
 		return platforms.All
 	}
@@ -51,16 +51,16 @@ func NewMatchComparer(all bool, ss []string) (platforms.MatchComparer, error) {
 	return platforms.Ordered(op...), err
 }
 
-// NewOCISpecPlatformSlice returns a slice of ocispec.Platform
+// NewOCISpecPlatformSlice returns a slice of specs.Platform
 // If all is true, NewOCISpecPlatformSlice always returns an empty slice, regardless to the value of ss.
 // If all is false and ss is empty, NewOCISpecPlatformSlice returns DefaultSpec.
 // Otherwise NewOCISpecPlatformSlice returns the slice that correspond to ss.
-func NewOCISpecPlatformSlice(all bool, ss []string) ([]ocispec.Platform, error) {
+func NewOCISpecPlatformSlice(all bool, ss []string) ([]specs.Platform, error) {
 	if all {
 		return nil, nil
 	}
 	if dss := strutil.DedupeStrSlice(ss); len(dss) > 0 {
-		var op []ocispec.Platform
+		var op []specs.Platform
 		for _, s := range dss {
 			p, err := platforms.Parse(s)
 			if err != nil {
@@ -70,7 +70,7 @@ func NewOCISpecPlatformSlice(all bool, ss []string) ([]ocispec.Platform, error) 
 		}
 		return op, nil
 	}
-	return []ocispec.Platform{platforms.DefaultSpec()}, nil
+	return []specs.Platform{platforms.DefaultSpec()}, nil
 }
 
 func NormalizeString(s string) (string, error) {

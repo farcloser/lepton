@@ -122,7 +122,9 @@ func writeEntry(e *Entry, stdout, stderr io.Writer, refTime time.Time, timestamp
 	}
 
 	if writeTo != nil {
-		_, err := writeTo.Write(output)
+		co := make([]byte, len(output))
+		copy(co, output)
+		_, err := writeTo.Write(co)
 		return err
 	}
 	return nil

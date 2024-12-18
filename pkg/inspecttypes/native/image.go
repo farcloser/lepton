@@ -17,7 +17,7 @@
 package native
 
 import (
-	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
+	"go.farcloser.world/containers/specs"
 
 	"github.com/containerd/containerd/v2/core/images"
 )
@@ -25,13 +25,13 @@ import (
 // Image corresponds to a containerd-native image object.
 // Not compatible with `docker image inspect`.
 type Image struct {
-	Image        images.Image        `json:"Image"`
-	IndexDesc    *ocispec.Descriptor `json:"IndexDesc,omitempty"`
-	Index        *ocispec.Index      `json:"Index,omitempty"`
-	ManifestDesc *ocispec.Descriptor `json:"ManifestDesc,omitempty"`
-	Manifest     *ocispec.Manifest   `json:"Manifest,omitempty"`
+	Image        images.Image      `json:"Image"`
+	IndexDesc    *specs.Descriptor `json:"IndexDesc,omitempty"`
+	Index        *specs.Index      `json:"Index,omitempty"`
+	ManifestDesc *specs.Descriptor `json:"ManifestDesc,omitempty"`
+	Manifest     *specs.Manifest   `json:"Manifest,omitempty"`
 	// e.g., "application/vnd.docker.container.image.v1+json"
-	ImageConfigDesc ocispec.Descriptor `json:"ImageConfigDesc"`
-	ImageConfig     ocispec.Image      `json:"ImageConfig"`
-	Size            int64              `json:"size"`
+	ImageConfigDesc specs.Descriptor `json:"ImageConfigDesc"`
+	ImageConfig     specs.Image      `json:"ImageConfig"`
+	Size            int64            `json:"size"`
 }

@@ -40,7 +40,7 @@ import (
 	"fmt"
 	"strings"
 
-	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
+	"go.farcloser.world/containers/specs"
 
 	"github.com/containerd/containerd/v2/core/images"
 	"github.com/containerd/containerd/v2/pkg/labels"
@@ -65,13 +65,13 @@ const (
 // construct source information.
 func SociAppendDefaultLabelsHandlerWrapper(indexDigest string, wrapper func(images.Handler) images.Handler) func(f images.Handler) images.Handler {
 	return func(f images.Handler) images.Handler {
-		return images.HandlerFunc(func(ctx context.Context, desc ocispec.Descriptor) ([]ocispec.Descriptor, error) {
+		return images.HandlerFunc(func(ctx context.Context, desc specs.Descriptor) ([]specs.Descriptor, error) {
 			children, err := wrapper(f).Handle(ctx, desc)
 			if err != nil {
 				return nil, err
 			}
 			switch desc.MediaType {
-			case ocispec.MediaTypeImageManifest, images.MediaTypeDockerSchema2Manifest:
+			case specs.MediaTypeImageManifest, images.MediaTypeDockerSchema2Manifest:
 				for i := range children {
 					c := &children[i]
 					if images.IsLayerType(c.MediaType) {

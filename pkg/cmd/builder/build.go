@@ -28,7 +28,7 @@ import (
 	"strconv"
 	"strings"
 
-	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
+	"go.farcloser.world/containers/specs"
 
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/images"
@@ -586,7 +586,7 @@ func parseBuildContextFromOCILayout(name, path string) ([]string, error) {
 	}, nil
 }
 
-func readOCIIndexFromPath(path string) (*ocispec.Index, error) {
+func readOCIIndexFromPath(path string) (*specs.Index, error) {
 	ociIndexJSONFile, err := os.Open(filepath.Join(path, "index.json"))
 	if err != nil {
 		return nil, err
@@ -598,7 +598,7 @@ func readOCIIndexFromPath(path string) (*ocispec.Index, error) {
 		return nil, err
 	}
 
-	var ociIndex *ocispec.Index
+	var ociIndex *specs.Index
 	err = json.Unmarshal(rawBytes, &ociIndex)
 	if err != nil {
 		return nil, err

@@ -19,7 +19,7 @@ package types
 import (
 	"io"
 
-	v1 "github.com/opencontainers/image-spec/specs-go/v1"
+	"go.farcloser.world/containers/specs"
 )
 
 // ImageListOptions specifies options for `image list`.
@@ -151,7 +151,7 @@ type ImagePullOptions struct {
 	// If nil, it will unpack automatically if only 1 platform is specified.
 	Unpack *bool
 	// Content for specific platforms. Empty if `--all-platforms` is true
-	OCISpecPlatform []v1.Platform
+	OCISpecPlatform []specs.Platform
 	// Pull mode
 	Mode string
 	// Suppress verbose output

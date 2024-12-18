@@ -47,7 +47,7 @@ func TestRunCustomRootfs(t *testing.T) {
 	testutil.DockerIncompatible(t)
 	// FIXME: root issue is undiagnosed and this is very likely a containerd bug
 	// It appears that in certain conditions, the proxy content store info method will fail on the layer of the image
-	// Search for func (pcs *proxyContentStore) ReaderAt(ctx context.Context, desc ocispec.Descriptor) (content.ReaderAt, error) {
+	// Search for func (pcs *proxyContentStore) ReaderAt(ctx context.Context, desc specs.Descriptor) (content.ReaderAt, error) {
 	// Note that:
 	// - the problem is still here with containerd and nerdctl v2
 	// - it seems to affect images that are tagged multiple times, or that share a layer with another image

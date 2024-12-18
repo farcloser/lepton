@@ -24,8 +24,8 @@ import (
 	"text/tabwriter"
 	"time"
 
-	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 	"go.farcloser.world/containers/digest"
+	"go.farcloser.world/containers/specs"
 
 	"github.com/containerd/containerd/v2/core/content"
 	"github.com/containerd/containerd/v2/core/remotes"
@@ -164,7 +164,7 @@ outer:
 type Jobs struct {
 	name     string
 	added    map[digest.Digest]struct{}
-	descs    []ocispec.Descriptor
+	descs    []specs.Descriptor
 	mu       sync.Mutex
 	resolved bool
 }
@@ -180,7 +180,7 @@ func New(name string) *Jobs {
 
 // Add adds a descriptor to be tracked.
 // From https://github.com/containerd/containerd/blob/v1.7.0-rc.2/cmd/ctr/commands/content/fetch.go#L359-L370
-func (j *Jobs) Add(desc ocispec.Descriptor) {
+func (j *Jobs) Add(desc specs.Descriptor) {
 	j.mu.Lock()
 	defer j.mu.Unlock()
 	j.resolved = true
@@ -194,11 +194,11 @@ func (j *Jobs) Add(desc ocispec.Descriptor) {
 
 // Jobs returns a list of all tracked descriptors.
 // From https://github.com/containerd/containerd/blob/v1.7.0-rc.2/cmd/ctr/commands/content/fetch.go#L372-L379
-func (j *Jobs) Jobs() []ocispec.Descriptor {
+func (j *Jobs) Jobs() []specs.Descriptor {
 	j.mu.Lock()
 	defer j.mu.Unlock()
 
-	var descs []ocispec.Descriptor
+	var descs []specs.Descriptor
 	return append(descs, j.descs...)
 }
 

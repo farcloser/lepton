@@ -19,16 +19,16 @@ package platformutil
 import (
 	"context"
 
-	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
+	"go.farcloser.world/containers/specs"
 
 	"github.com/containerd/containerd/v2/core/content"
 	"github.com/containerd/containerd/v2/core/images"
 	"github.com/containerd/platforms"
 )
 
-func LayerDescs(ctx context.Context, provider content.Provider, imageTarget ocispec.Descriptor, platform platforms.MatchComparer) ([]ocispec.Descriptor, error) {
-	var descs []ocispec.Descriptor
-	err := images.Walk(ctx, images.Handlers(images.HandlerFunc(func(ctx context.Context, desc ocispec.Descriptor) ([]ocispec.Descriptor, error) {
+func LayerDescs(ctx context.Context, provider content.Provider, imageTarget specs.Descriptor, platform platforms.MatchComparer) ([]specs.Descriptor, error) {
+	var descs []specs.Descriptor
+	err := images.Walk(ctx, images.Handlers(images.HandlerFunc(func(ctx context.Context, desc specs.Descriptor) ([]specs.Descriptor, error) {
 		if images.IsLayerType(desc.MediaType) {
 			descs = append(descs, desc)
 		}

@@ -103,8 +103,12 @@ func TestReadRotatedJSONLog(t *testing.T) {
 	// Make the function ReadLogs end.
 	close(containerStopped)
 
-	if expectedStdout != stdoutBuf.String() {
-		t.Errorf("expected: %s, acoutal: %s", expectedStdout, stdoutBuf.String())
+	o := make([]byte, len(stdoutBuf.Bytes()))
+	copy(o, stdoutBuf.Bytes())
+
+	// o := stdoutBuf.String()
+	if expectedStdout != string(o) {
+		t.Errorf("expected: %s, acoutal: %s", expectedStdout, o)
 	}
 }
 

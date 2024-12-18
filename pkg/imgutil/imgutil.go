@@ -25,7 +25,7 @@ import (
 	"reflect"
 
 	"github.com/opencontainers/image-spec/identity"
-	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
+	"go.farcloser.world/containers/specs"
 
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/content"
@@ -50,7 +50,7 @@ import (
 type EnsuredImage struct {
 	Ref         string
 	Image       containerd.Image
-	ImageConfig ocispec.ImageConfig
+	ImageConfig specs.ImageConfig
 	Snapshotter string
 	Remote      bool // true for stargz
 }
@@ -59,7 +59,7 @@ type EnsuredImage struct {
 type PullMode = string
 
 // GetExistingImage returns the specified image if exists in containerd. Return errdefs.NotFound() if not exists.
-func GetExistingImage(ctx context.Context, client *containerd.Client, snapshotter, rawRef string, platform ocispec.Platform) (*EnsuredImage, error) {
+func GetExistingImage(ctx context.Context, client *containerd.Client, snapshotter, rawRef string, platform specs.Platform) (*EnsuredImage, error) {
 	var res *EnsuredImage
 	imgwalker := &imagewalker.ImageWalker{
 		Client: client,
@@ -252,14 +252,14 @@ func PullImage(ctx context.Context, client *containerd.Client, resolver remotes.
 
 }
 
-func getImageConfig(ctx context.Context, image containerd.Image) (*ocispec.ImageConfig, error) {
+func getImageConfig(ctx context.Context, image containerd.Image) (*specs.ImageConfig, error) {
 	desc, err := image.Config(ctx)
 	if err != nil {
 		return nil, err
 	}
 	switch desc.MediaType {
-	case ocispec.MediaTypeImageConfig, images.MediaTypeDockerSchema2Config:
-		var ocispecImage ocispec.Image
+	case specs.MediaTypeImageConfig, images.MediaTypeDockerSchema2Config:
+		var ocispecImage specs.Image
 		b, err := content.ReadBlob(ctx, image.ContentStore(), desc)
 		if err != nil {
 			return nil, err
@@ -275,7 +275,7 @@ func getImageConfig(ctx context.Context, image containerd.Image) (*ocispec.Image
 }
 
 // ReadIndex returns image index, or nil for non-indexed image.
-func ReadIndex(ctx context.Context, img containerd.Image) (*ocispec.Index, *ocispec.Descriptor, error) {
+func ReadIndex(ctx context.Context, img containerd.Image) (*specs.Index, *specs.Descriptor, error) {
 	desc := img.Target()
 	if !images.IsIndexType(desc.MediaType) {
 		return nil, nil, nil
@@ -284,7 +284,7 @@ func ReadIndex(ctx context.Context, img containerd.Image) (*ocispec.Index, *ocis
 	if err != nil {
 		return nil, &desc, err
 	}
-	var idx ocispec.Index
+	var idx specs.Index
 	if err := json.Unmarshal(b, &idx); err != nil {
 		return nil, &desc, err
 	}
@@ -293,7 +293,7 @@ func ReadIndex(ctx context.Context, img containerd.Image) (*ocispec.Index, *ocis
 }
 
 // ReadManifest returns the manifest for img.platform, or nil if no manifest was found.
-func ReadManifest(ctx context.Context, img containerd.Image) (*ocispec.Manifest, *ocispec.Descriptor, error) {
+func ReadManifest(ctx context.Context, img containerd.Image) (*specs.Manifest, *specs.Descriptor, error) {
 	cs := img.ContentStore()
 	targetDesc := img.Target()
 	if images.IsManifestType(targetDesc.MediaType) {
@@ -301,7 +301,7 @@ func ReadManifest(ctx context.Context, img containerd.Image) (*ocispec.Manifest,
 		if err != nil {
 			return nil, &targetDesc, err
 		}
-		var mani ocispec.Manifest
+		var mani specs.Manifest
 		if err := json.Unmarshal(b, &mani); err != nil {
 			return nil, &targetDesc, err
 		}
@@ -322,7 +322,7 @@ func ReadManifest(ctx context.Context, img containerd.Image) (*ocispec.Manifest,
 			maniDesc := maniDesc
 			// ignore non-nil err
 			if b, err := content.ReadBlob(ctx, cs, maniDesc); err == nil {
-				var mani ocispec.Manifest
+				var mani specs.Manifest
 				if err := json.Unmarshal(b, &mani); err != nil {
 					return nil, nil, err
 				}
@@ -337,8 +337,8 @@ func ReadManifest(ctx context.Context, img containerd.Image) (*ocispec.Manifest,
 }
 
 // ReadImageConfig reads the config spec (`application/vnd.oci.image.config.v1+json`) for img.platform from content store.
-func ReadImageConfig(ctx context.Context, img containerd.Image) (ocispec.Image, ocispec.Descriptor, error) {
-	var config ocispec.Image
+func ReadImageConfig(ctx context.Context, img containerd.Image) (specs.Image, specs.Descriptor, error) {
+	var config specs.Image
 
 	configDesc, err := img.Config(ctx) // aware of img.platform
 	if err != nil {

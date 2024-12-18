@@ -19,19 +19,19 @@ package containerdutil
 import (
 	"context"
 
-	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
+	"go.farcloser.world/containers/specs"
 
 	"github.com/containerd/containerd/v2/core/content"
 )
 
 var ReadBlob = readBlobWithCache()
 
-type readBlob func(ctx context.Context, provider content.Provider, desc ocispec.Descriptor) ([]byte, error)
+type readBlob func(ctx context.Context, provider content.Provider, desc specs.Descriptor) ([]byte, error)
 
 func readBlobWithCache() readBlob {
 	var cache = make(map[string]([]byte))
 
-	return func(ctx context.Context, provider content.Provider, desc ocispec.Descriptor) ([]byte, error) {
+	return func(ctx context.Context, provider content.Provider, desc specs.Descriptor) ([]byte, error) {
 		var err error
 		v, ok := cache[desc.Digest.String()]
 		if !ok {
