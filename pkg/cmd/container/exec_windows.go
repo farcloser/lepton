@@ -17,7 +17,7 @@
 package container
 
 import (
-	"github.com/opencontainers/runtime-spec/specs-go"
+	"go.farcloser.world/containers/specs"
 )
 
 func setExecCapabilities(pspec *specs.Process) error {

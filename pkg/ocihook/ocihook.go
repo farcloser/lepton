@@ -29,9 +29,9 @@ import (
 	"time"
 
 	types100 "github.com/containernetworking/cni/pkg/types/100"
-	"github.com/opencontainers/runtime-spec/specs-go"
 	b4nndclient "github.com/rootless-containers/bypass4netns/pkg/api/daemon/client"
 	rlkclient "github.com/rootless-containers/rootlesskit/v2/pkg/api/client"
+	"go.farcloser.world/containers/specs"
 	"go.farcloser.world/core/filesystem"
 
 	"github.com/containerd/go-cni"

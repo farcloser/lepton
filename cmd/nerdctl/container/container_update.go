@@ -23,8 +23,8 @@ import (
 	"fmt"
 	"runtime"
 
-	runtimespec "github.com/opencontainers/runtime-spec/specs-go"
 	"github.com/spf13/cobra"
+	"go.farcloser.world/containers/specs"
 	"go.farcloser.world/core/units"
 
 	containerd "github.com/containerd/containerd/v2/client"
@@ -261,13 +261,13 @@ func updateContainer(ctx context.Context, client *containerd.Client, id string, 
 	}
 	if runtime.GOOS == "linux" {
 		if spec.Linux == nil {
-			spec.Linux = &runtimespec.Linux{}
+			spec.Linux = &specs.Linux{}
 		}
 		if spec.Linux.Resources == nil {
-			spec.Linux.Resources = &runtimespec.LinuxResources{}
+			spec.Linux.Resources = &specs.LinuxResources{}
 		}
 		if spec.Linux.Resources.BlockIO == nil {
-			spec.Linux.Resources.BlockIO = &runtimespec.LinuxBlockIO{}
+			spec.Linux.Resources.BlockIO = &specs.LinuxBlockIO{}
 		}
 		if cmd.Flags().Changed("blkio-weight") {
 			if spec.Linux.Resources.BlockIO.Weight != &opts.BlkioWeight {
@@ -275,7 +275,7 @@ func updateContainer(ctx context.Context, client *containerd.Client, id string, 
 			}
 		}
 		if spec.Linux.Resources.CPU == nil {
-			spec.Linux.Resources.CPU = &runtimespec.LinuxCPU{}
+			spec.Linux.Resources.CPU = &specs.LinuxCPU{}
 		}
 		if cmd.Flags().Changed("cpu-shares") {
 			if spec.Linux.Resources.CPU.Shares != &opts.CPUShares {
@@ -309,7 +309,7 @@ func updateContainer(ctx context.Context, client *containerd.Client, id string, 
 			}
 		}
 		if spec.Linux.Resources.Memory == nil {
-			spec.Linux.Resources.Memory = &runtimespec.LinuxMemory{}
+			spec.Linux.Resources.Memory = &specs.LinuxMemory{}
 		}
 		if cmd.Flags().Changed("memory") {
 			if spec.Linux.Resources.Memory.Limit != &opts.MemoryLimitInBytes {
@@ -325,7 +325,7 @@ func updateContainer(ctx context.Context, client *containerd.Client, id string, 
 			}
 		}
 		if spec.Linux.Resources.Pids == nil {
-			spec.Linux.Resources.Pids = &runtimespec.LinuxPids{}
+			spec.Linux.Resources.Pids = &specs.LinuxPids{}
 		}
 		if cmd.Flags().Changed("pids-limit") {
 			if spec.Linux.Resources.Pids.Limit != opts.PidsLimit {
@@ -368,7 +368,7 @@ func updateContainer(ctx context.Context, client *containerd.Client, id string, 
 	return task.Update(ctx, containerd.WithResources(spec.Linux.Resources))
 }
 
-func updateContainerSpec(ctx context.Context, container containerd.Container, spec *runtimespec.Spec) error {
+func updateContainerSpec(ctx context.Context, container containerd.Container, spec *specs.Spec) error {
 	if err := container.Update(ctx, func(ctx context.Context, client *containerd.Client, c *containers.Container) error {
 		a, err := typeurl.MarshalAny(spec)
 		if err != nil {
@@ -382,8 +382,8 @@ func updateContainerSpec(ctx context.Context, container containerd.Container, sp
 	return nil
 }
 
-func copySpec(spec *runtimespec.Spec) (*runtimespec.Spec, error) {
-	var copySpec runtimespec.Spec
+func copySpec(spec *specs.Spec) (*specs.Spec, error) {
+	var copySpec specs.Spec
 	if spec == nil {
 		return nil, errors.New("spec cannot be nil")
 	}

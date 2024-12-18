@@ -20,8 +20,8 @@ import (
 	"errors"
 	"os"
 
-	"github.com/moby/term"
 	"github.com/spf13/cobra"
+	"go.farcloser.world/core/term"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/pkg/clientutil"
@@ -40,7 +40,8 @@ func newComposeExecCommand() *cobra.Command {
 	}
 	composeExecCommand.Flags().SetInterspersed(false)
 
-	_, isTerminal := term.GetFdInfo(os.Stdout)
+	isTerminal := term.IsTerminal(os.Stdout.Fd())
+
 	composeExecCommand.Flags().BoolP("no-TTY", "T", !isTerminal, "Disable pseudo-TTY allocation. By default nerdctl compose exec allocates a TTY.")
 	composeExecCommand.Flags().BoolP("detach", "d", false, "Detached mode: Run containers in the background")
 	composeExecCommand.Flags().StringP("workdir", "w", "", "Working directory inside the container")

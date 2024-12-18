@@ -20,8 +20,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/mattn/go-isatty"
 	"github.com/spf13/cobra"
+	"go.farcloser.world/core/term"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
@@ -92,7 +92,7 @@ func saveAction(cmd *cobra.Command, args []string) error {
 		}
 		output = f
 		defer f.Close()
-	} else if out, ok := output.(*os.File); ok && isatty.IsTerminal(out.Fd()) {
+	} else if out, ok := output.(*os.File); ok && term.IsTerminal(out.Fd()) {
 		return fmt.Errorf("cowardly refusing to save to a terminal. Use the -o flag or redirect")
 	}
 	options.Stdout = output

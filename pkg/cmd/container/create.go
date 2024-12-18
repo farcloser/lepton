@@ -31,7 +31,7 @@ import (
 
 	dockercliopts "github.com/docker/cli/opts"
 	dockeropts "github.com/docker/docker/opts"
-	"github.com/opencontainers/runtime-spec/specs-go"
+	"go.farcloser.world/containers/specs"
 	"go.farcloser.world/core/utils"
 
 	containerd "github.com/containerd/containerd/v2/client"

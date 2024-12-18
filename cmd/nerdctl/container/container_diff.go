@@ -23,8 +23,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/opencontainers/image-spec/identity"
 	"github.com/spf13/cobra"
+	"go.farcloser.world/containers/specs"
 
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/leases"
@@ -166,7 +166,7 @@ func getChanges(ctx context.Context, client *containerd.Client, container contai
 	}
 	defer done(ctx)
 
-	rootfsID := identity.ChainID(baseImgConfig.RootFS.DiffIDs).String()
+	rootfsID := specs.ChainID(baseImgConfig.RootFS.DiffIDs).String()
 
 	randomID := idgen.GenerateID()
 	parent, err := sn.View(ctx, randomID, rootfsID)

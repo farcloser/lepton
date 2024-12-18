@@ -30,8 +30,7 @@ import (
 
 	securejoin "github.com/cyphar/filepath-securejoin"
 	"github.com/moby/sys/userns"
-	"github.com/opencontainers/image-spec/identity"
-	"github.com/opencontainers/runtime-spec/specs-go"
+	"go.farcloser.world/containers/specs"
 
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/containers"
@@ -147,7 +146,7 @@ func generateMountOpts(ctx context.Context, client *containerd.Client, ensuredIm
 		if err != nil {
 			return nil, nil, nil, err
 		}
-		chainID := identity.ChainID(diffIDs).String()
+		chainID := specs.ChainID(diffIDs).String()
 
 		s := client.SnapshotService(options.GOptions.Snapshotter)
 		tempDir, err = os.MkdirTemp("", "initialC")

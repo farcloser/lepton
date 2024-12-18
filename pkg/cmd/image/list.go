@@ -29,7 +29,6 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/opencontainers/image-spec/identity"
 	"go.farcloser.world/containers/specs"
 	"go.farcloser.world/core/units"
 
@@ -239,7 +238,7 @@ func readManifest(ctx context.Context, provider content.Provider, snapshotter sn
 	plt := platforms.Normalize(specs.Platform{OS: config.OS, Architecture: config.Architecture, Variant: config.Variant})
 
 	// Get the filesystem size for all layers
-	chainID := identity.ChainID(config.RootFS.DiffIDs).String()
+	chainID := specs.ChainID(config.RootFS.DiffIDs).String()
 	size := int64(0)
 	if _, actualSize, err := imgutil.ResourceUsage(ctx, snapshotter, chainID); err == nil {
 		size = actualSize.Size

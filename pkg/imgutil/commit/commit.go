@@ -27,7 +27,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/opencontainers/image-spec/identity"
 	"go.farcloser.world/containers/digest"
 	"go.farcloser.world/containers/specs"
 
@@ -182,7 +181,7 @@ func Commit(ctx context.Context, client *containerd.Client, container containerd
 		return emptyDigest, fmt.Errorf("failed to generate commit image config: %w", err)
 	}
 
-	rootfsID := identity.ChainID(imageConfig.RootFS.DiffIDs).String()
+	rootfsID := specs.ChainID(imageConfig.RootFS.DiffIDs).String()
 	if err := applyDiffLayer(ctx, rootfsID, baseImgConfig, sn, differ, diffLayerDesc); err != nil {
 		return emptyDigest, fmt.Errorf("failed to apply diff: %w", err)
 	}
@@ -307,6 +306,9 @@ func writeContentsForImage(ctx context.Context, snName string, baseImg container
 	}{
 		MediaType: images.MediaTypeDockerSchema2Manifest,
 		Manifest: specs.Manifest{
+			Versioned: specs.Versioned{
+				SchemaVersion: 2,
+			},
 			Config: configDesc,
 			Layers: layers,
 		},
@@ -338,7 +340,7 @@ func writeContentsForImage(ctx context.Context, snName string, baseImg container
 
 	// config should reference to snapshotter
 	labelOpt := content.WithLabels(map[string]string{
-		fmt.Sprintf("containerd.io/gc.ref.snapshot.%s", snName): identity.ChainID(newConfig.RootFS.DiffIDs).String(),
+		fmt.Sprintf("containerd.io/gc.ref.snapshot.%s", snName): specs.ChainID(newConfig.RootFS.DiffIDs).String(),
 	})
 	err = content.WriteBlob(ctx, cs, configDesc.Digest.String(), bytes.NewReader(newConfigJSON), configDesc, labelOpt)
 	if err != nil {
@@ -381,7 +383,7 @@ func createDiff(ctx context.Context, name string, sn snapshots.Snapshotter, cs c
 func applyDiffLayer(ctx context.Context, name string, baseImg specs.Image, sn snapshots.Snapshotter, differ diff.Applier, diffDesc specs.Descriptor) (retErr error) {
 	var (
 		key    = uniquePart() + "-" + name
-		parent = identity.ChainID(baseImg.RootFS.DiffIDs).String()
+		parent = specs.ChainID(baseImg.RootFS.DiffIDs).String()
 	)
 
 	mount, err := sn.Prepare(ctx, key, parent)

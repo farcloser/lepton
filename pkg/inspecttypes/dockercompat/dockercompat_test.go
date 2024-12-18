@@ -24,7 +24,7 @@ import (
 	"testing"
 
 	"github.com/docker/go-connections/nat"
-	"github.com/opencontainers/runtime-spec/specs-go"
+	"go.farcloser.world/containers/specs"
 	"gotest.tools/v3/assert"
 
 	containerd "github.com/containerd/containerd/v2/client"
