@@ -56,8 +56,8 @@ require (
 	github.com/vishvananda/netlink v1.3.0
 	github.com/vishvananda/netns v0.0.5
 	github.com/yuchanns/srslog v1.1.0
-	go.farcloser.world/containers v0.0.0-20241218212030-31dc1bbf0da4
-	go.farcloser.world/core v0.0.0-20241218205916-4784d4474ffe
+	go.farcloser.world/containers v0.0.0-20241218222123-7d33d08bddcd
+	go.farcloser.world/core v0.0.0-20241218222542-7d037cf6ac05
 	go.uber.org/mock v0.5.0
 	golang.org/x/crypto v0.31.0
 	golang.org/x/net v0.33.0

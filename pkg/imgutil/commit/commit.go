@@ -306,6 +306,9 @@ func writeContentsForImage(ctx context.Context, snName string, baseImg container
 	}{
 		MediaType: images.MediaTypeDockerSchema2Manifest,
 		Manifest: specs.Manifest{
+			Versioned: specs.Versioned{
+				SchemaVersion: 2,
+			},
 			Config: configDesc,
 			Layers: layers,
 		},
