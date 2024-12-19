@@ -126,7 +126,7 @@ func Unload(target string) error {
 	if err != nil {
 		return err
 	}
-	if _, err := remover.Write([]byte(target)); err != nil {
+	if _, err := remover.WriteString(target); err != nil {
 		remover.Close()
 		return err
 	}

@@ -189,7 +189,7 @@ func printHistory(cmd *cobra.Command, historys []historyPrintable) error {
 	case "", "table":
 		w = tabwriter.NewWriter(w, 4, 8, 4, ' ', 0)
 		if !quiet {
-			fmt.Fprintln(w, "SNAPSHOT\tCREATED\tCREATED BY\tSIZE\tCOMMENT")
+			fmt.Fprintln(w, "SNAPSHOT\tCREATED\tCREATED BY\tSIZE\tCOMMENT") //nolint:dupword
 		}
 	case "raw":
 		return errors.New("unsupported format: \"raw\"")
