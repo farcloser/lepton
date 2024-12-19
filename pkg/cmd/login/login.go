@@ -186,7 +186,7 @@ func tryLoginWithRegHost(ctx context.Context, rh docker.RegistryHost) error {
 			return fmt.Errorf("failed to call rh.Client.Do: %w", err)
 		}
 		ress = append(ress, res) //nolint:bodyclose
-		if res.StatusCode == 401 {
+		if res.StatusCode == http.StatusUnauthorized {
 			if err := rh.Authorizer.AddResponses(ctx, ress); err != nil && !errdefs.IsNotImplemented(err) {
 				return fmt.Errorf("failed to call rh.Authorizer.AddResponses: %w", err)
 			}
