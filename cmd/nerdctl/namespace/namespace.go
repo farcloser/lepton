@@ -99,17 +99,17 @@ func namespaceLsAction(cmd *cobra.Command, args []string) error {
 	// no "NETWORKS", because networks are global objects
 	fmt.Fprintln(w, "NAME\tCONTAINERS\tIMAGES\tVOLUMES\tLABELS")
 	for _, ns := range nsList {
-		ctx = namespaces.WithNamespace(ctx, ns)
+		nsCtx := namespaces.WithNamespace(ctx, ns)
 		var numContainers, numImages, numVolumes int
 		var labelStrings []string
 
-		containers, err := client.Containers(ctx)
+		containers, err := client.Containers(nsCtx)
 		if err != nil {
 			log.L.Warn(err)
 		}
 		numContainers = len(containers)
 
-		images, err := client.ImageService().List(ctx)
+		images, err := client.ImageService().List(nsCtx)
 		if err != nil {
 			log.L.Warn(err)
 		}
@@ -125,7 +125,7 @@ func namespaceLsAction(cmd *cobra.Command, args []string) error {
 			}
 		}
 
-		labels, err := client.NamespaceService().Labels(ctx, ns)
+		labels, err := client.NamespaceService().Labels(nsCtx, ns)
 		if err != nil {
 			return err
 		}
