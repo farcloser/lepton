@@ -93,14 +93,14 @@ type NetworkOptionsManager interface {
 	NetworkOptions() types.NetworkOptions
 
 	// VerifyNetworkOptions Verifies that the internal network settings are correct.
-	VerifyNetworkOptions(context.Context) error
+	VerifyNetworkOptions(ctx context.Context) error
 
 	// SetupNetworking Performs setup actions required for the container with the given ID.
-	SetupNetworking(context.Context, string) error
+	SetupNetworking(ctx context.Context, containerID string) error
 
 	// CleanupNetworking Performs any required cleanup actions for the given container.
 	// Should only be called to revert any setup steps performed in SetupNetworking.
-	CleanupNetworking(context.Context, containerd.Container) error
+	CleanupNetworking(ctx context.Context, container containerd.Container) error
 
 	// InternalNetworkingOptionLabels Returns the set of NetworkingOptions which should be set as labels on the container.
 	//
@@ -108,11 +108,11 @@ type NetworkOptionsManager interface {
 	// that the NetworkOptionsManager was initially instantiated with.
 	// E.g: in container networking mode, the label will be normalized to an ID:
 	// `--net=container:myContainer` => `--net=container:<ID of myContainer>`.
-	InternalNetworkingOptionLabels(context.Context) (types.NetworkOptions, error)
+	InternalNetworkingOptionLabels(ctx context.Context) (types.NetworkOptions, error)
 
 	// ContainerNetworkingOpts Returns a slice of `oci.SpecOpts` and `containerd.NewContainerOpts` which represent
 	// the network specs which need to be applied to the container with the given ID.
-	ContainerNetworkingOpts(context.Context, string) ([]oci.SpecOpts, []containerd.NewContainerOpts, error)
+	ContainerNetworkingOpts(ctx context.Context, containerID string) ([]oci.SpecOpts, []containerd.NewContainerOpts, error)
 }
 
 // NewNetworkingOptionsManager Returns a types.NetworkOptionsManager based on the provided command's flags.

@@ -29,7 +29,7 @@ import (
 
 // killer is from https://github.com/containerd/containerd/blob/v1.7.0-rc.2/cmd/ctr/commands/signals.go#L30-L32
 type killer interface {
-	Kill(context.Context, syscall.Signal, ...containerd.KillOpts) error
+	Kill(ctx context.Context, signal syscall.Signal, killOpts ...containerd.KillOpts) error
 }
 
 // ForwardAllSignals forwards signals.

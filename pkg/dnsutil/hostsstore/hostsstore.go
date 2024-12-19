@@ -85,7 +85,7 @@ type Meta struct {
 }
 
 type Store interface {
-	Acquire(Meta) error
+	Acquire(meta Meta) error
 	Release(id string) error
 	Update(id, newName string) error
 	HostsPath(id string) (location string, err error)

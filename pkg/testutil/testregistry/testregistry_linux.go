@@ -191,7 +191,7 @@ acl:
 
 // Auth is an interface to pass to the test registry for configuring authentication
 type Auth interface {
-	Params(*testutil.Base) []string
+	Params(base *testutil.Base) []string
 }
 
 type NoAuth struct {
