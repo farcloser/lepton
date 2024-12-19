@@ -27,7 +27,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"sort"
-	"strconv"
 	"strings"
 
 	"github.com/containernetworking/cni/libcni"
@@ -227,7 +226,7 @@ func (e *CNIEnv) NetworkList() ([]*NetworkConfig, error) {
 	return netConfigList, err
 }
 
-func (e *CNIEnv) NetworkMap() (map[string]*NetworkConfig, error) { //nolint:revive
+func (e *CNIEnv) NetworkMap() (map[string]*NetworkConfig, error) {
 	networks, err := e.networkConfigList()
 	if err != nil {
 		return nil, err
@@ -312,7 +311,7 @@ type cniNetworkConfig struct {
 	Plugins    []CNIPlugin       `json:"plugins"`
 }
 
-func (e *CNIEnv) CreateNetwork(opts types.NetworkCreateOptions) (*NetworkConfig, error) { //nolint:revive
+func (e *CNIEnv) CreateNetwork(opts types.NetworkCreateOptions) (*NetworkConfig, error) {
 	var netConf *NetworkConfig
 
 	fn := func() error {
@@ -655,20 +654,4 @@ func structToMap(in interface{}) (map[string]interface{}, error) {
 		return nil, err
 	}
 	return out, nil
-}
-
-// ParseMTU parses the mtu option
-// nolint:unused
-func parseMTU(mtu string) (int, error) {
-	if mtu == "" {
-		return 0, nil // default
-	}
-	m, err := strconv.Atoi(mtu)
-	if err != nil {
-		return 0, err
-	}
-	if m < 0 {
-		return 0, fmt.Errorf("mtu %d is less than zero", m)
-	}
-	return m, nil
 }

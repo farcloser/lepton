@@ -125,7 +125,7 @@ func NewDockerRegistry(data test.Data, helpers test.Helpers, currentCA *ca.CA, p
 			}
 		}
 
-		return hDir, nil
+		return hDir, err
 	}()
 
 	setup := func(data test.Data, helpers test.Helpers) {

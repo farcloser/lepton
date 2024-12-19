@@ -30,8 +30,7 @@ import (
 func Inspect(ctx context.Context, client *containerd.Client, inspectedNamespaces []string, options types.NamespaceInspectOptions) error {
 	result := make([]interface{}, len(inspectedNamespaces))
 	for index, ns := range inspectedNamespaces {
-		ctx = namespaces.WithNamespace(ctx, ns)
-		labels, err := client.NamespaceService().Labels(ctx, ns)
+		labels, err := client.NamespaceService().Labels(namespaces.WithNamespace(ctx, ns), ns)
 		if err != nil {
 			return err
 		}

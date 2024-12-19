@@ -30,7 +30,7 @@ import (
 	"github.com/containerd/log"
 )
 
-func generateRuntimeCOpts(cgroupManager, runtimeStr string) ([]containerd.NewContainerOpts, error) {
+func generateRuntimeCOpts(cgroupManager, runtimeStr string) []containerd.NewContainerOpts {
 	runtime := plugins.RuntimeRuncV2
 	var (
 		runcOpts    runcoptions.Options
@@ -54,7 +54,7 @@ func generateRuntimeCOpts(cgroupManager, runtimeStr string) ([]containerd.NewCon
 		}
 	}
 	o := containerd.WithRuntime(runtime, runtimeOpts)
-	return []containerd.NewContainerOpts{o}, nil
+	return []containerd.NewContainerOpts{o}
 }
 
 // WithSysctls sets the provided sysctls onto the spec

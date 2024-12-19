@@ -137,6 +137,7 @@ func ComposeUp(t *testing.T, base *testutil.Base, dockerComposeYAML string, opts
 		if err != nil {
 			return err
 		}
+		defer resp.Body.Close()
 		respBody, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return err

@@ -29,7 +29,7 @@ func ApparmorProfiles(cmd *cobra.Command) ([]string, cobra.ShellCompDirective) {
 	if err != nil {
 		return nil, cobra.ShellCompDirectiveError
 	}
-	var names []string // nolint: prealloc
+	var names []string //nolint:prealloc
 	for _, f := range profiles {
 		names = append(names, f.Name)
 	}

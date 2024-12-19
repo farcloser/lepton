@@ -45,7 +45,7 @@ func (c *Composer) Pull(ctx context.Context, po PullOptions, services []string) 
 func (c *Composer) pullServiceImage(ctx context.Context, image string, platform string, ps *serviceparser.Service, po PullOptions) error {
 	log.G(ctx).Infof("Pulling image %s", image)
 
-	var args []string // nolint: prealloc
+	var args []string
 	if platform != "" {
 		args = append(args, "--platform="+platform)
 	}

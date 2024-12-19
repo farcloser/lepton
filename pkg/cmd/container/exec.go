@@ -148,10 +148,7 @@ func generateExecProcessSpec(ctx context.Context, client *containerd.Client, con
 	if err != nil {
 		return nil, err
 	}
-	userOpts, err := generateUserOpts(options.User)
-	if err != nil {
-		return nil, err
-	}
+	userOpts := generateUserOpts(options.User)
 	if userOpts != nil {
 		c, err := container.Info(ctx)
 		if err != nil {

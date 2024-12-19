@@ -78,7 +78,7 @@ func listHnsEndpointsRegex(hnsEndpointNameRegex string) ([]hcsshim.HNSEndpoint, 
 
 	res := []hcsshim.HNSEndpoint{}
 	for _, endp := range hnsEndpoints {
-		if r.Match([]byte(endp.Name)) {
+		if r.MatchString(endp.Name) {
 			res = append(res, endp)
 		}
 	}

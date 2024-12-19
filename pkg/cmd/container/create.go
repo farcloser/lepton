@@ -270,15 +270,9 @@ func Create(ctx context.Context, client *containerd.Client, args []string, netMa
 		opts = append(opts, hookOpt)
 	}
 
-	uOpts, err := generateUserOpts(options.User)
-	if err != nil {
-		return nil, generateRemoveOrphanedDirsFunc(ctx, id, dataStore, internalLabels), err
-	}
+	uOpts := generateUserOpts(options.User)
 	opts = append(opts, uOpts...)
-	gOpts, err := generateGroupsOpts(options.GroupAdd)
-	if err != nil {
-		return nil, generateRemoveOrphanedDirsFunc(ctx, id, dataStore, internalLabels), err
-	}
+	gOpts := generateGroupsOpts(options.GroupAdd)
 	opts = append(opts, gOpts...)
 
 	umaskOpts, err := generateUmaskOpts(options.Umask)
@@ -287,10 +281,7 @@ func Create(ctx context.Context, client *containerd.Client, args []string, netMa
 	}
 	opts = append(opts, umaskOpts...)
 
-	rtCOpts, err := generateRuntimeCOpts(options.GOptions.CgroupManager, options.Runtime)
-	if err != nil {
-		return nil, generateRemoveOrphanedDirsFunc(ctx, id, dataStore, internalLabels), err
-	}
+	rtCOpts := generateRuntimeCOpts(options.GOptions.CgroupManager, options.Runtime)
 	cOpts = append(cOpts, rtCOpts...)
 
 	lCOpts, err := withContainerLabels(options.Label, options.LabelFile, ensuredImage)

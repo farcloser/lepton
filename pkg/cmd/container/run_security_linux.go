@@ -162,9 +162,9 @@ func isKnownCapName(s string) bool {
 	return ok
 }
 
-func generateCapOpts(capAdd, capDrop []string) ([]oci.SpecOpts, error) {
+func generateCapOpts(capAdd, capDrop []string) []oci.SpecOpts {
 	if len(capAdd) == 0 && len(capDrop) == 0 {
-		return nil, nil
+		return nil
 	}
 
 	var opts []oci.SpecOpts
@@ -189,5 +189,5 @@ func generateCapOpts(capAdd, capDrop []string) ([]oci.SpecOpts, error) {
 		}
 		opts = append(opts, oci.WithDroppedCapabilities(capsDrop))
 	}
-	return opts, nil
+	return opts
 }

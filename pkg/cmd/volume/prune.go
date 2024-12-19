@@ -36,7 +36,7 @@ func Prune(ctx context.Context, client *containerd.Client, options types.VolumeP
 		return err
 	}
 
-	var toRemove []string // nolint: prealloc
+	var toRemove []string
 
 	err = volStore.Prune(func(volumes []*native.Volume) ([]string, error) {
 		// Get containers and see which volumes are used

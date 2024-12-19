@@ -116,7 +116,7 @@ acl:
     actions: ["*"]
 `, user, string(bpass), user)
 	}
-	_, err = configFile.Write([]byte(configContent))
+	_, err = configFile.WriteString(configContent)
 	assert.NilError(base.T, err, fmt.Errorf("failed writing configuration: %w", err))
 
 	cert := ca.NewCert(hostIP.String())
@@ -191,7 +191,7 @@ acl:
 
 // Auth is an interface to pass to the test registry for configuring authentication
 type Auth interface {
-	Params(*testutil.Base) []string
+	Params(base *testutil.Base) []string
 }
 
 type NoAuth struct {

@@ -19,7 +19,9 @@ package image
 import (
 	"errors"
 	"fmt"
+	"net"
 	"net/http"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -199,7 +201,7 @@ func TestPush(t *testing.T) {
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
 						Output: func(stdout string, info string, t *testing.T) {
-							blobURL := fmt.Sprintf("http://%s:%d/v2/%s/blobs/%s", registryNoAuthHTTPRandom.IP.String(), registryNoAuthHTTPRandom.Port, data.Identifier(), testutil.NonDistBlobDigest)
+							blobURL := fmt.Sprintf("http://%s/v2/%s/blobs/%s", net.JoinHostPort(registryNoAuthHTTPRandom.IP.String(), strconv.Itoa(registryNoAuthHTTPRandom.Port)), data.Identifier(), testutil.NonDistBlobDigest)
 							resp, err := http.Get(blobURL)
 							assert.Assert(t, err, "error making http request")
 							if resp.Body != nil {
@@ -231,7 +233,7 @@ func TestPush(t *testing.T) {
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
 						Output: func(stdout string, info string, t *testing.T) {
-							blobURL := fmt.Sprintf("http://%s:%d/v2/%s/blobs/%s", registryNoAuthHTTPRandom.IP.String(), registryNoAuthHTTPRandom.Port, data.Identifier(), testutil.NonDistBlobDigest)
+							blobURL := fmt.Sprintf("http://%s/v2/%s/blobs/%s", net.JoinHostPort(registryNoAuthHTTPRandom.IP.String(), strconv.Itoa(registryNoAuthHTTPRandom.Port)), data.Identifier(), testutil.NonDistBlobDigest)
 							resp, err := http.Get(blobURL)
 							assert.Assert(t, err, "error making http request")
 							if resp.Body != nil {

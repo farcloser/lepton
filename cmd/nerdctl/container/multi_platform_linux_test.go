@@ -165,6 +165,7 @@ RUN uname -m > /usr/share/nginx/html/index.html
 	for testURL, expectedIndexHTML := range testCases {
 		resp, err := nettestutil.HTTPGet(testURL, 50, false)
 		assert.NilError(t, err)
+		defer resp.Body.Close()
 		respBody, err := io.ReadAll(resp.Body)
 		assert.NilError(t, err)
 		t.Logf("respBody=%q", respBody)

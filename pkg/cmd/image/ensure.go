@@ -68,7 +68,7 @@ func ensureOne(ctx context.Context, client *containerd.Client, rawRef string, ta
 	pltf := []specs.Platform{platform}
 	platformComparer := platformutil.NewMatchComparerFromOCISpecPlatformSlice(pltf)
 
-	_, _, _, missing, err := images.Check(ctx, client.ContentStore(), target, platformComparer)
+	_, _, _, missing, err := images.Check(ctx, client.ContentStore(), target, platformComparer) //nolint:dogsled
 	if err != nil {
 		return err
 	}

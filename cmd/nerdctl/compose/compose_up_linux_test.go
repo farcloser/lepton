@@ -103,6 +103,7 @@ COPY index.html /usr/share/nginx/html/index.html
 
 	resp, err := nettestutil.HTTPGet("http://127.0.0.1:8080", 50, false)
 	assert.NilError(t, err)
+	defer resp.Body.Close()
 	respBody, err := io.ReadAll(resp.Body)
 	assert.NilError(t, err)
 	t.Logf("respBody=%q", respBody)

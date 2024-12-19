@@ -31,10 +31,9 @@ import (
 // 2) Metadata is checkpointed as containerd container label.
 
 // metadataVersion is current version of container metadata.
-const metadataVersion = "v1" // nolint
+const metadataVersion = "v1"
 
 // ContainerVersionedMetadata is the internal versioned container metadata.
-// nolint
 type ContainerVersionedMetadata struct {
 	// Version indicates the version of the versioned container metadata.
 	Version string

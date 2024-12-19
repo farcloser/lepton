@@ -42,22 +42,20 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/store"
 )
 
-var _ error = ErrContainerStatus{}
-
-// ErrContainerStatus represents an error that container is in a status unexpected
+// StatusError represents an error that container is in a status unexpected
 // by the caller. E.g., remove a non-stoped/non-created container without force.
-type ErrContainerStatus struct {
+type StatusError struct {
 	ID     string
 	Status containerd.ProcessStatus
 }
 
-func (e ErrContainerStatus) Error() string {
+func (e StatusError) Error() string {
 	return fmt.Sprintf("container %s is in %v status", e.ID, e.Status)
 }
 
-// NewStatusError creates an ErrContainerStatus from container id and status.
+// NewStatusError creates an StatusError from container id and status.
 func NewStatusError(id string, status containerd.ProcessStatus) error {
-	return ErrContainerStatus{
+	return StatusError{
 		ID:     id,
 		Status: status,
 	}
@@ -72,7 +70,7 @@ func Remove(ctx context.Context, client *containerd.Client, containers []string,
 				return fmt.Errorf("multiple IDs found with provided prefix: %s", found.Req)
 			}
 			if err := RemoveContainer(ctx, found.Container, options.GOptions, options.Force, options.Volumes, client); err != nil {
-				if errors.As(err, &ErrContainerStatus{}) {
+				if errors.As(err, &StatusError{}) {
 					err = fmt.Errorf("%s. unpause/stop container first or force removal", err)
 				}
 				return err

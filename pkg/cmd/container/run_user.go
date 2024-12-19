@@ -25,12 +25,12 @@ import (
 	"github.com/containerd/containerd/v2/pkg/oci"
 )
 
-func generateUserOpts(user string) ([]oci.SpecOpts, error) {
+func generateUserOpts(user string) []oci.SpecOpts {
 	var opts []oci.SpecOpts
 	if user != "" {
 		opts = append(opts, oci.WithUser(user), withResetAdditionalGIDs(), oci.WithAdditionalGIDs(user))
 	}
-	return opts, nil
+	return opts
 }
 
 func generateUmaskOpts(umask string) ([]oci.SpecOpts, error) {
@@ -46,13 +46,13 @@ func generateUmaskOpts(umask string) ([]oci.SpecOpts, error) {
 	return opts, nil
 }
 
-func generateGroupsOpts(groups []string) ([]oci.SpecOpts, error) {
+func generateGroupsOpts(groups []string) []oci.SpecOpts {
 	var opts []oci.SpecOpts
 
 	if len(groups) != 0 {
 		opts = append(opts, oci.WithAppendAdditionalGroups(groups...))
 	}
-	return opts, nil
+	return opts
 }
 
 func withResetAdditionalGIDs() oci.SpecOpts {

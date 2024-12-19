@@ -27,18 +27,18 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/strutil"
 )
 
-func checkRestartCapabilities(ctx context.Context, client *containerd.Client, restartFlag string) (bool, error) {
+func checkRestartCapabilities(ctx context.Context, client *containerd.Client, restartFlag string) error {
 	policySlice := strings.Split(restartFlag, ":")
 	switch policySlice[0] {
 	case "", "no":
-		return true, nil
+		return nil
 	}
 	res, err := client.IntrospectionService().Plugins(ctx, "id==restart")
 	if err != nil {
-		return false, err
+		return err
 	}
 	if len(res.Plugins) == 0 {
-		return false, fmt.Errorf("no restart plugin found")
+		return fmt.Errorf("no restart plugin found")
 	}
 	restartPlugin := res.Plugins[0]
 	capabilities := restartPlugin.Capabilities
@@ -46,16 +46,16 @@ func checkRestartCapabilities(ctx context.Context, client *containerd.Client, re
 		capabilities = []string{"always"}
 	}
 	if !strutil.InStringSlice(capabilities, policySlice[0]) {
-		return false, fmt.Errorf("unsupported restart policy %q, supported policies are: %q", policySlice[0], capabilities)
+		return fmt.Errorf("unsupported restart policy %q, supported policies are: %q", policySlice[0], capabilities)
 	}
-	return true, nil
+	return nil
 }
 
 func generateRestartOpts(ctx context.Context, client *containerd.Client, restartFlag, logURI string, inRun bool) ([]containerd.NewContainerOpts, error) {
 	if restartFlag == "" || restartFlag == "no" {
 		return nil, nil
 	}
-	if _, err := checkRestartCapabilities(ctx, client, restartFlag); err != nil {
+	if err := checkRestartCapabilities(ctx, client, restartFlag); err != nil {
 		return nil, err
 	}
 
@@ -76,7 +76,7 @@ func generateRestartOpts(ctx context.Context, client *containerd.Client, restart
 
 // UpdateContainerRestartPolicyLabel updates the restart policy label of the container.
 func UpdateContainerRestartPolicyLabel(ctx context.Context, client *containerd.Client, container containerd.Container, restartFlag string) error {
-	if _, err := checkRestartCapabilities(ctx, client, restartFlag); err != nil {
+	if err := checkRestartCapabilities(ctx, client, restartFlag); err != nil {
 		return err
 	}
 	policy, err := restart.NewPolicy(restartFlag)

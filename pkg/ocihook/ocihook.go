@@ -323,105 +323,107 @@ func getNetNSPath(state *specs.State) (string, error) {
 	return s, nil
 }
 
-func getPortMapOpts(opts *handlerOpts) ([]cni.NamespaceOpts, error) {
-	if len(opts.ports) > 0 {
-		if !rootlessutil.IsRootlessChild() {
-			return []cni.NamespaceOpts{cni.WithCapabilityPortMap(opts.ports)}, nil
-		}
-		var (
-			childIP                            net.IP
-			portDriverDisallowsLoopbackChildIP bool
-		)
-		info, err := opts.rootlessKitClient.Info(context.TODO())
-		if err != nil {
-			log.L.WithError(err).Warn("cannot call RootlessKit Info API, make sure you have RootlessKit v0.14.1 or later")
-		} else {
-			childIP = info.NetworkDriver.ChildIP
-			portDriverDisallowsLoopbackChildIP = info.PortDriver.DisallowLoopbackChildIP // true for slirp4netns port driver
-		}
-		// For rootless, we need to modify the hostIP that is not bindable in the child namespace.
-		// https: //github.com/containerd/nerdctl/issues/88
-		//
-		// We must NOT modify opts.ports here, because we use the unmodified opts.ports for
-		// interaction with RootlessKit API.
-		ports := make([]cni.PortMapping, len(opts.ports))
-		for i, p := range opts.ports {
-			if hostIP := net.ParseIP(p.HostIP); hostIP != nil && !hostIP.IsUnspecified() {
-				// loopback address is always bindable in the child namespace, but other addresses are unlikely.
-				if !hostIP.IsLoopback() {
-					if !(childIP != nil && childIP.Equal(hostIP)) {
-						if portDriverDisallowsLoopbackChildIP {
-							p.HostIP = childIP.String()
-						} else {
-							p.HostIP = "127.0.0.1"
-						}
+func getPortMapOpts(opts *handlerOpts) []cni.NamespaceOpts {
+	if len(opts.ports) == 0 {
+		return nil
+	}
+
+	if !rootlessutil.IsRootlessChild() {
+		return []cni.NamespaceOpts{cni.WithCapabilityPortMap(opts.ports)}
+	}
+	var (
+		childIP                            net.IP
+		portDriverDisallowsLoopbackChildIP bool
+	)
+	info, err := opts.rootlessKitClient.Info(context.TODO())
+	if err != nil {
+		log.L.WithError(err).Warn("cannot call RootlessKit Info API, make sure you have RootlessKit v0.14.1 or later")
+	} else {
+		childIP = info.NetworkDriver.ChildIP
+		portDriverDisallowsLoopbackChildIP = info.PortDriver.DisallowLoopbackChildIP // true for slirp4netns port driver
+	}
+	// For rootless, we need to modify the hostIP that is not bindable in the child namespace.
+	// https: //github.com/containerd/nerdctl/issues/88
+	//
+	// We must NOT modify opts.ports here, because we use the unmodified opts.ports for
+	// interaction with RootlessKit API.
+	ports := make([]cni.PortMapping, len(opts.ports))
+	for i, p := range opts.ports {
+		if hostIP := net.ParseIP(p.HostIP); hostIP != nil && !hostIP.IsUnspecified() {
+			// loopback address is always bindable in the child namespace, but other addresses are unlikely.
+			if !hostIP.IsLoopback() {
+				if !(childIP != nil && childIP.Equal(hostIP)) {
+					if portDriverDisallowsLoopbackChildIP {
+						p.HostIP = childIP.String()
+					} else {
+						p.HostIP = "127.0.0.1"
 					}
-				} else if portDriverDisallowsLoopbackChildIP {
-					p.HostIP = childIP.String()
 				}
+			} else if portDriverDisallowsLoopbackChildIP {
+				p.HostIP = childIP.String()
 			}
-			ports[i] = p
 		}
-		return []cni.NamespaceOpts{cni.WithCapabilityPortMap(ports)}, nil
+		ports[i] = p
 	}
-	return nil, nil
+	return []cni.NamespaceOpts{cni.WithCapabilityPortMap(ports)}
 }
 
-func getIPAddressOpts(opts *handlerOpts) ([]cni.NamespaceOpts, error) {
-	if opts.containerIP != "" {
-		if rootlessutil.IsRootlessChild() {
-			log.L.Debug("container IP assignment is not fully supported in rootless mode. The IP is not accessible from the host (but still accessible from other containers).")
-		}
-
-		return []cni.NamespaceOpts{
-			cni.WithLabels(map[string]string{
-				// Special tick for go-cni. Because go-cni marks all labels and args as same
-				// So, we need add a special label to pass the containerIP to the host-local plugin.
-				// FYI: https://github.com/containerd/go-cni/blob/v1.1.3/README.md?plain=1#L57-L64
-				"IgnoreUnknown": "1",
-			}),
-			cni.WithArgs("IP", opts.containerIP),
-		}, nil
+func getIPAddressOpts(opts *handlerOpts) []cni.NamespaceOpts {
+	if opts.containerIP == "" {
+		return nil
 	}
-	return nil, nil
+
+	if rootlessutil.IsRootlessChild() {
+		log.L.Debug("container IP assignment is not fully supported in rootless mode. The IP is not accessible from the host (but still accessible from other containers).")
+	}
+
+	return []cni.NamespaceOpts{
+		cni.WithLabels(map[string]string{
+			// Special tick for go-cni. Because go-cni marks all labels and args as same
+			// So, we need add a special label to pass the containerIP to the host-local plugin.
+			// FYI: https://github.com/containerd/go-cni/blob/v1.1.3/README.md?plain=1#L57-L64
+			"IgnoreUnknown": "1",
+		}),
+		cni.WithArgs("IP", opts.containerIP),
+	}
 }
 
-func getMACAddressOpts(opts *handlerOpts) ([]cni.NamespaceOpts, error) {
-	if opts.containerMAC != "" {
-		return []cni.NamespaceOpts{
-			cni.WithLabels(map[string]string{
-				// allow loose CNI argument verification
-				// FYI: https://github.com/containernetworking/cni/issues/560
-				"IgnoreUnknown": "1",
-			}),
-			cni.WithArgs("MAC", opts.containerMAC),
-		}, nil
+func getMACAddressOpts(opts *handlerOpts) []cni.NamespaceOpts {
+	if opts.containerMAC == "" {
+		return nil
 	}
-	return nil, nil
+
+	return []cni.NamespaceOpts{
+		cni.WithLabels(map[string]string{
+			// allow loose CNI argument verification
+			// FYI: https://github.com/containernetworking/cni/issues/560
+			"IgnoreUnknown": "1",
+		}),
+		cni.WithArgs("MAC", opts.containerMAC),
+	}
 }
 
-func getIP6AddressOpts(opts *handlerOpts) ([]cni.NamespaceOpts, error) {
-	if opts.containerIP6 != "" {
-		if rootlessutil.IsRootlessChild() {
-			log.L.Debug("container IP6 assignment is not fully supported in rootless mode. The IP6 is not accessible from the host (but still accessible from other containers).")
-		}
-		return []cni.NamespaceOpts{
-			cni.WithLabels(map[string]string{
-				// allow loose CNI argument verification
-				// FYI: https://github.com/containernetworking/cni/issues/560
-				"IgnoreUnknown": "1",
-			}),
-			cni.WithCapability("ips", []string{opts.containerIP6}),
-		}, nil
+func getIP6AddressOpts(opts *handlerOpts) []cni.NamespaceOpts {
+	if opts.containerIP6 == "" {
+		return nil
 	}
-	return nil, nil
+
+	if rootlessutil.IsRootlessChild() {
+		log.L.Debug("container IP6 assignment is not fully supported in rootless mode. The IP6 is not accessible from the host (but still accessible from other containers).")
+	}
+
+	return []cni.NamespaceOpts{
+		cni.WithLabels(map[string]string{
+			// allow loose CNI argument verification
+			// FYI: https://github.com/containernetworking/cni/issues/560
+			"IgnoreUnknown": "1",
+		}),
+		cni.WithCapability("ips", []string{opts.containerIP6}),
+	}
 }
 
 func applyNetworkSettings(opts *handlerOpts) error {
-	portMapOpts, err := getPortMapOpts(opts)
-	if err != nil {
-		return err
-	}
+	portMapOpts := getPortMapOpts(opts)
 	nsPath, err := getNetNSPath(opts.state)
 	if err != nil {
 		return err
@@ -431,18 +433,9 @@ func applyNetworkSettings(opts *handlerOpts) error {
 	if err != nil {
 		return err
 	}
-	ipAddressOpts, err := getIPAddressOpts(opts)
-	if err != nil {
-		return err
-	}
-	macAddressOpts, err := getMACAddressOpts(opts)
-	if err != nil {
-		return err
-	}
-	ip6AddressOpts, err := getIP6AddressOpts(opts)
-	if err != nil {
-		return err
-	}
+	ipAddressOpts := getIPAddressOpts(opts)
+	macAddressOpts := getMACAddressOpts(opts)
+	ip6AddressOpts := getIP6AddressOpts(opts)
 	var namespaceOpts []cni.NamespaceOpts
 	namespaceOpts = append(namespaceOpts, portMapOpts...)
 	namespaceOpts = append(namespaceOpts, ipAddressOpts...)
@@ -595,22 +588,10 @@ func onPostStop(opts *handlerOpts) error {
 				}
 			}
 		}
-		portMapOpts, err := getPortMapOpts(opts)
-		if err != nil {
-			return err
-		}
-		ipAddressOpts, err := getIPAddressOpts(opts)
-		if err != nil {
-			return err
-		}
-		macAddressOpts, err := getMACAddressOpts(opts)
-		if err != nil {
-			return err
-		}
-		ip6AddressOpts, err := getIP6AddressOpts(opts)
-		if err != nil {
-			return err
-		}
+		portMapOpts := getPortMapOpts(opts)
+		ipAddressOpts := getIPAddressOpts(opts)
+		macAddressOpts := getMACAddressOpts(opts)
+		ip6AddressOpts := getIP6AddressOpts(opts)
 		var namespaceOpts []cni.NamespaceOpts
 		namespaceOpts = append(namespaceOpts, portMapOpts...)
 		namespaceOpts = append(namespaceOpts, ipAddressOpts...)

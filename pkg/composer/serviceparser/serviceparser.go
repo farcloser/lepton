@@ -215,7 +215,7 @@ func getReplicas(svc types.ServiceConfig) (int, error) {
 	// https://github.com/compose-spec/compose-go/commit/958cb4f953330a3d1303961796d826b7f79132d7
 
 	if svc.Deploy != nil && svc.Deploy.Replicas != nil {
-		replicas = int(*svc.Deploy.Replicas) // nolint:unconvert
+		replicas = int(*svc.Deploy.Replicas) //nolint:unconvert
 	}
 
 	if replicas < 0 {
@@ -224,7 +224,7 @@ func getReplicas(svc types.ServiceConfig) (int, error) {
 	return replicas, nil
 }
 
-func getCPULimit(svc types.ServiceConfig) (string, error) {
+func getCPULimit(svc types.ServiceConfig) string {
 	var limit string
 	if svc.CPUS > 0 {
 		log.L.Warn("cpus is deprecated, use deploy.resources.limits.cpus")
@@ -238,10 +238,10 @@ func getCPULimit(svc types.ServiceConfig) (string, error) {
 			limit = strconv.FormatFloat(float64(nanoCPUs), 'f', 2, 32)
 		}
 	}
-	return limit, nil
+	return limit
 }
 
-func getMemLimit(svc types.ServiceConfig) (types.UnitBytes, error) {
+func getMemLimit(svc types.ServiceConfig) types.UnitBytes {
 	var limit types.UnitBytes
 	if svc.MemLimit > 0 {
 		log.L.Warn("mem_limit is deprecated, use deploy.resources.limits.memory")
@@ -255,7 +255,7 @@ func getMemLimit(svc types.ServiceConfig) (types.UnitBytes, error) {
 			limit = memoryBytes
 		}
 	}
-	return limit, nil
+	return limit
 }
 
 func getGPUs(svc types.ServiceConfig) (reqs []string, _ error) {
@@ -363,7 +363,7 @@ type networkNamePair struct {
 
 // getNetworks returns full network names, e.g., {"compose-wordpress_default"}, or {"host"}
 func getNetworks(project *types.Project, svc types.ServiceConfig) ([]networkNamePair, error) {
-	var fullNames []networkNamePair // nolint: prealloc
+	var fullNames []networkNamePair //nolint:prealloc
 
 	if svc.Net != "" {
 		log.L.Warn("net is deprecated, use network_mode or networks")
@@ -500,9 +500,7 @@ func newContainer(project *types.Project, parsed *Service, i int) (*Container, e
 		c.RunArgs = append(c.RunArgs, fmt.Sprintf("--cap-drop=%s", v))
 	}
 
-	if cpuLimit, err := getCPULimit(svc); err != nil {
-		return nil, err
-	} else if cpuLimit != "" {
+	if cpuLimit := getCPULimit(svc); cpuLimit != "" {
 		c.RunArgs = append(c.RunArgs, fmt.Sprintf("--cpus=%s", cpuLimit))
 	}
 
@@ -549,9 +547,7 @@ func newContainer(project *types.Project, parsed *Service, i int) (*Container, e
 		c.RunArgs = append(c.RunArgs, "--init")
 	}
 
-	if memLimit, err := getMemLimit(svc); err != nil {
-		return nil, err
-	} else if memLimit > 0 {
+	if memLimit := getMemLimit(svc); memLimit > 0 {
 		c.RunArgs = append(c.RunArgs, fmt.Sprintf("-m=%d", memLimit))
 	}
 

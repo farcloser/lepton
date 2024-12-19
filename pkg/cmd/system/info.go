@@ -64,10 +64,7 @@ func Info(ctx context.Context, client *containerd.Client, options types.SystemIn
 		if err != nil {
 			return err
 		}
-		infoNative, err = fulfillNativeInfo(di, options.GOptions)
-		if err != nil {
-			return err
-		}
+		infoNative = fulfillNativeInfo(di, options.GOptions)
 	case "dockercompat":
 		infoCompat, err = infoutil.Info(ctx, client, options.GOptions.Snapshotter, options.GOptions.CgroupManager)
 		if err != nil {
@@ -100,7 +97,7 @@ func Info(ctx context.Context, client *containerd.Client, options types.SystemIn
 	return nil
 }
 
-func fulfillNativeInfo(di *native.DaemonInfo, globalOptions types.GlobalCommandOptions) (*native.Info, error) {
+func fulfillNativeInfo(di *native.DaemonInfo, globalOptions types.GlobalCommandOptions) *native.Info {
 	info := &native.Info{
 		Daemon: di,
 	}
@@ -108,7 +105,7 @@ func fulfillNativeInfo(di *native.DaemonInfo, globalOptions types.GlobalCommandO
 	info.Snapshotter = globalOptions.Snapshotter
 	info.CgroupManager = globalOptions.CgroupManager
 	info.Rootless = rootlessutil.IsRootless()
-	return info, nil
+	return info
 }
 
 func prettyPrintInfoNative(w io.Writer, info *native.Info) error {

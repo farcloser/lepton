@@ -218,7 +218,6 @@ func TestRunPortWithNoHostPort(t *testing.T) {
 				"-p", pFlag,
 				testutil.NginxAlpineImage)
 			var result *icmd.Result
-			stdoutContent := ""
 			if tc.runShouldSuccess {
 				cmd.AssertOK()
 			} else {
@@ -228,7 +227,7 @@ func TestRunPortWithNoHostPort(t *testing.T) {
 			portCmd := base.Cmd("port", testContainerName)
 			portCmd.Base.T.Helper()
 			result = portCmd.Run()
-			stdoutContent = result.Stdout() + result.Stderr()
+			stdoutContent := result.Stdout() + result.Stderr()
 			assert.Assert(cmd.Base.T, result.ExitCode == 0, stdoutContent)
 			regexExpression := regexp.MustCompile(`80\/tcp.*?->.*?0.0.0.0:(?P<portNumber>\d{1,5}).*?`)
 			match := regexExpression.FindStringSubmatch(stdoutContent)
@@ -242,9 +241,10 @@ func TestRunPortWithNoHostPort(t *testing.T) {
 				t.Fail()
 				return
 			}
-			connectURL := fmt.Sprintf("http://%s:%s", "127.0.0.1", paramsMap["portNumber"])
+			connectURL := fmt.Sprintf("http://%s", net.JoinHostPort("127.0.0.1", paramsMap["portNumber"]))
 			resp, err := nettestutil.HTTPGet(connectURL, 30, false)
 			assert.NilError(t, err)
+			defer resp.Body.Close()
 			respBody, err := io.ReadAll(resp.Body)
 			assert.NilError(t, err)
 			assert.Assert(t, strings.Contains(string(respBody), testutil.NginxAlpineIndexHTMLSnippet))
@@ -301,7 +301,6 @@ func TestUniqueHostPortAssignement(t *testing.T) {
 				pFlag,
 				testutil.NginxAlpineImage)
 			var result *icmd.Result
-			stdoutContent := ""
 			if tc.runShouldSuccess {
 				cmd1.AssertOK()
 				cmd2.AssertOK()
@@ -315,7 +314,7 @@ func TestUniqueHostPortAssignement(t *testing.T) {
 			portCmd1.Base.T.Helper()
 			portCmd2.Base.T.Helper()
 			result = portCmd1.Run()
-			stdoutContent = result.Stdout() + result.Stderr()
+			stdoutContent := result.Stdout() + result.Stderr()
 			assert.Assert(t, result.ExitCode == 0, stdoutContent)
 			port1, err := extractHostPort(stdoutContent, "80")
 			assert.NilError(t, err)
@@ -327,17 +326,19 @@ func TestUniqueHostPortAssignement(t *testing.T) {
 			assert.Assert(t, port1 != port2, "Host ports are not unique")
 
 			// Make HTTP GET request to container 1
-			connectURL1 := fmt.Sprintf("http://%s:%s", "127.0.0.1", port1)
+			connectURL1 := fmt.Sprintf("http://%s", net.JoinHostPort("127.0.0.1", port1))
 			resp1, err := nettestutil.HTTPGet(connectURL1, 30, false)
 			assert.NilError(t, err)
+			defer resp1.Body.Close()
 			respBody1, err := io.ReadAll(resp1.Body)
 			assert.NilError(t, err)
 			assert.Assert(t, strings.Contains(string(respBody1), testutil.NginxAlpineIndexHTMLSnippet))
 
 			// Make HTTP GET request to container 2
-			connectURL2 := fmt.Sprintf("http://%s:%s", "127.0.0.1", port2)
+			connectURL2 := fmt.Sprintf("http://%s", net.JoinHostPort("127.0.0.1", port2))
 			resp2, err := nettestutil.HTTPGet(connectURL2, 30, false)
 			assert.NilError(t, err)
+			defer resp2.Body.Close()
 			respBody2, err := io.ReadAll(resp2.Body)
 			assert.NilError(t, err)
 			assert.Assert(t, strings.Contains(string(respBody2), testutil.NginxAlpineIndexHTMLSnippet))

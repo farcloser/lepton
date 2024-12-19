@@ -189,7 +189,7 @@ func printHistory(cmd *cobra.Command, historys []historyPrintable) error {
 	case "", "table":
 		w = tabwriter.NewWriter(w, 4, 8, 4, ' ', 0)
 		if !quiet {
-			fmt.Fprintln(w, "SNAPSHOT\tCREATED\tCREATED BY\tSIZE\tCOMMENT")
+			fmt.Fprintln(w, "SNAPSHOT\tCREATED\tCREATED BY\tSIZE\tCOMMENT") //nolint:dupword
 		}
 	case "raw":
 		return errors.New("unsupported format: \"raw\"")
@@ -235,7 +235,7 @@ func (x *historyPrinter) printHistory(printable historyPrintable) error {
 	}
 
 	// Format date and size for display based on --human preference
-	printable.CreatedAt = printable.creationTime.Local().Format(time.RFC3339)
+	printable.CreatedAt = printable.creationTime.Local().Format(time.RFC3339) //nolint:gosmopolitan
 	if x.human {
 		printable.CreatedSince = formatter.TimeSinceInHuman(*printable.creationTime)
 		printable.Size = units.HumanSize(float64(printable.size))
