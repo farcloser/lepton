@@ -34,8 +34,8 @@ func TestGuessFirewallPluginVersion(t *testing.T) {
 	}
 	testCases := []testCase{
 		{
-			stderr:   "CNI firewall plugin v1.1.0\n",
-			expected: "1.1.0",
+			stderr:   "CNI firewall plugin v1.6.0\n",
+			expected: "1.6.0",
 		},
 		{
 			stderr:   "CNI firewall plugin v0.8.0\n",
