@@ -28,9 +28,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Masterminds/semver/v3"
 	"github.com/go-viper/mapstructure/v2"
 	"github.com/vishvananda/netlink"
+	"go.farcloser.world/core/version/semver"
 
 	"github.com/containerd/log"
 

@@ -21,7 +21,7 @@ package netutil
 import (
 	"testing"
 
-	"github.com/Masterminds/semver/v3"
+	"go.farcloser.world/core/version/semver"
 	"gotest.tools/v3/assert"
 )
 

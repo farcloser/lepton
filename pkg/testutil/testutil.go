@@ -31,9 +31,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Masterminds/semver/v3"
 	"go.farcloser.world/containers/digest"
 	"go.farcloser.world/core/filesystem"
+	"go.farcloser.world/core/version/semver"
 	"gotest.tools/v3/assert"
 	"gotest.tools/v3/icmd"
 

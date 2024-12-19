@@ -8,7 +8,6 @@ go 1.23.0
 // We should still move back to upstream in the future, and remove our copy.
 
 require (
-	github.com/Masterminds/semver/v3 v3.3.1
 	github.com/Microsoft/go-winio v0.6.2
 	github.com/Microsoft/hcsshim v0.12.9
 	github.com/compose-spec/compose-go/v2 v2.4.6
@@ -56,7 +55,7 @@ require (
 	github.com/vishvananda/netns v0.0.5
 	github.com/yuchanns/srslog v1.1.0
 	go.farcloser.world/containers v0.0.0-20241218222123-7d33d08bddcd
-	go.farcloser.world/core v0.0.0-20241218231132-78a573634019
+	go.farcloser.world/core v0.0.0-20241218235125-95d33951c312
 	go.uber.org/mock v0.5.0
 	golang.org/x/crypto v0.31.0
 	golang.org/x/net v0.33.0
@@ -72,6 +71,7 @@ require (
 	github.com/AdaLogics/go-fuzz-headers v0.0.0-20240806141605-e8a1dd7889d6 // indirect
 	github.com/AdamKorcz/go-118-fuzz-build v0.0.0-20231105174938-2b5cbb29f3e2 // indirect
 	github.com/Azure/go-ansiterm v0.0.0-20230124172434-306776ec8161 // indirect
+	github.com/Masterminds/semver/v3 v3.3.1 // indirect
 	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
 	github.com/cilium/ebpf v0.17.0 // indirect
 	github.com/containerd/errdefs/pkg v0.3.0 // indirect
