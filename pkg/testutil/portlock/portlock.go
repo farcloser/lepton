@@ -26,6 +26,7 @@ package portlock
 
 import (
 	"fmt"
+	"os"
 	"sync"
 	"time"
 )
@@ -51,7 +52,7 @@ func Acquire(port int) (int, error) {
 			port++
 			continue
 		}
-		fmt.Println("Waiting for port to become available...", port)
+		fmt.Fprintln(os.Stdout, "Waiting for port to become available...", port)
 		time.Sleep(1 * time.Second)
 	}
 }

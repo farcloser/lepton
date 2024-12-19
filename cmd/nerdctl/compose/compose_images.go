@@ -19,6 +19,7 @@ package compose
 import (
 	"context"
 	"fmt"
+	"os"
 	"strings"
 	"text/tabwriter"
 
@@ -119,7 +120,7 @@ func printComposeImageIDs(ctx context.Context, containers []containerd.Container
 
 	for _, id := range ids {
 		// always truncate image ids.
-		fmt.Println(strings.Split(id, ":")[1][:12])
+		fmt.Fprintln(os.Stdout, strings.Split(id, ":")[1][:12])
 	}
 	return nil
 }

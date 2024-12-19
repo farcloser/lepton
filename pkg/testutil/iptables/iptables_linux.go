@@ -18,6 +18,7 @@ package iptables
 
 import (
 	"fmt"
+	"os"
 	"regexp"
 	"testing"
 
@@ -85,7 +86,7 @@ func GetRedirectedChain(t *testing.T, ipt *iptables.IPTables, chain, namespace, 
 		if matchesContainer {
 			// then we find the appropriate chain in the rule
 			matches := re.FindStringSubmatch(rule)
-			fmt.Println(matches)
+			fmt.Fprintln(os.Stdout, matches)
 			if len(matches) >= 2 {
 				redirectedChain = matches[1]
 			}
