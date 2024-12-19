@@ -117,7 +117,7 @@ func runPacketSyslog(c net.PacketConn, done chan<- string) {
 		n, _, err = c.ReadFrom(buf[:])
 		rcvd += string(buf[:n])
 		if err != nil {
-			if oe, ok := err.(*net.OpError); ok {
+			if oe, ok := err.(*net.OpError); ok { //nolint:errorlint
 				if ct < 3 && oe.Temporary() {
 					ct++
 					continue

@@ -497,7 +497,7 @@ func applyNetworkSettings(opts *handlerOpts) error {
 		}
 		if !b4nnBindEnabled && len(opts.ports) > 0 {
 			if err := exposePortsRootless(ctx, opts.rootlessKitClient, opts.ports); err != nil {
-				return fmt.Errorf("failed to expose ports in rootless mode: %s", err)
+				return fmt.Errorf("failed to expose ports in rootless mode: %w", err)
 			}
 		}
 	}
@@ -584,7 +584,7 @@ func onPostStop(opts *handlerOpts) error {
 			}
 			if !b4nnBindEnabled && len(opts.ports) > 0 {
 				if err := unexposePortsRootless(ctx, opts.rootlessKitClient, opts.ports); err != nil {
-					return fmt.Errorf("failed to unexpose ports in rootless mode: %s", err)
+					return fmt.Errorf("failed to unexpose ports in rootless mode: %w", err)
 				}
 			}
 		}

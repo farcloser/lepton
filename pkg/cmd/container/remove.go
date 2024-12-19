@@ -71,7 +71,7 @@ func Remove(ctx context.Context, client *containerd.Client, containers []string,
 			}
 			if err := RemoveContainer(ctx, found.Container, options.GOptions, options.Force, options.Volumes, client); err != nil {
 				if errors.As(err, &StatusError{}) {
-					err = fmt.Errorf("%s. unpause/stop container first or force removal", err)
+					err = fmt.Errorf("%w. unpause/stop container first or force removal", err)
 				}
 				return err
 			}
@@ -190,13 +190,13 @@ func RemoveContainer(ctx context.Context, c containerd.Container, globalOptions 
 
 		netOpts, err := containerutil.NetworkOptionsFromSpec(spec)
 		if err != nil {
-			retErr = fmt.Errorf("failed to load container networking options from specs: %s", err)
+			retErr = fmt.Errorf("failed to load container networking options from specs: %w", err)
 			return
 		}
 
 		networkManager, err := containerutil.NewNetworkingOptionsManager(globalOptions, netOpts, client)
 		if err != nil {
-			retErr = fmt.Errorf("failed to instantiate network options manager: %s", err)
+			retErr = fmt.Errorf("failed to instantiate network options manager: %w", err)
 			return
 		}
 

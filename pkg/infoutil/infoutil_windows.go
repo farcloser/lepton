@@ -99,19 +99,19 @@ func distroName(sw windowsInfoUtil) (string, error) {
 	// Eg. 22631 (REG_SZ)
 	currBuildNo, err := sw.GetRegistryStringValue(registry.LOCAL_MACHINE, regPath, "CurrentBuildNumber")
 	if err != nil {
-		return "", fmt.Errorf("failed to get os version (build number) %v", err)
+		return "", fmt.Errorf("failed to get os version (build number) %w", err)
 	}
 
 	// Eg. 23H2 (REG_SZ)
 	displayVersion, err := sw.GetRegistryStringValue(registry.LOCAL_MACHINE, regPath, "DisplayVersion")
 	if err != nil {
-		return "", fmt.Errorf("failed to get os version (display version) %v", err)
+		return "", fmt.Errorf("failed to get os version (display version) %w", err)
 	}
 
 	// UBR: Update Build Revision. Eg. 3737 (REG_DWORD 32-bit Value)
 	ubr, err := sw.GetRegistryIntValue(registry.LOCAL_MACHINE, regPath, "UBR")
 	if err != nil {
-		return "", fmt.Errorf("failed to get os version (ubr) %v", err)
+		return "", fmt.Errorf("failed to get os version (ubr) %w", err)
 	}
 
 	productType := ""

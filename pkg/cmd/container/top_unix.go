@@ -98,7 +98,7 @@ func containerTop(ctx context.Context, stdio io.Writer, client *containerd.Clien
 		// so retry without it
 		output, err = exec.Command("ps", args...).Output()
 		if err != nil {
-			if ee, ok := err.(*exec.ExitError); ok {
+			if ee, ok := err.(*exec.ExitError); ok { //nolint:errorlint
 				// first line of stderr shows why ps failed
 				line := bytes.SplitN(ee.Stderr, []byte{'\n'}, 2)
 				if len(line) > 0 && len(line[0]) > 0 {
@@ -231,7 +231,7 @@ func parsePSOutput(output []byte, procs []uint32) (*ContainerTopOKBody, error) {
 		}
 		p, err = strconv.Atoi(fields[pidIndex])
 		if err != nil {
-			return nil, fmt.Errorf("unexpected pid '%s': %s", fields[pidIndex], err)
+			return nil, fmt.Errorf("unexpected pid '%s': %w", fields[pidIndex], err)
 		}
 
 		if hasPid(procs, p) {

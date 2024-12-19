@@ -62,7 +62,7 @@ func setContainerStatsAndRenderStatsEntry(previousStats *statsutil.ContainerStat
 
 		ns, err = netns.GetFromPid(pid)
 		if err != nil {
-			err = fmt.Errorf("failed to retrieve the statistics in netns %s: %v", ns, err)
+			err = fmt.Errorf("failed to retrieve the statistics in netns %s: %w", ns, err)
 			return
 		}
 		defer func() {
@@ -71,7 +71,7 @@ func setContainerStatsAndRenderStatsEntry(previousStats *statsutil.ContainerStat
 
 		nlHandle, err = netlink.NewHandleAt(ns)
 		if err != nil {
-			err = fmt.Errorf("failed to retrieve the statistics in netns %s: %v", ns, err)
+			err = fmt.Errorf("failed to retrieve the statistics in netns %s: %w", ns, err)
 			return
 		}
 		defer nlHandle.Close()
@@ -79,7 +79,7 @@ func setContainerStatsAndRenderStatsEntry(previousStats *statsutil.ContainerStat
 		for _, v := range interfaces {
 			nlink, err = nlHandle.LinkByIndex(v.Index)
 			if err != nil {
-				err = fmt.Errorf("failed to retrieve the statistics for %s in netns %s: %v", v.Name, ns, err)
+				err = fmt.Errorf("failed to retrieve the statistics for %s in netns %s: %w", v.Name, ns, err)
 				return
 			}
 			//exclude inactive interface

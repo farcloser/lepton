@@ -63,7 +63,7 @@ func FormatSlice(format string, writer io.Writer, x []interface{}) error {
 		for _, f := range x {
 			var b bytes.Buffer
 			if err := tmpl.Execute(&b, f); err != nil {
-				if _, ok := err.(template.ExecError); ok {
+				if _, ok := err.(template.ExecError); ok { //nolint:errorlint
 					// FallBack to Raw Format
 					if err = tryRawFormat(&b, f, tmpl); err != nil {
 						return err
@@ -90,12 +90,12 @@ func tryRawFormat(b *bytes.Buffer, f interface{}, tmpl *template.Template) error
 	dec.UseNumber()
 
 	if rawErr := dec.Decode(&raw); rawErr != nil {
-		return fmt.Errorf("unable to read inspect data: %v", rawErr)
+		return fmt.Errorf("unable to read inspect data: %w", rawErr)
 	}
 
 	tmplMissingKey := tmpl.Option("missingkey=error")
 	if rawErr := tmplMissingKey.Execute(b, raw); rawErr != nil {
-		return fmt.Errorf("template parsing error: %v", rawErr)
+		return fmt.Errorf("template parsing error: %w", rawErr)
 	}
 
 	return nil

@@ -83,7 +83,7 @@ volumes:
 			tab := tabutil.NewReader("NAME\tIMAGE\tCOMMAND\tSERVICE\tSTATUS\tPORTS")
 			err := tab.ParseHeader(lines[0])
 			if err != nil {
-				return fmt.Errorf("failed to parse header: %v", err)
+				return fmt.Errorf("failed to parse header: %w", err)
 			}
 
 			container, _ := tab.ReadRow(lines[1], "NAME")

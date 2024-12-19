@@ -133,7 +133,7 @@ func TestContainerList(t *testing.T) {
 		tab := tabutil.NewReader("CONTAINER ID\tIMAGE\tCOMMAND\tCREATED\tSTATUS\tPORTS\tNAMES\tSIZE")
 		err := tab.ParseHeader(lines[0])
 		if err != nil {
-			return fmt.Errorf("failed to parse header: %v", err)
+			return fmt.Errorf("failed to parse header: %w", err)
 		}
 
 		container, _ := tab.ReadRow(lines[1], "NAMES")
@@ -177,7 +177,7 @@ func TestContainerListWideMode(t *testing.T) {
 		tab := tabutil.NewReader("CONTAINER ID\tIMAGE\tCOMMAND\tCREATED\tSTATUS\tPORTS\tNAMES\tRUNTIME\tPLATFORM\tSIZE")
 		err := tab.ParseHeader(lines[0])
 		if err != nil {
-			return fmt.Errorf("failed to parse header: %v", err)
+			return fmt.Errorf("failed to parse header: %w", err)
 		}
 
 		container, _ := tab.ReadRow(lines[1], "NAMES")
@@ -216,7 +216,7 @@ func TestContainerListWithLabels(t *testing.T) {
 		// 2. the results has no guarantee to show only configured labels.
 		labelsMap, err := strutil.ParseCSVMap(lines[0])
 		if err != nil {
-			return fmt.Errorf("failed to parse labels: %v", err)
+			return fmt.Errorf("failed to parse labels: %w", err)
 		}
 
 		for i := range testContainer.labels {
@@ -260,7 +260,7 @@ func TestContainerListWithFilter(t *testing.T) {
 		tab := tabutil.NewReader("CONTAINER ID\tIMAGE\tCOMMAND\tCREATED\tSTATUS\tPORTS\tNAMES")
 		err := tab.ParseHeader(lines[0])
 		if err != nil {
-			return fmt.Errorf("failed to parse header: %v", err)
+			return fmt.Errorf("failed to parse header: %w", err)
 		}
 
 		containerName, _ := tab.ReadRow(lines[1], "NAMES")
@@ -330,7 +330,7 @@ func TestContainerListWithFilter(t *testing.T) {
 		tab := tabutil.NewReader("CONTAINER ID\tIMAGE\tCOMMAND\tCREATED\tSTATUS\tPORTS\tNAMES")
 		err := tab.ParseHeader(lines[0])
 		if err != nil {
-			return fmt.Errorf("failed to parse header: %v", err)
+			return fmt.Errorf("failed to parse header: %w", err)
 		}
 		containerNames := map[string]struct{}{
 			testContainerA.name: {}, testContainerB.name: {},
@@ -359,7 +359,7 @@ func TestContainerListWithFilter(t *testing.T) {
 		tab := tabutil.NewReader("CONTAINER ID\tIMAGE\tCOMMAND\tCREATED\tSTATUS\tPORTS\tNAMES")
 		err := tab.ParseHeader(lines[0])
 		if err != nil {
-			return fmt.Errorf("failed to parse header: %v", err)
+			return fmt.Errorf("failed to parse header: %w", err)
 		}
 		var id string
 		for idx, line := range lines {
@@ -381,7 +381,7 @@ func TestContainerListWithFilter(t *testing.T) {
 			tab := tabutil.NewReader("CONTAINER ID\tIMAGE\tCOMMAND\tCREATED\tSTATUS\tPORTS\tNAMES")
 			err := tab.ParseHeader(lines[0])
 			if err != nil {
-				return fmt.Errorf("failed to parse header: %v", err)
+				return fmt.Errorf("failed to parse header: %w", err)
 			}
 			foundA := false
 			for idx, line := range lines {
@@ -416,7 +416,7 @@ func TestContainerListWithFilter(t *testing.T) {
 		tab := tabutil.NewReader("CONTAINER ID\tIMAGE\tCOMMAND\tCREATED\tSTATUS\tPORTS\tNAMES")
 		err := tab.ParseHeader(lines[0])
 		if err != nil {
-			return fmt.Errorf("failed to parse header: %v", err)
+			return fmt.Errorf("failed to parse header: %w", err)
 		}
 		foundA := false
 		var id string
@@ -445,7 +445,7 @@ func TestContainerListWithFilter(t *testing.T) {
 			tab := tabutil.NewReader("CONTAINER ID\tIMAGE\tCOMMAND\tCREATED\tSTATUS\tPORTS\tNAMES")
 			err := tab.ParseHeader(lines[0])
 			if err != nil {
-				return fmt.Errorf("failed to parse header: %v", err)
+				return fmt.Errorf("failed to parse header: %w", err)
 			}
 			for idx, line := range lines {
 				if idx == 0 {
@@ -472,7 +472,7 @@ func TestContainerListWithFilter(t *testing.T) {
 				tab := tabutil.NewReader("CONTAINER ID\tIMAGE\tCOMMAND\tCREATED\tSTATUS\tPORTS\tNAMES")
 				err := tab.ParseHeader(lines[0])
 				if err != nil {
-					return fmt.Errorf("failed to parse header: %v", err)
+					return fmt.Errorf("failed to parse header: %w", err)
 				}
 				containerName, _ := tab.ReadRow(lines[1], "NAMES")
 				assert.Equal(t, containerName, testContainer.name)
@@ -490,7 +490,7 @@ func TestContainerListWithFilter(t *testing.T) {
 		tab := tabutil.NewReader("CONTAINER ID\tIMAGE\tCOMMAND\tCREATED\tSTATUS\tPORTS\tNAMES")
 		err := tab.ParseHeader(lines[0])
 		if err != nil {
-			return fmt.Errorf("failed to parse header: %v", err)
+			return fmt.Errorf("failed to parse header: %w", err)
 		}
 		containerName, _ := tab.ReadRow(lines[1], "NAMES")
 		assert.Equal(t, containerName, testContainerA.name)
@@ -507,7 +507,7 @@ func TestContainerListWithFilter(t *testing.T) {
 			tab := tabutil.NewReader("CONTAINER ID\tIMAGE\tCOMMAND\tCREATED\tSTATUS\tPORTS\tNAMES")
 			err := tab.ParseHeader(lines[0])
 			if err != nil {
-				return fmt.Errorf("failed to parse header: %v", err)
+				return fmt.Errorf("failed to parse header: %w", err)
 			}
 			containerNames := map[string]struct{}{
 				testContainerB.name: {},
@@ -534,7 +534,7 @@ func TestContainerListWithFilter(t *testing.T) {
 		tab := tabutil.NewReader("CONTAINER ID\tIMAGE\tCOMMAND\tCREATED\tSTATUS\tPORTS\tNAMES")
 		err := tab.ParseHeader(lines[0])
 		if err != nil {
-			return fmt.Errorf("failed to parse header: %v", err)
+			return fmt.Errorf("failed to parse header: %w", err)
 		}
 		containerNames := map[string]struct{}{
 			testContainerC.name: {},
@@ -560,7 +560,7 @@ func TestContainerListWithFilter(t *testing.T) {
 		tab := tabutil.NewReader("CONTAINER ID\tIMAGE\tCOMMAND\tCREATED\tSTATUS\tPORTS\tNAMES")
 		err := tab.ParseHeader(lines[0])
 		if err != nil {
-			return fmt.Errorf("failed to parse header: %v", err)
+			return fmt.Errorf("failed to parse header: %w", err)
 		}
 		containerNames := map[string]struct{}{
 			testContainerC.name: {},
@@ -587,7 +587,7 @@ func TestContainerListWithFilter(t *testing.T) {
 		tab := tabutil.NewReader("CONTAINER ID\tIMAGE\tCOMMAND\tCREATED\tSTATUS\tPORTS\tNAMES")
 		err := tab.ParseHeader(lines[0])
 		if err != nil {
-			return fmt.Errorf("failed to parse header: %v", err)
+			return fmt.Errorf("failed to parse header: %w", err)
 		}
 		containerNames := map[string]struct{}{
 			testContainerC.name: {},

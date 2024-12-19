@@ -85,7 +85,7 @@ func Logs(ctx context.Context, client *containerd.Client, container string, opti
 					} else {
 						waitCh, err := task.Wait(ctx)
 						if err != nil {
-							return fmt.Errorf("failed to get wait channel for task %#v: %s", task, err)
+							return fmt.Errorf("failed to get wait channel for task %#v: %w", task, err)
 						}
 
 						// Setup goroutine to send stop event if container task finishes:
@@ -129,14 +129,14 @@ func Logs(ctx context.Context, client *containerd.Client, container string, opti
 func getLogPath(ctx context.Context, container containerd.Container) (string, error) {
 	extensions, err := container.Extensions(ctx)
 	if err != nil {
-		return "", fmt.Errorf("get extensions for container %s,failed: %#v", container.ID(), err)
+		return "", fmt.Errorf("get extensions for container %s,failed: %w", container.ID(), err)
 	}
 	metaData := extensions[k8slabels.ContainerMetadataExtension]
 	var meta cri.ContainerMetadata
 	if metaData != nil {
 		err = meta.UnmarshalJSON(metaData.GetValue())
 		if err != nil {
-			return "", fmt.Errorf("unmarshal extensions for container %s,failed: %#v", container.ID(), err)
+			return "", fmt.Errorf("unmarshal extensions for container %s,failed: %w", container.ID(), err)
 		}
 	}
 

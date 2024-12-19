@@ -60,7 +60,7 @@ func Kill(ctx context.Context, client *containerd.Client, reqs []string, options
 				return fmt.Errorf("multiple IDs found with provided prefix: %s", found.Req)
 			}
 			if err := cleanupNetwork(ctx, found.Container, options.GOptions); err != nil {
-				return fmt.Errorf("unable to cleanup network for container: %s, %q", found.Req, err)
+				return fmt.Errorf("unable to cleanup network for container: %s, %w", found.Req, err)
 			}
 			if err := killContainer(ctx, found.Container, parsedSignal); err != nil {
 				if errdefs.IsNotFound(err) {
@@ -129,7 +129,7 @@ func cleanupNetwork(ctx context.Context, container containerd.Container, globalO
 		}
 		ports, portErr := portutil.ParsePortsLabel(info.Labels)
 		if portErr != nil {
-			return fmt.Errorf("no oci spec: %q", portErr)
+			return fmt.Errorf("no oci spec: %w", portErr)
 		}
 		portMappings := []cni.NamespaceOpts{
 			cni.WithCapabilityPortMap(ports),

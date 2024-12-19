@@ -156,7 +156,7 @@ func WriteTempDockerfile(rc io.Reader) (dockerfileDir string, err error) {
 	// err is a named return value, due to the defer call below.
 	dockerfileDir, err = os.MkdirTemp("", TempDockerfileName)
 	if err != nil {
-		return "", fmt.Errorf("unable to create temporary context directory: %v", err)
+		return "", fmt.Errorf("unable to create temporary context directory: %w", err)
 	}
 	defer func() {
 		if err != nil {

@@ -68,7 +68,7 @@ func ProcessFlagV(s string, volStore volumestore.VolumeStore, createDir bool) (*
 
 	split, err := splitVolumeSpec(s)
 	if err != nil {
-		return nil, fmt.Errorf("failed to split volume mount specification: %v", err)
+		return nil, fmt.Errorf("failed to split volume mount specification: %w", err)
 	}
 
 	switch len(split) {
