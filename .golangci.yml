@@ -29,6 +29,8 @@ linters:
     - gci
 
     # To be enabled
+    - intrange
+    - copyloopvar
     - wsl
     - nlreturn
     - gochecknoglobals
