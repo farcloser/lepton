@@ -462,7 +462,7 @@ func TestRunNetworkHostHostname(t *testing.T) {
 
 	hostname, err := os.Hostname()
 	assert.NilError(t, err)
-	hostname = hostname + "\n"
+	hostname += "\n"
 	base.Cmd("run", "--rm", "--network", "host", testutil.CommonImage, "hostname").AssertOutExactly(hostname)
 	base.Cmd("run", "--rm", "--network", "host", testutil.CommonImage, "sh", "-euxc", "echo $HOSTNAME").AssertOutExactly(hostname)
 	base.Cmd("run", "--rm", "--network", "host", "--hostname", "override", testutil.CommonImage, "hostname").AssertOutExactly("override\n")

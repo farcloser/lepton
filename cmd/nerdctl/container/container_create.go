@@ -32,8 +32,7 @@ import (
 func NewCreateCommand() *cobra.Command {
 	shortHelp := "Create a new container."
 	longHelp := shortHelp
-	switch runtime.GOOS {
-	case "windows":
+	if runtime.GOOS == "windows" {
 		longHelp += "\n"
 		longHelp += "WARNING: `create` is experimental on Windows and currently broken (https://github.com/containerd/nerdctl/issues/28)"
 	}

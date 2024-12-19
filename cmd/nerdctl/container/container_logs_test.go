@@ -39,7 +39,7 @@ bar`
 	base.Cmd("run", "-d", "--name", containerName, testutil.CommonImage,
 		"sh", "-euxc", "echo foo; echo bar").AssertOK()
 
-	//test since / until flag
+	// test since / until flag
 	time.Sleep(3 * time.Second)
 	base.Cmd("logs", "--since", "1s", containerName).AssertOutNotContains(expected)
 	base.Cmd("logs", "--since", "10s", containerName).AssertOutContains(expected)
@@ -50,10 +50,10 @@ bar`
 	base.Cmd("logs", "-f", containerName).AssertOutContains("bar")
 	base.Cmd("logs", "-f", containerName).AssertOutContains("foo")
 
-	//test timestamps flag
+	// test timestamps flag
 	base.Cmd("logs", "-t", containerName).AssertOutContains(time.Now().Format("2006-01-02"))
 
-	//test tail flag
+	// test tail flag
 	base.Cmd("logs", "-n", "all", containerName).AssertOutContains(expected)
 
 	base.Cmd("logs", "-n", "1", containerName).AssertOutWithFunc(func(stdout string) error {

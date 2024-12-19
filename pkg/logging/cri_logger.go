@@ -167,9 +167,9 @@ func ReadLogs(opts *LogViewOptions, stdout, stderr io.Writer, stopChannel chan o
 						newF, err := openFileShareDelete(logPath)
 						if err != nil {
 							if errors.Is(err, os.ErrNotExist) {
-								//If the user application outputs logs too quickly,
-								//There is a slight possibility that the log file has just been rotated,
-								//try opening it once more.
+								// If the user application outputs logs too quickly,
+								// There is a slight possibility that the log file has just been rotated,
+								// try opening it once more.
 								time.Sleep(10 * time.Millisecond)
 							}
 							newF, err = openFileShareDelete(logPath)
@@ -250,19 +250,19 @@ func newLogWriter(stdout io.Writer, stderr io.Writer, opts *LogViewOptions) *log
 		opts:   opts,
 		remain: math.MaxInt64, // initialize it as infinity
 	}
-	//if opts.bytes >= 0 {
+	// if opts.bytes >= 0 {
 	//	w.remain = opts.bytes
-	//}
+	// }
 	return w
 }
 
 // writeLogs writes logs into stdout, stderr.
 func (w *logWriter) write(msg *logMessage, addPrefix bool) error {
 
-	//if msg.timestamp.Before(ts) {
+	// if msg.timestamp.Before(ts) {
 	//	// Skip the line because it's older than since
 	//	return nil
-	//}
+	// }
 	line := msg.log
 	if w.opts.Timestamps && addPrefix {
 		prefix := append([]byte(msg.timestamp.Format(log.RFC3339NanoFixed)), delimiter[0])

@@ -267,7 +267,7 @@ func generateMountOpts(ctx context.Context, client *containerd.Client, ensuredIm
 			return nil, nil, nil, err
 		}
 
-		//copying up initial contents of the mount point directory
+		// copying up initial contents of the mount point directory
 		if err := copyExistingContents(target, anonVol.Mountpoint); err != nil {
 			return nil, nil, nil, err
 		}

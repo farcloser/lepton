@@ -250,7 +250,7 @@ func generateBuildctlArgs(ctx context.Context, client *containerd.Client, option
 			tags[idx] = parsedReference.String()
 		}
 	} else if len(tags) == 0 {
-		output = output + ",dangling-name-prefix=<none>"
+		output += ",dangling-name-prefix=<none>"
 	}
 
 	buildctlArgs = buildkitutil.BuildctlBaseArgs(options.BuildKitHost)

@@ -82,10 +82,10 @@ func setContainerStatsAndRenderStatsEntry(previousStats *statsutil.ContainerStat
 				err = fmt.Errorf("failed to retrieve the statistics for %s in netns %s: %w", v.Name, ns, err)
 				return
 			}
-			//exclude inactive interface
+			// exclude inactive interface
 			if nlink.Attrs().Flags&net.FlagUp != 0 {
 
-				//exclude loopback interface
+				// exclude loopback interface
 				if nlink.Attrs().Flags&net.FlagLoopback != 0 || strings.HasPrefix(nlink.Attrs().Name, "lo") {
 					continue
 				}

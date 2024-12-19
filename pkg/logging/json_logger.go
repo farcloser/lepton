@@ -234,9 +234,9 @@ func viewLogsJSONFileDirect(lvopts LogViewOptions, jsonLogFilePath string, stdou
 					newF, err := openFileShareDelete(jsonLogFilePath)
 					if err != nil {
 						if errors.Is(err, os.ErrNotExist) {
-							//If the user application outputs logs too quickly,
-							//There is a slight possibility the log file has just been rotated,
-							//try opening it once more.
+							// If the user application outputs logs too quickly,
+							// There is a slight possibility the log file has just been rotated,
+							// try opening it once more.
 							time.Sleep(10 * time.Millisecond)
 						}
 						newF, err = openFileShareDelete(jsonLogFilePath)

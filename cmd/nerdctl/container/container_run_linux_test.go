@@ -198,7 +198,7 @@ func TestRunAddHost(t *testing.T) {
 		var found bool
 		sc := bufio.NewScanner(bytes.NewBufferString(stdout))
 		for sc.Scan() {
-			//removing spaces and tabs separating items
+			// removing spaces and tabs separating items
 			line := strings.ReplaceAll(sc.Text(), " ", "")
 			line = strings.ReplaceAll(line, "\t", "")
 			if strings.Contains(line, "10.0.0.1testing.example.com") {
@@ -214,7 +214,7 @@ func TestRunAddHost(t *testing.T) {
 		var found int
 		sc := bufio.NewScanner(bytes.NewBufferString(stdout))
 		for sc.Scan() {
-			//removing spaces and tabs separating items
+			// removing spaces and tabs separating items
 			line := strings.ReplaceAll(sc.Text(), " ", "")
 			line = strings.ReplaceAll(line, "\t", "")
 			if strutil.InStringSlice([]string{"10.0.0.1test", "10.0.0.1test1"}, line) {
@@ -247,7 +247,7 @@ func TestRunAddHostWithCustomHostGatewayIP(t *testing.T) {
 		var found bool
 		sc := bufio.NewScanner(bytes.NewBufferString(stdout))
 		for sc.Scan() {
-			//removing spaces and tabs separating items
+			// removing spaces and tabs separating items
 			line := strings.ReplaceAll(sc.Text(), " ", "")
 			line = strings.ReplaceAll(line, "\t", "")
 			if strings.Contains(line, "192.168.5.2test") {

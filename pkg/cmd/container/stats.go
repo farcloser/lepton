@@ -358,14 +358,14 @@ func collect(ctx context.Context, globalOptions types.GlobalCommandOptions, s *s
 		previousStats := new(statsutil.ContainerStats)
 		firstSet := true
 		for {
-			//task is in the for loop to avoid nil task just after Container creation
+			// task is in the for loop to avoid nil task just after Container creation
 			task, err := container.Task(ctx, nil)
 			if err != nil {
 				u <- err
 				continue
 			}
 
-			//labels is in the for loop to avoid nil labels just after Container creation
+			// labels is in the for loop to avoid nil labels just after Container creation
 			clabels, err := container.Labels(ctx)
 			if err != nil {
 				u <- err
@@ -404,7 +404,7 @@ func collect(ctx context.Context, globalOptions types.GlobalCommandOptions, s *s
 				s.SetStatistics(statsEntry)
 			}
 			u <- nil
-			//sleep to create distant CPU readings
+			// sleep to create distant CPU readings
 			time.Sleep(500 * time.Millisecond)
 		}
 	}()

@@ -44,7 +44,7 @@ func TestRunSoci(t *testing.T) {
 			base := testutil.NewBase(t)
 			helpers.RequiresSoci(base)
 
-			//counting initial snapshot mounts
+			// counting initial snapshot mounts
 			initialMounts, err := exec.Command("mount").Output()
 			if err != nil {
 				t.Fatal(err)

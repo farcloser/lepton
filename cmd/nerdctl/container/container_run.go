@@ -50,8 +50,7 @@ const (
 func NewRunCommand() *cobra.Command {
 	shortHelp := "Run a command in a new container."
 	longHelp := shortHelp
-	switch runtime.GOOS {
-	case "windows":
+	if runtime.GOOS == "windows" {
 		longHelp += "\n"
 		longHelp += "WARNING: `run` is experimental on Windows and currently broken (https://github.com/containerd/nerdctl/issues/28)"
 	}

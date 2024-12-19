@@ -182,7 +182,7 @@ func (c *Composer) upServiceContainer(ctx context.Context, service *serviceparse
 		container.RunArgs = append([]string{"--env-file=" + c.EnvFile}, container.RunArgs...)
 	}
 
-	//add metadata labels to container https://github.com/compose-spec/compose-spec/blob/master/spec.md#labels
+	// add metadata labels to container https://github.com/compose-spec/compose-spec/blob/master/spec.md#labels
 	container.RunArgs = append([]string{
 		"--cidfile=" + cidFilename,
 		fmt.Sprintf("-l=%s=%s", labels.ComposeProject, c.project.Name),

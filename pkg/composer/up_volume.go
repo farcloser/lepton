@@ -50,7 +50,7 @@ func (c *Composer) upVolume(ctx context.Context, shortName string) error {
 		return err
 	} else if !volExists {
 		log.G(ctx).Infof("Creating volume %s", fullName)
-		//add metadata labels to volume https://github.com/compose-spec/compose-spec/blob/master/spec.md#labels-2
+		// add metadata labels to volume https://github.com/compose-spec/compose-spec/blob/master/spec.md#labels-2
 		createArgs := []string{
 			fmt.Sprintf("--label=%s=%s", labels.ComposeProject, c.project.Name),
 			fmt.Sprintf("--label=%s=%s", labels.ComposeVolume, shortName),

@@ -459,7 +459,7 @@ func getTmpfsSize(size int64) string {
 		{"k", 1 << 10},
 	} {
 		if size%r.divisor == 0 {
-			size = size / r.divisor
+			size /= r.divisor
 			suffix = r.suffix
 			break
 		}

@@ -500,10 +500,7 @@ func TestRunAddHostRemainsWhenAnotherContainerCreated(t *testing.T) {
 	defer base.Cmd("container", "rm", "-f", containerName).Run()
 
 	checkEtcHosts := func(stdout string) error {
-		matcher, err := regexp.Compile(`^10.0.0.1\s+test-add-host$`)
-		if err != nil {
-			return err
-		}
+		matcher := regexp.MustCompile(`^10.0.0.1\s+test-add-host$`)
 		var found bool
 		sc := bufio.NewScanner(bytes.NewBufferString(stdout))
 		for sc.Scan() {
