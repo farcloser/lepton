@@ -28,7 +28,7 @@ import (
 	"sync"
 	"syscall"
 
-	"github.com/Masterminds/semver/v3"
+	"go.farcloser.world/core/version/semver"
 	"golang.org/x/term"
 
 	"github.com/containerd/console"
@@ -130,9 +130,10 @@ func NewTask(ctx context.Context, client *containerd.Client, container container
 	} else {
 		var in io.Reader
 		if flagI {
+			v2, _ := semver.NewVersion("2.0.0-0")
 			if sv, err := infoutil.ServerSemVer(ctx, client); err != nil {
 				log.G(ctx).Warn(err)
-			} else if sv.LessThan(semver.MustParse("2.0.0-0")) {
+			} else if sv.LessThan(v2) {
 				log.G(ctx).Warnf("`(run|exec) -i` without `-t` expects containerd 2.0 or later, got containerd %v", sv)
 			}
 			var stdinC io.ReadCloser = &StdinCloser{

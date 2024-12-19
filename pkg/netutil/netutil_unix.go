@@ -21,6 +21,7 @@ package netutil
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net"
 	"os/exec"
@@ -28,9 +29,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Masterminds/semver/v3"
 	"github.com/go-viper/mapstructure/v2"
 	"github.com/vishvananda/netlink"
+	"go.farcloser.world/core/version/semver"
 
 	"github.com/containerd/log"
 
@@ -133,13 +134,9 @@ func (e *CNIEnv) generateCNIPlugins(driver string, name string, ipam map[string]
 		plugins = []CNIPlugin{bridge, newPortMapPlugin(), newFirewallPlugin(), newTuningPlugin()}
 		if name != DefaultNetworkName {
 			firewallPath := filepath.Join(e.Path, "firewall")
-			ok, err := firewallPluginGEQ110(firewallPath)
-			if err != nil {
-				log.L.WithError(err).Warnf("Failed to detect whether %q is newer than v1.1.0", firewallPath)
-			}
-			if !ok {
-				log.L.Warnf("To isolate bridge networks, CNI plugin \"firewall\" (>= 1.1.0) needs to be installed in CNI_PATH (%q), see https://github.com/containernetworking/plugins",
-					e.Path)
+			ok, err := enforceFirewallPluginVersion(firewallPath)
+			if err != nil || !ok {
+				return nil, errors.Join(errors.New("unsupported firewall plugin version - you need at least 1.5.0"), err)
 			}
 		}
 	case "macvlan", "ipvlan":
@@ -278,7 +275,7 @@ func (e *CNIEnv) parseIPAMRanges(subnets []string, gateway, ipRange string, ipv6
 	return ranges, findIPv4, nil
 }
 
-func firewallPluginGEQ110(firewallPath string) (bool, error) {
+func enforceFirewallPluginVersion(firewallPath string) (bool, error) {
 	// TODO: guess true by default in 2023
 	guessed := false
 
@@ -307,8 +304,8 @@ func firewallPluginGEQ110(firewallPath string) (bool, error) {
 	if err != nil {
 		return guessed, fmt.Errorf("failed to guess the version of %q: %w", firewallPath, err)
 	}
-	ver110 := semver.MustParse("v1.6.0")
-	return ver.GreaterThan(ver110) || ver.Equal(ver110), nil
+	minVer, _ := semver.NewVersion("v1.5.0")
+	return ver.GreaterThan(minVer) || ver.Equal(minVer), nil
 }
 
 // guessFirewallPluginVersion guess the version of the CNI firewall plugin (not the version of the implemented CNI spec).
