@@ -215,7 +215,7 @@ func getReplicas(svc types.ServiceConfig) (int, error) {
 	// https://github.com/compose-spec/compose-go/commit/958cb4f953330a3d1303961796d826b7f79132d7
 
 	if svc.Deploy != nil && svc.Deploy.Replicas != nil {
-		replicas = int(*svc.Deploy.Replicas) // nolint:unconvert
+		replicas = int(*svc.Deploy.Replicas) //nolint:unconvert
 	}
 
 	if replicas < 0 {
@@ -363,7 +363,7 @@ type networkNamePair struct {
 
 // getNetworks returns full network names, e.g., {"compose-wordpress_default"}, or {"host"}
 func getNetworks(project *types.Project, svc types.ServiceConfig) ([]networkNamePair, error) {
-	var fullNames []networkNamePair // nolint: prealloc
+	var fullNames []networkNamePair //nolint:prealloc
 
 	if svc.Net != "" {
 		log.L.Warn("net is deprecated, use network_mode or networks")

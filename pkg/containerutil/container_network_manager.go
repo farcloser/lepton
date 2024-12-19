@@ -609,7 +609,7 @@ func withRemoveSysfs(_ context.Context, _ oci.Client, c *containers.Container, s
 		// NOP, as the user has specified a custom /sys mount
 		return nil
 	}
-	var mounts []specs.Mount // nolint: prealloc
+	var mounts []specs.Mount //nolint:prealloc
 	for _, mount := range s.Mounts {
 		if strings.HasPrefix(mount.Destination, "/sys") {
 			continue
@@ -685,7 +685,6 @@ func writeEtcHostnameForContainer(globalOptions types.GlobalCommandOptions, host
 
 // Loads all available networks and verifies that every selected network
 // from the networkSlice is of a type within supportedTypes.
-// nolint:unused
 func verifyNetworkTypes(env *netutil.CNIEnv, networkSlice []string, supportedTypes []string) (map[string]*netutil.NetworkConfig, error) {
 	res := make(map[string]*netutil.NetworkConfig, len(networkSlice))
 	var netConfig *netutil.NetworkConfig

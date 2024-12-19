@@ -50,7 +50,7 @@ func (c *Composer) Build(ctx context.Context, bo BuildOptions, services []string
 func (c *Composer) buildServiceImage(ctx context.Context, image string, b *serviceparser.Build, platform string, bo BuildOptions) error {
 	log.G(ctx).Infof("Building image %s", image)
 
-	var args []string // nolint: prealloc
+	var args []string //nolint:prealloc
 	if platform != "" {
 		args = append(args, "--platform="+platform)
 	}

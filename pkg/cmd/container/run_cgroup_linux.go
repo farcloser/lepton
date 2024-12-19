@@ -66,7 +66,7 @@ func generateCgroupOpts(id string, options types.ContainerCreateOptions) ([]oci.
 		return []oci.SpecOpts{oci.WithCgroup("")}, nil
 	}
 
-	var opts []oci.SpecOpts // nolint: prealloc
+	var opts []oci.SpecOpts //nolint:prealloc
 	path, err := generateCgroupPath(id, options.GOptions.CgroupManager, options.CgroupParent)
 	if err != nil {
 		return nil, err

@@ -78,7 +78,7 @@ func RegisterDriver(name string, f DriverFactory, validateFunc LogOptsValidateFu
 }
 
 func Drivers() []string {
-	var ss []string // nolint: prealloc
+	var ss []string //nolint:prealloc
 	for f := range drivers {
 		ss = append(ss, f)
 	}

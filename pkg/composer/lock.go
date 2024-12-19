@@ -24,7 +24,6 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 )
 
-//nolint:unused
 var locked *os.File
 
 func Lock(dataRoot string, address string) error {

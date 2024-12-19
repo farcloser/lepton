@@ -44,7 +44,7 @@ func Prune(ctx context.Context, client *containerd.Client, options types.Network
 		return err
 	}
 
-	var removedNetworks []string // nolint: prealloc
+	var removedNetworks []string //nolint:prealloc
 	for _, net := range networkConfigs {
 		if strutil.InStringSlice(options.NetworkDriversToKeep, net.Name) {
 			continue

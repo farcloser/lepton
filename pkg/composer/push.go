@@ -44,7 +44,7 @@ func (c *Composer) Push(ctx context.Context, po PushOptions, services []string) 
 func (c *Composer) pushServiceImage(ctx context.Context, image string, platform string, ps *serviceparser.Service, po PushOptions) error {
 	log.G(ctx).Infof("Pushing image %s", image)
 
-	var args []string // nolint: prealloc
+	var args []string
 	if platform != "" {
 		args = append(args, "--platform="+platform)
 	}

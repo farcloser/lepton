@@ -53,6 +53,21 @@ const (
 	StartingCIDR = "10.4.1.0/24"
 )
 
+// parseMTU parses the mtu option
+func parseMTU(mtu string) (int, error) {
+	if mtu == "" {
+		return 0, nil // default
+	}
+	m, err := strconv.Atoi(mtu)
+	if err != nil {
+		return 0, err
+	}
+	if m < 0 {
+		return 0, fmt.Errorf("mtu %d is less than zero", m)
+	}
+	return m, nil
+}
+
 func (n *NetworkConfig) subnets() []*net.IPNet {
 	var subnets []*net.IPNet
 	if len(n.Plugins) > 0 && n.Plugins[0].Network.Type == "bridge" {
