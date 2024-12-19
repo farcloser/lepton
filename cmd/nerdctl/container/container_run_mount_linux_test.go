@@ -381,7 +381,7 @@ func TestRunMountBindMode(t *testing.T) {
 	}
 	defer os.RemoveAll(tmpDir1)
 	tmpDir1Mnt := filepath.Join(tmpDir1, "mnt")
-	if err := os.MkdirAll(tmpDir1Mnt, 0700); err != nil {
+	if err := os.MkdirAll(tmpDir1Mnt, 0o700); err != nil {
 		t.Fatal(err)
 	}
 
@@ -447,7 +447,7 @@ func TestRunVolumeBindMode(t *testing.T) {
 	}
 	defer os.RemoveAll(tmpDir1)
 	tmpDir1Mnt := filepath.Join(tmpDir1, "mnt")
-	if err := os.MkdirAll(tmpDir1Mnt, 0700); err != nil {
+	if err := os.MkdirAll(tmpDir1Mnt, 0o700); err != nil {
 		t.Fatal(err)
 	}
 

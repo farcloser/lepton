@@ -76,7 +76,7 @@ func Run(stdin io.Reader, stderr io.Writer, event, dataStore, cniPath, cniNetcon
 	if containerStateDir == "" {
 		return errors.New("state dir must be set")
 	}
-	if err := os.MkdirAll(containerStateDir, 0700); err != nil {
+	if err := os.MkdirAll(containerStateDir, 0o700); err != nil {
 		return fmt.Errorf("failed to create %q: %w", containerStateDir, err)
 	}
 	logFilePath := filepath.Join(containerStateDir, "oci-hook."+event+".log")
@@ -629,7 +629,7 @@ func writePidFile(path string, pid int) error {
 		return err
 	}
 	tempPath := filepath.Join(filepath.Dir(path), "."+filepath.Base(path))
-	f, err := os.OpenFile(tempPath, os.O_RDWR|os.O_CREATE|os.O_EXCL|os.O_SYNC, 0666)
+	f, err := os.OpenFile(tempPath, os.O_RDWR|os.O_CREATE|os.O_EXCL|os.O_SYNC, 0o666)
 	if err != nil {
 		return err
 	}

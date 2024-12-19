@@ -108,7 +108,7 @@ func openFifos(ctx context.Context, fifos *cio.FIFOSet) (f pipes, retErr error) 
 	}()
 
 	if fifos.Stdin != "" {
-		if f.Stdin, retErr = fifo.OpenFifo(ctx, fifos.Stdin, syscall.O_WRONLY|syscall.O_CREAT|syscall.O_NONBLOCK, 0700); retErr != nil {
+		if f.Stdin, retErr = fifo.OpenFifo(ctx, fifos.Stdin, syscall.O_WRONLY|syscall.O_CREAT|syscall.O_NONBLOCK, 0o700); retErr != nil {
 			return f, fmt.Errorf("failed to open stdin fifo: %w", retErr)
 		}
 		defer func() {
@@ -118,7 +118,7 @@ func openFifos(ctx context.Context, fifos *cio.FIFOSet) (f pipes, retErr error) 
 		}()
 	}
 	if fifos.Stdout != "" {
-		if f.Stdout, retErr = fifo.OpenFifo(ctx, fifos.Stdout, syscall.O_RDONLY|syscall.O_CREAT|syscall.O_NONBLOCK, 0700); retErr != nil {
+		if f.Stdout, retErr = fifo.OpenFifo(ctx, fifos.Stdout, syscall.O_RDONLY|syscall.O_CREAT|syscall.O_NONBLOCK, 0o700); retErr != nil {
 			return f, fmt.Errorf("failed to open stdout fifo: %w", retErr)
 		}
 		defer func() {
@@ -128,7 +128,7 @@ func openFifos(ctx context.Context, fifos *cio.FIFOSet) (f pipes, retErr error) 
 		}()
 	}
 	if !fifos.Terminal && fifos.Stderr != "" {
-		if f.Stderr, retErr = fifo.OpenFifo(ctx, fifos.Stderr, syscall.O_RDONLY|syscall.O_CREAT|syscall.O_NONBLOCK, 0700); retErr != nil {
+		if f.Stderr, retErr = fifo.OpenFifo(ctx, fifos.Stderr, syscall.O_RDONLY|syscall.O_CREAT|syscall.O_NONBLOCK, 0o700); retErr != nil {
 			return f, fmt.Errorf("failed to open stderr fifo: %w", retErr)
 		}
 	}

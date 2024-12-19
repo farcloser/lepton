@@ -188,7 +188,7 @@ func WithDefaultNetwork(bridgeIP string) CNIEnvOpt {
 
 func WithNamespace(namespace string) CNIEnvOpt {
 	return func(e *CNIEnv) error {
-		if err := os.MkdirAll(filepath.Join(e.NetconfPath, namespace), 0755); err != nil {
+		if err := os.MkdirAll(filepath.Join(e.NetconfPath, namespace), 0o755); err != nil {
 			return err
 		}
 		e.Namespace = namespace
@@ -201,7 +201,7 @@ func NewCNIEnv(cniPath, cniConfPath string, opts ...CNIEnvOpt) (*CNIEnv, error) 
 		Path:        cniPath,
 		NetconfPath: cniConfPath,
 	}
-	if err := os.MkdirAll(e.NetconfPath, 0755); err != nil {
+	if err := os.MkdirAll(e.NetconfPath, 0o755); err != nil {
 		return nil, err
 	}
 
@@ -496,7 +496,7 @@ func (e *CNIEnv) writeNetworkConfig(net *NetworkConfig) error {
 	if _, err := os.Stat(filename); err == nil {
 		return errdefs.ErrAlreadyExists
 	}
-	return os.WriteFile(filename, net.Bytes, 0644)
+	return os.WriteFile(filename, net.Bytes, 0o644)
 }
 
 // networkConfigList loads config from dir if dir exists.

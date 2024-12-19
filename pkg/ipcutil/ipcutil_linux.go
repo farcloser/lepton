@@ -34,7 +34,7 @@ func makeShareableDevshm(shmPath, shmSize string) error {
 		}
 		shmproperty = fmt.Sprintf("%s,size=%d", shmproperty, shmBytes)
 	}
-	err := os.MkdirAll(shmPath, 0700)
+	err := os.MkdirAll(shmPath, 0o700)
 	if err != nil {
 		return err
 	}

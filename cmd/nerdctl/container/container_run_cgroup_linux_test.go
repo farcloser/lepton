@@ -186,7 +186,7 @@ func TestRunDevice(t *testing.T) {
 		t.Logf("lo[%d] = %+v", i, lo[i])
 		defer lo[i].Close()
 		loContent[i] = fmt.Sprintf("lo%d-content", i)
-		assert.NilError(t, os.WriteFile(lo[i].Device, []byte(loContent[i]), 0700))
+		assert.NilError(t, os.WriteFile(lo[i].Device, []byte(loContent[i]), 0o700))
 	}
 
 	base := testutil.NewBase(t)

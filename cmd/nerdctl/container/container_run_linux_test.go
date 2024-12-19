@@ -184,7 +184,7 @@ func TestRunIpcHost(t *testing.T) {
 	base := testutil.NewBase(t)
 	testFilePath := filepath.Join("/dev/shm",
 		fmt.Sprintf("%s-%d-%s", testutil.Identifier(t), os.Geteuid(), base.Target))
-	err := os.WriteFile(testFilePath, []byte(""), 0644)
+	err := os.WriteFile(testFilePath, []byte(""), 0o644)
 	assert.NilError(base.T, err)
 	defer os.Remove(testFilePath)
 
@@ -404,7 +404,7 @@ func TestRunSigProxy(t *testing.T) {
 func TestRunWithFluentdLogDriver(t *testing.T) {
 	base := testutil.NewBase(t)
 	tempDirectory := t.TempDir()
-	err := os.Chmod(tempDirectory, 0777)
+	err := os.Chmod(tempDirectory, 0o777)
 	assert.NilError(t, err)
 
 	containerName := testutil.Identifier(t)
@@ -433,7 +433,7 @@ func TestRunWithFluentdLogDriver(t *testing.T) {
 func TestRunWithFluentdLogDriverWithLogOpt(t *testing.T) {
 	base := testutil.NewBase(t)
 	tempDirectory := t.TempDir()
-	err := os.Chmod(tempDirectory, 0777)
+	err := os.Chmod(tempDirectory, 0o777)
 	assert.NilError(t, err)
 
 	containerName := testutil.Identifier(t)

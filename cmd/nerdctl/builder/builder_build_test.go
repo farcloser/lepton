@@ -172,7 +172,7 @@ CMD ["echo", "build-test-string"]`, testutil.CommonImage)
 			dockerfileSecond := fmt.Sprintf(`FROM %s
 RUN echo hello2 > /hello2
 CMD ["cat", "/hello2"]`, data.Identifier("first"))
-			err = os.WriteFile(filepath.Join(data.TempDir(), "Dockerfile"), []byte(dockerfileSecond), 0644)
+			err = os.WriteFile(filepath.Join(data.TempDir(), "Dockerfile"), []byte(dockerfileSecond), 0o644)
 			assert.NilError(helpers.T(), err)
 			helpers.Ensure("build", "-t", data.Identifier("second"), data.TempDir())
 		},
@@ -257,7 +257,7 @@ func TestBuildWithDockerfile(t *testing.T) {
 CMD ["echo", "build-test-dockerfile"]
 	`, testutil.CommonImage)
 			buildCtx := filepath.Join(data.TempDir(), "test")
-			err := os.MkdirAll(buildCtx, 0755)
+			err := os.MkdirAll(buildCtx, 0o755)
 			assert.NilError(helpers.T(), err)
 			err = os.WriteFile(filepath.Join(buildCtx, "Dockerfile"), []byte(dockerfile), 0o600)
 			assert.NilError(helpers.T(), err)
@@ -318,7 +318,7 @@ COPY %s /`, testFileName)
 			err := os.WriteFile(filepath.Join(data.TempDir(), "Dockerfile"), []byte(dockerfile), 0o600)
 			assert.NilError(helpers.T(), err)
 
-			err = os.WriteFile(filepath.Join(data.TempDir(), testFileName), []byte(testContent), 0644)
+			err = os.WriteFile(filepath.Join(data.TempDir(), testFileName), []byte(testContent), 0o644)
 			assert.NilError(helpers.T(), err)
 
 			data.Set("buildCtx", data.TempDir())

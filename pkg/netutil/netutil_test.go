@@ -225,7 +225,7 @@ func TestNetworkWithDefaultNameAlreadyExists(t *testing.T) {
 
 	// Filename is irrelevant as long as it's not nerdctl's.
 	testConfFile := filepath.Join(cniConfTestDir, testutil.Identifier(t)+".conf")
-	err = os.WriteFile(testConfFile, buf.Bytes(), 0600)
+	err = os.WriteFile(testConfFile, buf.Bytes(), 0o600)
 	assert.NilError(t, err)
 
 	// Check network is detected.

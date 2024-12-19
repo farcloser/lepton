@@ -30,13 +30,13 @@ import (
 
 func CreateBuildContext(t *testing.T, dockerfile string) string {
 	tmpDir := t.TempDir()
-	err := os.WriteFile(filepath.Join(tmpDir, "Dockerfile"), []byte(dockerfile), 0644)
+	err := os.WriteFile(filepath.Join(tmpDir, "Dockerfile"), []byte(dockerfile), 0o644)
 	assert.NilError(t, err)
 	return tmpDir
 }
 
 func ExtractDockerArchive(archiveTarPath, rootfsPath string) error {
-	if err := os.MkdirAll(rootfsPath, 0755); err != nil {
+	if err := os.MkdirAll(rootfsPath, 0o755); err != nil {
 		return err
 	}
 	workDir, err := os.MkdirTemp("", "extract-docker-archive")
