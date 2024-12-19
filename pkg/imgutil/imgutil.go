@@ -71,7 +71,7 @@ func GetExistingImage(ctx context.Context, client *containerd.Client, snapshotte
 			if err != nil {
 				// Image found but blob not found for foreign arch
 				// Ignore err and return nil, so that the walker can visit the next candidate.
-				return nil
+				return nil //nolint:nilerr
 			}
 			res = &EnsuredImage{
 				Ref:         found.Image.Name,

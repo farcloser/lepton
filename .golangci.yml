@@ -10,66 +10,122 @@ run:
   allow-serial-runners: true
 
 linters:
-  disable-all: true
-  enable:
-    - depguard
-    - gofmt
-    - goimports
-    - govet
-    - ineffassign
-    - misspell
-    - nakedret
-    - prealloc
-    - typecheck
-    # - asciicheck
-    # - bodyclose
-    # - dogsled
-    # - dupl
-    # - errcheck
-    # - errorlint
-    # - exhaustive
-    # - exhaustivestruct
-    # - exportloopref
-    # - funlen
-    # - gci
-    # - gochecknoglobals
-    # - gochecknoinits
-    # - gocognit
-    # - goconst
-    # - gocritic
-    # - gocyclo
-    # - godot
-    # - godox
-    # - goerr113
-    # - gofumpt
-    # - goheader
-    # - golint
-    # - gomnd
-    # - gomodguard
-    # - goprintffuncname
-    # - gosec (gas)
-    - gosimple  # (megacheck)
-    # - interfacer
-    # - lll
-    # - maligned
-    # - nestif
-    # - nlreturn
-    # - noctx
-    # - nolintlint
-    - revive
-    # - rowserrcheck
-    # - scopelint
-    # - sqlclosecheck
-    - staticcheck
-    - stylecheck
-    # - testpackage
-    # - tparallel
-    - unconvert
-    # - unparam
-    - unused
-    # - whitespace
-    # - wrapcheck
-    # - wsl
+  disable-all: false
+  enable-all: true
+  disable:
+    # I like namedreturns occasionally
+    - nonamedreturns
+    # Deprecated
+    - exportloopref
+    # Too annoying
+    - exhaustruct  # this is fine without, usually
+    - funlen  # somewhat ridiculous
+    - cyclop  # who cares! :D
+    - godox  # just leave it alone
+    # TODO(apostasie) Temporary out until we wrap up all of them
+    - wrapcheck
+
+    # We us go-imports instead
+    - gci
+
+    # Deviation
+    - wsl
+    - nlreturn
+    - gochecknoglobals
+    - godot
+    - lll
+    - varnamelen
+    - thelper
+    - protogetter
+    - gosec
+    - err113
+    - gofumpt
+    - musttag
+    - paralleltest
+    - testpackage
+    - exhaustive
+#    - nilerr
+    - gocritic
+#    - noctx
+    - nestif
+    - contextcheck
+    - gocyclo
+
+#    - perfsprint
+    - forcetypeassert
+    - gocognit
+    - errcheck
+    - dupl
+    - whitespace
+    - mnd
+    - ireturn
+    - nilnil
+
+    - tparallel
+    - tagliatelle
+    - goconst
+    - maintidx
+
+#  disable-all: true
+#  enable:
+#    - depguard
+#    - gofmt
+#    - goimports
+#    - govet
+#    - ineffassign
+#    - misspell
+#    - nakedret
+#    - prealloc
+#    - typecheck
+#    # - asciicheck
+#    # - bodyclose
+#    # - dogsled
+#    # - dupl
+#    # - errcheck
+#    # - errorlint
+#    # - exhaustive
+#    # - exhaustivestruct
+#    # - exportloopref
+#    # - funlen
+#    # - gci
+#    # - gochecknoglobals
+#    # - gochecknoinits
+#    # - gocognit
+#    # - goconst
+#    # - gocritic
+#    # - gocyclo
+#    # - godot
+#    # - godox
+#    # - goerr113
+#    # - gofumpt
+#    # - goheader
+#    # - golint
+#    # - gomnd
+#    # - gomodguard
+#    # - goprintffuncname
+#    # - gosec (gas)
+#    - gosimple  # (megacheck)
+#    # - interfacer
+#    # - lll
+#    # - maligned
+#    # - nestif
+#    # - nlreturn
+#    # - noctx
+#    # - nolintlint
+#    - revive
+#    # - rowserrcheck
+#    # - scopelint
+#    # - sqlclosecheck
+#    - staticcheck
+#    - stylecheck
+#    # - testpackage
+#    # - tparallel
+#    - unconvert
+#    # - unparam
+#    - unused
+#    # - whitespace
+#    # - wrapcheck
+#    # - wsl
 linters-settings:
   gocritic:
     enabled-checks:

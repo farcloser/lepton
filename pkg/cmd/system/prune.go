@@ -61,7 +61,8 @@ func Prune(ctx context.Context, client *containerd.Client, options types.SystemP
 		GOptions: options.GOptions,
 		All:      options.All,
 	}); err != nil {
-		return nil
+		// ?
+		return nil //nolint:nilerr
 	}
 
 	if options.BuildKitHost != "" {

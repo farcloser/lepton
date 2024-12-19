@@ -44,7 +44,7 @@ func HTTPGet(urlStr string, attempts int, insecure bool) (*http.Response, error)
 		},
 	}
 	for i := 0; i < attempts; i++ {
-		resp, err = client.Get(urlStr)
+		resp, err = client.Get(urlStr) //nolint:noctx
 		if err == nil {
 			return resp, nil
 		}
