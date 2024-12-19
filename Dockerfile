@@ -237,7 +237,7 @@ RUN perl -pi -e 's/multi-user.target/docker-entrypoint.target/g' /usr/local/lib/
   systemctl enable containerd buildkit && \
   mkdir -p /etc/bash_completion.d && \
   ${BINARY_NAME} completion bash >/etc/bash_completion.d/${BINARY_NAME} && \
-  mkdir -p -m 0o755 /etc/cni
+  mkdir -p -m 0755 /etc/cni
 COPY ./Dockerfile.d/etc_containerd_config.toml /etc/containerd/config.toml
 COPY ./Dockerfile.d/etc_buildkit_buildkitd.toml /etc/buildkit/buildkitd.toml
 VOLUME /var/lib/containerd
@@ -293,7 +293,7 @@ RUN apt-get update -qq && apt-get install -qq --no-install-recommends \
 # TODO: update containerized-systemd to enable sshd by default, or allow `systemctl wants <TARGET> ssh` here
 RUN ssh-keygen -q -t rsa -f /root/.ssh/id_rsa -N '' && \
   useradd -m -s /bin/bash rootless && \
-  mkdir -p -m 0o700 /home/rootless/.ssh && \
+  mkdir -p -m 0700 /home/rootless/.ssh && \
   cp -a /root/.ssh/id_rsa.pub /home/rootless/.ssh/authorized_keys && \
   mkdir -p /home/rootless/.local/share && \
   chown -R rootless:rootless /home/rootless
