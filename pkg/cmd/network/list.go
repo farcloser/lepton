@@ -88,8 +88,8 @@ func List(ctx context.Context, options types.NetworkListOptions) error {
 		netConfigs = filtered
 	}
 
-	pp := make([]networkPrintable, len(netConfigs))
-	for i, n := range netConfigs {
+	pp := []networkPrintable{}
+	for _, n := range netConfigs {
 		p := networkPrintable{
 			Name: n.Name,
 			file: n.File,
@@ -103,7 +103,7 @@ func List(ctx context.Context, options types.NetworkListOptions) error {
 		if n.CliLabels != nil {
 			p.Labels = formatter.FormatLabels(*n.CliLabels)
 		}
-		pp[i] = p
+		pp = append(pp, p)
 	}
 
 	// append pseudo networks
