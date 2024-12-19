@@ -19,6 +19,8 @@ package container
 import (
 	"fmt"
 	"io"
+	"net"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -46,7 +48,8 @@ func TestStopStart(t *testing.T) {
 		testutil.NginxAlpineImage).AssertOK()
 
 	check := func(httpGetRetry int) error {
-		resp, err := nettestutil.HTTPGet(fmt.Sprintf("http://127.0.0.1:%d", hostPort), httpGetRetry, false)
+		resp, err := nettestutil.HTTPGet(fmt.Sprintf("http://%s", net.JoinHostPort("127.0.0.1",
+			strconv.Itoa(hostPort))), httpGetRetry, false)
 		if err != nil {
 			return err
 		}

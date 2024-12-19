@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -196,7 +197,7 @@ func baseTestRunPort(t *testing.T, nginxImage string, nginxIndexHTMLSnippet stri
 			base := testutil.NewBase(t)
 			defer base.Cmd("rm", "-f", testContainerName).Run()
 			pFlag := fmt.Sprintf("%s:%s:%s", tc.listenIP.String(), tc.hostPort, tc.containerPort)
-			connectURL := fmt.Sprintf("http://%s:%d", tc.connectIP.String(), tc.connectURLPort)
+			connectURL := fmt.Sprintf("http://%s", net.JoinHostPort(tc.connectIP.String(), strconv.Itoa(tc.connectURLPort)))
 			t.Logf("pFlag=%q, connectURL=%q", pFlag, connectURL)
 			cmd := base.Cmd("run", "-d",
 				"--name", testContainerName,
