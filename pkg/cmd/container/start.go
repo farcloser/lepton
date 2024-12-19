@@ -18,6 +18,7 @@ package container
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	containerd "github.com/containerd/containerd/v2/client"
@@ -30,7 +31,7 @@ import (
 // Start starts a list of `containers`. If attach is true, it only starts a single container.
 func Start(ctx context.Context, client *containerd.Client, reqs []string, options types.ContainerStartOptions) error {
 	if options.Attach && len(reqs) > 1 {
-		return fmt.Errorf("you cannot start and attach multiple containers at once")
+		return errors.New("you cannot start and attach multiple containers at once")
 	}
 
 	walker := &containerwalker.ContainerWalker{

@@ -18,7 +18,6 @@ package volume
 
 import (
 	"errors"
-	"fmt"
 	"testing"
 
 	"gotest.tools/v3/assert"
@@ -58,7 +57,7 @@ func TestVolumeRemove(t *testing.T) {
 
 			Setup: func(data test.Data, helpers test.Helpers) {
 				helpers.Ensure("volume", "create", data.Identifier())
-				helpers.Ensure("run", "-v", fmt.Sprintf("%s:/volume", data.Identifier()),
+				helpers.Ensure("run", "-v", data.Identifier()+":/volume",
 					"--name", data.Identifier(), testutil.CommonImage)
 			},
 
@@ -108,7 +107,7 @@ func TestVolumeRemove(t *testing.T) {
 
 			Setup: func(data test.Data, helpers test.Helpers) {
 				helpers.Ensure("volume", "create", data.Identifier())
-				helpers.Ensure("run", "-v", fmt.Sprintf("%s:/volume", data.Identifier()), "--name", data.Identifier(), testutil.CommonImage)
+				helpers.Ensure("run", "-v", data.Identifier()+":/volume", "--name", data.Identifier(), testutil.CommonImage)
 				helpers.Ensure("rm", "-f", data.Identifier())
 			},
 
@@ -154,7 +153,7 @@ func TestVolumeRemove(t *testing.T) {
 			Setup: func(data test.Data, helpers test.Helpers) {
 				helpers.Ensure("volume", "create", data.Identifier())
 				helpers.Ensure("volume", "create", data.Identifier("busy"))
-				helpers.Ensure("run", "-v", fmt.Sprintf("%s:/volume", data.Identifier("busy")), "--name", data.Identifier(), testutil.CommonImage)
+				helpers.Ensure("run", "-v", data.Identifier("busy")+":/volume", "--name", data.Identifier(), testutil.CommonImage)
 			},
 
 			Cleanup: func(data test.Data, helpers test.Helpers) {
@@ -206,7 +205,7 @@ func TestVolumeRemove(t *testing.T) {
 
 			Setup: func(data test.Data, helpers test.Helpers) {
 				helpers.Ensure("volume", "create", data.Identifier("busy"))
-				helpers.Ensure("run", "-v", fmt.Sprintf("%s:/volume", data.Identifier("busy")), "--name", data.Identifier(), testutil.CommonImage)
+				helpers.Ensure("run", "-v", data.Identifier("busy")+":/volume", "--name", data.Identifier(), testutil.CommonImage)
 			},
 
 			Cleanup: func(data test.Data, helpers test.Helpers) {

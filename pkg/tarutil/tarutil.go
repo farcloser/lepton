@@ -17,7 +17,7 @@
 package tarutil
 
 import (
-	"fmt"
+	"errors"
 	"os"
 	"os/exec"
 	"strings"
@@ -53,5 +53,5 @@ func FindTarBinary() (string, bool, error) {
 	if exe, err := exec.LookPath("tar"); err == nil {
 		return exe, isGNU(exe), nil
 	}
-	return "", false, fmt.Errorf("failed to find `tar` binary")
+	return "", false, errors.New("failed to find `tar` binary")
 }

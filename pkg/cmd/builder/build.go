@@ -225,7 +225,7 @@ func generateBuildctlArgs(ctx context.Context, client *containerd.Client, option
 		if !strings.Contains(output, "type=") {
 			// should accept --output <DIR> as an alias of --output
 			// type=local,dest=<DIR>
-			output = fmt.Sprintf("type=local,dest=%s", output)
+			output = "type=local,dest=" + output
 		}
 		if strings.Contains(output, "type=docker") || strings.Contains(output, "type=oci") {
 			if !strings.Contains(output, "dest=") {
@@ -405,7 +405,7 @@ func generateBuildctlArgs(ctx context.Context, client *containerd.Client, option
 			optAttestType := strings.TrimPrefix(optAttestType, "type=")
 			buildctlArgs = append(buildctlArgs, fmt.Sprintf("--opt=attest:%s=%s", optAttestType, optAttestAttrs))
 		} else {
-			return "", nil, false, "", nil, nil, fmt.Errorf("attestation type not specified")
+			return "", nil, false, "", nil, nil, errors.New("attestation type not specified")
 		}
 	}
 
@@ -581,7 +581,7 @@ func parseBuildContextFromOCILayout(name, path string) ([]string, error) {
 	}
 
 	return []string{
-		fmt.Sprintf("--oci-layout=parent-image-key=%s", abspath),
+		"--oci-layout=parent-image-key=" + abspath,
 		fmt.Sprintf("--opt=context:%s=oci-layout:parent-image-key@%s", name, digest),
 	}, nil
 }

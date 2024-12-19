@@ -290,7 +290,7 @@ func TestRunWithJsonFileLogDriverAndLogPathOpt(t *testing.T) {
 
 	defer base.Cmd("rm", "-f", containerName).AssertOK()
 	customLogJSONPath := filepath.Join(t.TempDir(), containerName, containerName+"-json.log")
-	base.Cmd("run", "-d", "--log-driver", "json-file", "--log-opt", fmt.Sprintf("log-path=%s", customLogJSONPath), "--log-opt", "max-size=5K", "--log-opt", "max-file=2", "--name", containerName, testutil.CommonImage,
+	base.Cmd("run", "-d", "--log-driver", "json-file", "--log-opt", "log-path="+customLogJSONPath, "--log-opt", "max-size=5K", "--log-opt", "max-file=2", "--name", containerName, testutil.CommonImage,
 		"sh", "-euxc", "hexdump -C /dev/urandom | head -n1000").AssertOK()
 
 	time.Sleep(3 * time.Second)
@@ -339,15 +339,15 @@ func TestRunWithJournaldLogDriver(t *testing.T) {
 	testCases := []testCase{
 		{
 			name:   "filter journald logs using SYSLOG_IDENTIFIER field",
-			filter: fmt.Sprintf("SYSLOG_IDENTIFIER=%s", inspectedContainer.ID[:12]),
+			filter: "SYSLOG_IDENTIFIER=" + inspectedContainer.ID[:12],
 		},
 		{
 			name:   "filter journald logs using CONTAINER_NAME field",
-			filter: fmt.Sprintf("CONTAINER_NAME=%s", containerName),
+			filter: "CONTAINER_NAME=" + containerName,
 		},
 		{
 			name:   "filter journald logs using IMAGE_NAME field",
-			filter: fmt.Sprintf("IMAGE_NAME=%s", testutil.CommonImage),
+			filter: "IMAGE_NAME=" + testutil.CommonImage,
 		},
 	}
 	for _, tc := range testCases {
@@ -386,7 +386,7 @@ func TestRunWithJournaldLogDriverAndLogOpt(t *testing.T) {
 	inspectedContainer := base.InspectContainer(containerName)
 	found := 0
 	check := func(log poll.LogT) poll.Result {
-		res := icmd.RunCmd(icmd.Command(journalctl, "--no-pager", "--since", "2 minutes ago", fmt.Sprintf("SYSLOG_IDENTIFIER=%s", inspectedContainer.ID)))
+		res := icmd.RunCmd(icmd.Command(journalctl, "--no-pager", "--since", "2 minutes ago", "SYSLOG_IDENTIFIER="+inspectedContainer.ID))
 		assert.Equal(t, 0, res.ExitCode, res)
 		if strings.Contains(res.Stdout(), "bar") && strings.Contains(res.Stdout(), "foo") {
 			found = 1
@@ -469,7 +469,7 @@ COPY --from=builder /go/src/logger/logger /
 
 	buildCtx := helpers.CreateBuildContext(t, dockerfile)
 	tmpDir := t.TempDir()
-	base.Cmd("build", buildCtx, "--output", fmt.Sprintf("type=local,src=/go/src/logger/logger,dest=%s", tmpDir)).AssertOK()
+	base.Cmd("build", buildCtx, "--output", "type=local,src=/go/src/logger/logger,dest="+tmpDir).AssertOK()
 	defer base.Cmd("image", "rm", "-f", imageName).AssertOK()
 
 	base.Cmd("container", "rm", "-f", containerName).AssertOK()
@@ -512,7 +512,7 @@ func TestRunAddHostRemainsWhenAnotherContainerCreated(t *testing.T) {
 			}
 		}
 		if !found {
-			return fmt.Errorf("host not found")
+			return errors.New("host not found")
 		}
 		return nil
 	}
@@ -706,9 +706,9 @@ func TestRunFromOCIArchive(t *testing.T) {
 	CMD ["echo", "%s"]`, testutil.CommonImage, sentinel)
 
 	buildCtx := helpers.CreateBuildContext(t, dockerfile)
-	tag := fmt.Sprintf("%s:latest", imageName)
+	tag := imageName + ":latest"
 	tarPath := fmt.Sprintf("%s/%s.tar", buildCtx, imageName)
 
-	base.Cmd("build", "--tag", tag, fmt.Sprintf("--output=type=oci,dest=%s", tarPath), buildCtx).AssertOK()
-	base.Cmd("run", "--rm", fmt.Sprintf("oci-archive://%s", tarPath)).AssertOutContainsAll(fmt.Sprintf("Loaded image: %s", tag), sentinel)
+	base.Cmd("build", "--tag", tag, "--output=type=oci,dest="+tarPath, buildCtx).AssertOK()
+	base.Cmd("run", "--rm", "oci-archive://"+tarPath).AssertOutContainsAll("Loaded image: "+tag, sentinel)
 }

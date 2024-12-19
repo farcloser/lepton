@@ -20,6 +20,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"go.farcloser.world/containers/specs"
@@ -70,7 +71,7 @@ func setPlatformOptions(
 				return nil, fmt.Errorf("failed to parse memory bytes %q: %w", options.Memory, err)
 			}
 			UVMMemmory := map[string]string{
-				uvmMemorySizeInMB: fmt.Sprintf("%v", mem64),
+				uvmMemorySizeInMB: strconv.FormatInt(mem64, 10),
 			}
 			opts = append(opts, oci.WithAnnotations(UVMMemmory))
 		}

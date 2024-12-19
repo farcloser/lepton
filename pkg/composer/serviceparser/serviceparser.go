@@ -285,13 +285,13 @@ func getGPUs(svc types.ServiceConfig) (reqs []string, _ error) {
 
 			var e []string
 			if len(dev.Capabilities) > 0 {
-				e = append(e, fmt.Sprintf("capabilities=%s", strings.Join(dev.Capabilities, ",")))
+				e = append(e, "capabilities="+strings.Join(dev.Capabilities, ","))
 			}
 			if dev.Driver != "" {
-				e = append(e, fmt.Sprintf("driver=%s", dev.Driver))
+				e = append(e, "driver="+dev.Driver)
 			}
 			if len(dev.IDs) > 0 {
-				e = append(e, fmt.Sprintf("device=%s", strings.Join(dev.IDs, ",")))
+				e = append(e, "device="+strings.Join(dev.IDs, ","))
 			}
 			if dev.Count != 0 {
 				e = append(e, fmt.Sprintf("count=%d", dev.Count))
@@ -341,11 +341,11 @@ func getRestart(svc types.ServiceConfig) (string, error) {
 		case "", "any":
 			restartFlag = "always"
 		case "always":
-			return "", fmt.Errorf("deploy.restart_policy.condition: \"always\" is invalid, did you mean \"any\"?")
+			return "", errors.New("deploy.restart_policy.condition: \"always\" is invalid, did you mean \"any\"?")
 		case "none":
 			restartFlag = "no"
 		case "no":
-			return "", fmt.Errorf("deploy.restart_policy.condition: \"no\" is invalid, did you mean \"none\"?")
+			return "", errors.New("deploy.restart_policy.condition: \"no\" is invalid, did you mean \"none\"?")
 		case "on-failure":
 			log.L.Warnf("Ignoring: service %s: deploy.restart_policy.condition=%q (unimplemented)", svc.Name, cond)
 		default:
@@ -482,7 +482,7 @@ func newContainer(project *types.Project, parsed *Service, i int) (*Container, e
 
 	for k, v := range svc.Annotations {
 		if v == "" {
-			c.RunArgs = append(c.RunArgs, fmt.Sprintf("--annotation=%s", k))
+			c.RunArgs = append(c.RunArgs, "--annotation="+k)
 		} else {
 			c.RunArgs = append(c.RunArgs, fmt.Sprintf("--annotation=%s=%s", k, v))
 		}
@@ -493,19 +493,19 @@ func newContainer(project *types.Project, parsed *Service, i int) (*Container, e
 	}
 
 	for _, v := range svc.CapAdd {
-		c.RunArgs = append(c.RunArgs, fmt.Sprintf("--cap-add=%s", v))
+		c.RunArgs = append(c.RunArgs, "--cap-add="+v)
 	}
 
 	for _, v := range svc.CapDrop {
-		c.RunArgs = append(c.RunArgs, fmt.Sprintf("--cap-drop=%s", v))
+		c.RunArgs = append(c.RunArgs, "--cap-drop="+v)
 	}
 
 	if cpuLimit := getCPULimit(svc); cpuLimit != "" {
-		c.RunArgs = append(c.RunArgs, fmt.Sprintf("--cpus=%s", cpuLimit))
+		c.RunArgs = append(c.RunArgs, "--cpus="+cpuLimit)
 	}
 
 	if svc.CPUSet != "" {
-		c.RunArgs = append(c.RunArgs, fmt.Sprintf("--cpuset-cpus=%s", svc.CPUSet))
+		c.RunArgs = append(c.RunArgs, "--cpuset-cpus="+svc.CPUSet)
 	}
 
 	if svc.CPUShares != 0 {
@@ -517,22 +517,22 @@ func newContainer(project *types.Project, parsed *Service, i int) (*Container, e
 	}
 
 	for _, v := range svc.DNS {
-		c.RunArgs = append(c.RunArgs, fmt.Sprintf("--dns=%s", v))
+		c.RunArgs = append(c.RunArgs, "--dns="+v)
 	}
 	for _, v := range svc.DNSSearch {
-		c.RunArgs = append(c.RunArgs, fmt.Sprintf("--dns-search=%s", v))
+		c.RunArgs = append(c.RunArgs, "--dns-search="+v)
 	}
 	for _, v := range svc.DNSOpts {
-		c.RunArgs = append(c.RunArgs, fmt.Sprintf("--dns-option=%s", v))
+		c.RunArgs = append(c.RunArgs, "--dns-option="+v)
 	}
 
 	for _, v := range svc.Entrypoint {
-		c.RunArgs = append(c.RunArgs, fmt.Sprintf("--entrypoint=%s", v))
+		c.RunArgs = append(c.RunArgs, "--entrypoint="+v)
 	}
 
 	for k, v := range svc.Environment {
 		if v == nil {
-			c.RunArgs = append(c.RunArgs, fmt.Sprintf("-e=%s", k))
+			c.RunArgs = append(c.RunArgs, "-e="+k)
 		} else {
 			c.RunArgs = append(c.RunArgs, fmt.Sprintf("-e=%s=%s", k, *v))
 		}
@@ -555,13 +555,13 @@ func newContainer(project *types.Project, parsed *Service, i int) (*Container, e
 		return nil, err
 	} else if len(gpuReqs) > 0 {
 		for _, gpus := range gpuReqs {
-			c.RunArgs = append(c.RunArgs, fmt.Sprintf("--gpus=%s", gpus))
+			c.RunArgs = append(c.RunArgs, "--gpus="+gpus)
 		}
 	}
 
 	for k, v := range svc.Labels {
 		if v == "" {
-			c.RunArgs = append(c.RunArgs, fmt.Sprintf("-l=%s", k))
+			c.RunArgs = append(c.RunArgs, "-l="+k)
 		} else {
 			c.RunArgs = append(c.RunArgs, fmt.Sprintf("-l=%s=%s", k, v))
 		}
@@ -569,7 +569,7 @@ func newContainer(project *types.Project, parsed *Service, i int) (*Container, e
 
 	if svc.Logging != nil {
 		if svc.Logging.Driver != "" {
-			c.RunArgs = append(c.RunArgs, fmt.Sprintf("--log-driver=%s", svc.Logging.Driver))
+			c.RunArgs = append(c.RunArgs, "--log-driver="+svc.Logging.Driver)
 		}
 		if svc.Logging.Options != nil {
 			for k, v := range svc.Logging.Options {
@@ -599,14 +599,14 @@ func newContainer(project *types.Project, parsed *Service, i int) (*Container, e
 	}
 
 	if netTypeContainer && svc.Hostname != "" {
-		return nil, fmt.Errorf("conflicting options: hostname and container network mode")
+		return nil, errors.New("conflicting options: hostname and container network mode")
 	}
 	if !netTypeContainer {
 		hostname := svc.Hostname
 		if hostname == "" {
 			hostname = svc.Name
 		}
-		c.RunArgs = append(c.RunArgs, fmt.Sprintf("--hostname=%s", hostname))
+		c.RunArgs = append(c.RunArgs, "--hostname="+hostname)
 	}
 
 	if svc.Pid != "" {
@@ -652,13 +652,13 @@ func newContainer(project *types.Project, parsed *Service, i int) (*Container, e
 		c.RunArgs = append(c.RunArgs, fmt.Sprintf("--stop-timeout=%d", int(timeout.Seconds())))
 	}
 	if svc.StopSignal != "" {
-		c.RunArgs = append(c.RunArgs, fmt.Sprintf("--stop-signal=%s", svc.StopSignal))
+		c.RunArgs = append(c.RunArgs, "--stop-signal="+svc.StopSignal)
 	}
 
 	if restart, err := getRestart(svc); err != nil {
 		return nil, err
 	} else if restart != "" {
-		c.RunArgs = append(c.RunArgs, fmt.Sprintf("--restart=%s", restart))
+		c.RunArgs = append(c.RunArgs, "--restart="+restart)
 	}
 
 	if svc.Runtime != "" {
@@ -670,7 +670,7 @@ func newContainer(project *types.Project, parsed *Service, i int) (*Container, e
 	}
 
 	for _, v := range svc.SecurityOpt {
-		c.RunArgs = append(c.RunArgs, fmt.Sprintf("--security-opt=%s", v))
+		c.RunArgs = append(c.RunArgs, "--security-opt="+v)
 	}
 
 	for k, v := range svc.Sysctls {
@@ -686,7 +686,7 @@ func newContainer(project *types.Project, parsed *Service, i int) (*Container, e
 	}
 
 	for _, v := range svc.GroupAdd {
-		c.RunArgs = append(c.RunArgs, fmt.Sprintf("--group-add=%s", v))
+		c.RunArgs = append(c.RunArgs, "--group-add="+v)
 	}
 
 	for _, v := range svc.Volumes {

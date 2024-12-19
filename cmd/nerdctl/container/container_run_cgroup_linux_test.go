@@ -340,9 +340,9 @@ func TestRunCgroupParent(t *testing.T) {
 	id := base.InspectContainer(containerName).ID
 	expected := filepath.Join(parent, id)
 	if info.CgroupDriver == "systemd" {
-		expected = filepath.Join(parent, fmt.Sprintf("nerdctl-%s", id))
+		expected = filepath.Join(parent, "nerdctl-"+id)
 		if base.Target == testutil.Docker {
-			expected = filepath.Join(parent, fmt.Sprintf("docker-%s", id))
+			expected = filepath.Join(parent, "docker-"+id)
 		}
 	}
 	base.Cmd("exec", containerName, "cat", "/proc/self/cgroup").AssertOutContains(expected)

@@ -22,13 +22,13 @@ import "fmt"
 
 // makeShareableDevshm returns devshm directory path on host when there is no error.
 func makeShareableDevshm(shmPath, shmSize string) error {
-	return fmt.Errorf("unix does not support shareable devshm")
+	return errors.New("unix does not support shareable devshm")
 }
 
 // cleanUpPlatformSpecificIPC cleans up platform specific IPC.
 func cleanUpPlatformSpecificIPC(ipc IPC) error {
 	if ipc.Mode == Shareable {
-		return fmt.Errorf("unix does not support shareable devshm")
+		return errors.New("unix does not support shareable devshm")
 	}
 	return nil
 }

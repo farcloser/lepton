@@ -205,7 +205,7 @@ func parsePSOutput(output []byte, procs []uint32) (*ContainerTopOKBody, error) {
 		}
 	}
 	if pidIndex == -1 {
-		return nil, fmt.Errorf("couldn't find PID field in ps output")
+		return nil, errors.New("couldn't find PID field in ps output")
 	}
 
 	// loop through the output and extract the PID from each line

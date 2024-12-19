@@ -18,7 +18,6 @@ package netutil
 
 import (
 	"bytes"
-	"fmt"
 	"net"
 	"os"
 	"path/filepath"
@@ -225,7 +224,7 @@ func TestNetworkWithDefaultNameAlreadyExists(t *testing.T) {
 	assert.NilError(t, tpl.ExecuteTemplate(buf, "test", values))
 
 	// Filename is irrelevant as long as it's not nerdctl's.
-	testConfFile := filepath.Join(cniConfTestDir, fmt.Sprintf("%s.conf", testutil.Identifier(t)))
+	testConfFile := filepath.Join(cniConfTestDir, testutil.Identifier(t)+".conf")
 	err = os.WriteFile(testConfFile, buf.Bytes(), 0600)
 	assert.NilError(t, err)
 

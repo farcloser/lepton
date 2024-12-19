@@ -17,7 +17,6 @@
 package container
 
 import (
-	"fmt"
 	"os"
 	"testing"
 
@@ -51,10 +50,10 @@ func TestRunMountVolume(t *testing.T) {
 	base.Cmd("run",
 		"-d",
 		"--name", containerName,
-		"-v", fmt.Sprintf("%s:C:/mnt1", rwDir),
-		"-v", fmt.Sprintf("%s:C:/mnt2:ro", roDir),
-		"-v", fmt.Sprintf("%s:C:/mnt3", rwVolName),
-		"-v", fmt.Sprintf("%s:C:/mnt4:ro", roVolName),
+		"-v", rwDir+":C:/mnt1",
+		"-v", roDir+":C:/mnt2:ro",
+		"-v", rwVolName+":C:/mnt3",
+		"-v", roVolName+":C:/mnt4:ro",
 		testutil.CommonImage,
 		"ping localhost -t",
 	).AssertOK()
@@ -67,15 +66,15 @@ func TestRunMountVolume(t *testing.T) {
 
 	base.Cmd("run",
 		"--rm",
-		"-v", fmt.Sprintf("%s:C:/mnt1", rwDir),
-		"-v", fmt.Sprintf("%s:C:/mnt3", rwVolName),
+		"-v", rwDir+":C:/mnt1",
+		"-v", rwVolName+":C:/mnt3",
 		testutil.CommonImage,
 		"cat", "C:/mnt1/file1", "C:/mnt3/file3",
 	).AssertOutContainsAll("str1", "str3")
 	base.Cmd("run",
 		"--rm",
-		"-v", fmt.Sprintf("%s:C:/mnt3/mnt1", rwDir),
-		"-v", fmt.Sprintf("%s:C:/mnt3", rwVolName),
+		"-v", rwDir+":C:/mnt3/mnt1",
+		"-v", rwVolName+":C:/mnt3",
 		testutil.CommonImage,
 		"cat", "C:/mnt3/mnt1/file1", "C:/mnt3/file3",
 	).AssertOutContainsAll("str1", "str3")
@@ -96,7 +95,7 @@ func TestRunMountVolumeInspect(t *testing.T) {
 		"-v", "C:/mnt1",
 		"-v", "C:/mnt2:C:/mnt2",
 		"-v", "\\\\.\\pipe\\containerd-containerd:\\\\.\\pipe\\containerd-containerd",
-		"-v", fmt.Sprintf("%s:C:/mnt3", testVolume),
+		"-v", testVolume+":C:/mnt3",
 		testutil.CommonImage,
 	).AssertOK()
 

@@ -18,6 +18,7 @@ package container
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -38,7 +39,7 @@ func checkRestartCapabilities(ctx context.Context, client *containerd.Client, re
 		return err
 	}
 	if len(res.Plugins) == 0 {
-		return fmt.Errorf("no restart plugin found")
+		return errors.New("no restart plugin found")
 	}
 	restartPlugin := res.Plugins[0]
 	capabilities := restartPlugin.Capabilities

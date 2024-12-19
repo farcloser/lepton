@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"strconv"
 	"testing"
 
 	"github.com/coreos/go-iptables/iptables"
@@ -42,7 +43,7 @@ func ForwardExists(t *testing.T, ipt *iptables.IPTables, chain, containerIP stri
 	// here we check if at least one of the rules in the chain
 	// matches the required string to identify that the rule was applied
 	found := false
-	matchRule := `--dport ` + fmt.Sprintf("%d", port) + ` .+ --to-destination ` + containerIP
+	matchRule := `--dport ` + strconv.Itoa(port) + ` .+ --to-destination ` + containerIP
 	for _, rule := range rules {
 		foundInRule, err := regexp.MatchString(matchRule, rule)
 		if err != nil {

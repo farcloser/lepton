@@ -132,7 +132,7 @@ func FormatPorts(labelMap map[string]string) string {
 }
 
 func TimeSinceInHuman(since time.Time) string {
-	return fmt.Sprintf("%s ago", duration.HumanDuration(time.Since(since)))
+	return duration.HumanDuration(time.Since(since)) + " ago"
 }
 
 func FormatLabels(labelMap map[string]string) string {

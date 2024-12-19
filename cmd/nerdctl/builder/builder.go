@@ -17,6 +17,7 @@
 package builder
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -156,7 +157,7 @@ func builderDebugAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	if len(args) < 1 {
-		return fmt.Errorf("context needs to be specified")
+		return errors.New("context needs to be specified")
 	}
 
 	buildgBinary, err := exec.LookPath("buildg")

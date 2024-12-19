@@ -56,10 +56,10 @@ func (w *ImageWalker) Walk(ctx context.Context, req string) (int, error) {
 	parsedReference, err := referenceutil.Parse(req)
 	if err == nil {
 		parsedReferenceStr = parsedReference.String()
-		filters = append(filters, fmt.Sprintf("name==%s", parsedReferenceStr))
+		filters = append(filters, "name=="+parsedReferenceStr)
 	}
 	filters = append(filters,
-		fmt.Sprintf("name==%s", req),
+		"name=="+req,
 		fmt.Sprintf("target.digest~=^sha256:%s.*$", regexp.QuoteMeta(req)),
 		fmt.Sprintf("target.digest~=^%s.*$", regexp.QuoteMeta(req)),
 	)

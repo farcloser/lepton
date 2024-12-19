@@ -480,7 +480,7 @@ services:
 `, imageSvc0, keyPair.PublicKey, keyPair.PrivateKey,
 		imageSvc1, keyPair.PrivateKey, imageSvc2)
 
-	dockerfile := fmt.Sprintf(`FROM %s`, testutil.AlpineImage)
+	dockerfile := "FROM " + testutil.AlpineImage
 
 	comp := testutil.NewComposeDir(t, dockerComposeYAML)
 	defer comp.CleanUp()

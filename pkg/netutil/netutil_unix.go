@@ -250,7 +250,7 @@ func (e *CNIEnv) generateIPAM(driver string, subnets []string, gatewayStr, ipRan
 					SkipDefault: parsed.SkipDefault,
 				})
 			} else {
-				return nil, fmt.Errorf("ipam option must have a type (provide or request)")
+				return nil, errors.New("ipam option must have a type (provide or request)")
 			}
 		}
 

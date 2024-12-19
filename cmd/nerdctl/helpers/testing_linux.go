@@ -103,7 +103,7 @@ func NewCosignKeyPair(t testing.TB, path string, password string) *CosignKeyPair
 
 	cmd := exec.Command("cosign", "generate-key-pair")
 	cmd.Dir = td
-	cmd.Env = append(cmd.Env, fmt.Sprintf("COSIGN_PASSWORD=%s", password))
+	cmd.Env = append(cmd.Env, "COSIGN_PASSWORD="+password)
 	if out, err := cmd.CombinedOutput(); err != nil {
 		t.Fatalf("failed to run %v: %v (%q)", cmd.Args, err, string(out))
 	}
@@ -129,8 +129,8 @@ func ComposeUp(t *testing.T, base *testutil.Base, dockerComposeYAML string, opts
 
 	base.ComposeCmd(append(append([]string{"-f", comp.YAMLFullPath()}, opts...), "up", "-d")...).AssertOK()
 	defer base.ComposeCmd("-f", comp.YAMLFullPath(), "down", "-v").Run()
-	base.Cmd("volume", "inspect", fmt.Sprintf("%s_db", projectName)).AssertOK()
-	base.Cmd("network", "inspect", fmt.Sprintf("%s_default", projectName)).AssertOK()
+	base.Cmd("volume", "inspect", projectName+"_db").AssertOK()
+	base.Cmd("network", "inspect", projectName+"_default").AssertOK()
 
 	checkWordpress := func() error {
 		resp, err := nettestutil.HTTPGet("http://127.0.0.1:8080", 10, false)
@@ -168,6 +168,6 @@ func ComposeUp(t *testing.T, base *testutil.Base, dockerComposeYAML string, opts
 	t.Log("wordpress seems functional")
 
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "down", "-v").AssertOK()
-	base.Cmd("volume", "inspect", fmt.Sprintf("%s_db", projectName)).AssertFail()
-	base.Cmd("network", "inspect", fmt.Sprintf("%s_default", projectName)).AssertFail()
+	base.Cmd("volume", "inspect", projectName+"_db").AssertFail()
+	base.Cmd("network", "inspect", projectName+"_default").AssertFail()
 }

@@ -241,7 +241,7 @@ RUN echo "actually creating a layer so that docker sets the createdAt time"
 			},
 			{
 				Description: "since=" + testutil.CommonImage,
-				Command:     test.Command("images", "--filter", fmt.Sprintf("since=%s", testutil.CommonImage)),
+				Command:     test.Command("images", "--filter", "since="+testutil.CommonImage),
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
 						Output: test.All(
@@ -253,7 +253,7 @@ RUN echo "actually creating a layer so that docker sets the createdAt time"
 			},
 			{
 				Description: "since=" + testutil.CommonImage + " " + testutil.CommonImage,
-				Command:     test.Command("images", "--filter", fmt.Sprintf("since=%s", testutil.CommonImage), testutil.CommonImage),
+				Command:     test.Command("images", "--filter", "since="+testutil.CommonImage, testutil.CommonImage),
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
 						Output: test.All(

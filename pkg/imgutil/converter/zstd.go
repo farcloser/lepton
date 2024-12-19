@@ -18,7 +18,6 @@ package converter
 
 import (
 	"context"
-	"fmt"
 	"io"
 
 	"go.farcloser.world/containers/specs"
@@ -69,8 +68,8 @@ func ZstdLayerConvertFunc(options types.ImageConvertOptions) (converter.ConvertF
 			oldReader = sectionReader
 		}
 
-		ref := fmt.Sprintf("convert-zstd-from-%s", desc.Digest)
-		w, err := content.OpenWriter(ctx, cs, content.WithRef(ref))
+		ref := "convert-zstd-from-" + desc.Digest
+		w, err := content.OpenWriter(ctx, cs, content.WithRef(ref.String()))
 		if err != nil {
 			return nil, err
 		}

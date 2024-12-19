@@ -77,7 +77,7 @@ func DetectFlags(ctx context.Context, client *containerd.Client, stateDir string
 		res.Mode = Container
 		parsed := strings.Split(ipc, ":")
 		if len(parsed) < 2 || parsed[0] != "container" {
-			return res, fmt.Errorf("invalid ipc namespace. Set --ipc=[host|container:<name|id>")
+			return res, errors.New("invalid ipc namespace. Set --ipc=[host|container:<name|id>")
 		}
 
 		containerName := parsed[1]
@@ -181,7 +181,7 @@ func GenerateIPCOpts(ctx context.Context, ipc IPC, client *containerd.Client) ([
 		}
 
 		if status.Status != containerd.Running {
-			return nil, fmt.Errorf("shared container is not running")
+			return nil, errors.New("shared container is not running")
 		}
 
 		targetConLabels, err := targetCon.Labels(ctx)

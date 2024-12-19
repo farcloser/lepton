@@ -101,7 +101,7 @@ func CNIRuntimeDir() string {
 		log.L.Warn(err)
 		xdr = fmt.Sprintf("/run/user/%d", rootlessutil.ParentEUID())
 	}
-	return fmt.Sprintf("%s/cni", xdr)
+	return xdr + "/cni"
 }
 
 func CliTOML() string {

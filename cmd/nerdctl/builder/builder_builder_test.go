@@ -100,7 +100,7 @@ CMD ["echo", "builder-debug-test-string"]`, testutil.CommonImage)
 					helpers.Ensure("pull", "--quiet", oldImage)
 					helpers.Ensure("tag", oldImage, newImage)
 
-					dockerfile := fmt.Sprintf(`FROM %s`, newImage)
+					dockerfile := "FROM " + newImage
 					buildCtx := data.TempDir()
 					err := os.WriteFile(filepath.Join(buildCtx, "Dockerfile"), []byte(dockerfile), 0o600)
 					assert.NilError(helpers.T(), err)

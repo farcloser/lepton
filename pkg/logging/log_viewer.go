@@ -17,6 +17,7 @@
 package logging
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -43,7 +44,7 @@ func RegisterLogViewer(driverName string, lvfn LogViewerFunc) {
 	logViewers[driverName] = lvfn
 }
 
-func init() {
+func InitLogViewer() {
 	RegisterLogViewer("json-file", viewLogsJSONFile)
 	RegisterLogViewer("journald", viewLogsJournald)
 	RegisterLogViewer("cri", viewLogsCRI)
@@ -132,11 +133,11 @@ func InitContainerLogViewer(containerLabels map[string]string, lvopts LogViewOpt
 	}
 
 	if lcfg.Driver == "cri" && !experimental {
-		return nil, fmt.Errorf("the `cri` log viewer requires experimental mode to be enabled")
+		return nil, errors.New("the `cri` log viewer requires experimental mode to be enabled")
 	}
 
 	if lcfg.Driver == "none" {
-		return nil, fmt.Errorf("log type `none` was selected, nothing to log")
+		return nil, errors.New("log type `none` was selected, nothing to log")
 	}
 
 	lv := &ContainerLogViewer{

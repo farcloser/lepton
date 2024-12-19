@@ -20,7 +20,7 @@ package ocihook
 
 import (
 	"context"
-	"fmt"
+	"errors"
 
 	rlkclient "github.com/rootless-containers/rootlesskit/v2/pkg/api/client"
 
@@ -28,9 +28,9 @@ import (
 )
 
 func exposePortsRootless(ctx context.Context, rlkClient rlkclient.Client, ports []cni.PortMapping) error {
-	return fmt.Errorf("cannot expose ports rootlessly on non-Linux hosts")
+	return errors.New("cannot expose ports rootlessly on non-Linux hosts")
 }
 
 func unexposePortsRootless(ctx context.Context, rlkClient rlkclient.Client, ports []cni.PortMapping) error {
-	return fmt.Errorf("cannot unexpose ports rootlessly on non-Linux hosts")
+	return errors.New("cannot unexpose ports rootlessly on non-Linux hosts")
 }

@@ -213,7 +213,7 @@ func PullImage(ctx context.Context, client *containerd.Client, resolver remotes.
 	if options.Unpack != nil {
 		unpackB = *options.Unpack
 		if unpackB && len(options.OCISpecPlatform) != 1 {
-			return nil, fmt.Errorf("unpacking requires a single platform to be specified (e.g., --platform=amd64)")
+			return nil, errors.New("unpacking requires a single platform to be specified (e.g., --platform=amd64)")
 		}
 	}
 

@@ -115,7 +115,7 @@ func historyAction(cmd *cobra.Command, args []string) error {
 				var snapshotName string
 				if !h.EmptyLayer {
 					if len(diffIDs) <= layerCounter {
-						return fmt.Errorf("too many non-empty layers in History section")
+						return errors.New("too many non-empty layers in History section")
 					}
 					diffIDs := diffIDs[0 : layerCounter+1]
 					chainID := specs.ChainID(diffIDs).String()

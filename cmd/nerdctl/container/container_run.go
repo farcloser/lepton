@@ -320,7 +320,7 @@ func processCreateCommandFlagsInRun(cmd *cobra.Command) (types.ContainerCreateOp
 		}
 	}
 	if !validAttachFlag {
-		return opt, fmt.Errorf("invalid stream specified with -a flag. Valid streams are STDIN, STDOUT, and STDERR")
+		return opt, errors.New("invalid stream specified with -a flag. Valid streams are STDIN, STDOUT, and STDERR")
 	}
 
 	return opt, nil

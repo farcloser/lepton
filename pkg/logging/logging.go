@@ -94,7 +94,7 @@ func GetDriver(name string, opts map[string]string, address string) (Driver, err
 	return driverFactory(opts, address)
 }
 
-func init() {
+func InitLogging() {
 	RegisterDriver("none", func(opts map[string]string, address string) (Driver, error) {
 		return &NoneLogger{}, nil
 	}, NoneLogOptsValidate)
@@ -258,7 +258,7 @@ func startTail(ctx context.Context, logName string, w *fsnotify.Watcher) (bool, 
 	for {
 		select {
 		case <-ctx.Done():
-			return false, fmt.Errorf("context cancelled")
+			return false, errors.New("context cancelled")
 		case e := <-w.Events:
 			switch {
 			case e.Has(fsnotify.Write):

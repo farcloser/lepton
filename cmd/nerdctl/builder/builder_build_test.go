@@ -327,7 +327,7 @@ COPY %s /`, testFileName)
 			{
 				Description: "destination 1",
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-					return helpers.Command("build", "-o", fmt.Sprintf("type=local,dest=%s", data.TempDir()), data.Get("buildCtx"))
+					return helpers.Command("build", "-o", "type=local,dest="+data.TempDir(), data.Get("buildCtx"))
 				},
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
@@ -688,7 +688,7 @@ CMD ["echo", "build-myorg/myapp"]`
 			data.Set("buildCtx", buildCtx)
 		},
 		Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-			return helpers.Command("build", "-t", data.Identifier(), data.Get("buildCtx"), fmt.Sprintf("--build-context=myorg/myapp=docker-image://%s", testutil.CommonImage))
+			return helpers.Command("build", "-t", data.Identifier(), data.Get("buildCtx"), "--build-context=myorg/myapp=docker-image://"+testutil.CommonImage)
 		},
 		Expected: test.Expects(0, nil, nil),
 	}
@@ -725,7 +725,7 @@ RUN ["cat", "/hello_from_dir2.txt"]`, testutil.CommonImage, filename)
 			data.Set("dir2", dir2)
 		},
 		Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-			return helpers.Command("build", "-t", data.Identifier(), data.Get("buildCtx"), fmt.Sprintf("--build-context=dir2=%s", data.Get("dir2")))
+			return helpers.Command("build", "-t", data.Identifier(), data.Get("buildCtx"), "--build-context=dir2="+data.Get("dir2"))
 		},
 		Expected: test.Expects(0, nil, nil),
 	}
@@ -876,7 +876,7 @@ func TestBuildAttestation(t *testing.T) {
 				helpers.Anyhow("buildx", "create", "--name", data.Identifier("builder"), "--bootstrap", "--use")
 			}
 
-			dockerfile := fmt.Sprintf(`FROM %s`, testutil.CommonImage)
+			dockerfile := "FROM " + testutil.CommonImage
 			buildCtx := data.TempDir()
 			err := os.WriteFile(filepath.Join(buildCtx, "Dockerfile"), []byte(dockerfile), 0o600)
 			assert.NilError(helpers.T(), err)
@@ -893,7 +893,7 @@ func TestBuildAttestation(t *testing.T) {
 					if nerdtest.IsDocker() {
 						cmd.WithArgs("--builder", data.Identifier("builder"))
 					}
-					cmd.WithArgs("--sbom=true", "-o", fmt.Sprintf("type=local,dest=%s", outputSBOMDir), data.Get("buildCtx"))
+					cmd.WithArgs("--sbom=true", "-o", "type=local,dest="+outputSBOMDir, data.Get("buildCtx"))
 					return cmd
 				},
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
@@ -915,7 +915,7 @@ func TestBuildAttestation(t *testing.T) {
 					if nerdtest.IsDocker() {
 						cmd.WithArgs("--builder", data.Identifier("builder"))
 					}
-					cmd.WithArgs("--provenance=mode=min", "-o", fmt.Sprintf("type=local,dest=%s", outputProvenanceDir), data.Get("buildCtx"))
+					cmd.WithArgs("--provenance=mode=min", "-o", "type=local,dest="+outputProvenanceDir, data.Get("buildCtx"))
 					return cmd
 				},
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
@@ -938,7 +938,7 @@ func TestBuildAttestation(t *testing.T) {
 					if nerdtest.IsDocker() {
 						cmd.WithArgs("--builder", data.Identifier("builder"))
 					}
-					cmd.WithArgs("--attest=type=provenance,mode=min", "--attest=type=sbom", "-o", fmt.Sprintf("type=local,dest=%s", outputAttestationDir), data.Get("buildCtx"))
+					cmd.WithArgs("--attest=type=provenance,mode=min", "--attest=type=sbom", "-o", "type=local,dest="+outputAttestationDir, data.Get("buildCtx"))
 					return cmd
 				},
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {

@@ -325,7 +325,7 @@ func Create(ctx context.Context, client *containerd.Client, args []string, netMa
 		// in the daemon level HostGateway IP config variable.
 		if len(parts) == 2 && parts[1] == dockeropts.HostGatewayName {
 			if options.GOptions.HostGatewayIP == "" {
-				return nil, generateRemoveOrphanedDirsFunc(ctx, id, dataStore, internalLabels), fmt.Errorf("unable to derive the IP value for host-gateway")
+				return nil, generateRemoveOrphanedDirsFunc(ctx, id, dataStore, internalLabels), errors.New("unable to derive the IP value for host-gateway")
 			}
 			parts[1] = options.GOptions.HostGatewayIP
 			internalLabels.extraHosts[i] = fmt.Sprintf(`%s:%s`, parts[0], parts[1])

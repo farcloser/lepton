@@ -73,7 +73,7 @@ func AddStringFlag(cmd *cobra.Command, name string, aliases []string, value stri
 	if envV, ok := os.LookupEnv(env); ok {
 		value = envV
 	}
-	aliasesUsage := fmt.Sprintf("Alias of --%s", name)
+	aliasesUsage := "Alias of --" + name
 	p := new(string)
 	flags := cmd.Flags()
 	flags.StringVar(p, name, value, usage)
@@ -119,7 +119,7 @@ func AddPersistentStringArrayFlag(cmd *cobra.Command, name string, aliases, nonP
 	if envV, ok := os.LookupEnv(env); ok {
 		value = []string{envV}
 	}
-	aliasesUsage := fmt.Sprintf("Alias of --%s", name)
+	aliasesUsage := "Alias of --" + name
 	p := new([]string)
 	flags := cmd.Flags()
 	for _, a := range nonPersistentAliases {
@@ -152,7 +152,7 @@ func AddPersistentStringFlag(cmd *cobra.Command, name string, aliases, localAlia
 	if envV, ok := os.LookupEnv(env); ok {
 		value = envV
 	}
-	aliasesUsage := fmt.Sprintf("Alias of --%s", name)
+	aliasesUsage := "Alias of --" + name
 	p := new(string)
 
 	// flags is full set of flag(s)
@@ -207,7 +207,7 @@ func AddPersistentBoolFlag(cmd *cobra.Command, name string, aliases, nonPersiste
 			log.L.WithError(err).Warnf("Invalid boolean value for `%s`", env)
 		}
 	}
-	aliasesUsage := fmt.Sprintf("Alias of --%s", name)
+	aliasesUsage := "Alias of --" + name
 	p := new(bool)
 	flags := cmd.Flags()
 	for _, a := range nonPersistentAliases {

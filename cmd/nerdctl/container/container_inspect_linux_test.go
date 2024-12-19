@@ -195,7 +195,7 @@ func TestContainerInspectState(t *testing.T) {
 	testCases := []testCase{
 		{
 			name:          "inspect State with error",
-			containerName: fmt.Sprintf("%s-fail", testContainer),
+			containerName: testContainer + "-fail",
 			cmd:           "aa",
 			want: dockercompat.ContainerState{
 				Error:  "executable file not found in $PATH",
@@ -204,7 +204,7 @@ func TestContainerInspectState(t *testing.T) {
 		},
 		{
 			name:          "inspect State without error",
-			containerName: fmt.Sprintf("%s-success", testContainer),
+			containerName: testContainer + "-success",
 			cmd:           "ls",
 			want: dockercompat.ContainerState{
 				Error:  "",

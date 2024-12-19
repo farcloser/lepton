@@ -54,7 +54,7 @@ func (c *Composer) upNetwork(ctx context.Context, shortName string) error {
 		}
 
 		if net.Driver != "" {
-			createArgs = append(createArgs, fmt.Sprintf("--driver=%s", net.Driver))
+			createArgs = append(createArgs, "--driver="+net.Driver)
 		}
 
 		if net.DriverOpts != nil {
@@ -73,13 +73,13 @@ func (c *Composer) upNetwork(ctx context.Context, shortName string) error {
 				log.G(ctx).Warnf("Ignoring: network %s: ipam.config[0]: %+v", shortName, unknown)
 			}
 			if ipamConfig.Subnet != "" {
-				createArgs = append(createArgs, fmt.Sprintf("--subnet=%s", ipamConfig.Subnet))
+				createArgs = append(createArgs, "--subnet="+ipamConfig.Subnet)
 			}
 			if ipamConfig.Gateway != "" {
-				createArgs = append(createArgs, fmt.Sprintf("--gateway=%s", ipamConfig.Gateway))
+				createArgs = append(createArgs, "--gateway="+ipamConfig.Gateway)
 			}
 			if ipamConfig.IPRange != "" {
-				createArgs = append(createArgs, fmt.Sprintf("--ip-range=%s", ipamConfig.IPRange))
+				createArgs = append(createArgs, "--ip-range="+ipamConfig.IPRange)
 			}
 		}
 

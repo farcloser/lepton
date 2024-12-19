@@ -40,7 +40,7 @@ const (
 // That being said, this is still a much better solution than writing directly to the destination file.
 func New(rootPath string, dirPerm os.FileMode, filePerm os.FileMode) (Store, error) {
 	if rootPath == "" {
-		return nil, errors.Join(ErrInvalidArgument, fmt.Errorf("FileStore rootPath cannot be empty"))
+		return nil, errors.Join(ErrInvalidArgument, errors.New("FileStore rootPath cannot be empty"))
 	}
 
 	if dirPerm == 0 {
@@ -115,7 +115,7 @@ func (vs *fileStore) WithLock(fun func() error) (err error) {
 
 func (vs *fileStore) Get(key ...string) ([]byte, error) {
 	if vs.locked == nil {
-		return nil, errors.Join(ErrFaultyImplementation, fmt.Errorf("operations on the store must use locking"))
+		return nil, errors.Join(ErrFaultyImplementation, errors.New("operations on the store must use locking"))
 	}
 
 	if err := validateAllPathComponents(key...); err != nil {
@@ -166,7 +166,7 @@ func (vs *fileStore) Exists(key ...string) (bool, error) {
 
 func (vs *fileStore) Set(data []byte, key ...string) error {
 	if vs.locked == nil {
-		return errors.Join(ErrFaultyImplementation, fmt.Errorf("operations on the store must use locking"))
+		return errors.Join(ErrFaultyImplementation, errors.New("operations on the store must use locking"))
 	}
 
 	if err := validateAllPathComponents(key...); err != nil {
@@ -197,7 +197,7 @@ func (vs *fileStore) Set(data []byte, key ...string) error {
 
 func (vs *fileStore) List(key ...string) ([]string, error) {
 	if vs.locked == nil {
-		return nil, errors.Join(ErrFaultyImplementation, fmt.Errorf("operations on the store must use locking"))
+		return nil, errors.Join(ErrFaultyImplementation, errors.New("operations on the store must use locking"))
 	}
 
 	// Unlike Get, Set and Delete, List can have zero length key
@@ -237,7 +237,7 @@ func (vs *fileStore) List(key ...string) ([]string, error) {
 
 func (vs *fileStore) Delete(key ...string) error {
 	if vs.locked == nil {
-		return errors.Join(ErrFaultyImplementation, fmt.Errorf("operations on the store must use locking"))
+		return errors.Join(ErrFaultyImplementation, errors.New("operations on the store must use locking"))
 	}
 
 	if err := validateAllPathComponents(key...); err != nil {
@@ -272,7 +272,7 @@ func (vs *fileStore) Location(key ...string) (string, error) {
 
 func (vs *fileStore) GroupEnsure(key ...string) error {
 	if vs.locked == nil {
-		return errors.Join(ErrFaultyImplementation, fmt.Errorf("operations on the store must use locking"))
+		return errors.Join(ErrFaultyImplementation, errors.New("operations on the store must use locking"))
 	}
 
 	if err := validateAllPathComponents(key...); err != nil {
@@ -290,7 +290,7 @@ func (vs *fileStore) GroupEnsure(key ...string) error {
 
 func (vs *fileStore) GroupSize(key ...string) (int64, error) {
 	if vs.locked == nil {
-		return 0, errors.Join(ErrFaultyImplementation, fmt.Errorf("operations on the store must use locking"))
+		return 0, errors.Join(ErrFaultyImplementation, errors.New("operations on the store must use locking"))
 	}
 
 	if err := validateAllPathComponents(key...); err != nil {

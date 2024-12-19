@@ -18,7 +18,7 @@ package bypass4netnsutil
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -82,7 +82,7 @@ func getXDGRuntimeDir() (string, error) {
 	if xrd := os.Getenv("XDG_RUNTIME_DIR"); xrd != "" {
 		return xrd, nil
 	}
-	return "", fmt.Errorf("environment variable XDG_RUNTIME_DIR is not set")
+	return "", errors.New("environment variable XDG_RUNTIME_DIR is not set")
 }
 
 func CreateSocketDir() error {

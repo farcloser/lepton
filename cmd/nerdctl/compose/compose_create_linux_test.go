@@ -113,7 +113,7 @@ services:
     image: %s
 `, imageSvc0)
 
-	dockerfile := fmt.Sprintf(`FROM %s`, testutil.AlpineImage)
+	dockerfile := "FROM " + testutil.AlpineImage
 
 	testutil.RequiresBuild(t)
 	testutil.RegisterBuildCacheCleanup(t)
