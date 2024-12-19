@@ -124,6 +124,9 @@ func usage(c *cobra.Command) error {
 }
 
 func main() {
+	logging.InitLogging()
+	logging.InitLogViewer()
+
 	if err := xmain(); err != nil {
 		errutil.HandleExitCoder(err)
 		log.L.Fatal(err)

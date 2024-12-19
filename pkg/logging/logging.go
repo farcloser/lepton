@@ -94,7 +94,7 @@ func GetDriver(name string, opts map[string]string, address string) (Driver, err
 	return driverFactory(opts, address)
 }
 
-func init() {
+func InitLogging() {
 	RegisterDriver("none", func(opts map[string]string, address string) (Driver, error) {
 		return &NoneLogger{}, nil
 	}, NoneLogOptsValidate)
