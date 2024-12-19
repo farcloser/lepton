@@ -32,7 +32,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/annotations"
 )
 
-func generateSecurityOpt(listenerPath string) (oci.SpecOpts, error) {
+func generateSecurityOpt(listenerPath string) oci.SpecOpts {
 	opt := func(_ context.Context, _ oci.Client, _ *containers.Container, s *specs.Spec) error {
 		if s.Linux.Seccomp == nil {
 			s.Linux.Seccomp = b4nnoci.GetDefaultSeccompProfile(listenerPath)
@@ -45,7 +45,7 @@ func generateSecurityOpt(listenerPath string) (oci.SpecOpts, error) {
 		}
 		return nil
 	}
-	return opt, nil
+	return opt
 }
 
 func GenerateBypass4netnsOpts(securityOptsMaps map[string]string, annotationsMap map[string]string, id string) ([]oci.SpecOpts, error) {
@@ -73,14 +73,9 @@ func GenerateBypass4netnsOpts(securityOptsMaps map[string]string, annotationsMap
 		return nil, err
 	}
 
-	opts := []oci.SpecOpts{}
-	opt, err := generateSecurityOpt(socketPath)
-	if err != nil {
-		return nil, err
-	}
-	opts = append(opts, opt)
-
-	return opts, nil
+	return []oci.SpecOpts{
+		generateSecurityOpt(socketPath),
+	}, nil
 }
 
 func getXDGRuntimeDir() (string, error) {

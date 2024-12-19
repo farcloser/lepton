@@ -204,7 +204,7 @@ func TestSyslogFormat(t *testing.T) {
 
 	networks := []string{"unix"}
 	fmtValidFuncs := map[string]func(string, string, string, string, syslog.Priority, bool) error{
-		"": func(rcvd, msg, tag, hostname string, pri syslog.Priority, isSTLS bool) error {
+		"": func(rcvd, msg, tag, _hostname string, pri syslog.Priority, _isSTLS bool) error {
 			var mon, day, hrs string
 			var pid int
 			exp := fmt.Sprintf("<%d>", pri|syslog.LOG_INFO) + "%s %s %s " + tag + "[%d]: " + msg + "\n"
@@ -213,7 +213,7 @@ func TestSyslogFormat(t *testing.T) {
 			}
 			return nil
 		},
-		"rfc3164": func(rcvd, msg, tag, hostname string, pri syslog.Priority, isTLS bool) error {
+		"rfc3164": func(rcvd, msg, tag, hostname string, pri syslog.Priority, _isTLS bool) error {
 			var parsedHostname, mon, day, hrs string
 			var pid int
 			exp := fmt.Sprintf("<%d>", pri|syslog.LOG_INFO) + "%s %s %s %s " + tag + "[%d]: " + msg + "\n"

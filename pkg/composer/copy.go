@@ -96,7 +96,7 @@ func (c *Composer) Copy(ctx context.Context, co CopyOptions) error {
 	return nil
 }
 
-func (c *Composer) logCopyMsg(ctx context.Context, container containerd.Container, direction copyDirection, srcService string, srcPath string, destService string, dstPath string, dryRun bool) error {
+func (c *Composer) logCopyMsg(ctx context.Context, container containerd.Container, direction copyDirection, _srcService string, srcPath string, _destService string, dstPath string, dryRun bool) error {
 	containerLabels, err := container.Labels(ctx)
 	if err != nil {
 		return err

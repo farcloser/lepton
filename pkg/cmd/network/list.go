@@ -74,10 +74,7 @@ func List(ctx context.Context, options types.NetworkListOptions) error {
 		return err
 	}
 
-	labelFilterFuncs, nameFilterFuncs, err := getNetworkFilterFuncs(filters)
-	if err != nil {
-		return err
-	}
+	labelFilterFuncs, nameFilterFuncs := getNetworkFilterFuncs(filters)
 	if len(filters) > 0 {
 		filtered := make([]*netutil.NetworkConfig, 0)
 		for _, net := range netConfigs {
@@ -141,7 +138,7 @@ func List(ctx context.Context, options types.NetworkListOptions) error {
 	return nil
 }
 
-func getNetworkFilterFuncs(filters []string) ([]func(*map[string]string) bool, []func(string) bool, error) {
+func getNetworkFilterFuncs(filters []string) ([]func(*map[string]string) bool, []func(string) bool) {
 	labelFilterFuncs := make([]func(*map[string]string) bool, 0)
 	nameFilterFuncs := make([]func(string) bool, 0)
 
@@ -176,7 +173,7 @@ func getNetworkFilterFuncs(filters []string) ([]func(*map[string]string) bool, [
 			continue
 		}
 	}
-	return labelFilterFuncs, nameFilterFuncs, nil
+	return labelFilterFuncs, nameFilterFuncs
 }
 
 func networkMatchesFilter(net *netutil.NetworkConfig, labelFilterFuncs []func(*map[string]string) bool, nameFilterFuncs []func(string) bool) bool {

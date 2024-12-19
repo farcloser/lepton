@@ -65,12 +65,9 @@ func setPlatformOptions(ctx context.Context, client *containerd.Client, id, uts 
 
 	annotations := utils.KeyValueStringsToMap(options.Annotations)
 
-	capOpts, err := generateCapOpts(
+	capOpts := generateCapOpts(
 		strutil.DedupeStrSlice(options.CapAdd),
 		strutil.DedupeStrSlice(options.CapDrop))
-	if err != nil {
-		return nil, err
-	}
 	opts = append(opts, capOpts...)
 	securityOptsMaps := utils.KeyValueStringsToMap(strutil.DedupeStrSlice(options.SecurityOpt))
 	secOpts, err := generateSecurityOpts(options.Privileged, securityOptsMaps)

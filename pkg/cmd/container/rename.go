@@ -54,8 +54,7 @@ func Rename(ctx context.Context, client *containerd.Client, containerID, newCont
 			if found.MatchCount > 1 {
 				return fmt.Errorf("multiple IDs found with provided prefix: %s", found.Req)
 			}
-			return renameContainer(ctx, found.Container, newContainerName,
-				options.GOptions.Namespace, namest, hostst)
+			return renameContainer(ctx, found.Container, newContainerName, namest, hostst)
 		},
 	}
 
@@ -67,7 +66,7 @@ func Rename(ctx context.Context, client *containerd.Client, containerID, newCont
 	return nil
 }
 
-func renameContainer(ctx context.Context, container containerd.Container, newName, ns string,
+func renameContainer(ctx context.Context, container containerd.Container, newName string,
 	namst namestore.NameStore, hostst hostsstore.Store) (err error) {
 	l, err := container.Labels(ctx)
 	if err != nil {

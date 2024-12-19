@@ -325,7 +325,7 @@ func Stats(ctx context.Context, client *containerd.Client, containerIDs []string
 	return err
 }
 
-func collect(ctx context.Context, globalOptions types.GlobalCommandOptions, s *statsutil.Stats, waitFirst *sync.WaitGroup, id string, noStream bool) {
+func collect(ctx context.Context, globalOptions types.GlobalCommandOptions, s *statsutil.Stats, waitFirst *sync.WaitGroup, id string, _noStream bool) {
 	log.G(ctx).Debugf("collecting stats for %s", s.ID)
 	var (
 		getFirst = true

@@ -224,7 +224,7 @@ func getReplicas(svc types.ServiceConfig) (int, error) {
 	return replicas, nil
 }
 
-func getCPULimit(svc types.ServiceConfig) (string, error) {
+func getCPULimit(svc types.ServiceConfig) string {
 	var limit string
 	if svc.CPUS > 0 {
 		log.L.Warn("cpus is deprecated, use deploy.resources.limits.cpus")
@@ -238,10 +238,10 @@ func getCPULimit(svc types.ServiceConfig) (string, error) {
 			limit = strconv.FormatFloat(float64(nanoCPUs), 'f', 2, 32)
 		}
 	}
-	return limit, nil
+	return limit
 }
 
-func getMemLimit(svc types.ServiceConfig) (types.UnitBytes, error) {
+func getMemLimit(svc types.ServiceConfig) types.UnitBytes {
 	var limit types.UnitBytes
 	if svc.MemLimit > 0 {
 		log.L.Warn("mem_limit is deprecated, use deploy.resources.limits.memory")
@@ -255,7 +255,7 @@ func getMemLimit(svc types.ServiceConfig) (types.UnitBytes, error) {
 			limit = memoryBytes
 		}
 	}
-	return limit, nil
+	return limit
 }
 
 func getGPUs(svc types.ServiceConfig) (reqs []string, _ error) {
@@ -500,9 +500,7 @@ func newContainer(project *types.Project, parsed *Service, i int) (*Container, e
 		c.RunArgs = append(c.RunArgs, fmt.Sprintf("--cap-drop=%s", v))
 	}
 
-	if cpuLimit, err := getCPULimit(svc); err != nil {
-		return nil, err
-	} else if cpuLimit != "" {
+	if cpuLimit := getCPULimit(svc); cpuLimit != "" {
 		c.RunArgs = append(c.RunArgs, fmt.Sprintf("--cpus=%s", cpuLimit))
 	}
 
@@ -549,9 +547,7 @@ func newContainer(project *types.Project, parsed *Service, i int) (*Container, e
 		c.RunArgs = append(c.RunArgs, "--init")
 	}
 
-	if memLimit, err := getMemLimit(svc); err != nil {
-		return nil, err
-	} else if memLimit > 0 {
+	if memLimit := getMemLimit(svc); memLimit > 0 {
 		c.RunArgs = append(c.RunArgs, fmt.Sprintf("-m=%d", memLimit))
 	}
 
