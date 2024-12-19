@@ -235,7 +235,7 @@ func (x *historyPrinter) printHistory(printable historyPrintable) error {
 	}
 
 	// Format date and size for display based on --human preference
-	printable.CreatedAt = printable.creationTime.Local().Format(time.RFC3339)
+	printable.CreatedAt = printable.creationTime.Local().Format(time.RFC3339) //nolint:gosmopolitan
 	if x.human {
 		printable.CreatedSince = formatter.TimeSinceInHuman(*printable.creationTime)
 		printable.Size = units.HumanSize(float64(printable.size))

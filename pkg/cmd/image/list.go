@@ -320,7 +320,8 @@ func (x *imagePrinter) printImageSinglePlatform(desc specs.Descriptor, img image
 	}
 
 	p := imagePrintable{
-		CreatedAt:    img.CreatedAt.Round(time.Second).Local().String(), // format like "2021-08-07 02:19:45 +0900 JST"
+		// format like "2021-08-07 02:19:45 +0900 JST"
+		CreatedAt:    img.CreatedAt.Round(time.Second).Local().String(), //nolint:gosmopolitan
 		CreatedSince: formatter.TimeSinceInHuman(img.CreatedAt),
 		Digest:       img.Target.Digest.String(),
 		ID:           img.Target.Digest.String(),
