@@ -31,8 +31,10 @@ import (
 	"time"
 )
 
-var mut = &sync.Mutex{} //nolint:gochecknoglobals
-var portList = map[int]bool{}
+var (
+	mut      = &sync.Mutex{} //nolint:gochecknoglobals
+	portList = map[int]bool{}
+)
 
 func Acquire(port int) (int, error) {
 	flexible := false

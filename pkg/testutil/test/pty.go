@@ -18,5 +18,7 @@ package test
 
 import "errors"
 
-var ErrPTYFailure = errors.New("pty failure")
-var ErrPTYUnsupportedPlatform = errors.New("pty not supported on this platform")
+var (
+	ErrPTYFailure             = errors.New("pty failure")
+	ErrPTYUnsupportedPlatform = errors.New("pty not supported on this platform")
+)

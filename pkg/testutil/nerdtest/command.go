@@ -43,9 +43,7 @@ const (
 	targetDocker  = target("docker")
 )
 
-var (
-	targetNerdishctl = version.RootName
-)
+var targetNerdishctl = version.RootName
 
 func getTarget() string {
 	// Indirecting to testutil for now

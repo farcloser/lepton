@@ -37,21 +37,17 @@ linters:
     - varnamelen
     - thelper
     - protogetter
-    - gosec
-    - err113
+#    - gosec
+#    - err113
     - gofumpt
+    - exhaustive
     - musttag
     - paralleltest
     - testpackage
-    - exhaustive
-#    - nilerr
     - gocritic
-#    - noctx
     - nestif
     - contextcheck
     - gocyclo
-
-#    - perfsprint
     - forcetypeassert
     - gocognit
     - errcheck

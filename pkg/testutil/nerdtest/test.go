@@ -22,12 +22,14 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
 )
 
-var DockerConfig test.ConfigKey = "DockerConfig"
-var Namespace test.ConfigKey = "Namespace"
-var NerdctlToml test.ConfigKey = "NerdctlToml"
-var HostsDir test.ConfigKey = "HostsDir"
-var DataRoot test.ConfigKey = "DataRoot"
-var Debug test.ConfigKey = "Debug"
+var (
+	DockerConfig test.ConfigKey = "DockerConfig"
+	Namespace    test.ConfigKey = "Namespace"
+	NerdctlToml  test.ConfigKey = "NerdctlToml"
+	HostsDir     test.ConfigKey = "HostsDir"
+	DataRoot     test.ConfigKey = "DataRoot"
+	Debug        test.ConfigKey = "Debug"
+)
 
 func Setup() *test.Case {
 	test.Customize(&nerdctlSetup{})

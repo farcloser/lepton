@@ -65,11 +65,13 @@ func Arch(arch string) *Requirement {
 	}
 }
 
-var Amd64 = Arch("amd64")
-var Arm64 = Arch("arm64")
-var Windows = OS("windows")
-var Linux = OS("linux")
-var Darwin = OS("darwin")
+var (
+	Amd64   = Arch("amd64")
+	Arm64   = Arch("arm64")
+	Windows = OS("windows")
+	Linux   = OS("linux")
+	Darwin  = OS("darwin")
+)
 
 // NOTE: Not will always lose setups and cleanups...
 
