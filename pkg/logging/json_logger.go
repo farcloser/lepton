@@ -175,7 +175,8 @@ func viewLogsJSONFileDirect(lvopts LogViewOptions, jsonLogFilePath string, stdou
 	baseName := filepath.Base(jsonLogFilePath)
 	dir := filepath.Dir(jsonLogFilePath)
 	retryTimes := 2
-	backBytes := 0
+
+	var backBytes int
 
 	for {
 		select {

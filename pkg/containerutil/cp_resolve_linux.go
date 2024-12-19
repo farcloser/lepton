@@ -316,7 +316,7 @@ func (res *resolver) resolvePath(path string) (string, error) {
 	vol := path[:volLen]
 	dest := vol
 	linksWalked := 0
-	//nolint:ineffassign
+	//nolint:ineffassign,wastedassign
 	for start, end := volLen, volLen; start < len(path); start = end {
 		for start < len(path) && os.IsPathSeparator(path[start]) {
 			start++

@@ -218,7 +218,6 @@ func TestRunPortWithNoHostPort(t *testing.T) {
 				"-p", pFlag,
 				testutil.NginxAlpineImage)
 			var result *icmd.Result
-			stdoutContent := ""
 			if tc.runShouldSuccess {
 				cmd.AssertOK()
 			} else {
@@ -228,7 +227,7 @@ func TestRunPortWithNoHostPort(t *testing.T) {
 			portCmd := base.Cmd("port", testContainerName)
 			portCmd.Base.T.Helper()
 			result = portCmd.Run()
-			stdoutContent = result.Stdout() + result.Stderr()
+			stdoutContent := result.Stdout() + result.Stderr()
 			assert.Assert(cmd.Base.T, result.ExitCode == 0, stdoutContent)
 			regexExpression := regexp.MustCompile(`80\/tcp.*?->.*?0.0.0.0:(?P<portNumber>\d{1,5}).*?`)
 			match := regexExpression.FindStringSubmatch(stdoutContent)
@@ -302,7 +301,6 @@ func TestUniqueHostPortAssignement(t *testing.T) {
 				pFlag,
 				testutil.NginxAlpineImage)
 			var result *icmd.Result
-			stdoutContent := ""
 			if tc.runShouldSuccess {
 				cmd1.AssertOK()
 				cmd2.AssertOK()
@@ -316,7 +314,7 @@ func TestUniqueHostPortAssignement(t *testing.T) {
 			portCmd1.Base.T.Helper()
 			portCmd2.Base.T.Helper()
 			result = portCmd1.Run()
-			stdoutContent = result.Stdout() + result.Stderr()
+			stdoutContent := result.Stdout() + result.Stderr()
 			assert.Assert(t, result.ExitCode == 0, stdoutContent)
 			port1, err := extractHostPort(stdoutContent, "80")
 			assert.NilError(t, err)
