@@ -21,8 +21,8 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/klauspost/compress/zstd"
 	"go.farcloser.world/containers/specs"
+	"go.farcloser.world/core/compression/zstd"
 
 	"github.com/containerd/containerd/v2/core/content"
 	"github.com/containerd/containerd/v2/core/images"

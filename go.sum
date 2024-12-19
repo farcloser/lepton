@@ -297,8 +297,8 @@ github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9dec
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
 go.farcloser.world/containers v0.0.0-20241218222123-7d33d08bddcd h1:2egbrg9oGtlEmRQFK8FfQG9qnS3U4Embnhf11DL4Ur0=
 go.farcloser.world/containers v0.0.0-20241218222123-7d33d08bddcd/go.mod h1:ZXHYwP/8pAa4bKXNVdI62QTuo9pu32ESYXPXHBAqlfc=
-go.farcloser.world/core v0.0.0-20241218222542-7d037cf6ac05 h1:cqkCLkqIvdpc8LE5I94gU5+Hl3drUaKxODLTSjvQoD0=
-go.farcloser.world/core v0.0.0-20241218222542-7d037cf6ac05/go.mod h1:+76DnGWJ8zWTsLr6kF7keCaUiSOoud4vBmhVMiPaZ9k=
+go.farcloser.world/core v0.0.0-20241218231132-78a573634019 h1:6PwmIHs7xF1lAPSPtX2FxK0SiZEWoGjZYo6XmJqniWo=
+go.farcloser.world/core v0.0.0-20241218231132-78a573634019/go.mod h1:LxaobC1TgwGjGvdgQxu25YpB/DDEQYiqVsyoFEsxUaI=
 go.opencensus.io v0.24.0 h1:y73uSU6J157QMP2kn2r30vwW1A2W2WFwSCGnAVxeaD0=
 go.opencensus.io v0.24.0/go.mod h1:vNK8G9p7aAivkbmorf4v+7Hgx+Zs0yY+0fOtgBfjQKo=
 go.opentelemetry.io/auto/sdk v1.1.0 h1:cH53jehLUN6UFLY71z+NDOiNJqDdPRaXzTel0sJySYA=
