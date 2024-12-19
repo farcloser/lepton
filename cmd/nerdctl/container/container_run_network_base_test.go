@@ -215,6 +215,7 @@ func baseTestRunPort(t *testing.T, nginxImage string, nginxIndexHTMLSnippet stri
 				assert.ErrorContains(t, err, tc.err)
 				return
 			}
+			defer resp.Body.Close()
 			assert.NilError(t, err)
 			respBody, err := io.ReadAll(resp.Body)
 			assert.NilError(t, err)

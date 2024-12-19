@@ -53,6 +53,7 @@ func TestStopStart(t *testing.T) {
 		if err != nil {
 			return err
 		}
+		defer resp.Body.Close()
 		respBody, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return err
