@@ -17,6 +17,7 @@
 package network
 
 import (
+	"errors"
 	"fmt"
 	"io"
 
@@ -29,7 +30,7 @@ import (
 func Create(options types.NetworkCreateOptions, stdout io.Writer) error {
 	if len(options.Subnets) == 0 {
 		if options.Gateway != "" || options.IPRange != "" {
-			return fmt.Errorf("cannot set gateway or ip-range without subnet, specify --subnet manually")
+			return errors.New("cannot set gateway or ip-range without subnet, specify --subnet manually")
 		}
 		options.Subnets = []string{""}
 	}

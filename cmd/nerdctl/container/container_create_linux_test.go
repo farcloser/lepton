@@ -317,10 +317,10 @@ func TestCreateFromOCIArchive(t *testing.T) {
 	CMD ["echo", "%s"]`, testutil.CommonImage, sentinel)
 
 	buildCtx := helpers.CreateBuildContext(t, dockerfile)
-	tag := fmt.Sprintf("%s:latest", imageName)
+	tag := imageName + ":latest"
 	tarPath := fmt.Sprintf("%s/%s.tar", buildCtx, imageName)
 
-	base.Cmd("build", "--tag", tag, fmt.Sprintf("--output=type=oci,dest=%s", tarPath), buildCtx).AssertOK()
-	base.Cmd("create", "--rm", "--name", containerName, fmt.Sprintf("oci-archive://%s", tarPath)).AssertOK()
+	base.Cmd("build", "--tag", tag, "--output=type=oci,dest="+tarPath, buildCtx).AssertOK()
+	base.Cmd("create", "--rm", "--name", containerName, "oci-archive://"+tarPath).AssertOK()
 	base.Cmd("start", "--attach", containerName).AssertOutContains("test-nerdctl-create-from-oci-archive")
 }

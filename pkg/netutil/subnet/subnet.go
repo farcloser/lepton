@@ -17,6 +17,7 @@
 package subnet
 
 import (
+	"errors"
 	"fmt"
 	"net"
 
@@ -55,7 +56,7 @@ func GetFreeSubnet(n *net.IPNet, usedNetworks []*net.IPNet) (*net.IPNet, error) 
 		}
 		n = next
 	}
-	return nil, fmt.Errorf("could not find free subnet")
+	return nil, errors.New("could not find free subnet")
 }
 
 func nextSubnet(subnet *net.IPNet) (*net.IPNet, error) {
@@ -78,7 +79,7 @@ func nextSubnet(subnet *net.IPNet) (*net.IPNet, error) {
 
 func incByte(subnet *net.IPNet, idx int, shift uint) error {
 	if idx < 0 {
-		return fmt.Errorf("no more subnets left")
+		return errors.New("no more subnets left")
 	}
 
 	var val byte = 1 << shift

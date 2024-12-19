@@ -76,7 +76,7 @@ const (
 // them to the provided io.Writers after applying the provided logging options.
 func viewLogsCRI(lvopts LogViewOptions, stdout, stderr io.Writer, stopChannel chan os.Signal) error {
 	if lvopts.LogPath == "" {
-		return fmt.Errorf("logpath is nil ")
+		return errors.New("logpath is nil ")
 	}
 
 	return ReadLogs(&lvopts, stdout, stderr, stopChannel)
@@ -321,7 +321,7 @@ func ParseCRILog(log []byte, msg *logMessage) error {
 	// Parse timestamp
 	idx := bytes.Index(log, delimiter)
 	if idx < 0 {
-		return fmt.Errorf("timestamp is not found")
+		return errors.New("timestamp is not found")
 	}
 	msg.timestamp, err = time.Parse(time.RFC3339Nano, string(log[:idx]))
 	if err != nil {
@@ -332,7 +332,7 @@ func ParseCRILog(log []byte, msg *logMessage) error {
 	log = log[idx+1:]
 	idx = bytes.Index(log, delimiter)
 	if idx < 0 {
-		return fmt.Errorf("stream type is not found")
+		return errors.New("stream type is not found")
 	}
 	msg.stream = LogStreamType(log[:idx])
 	if msg.stream != Stdout && msg.stream != Stderr {
@@ -343,7 +343,7 @@ func ParseCRILog(log []byte, msg *logMessage) error {
 	log = log[idx+1:]
 	idx = bytes.Index(log, delimiter)
 	if idx < 0 {
-		return fmt.Errorf("log tag is not found")
+		return errors.New("log tag is not found")
 	}
 	// Keep this forward compatible.
 	tags := bytes.Split(log[:idx], tagDelimiter)

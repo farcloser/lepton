@@ -127,7 +127,7 @@ func TestRunShmSizeIPCContainer(t *testing.T) {
 	baseContainerID := strings.TrimSpace(sharedContainerResult.Stdout())
 	defer base.Cmd("rm", "-f", baseContainerID).Run()
 
-	base.Cmd("run", "--rm", fmt.Sprintf("--ipc=container:%s", baseContainerID),
+	base.Cmd("run", "--rm", "--ipc=container:"+baseContainerID,
 		testutil.AlpineImage, "/bin/grep", "shm", "/proc/self/mounts").AssertOutContains("size=32768k")
 }
 
@@ -140,7 +140,7 @@ func TestRunIPCContainer(t *testing.T) {
 	victimContainerID := strings.TrimSpace(victimContainerResult.Stdout())
 	defer base.Cmd("rm", "-f", victimContainerID).Run()
 
-	base.Cmd("run", "--rm", fmt.Sprintf("--ipc=container:%s", victimContainerID),
+	base.Cmd("run", "--rm", "--ipc=container:"+victimContainerID,
 		testutil.AlpineImage, "/bin/grep", "shm", "/proc/self/mounts").AssertOutContains("size=32768k")
 }
 
@@ -175,7 +175,7 @@ func TestRunPidContainer(t *testing.T) {
 	baseContainerID := strings.TrimSpace(sharedContainerResult.Stdout())
 	defer base.Cmd("rm", "-f", baseContainerID).Run()
 
-	base.Cmd("run", "--rm", fmt.Sprintf("--pid=container:%s", baseContainerID),
+	base.Cmd("run", "--rm", "--pid=container:"+baseContainerID,
 		testutil.AlpineImage, "ps", "ax").AssertOutContains("sleep " + nerdtest.Infinity)
 }
 
@@ -409,7 +409,7 @@ func TestRunWithFluentdLogDriver(t *testing.T) {
 
 	containerName := testutil.Identifier(t)
 	base.Cmd("run", "-d", "--name", containerName, "-p", "24224:24224",
-		"-v", fmt.Sprintf("%s:/fluentd/log", tempDirectory), testutil.FluentdImage).AssertOK()
+		"-v", tempDirectory+":/fluentd/log", testutil.FluentdImage).AssertOK()
 	defer base.Cmd("rm", "-f", containerName).AssertOK()
 	time.Sleep(3 * time.Second)
 
@@ -438,7 +438,7 @@ func TestRunWithFluentdLogDriverWithLogOpt(t *testing.T) {
 
 	containerName := testutil.Identifier(t)
 	base.Cmd("run", "-d", "--name", containerName, "-p", "24225:24224",
-		"-v", fmt.Sprintf("%s:/fluentd/log", tempDirectory), testutil.FluentdImage).AssertOK()
+		"-v", tempDirectory+":/fluentd/log", testutil.FluentdImage).AssertOK()
 	defer base.Cmd("rm", "-f", containerName).AssertOK()
 	time.Sleep(3 * time.Second)
 

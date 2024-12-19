@@ -82,6 +82,6 @@ func Equals(compare string) Comparator {
 func Match(reg *regexp.Regexp) Comparator {
 	return func(stdout string, info string, t *testing.T) {
 		t.Helper()
-		assert.Check(t, reg.MatchString(stdout), fmt.Sprintf("Output does not match: %s", reg), info)
+		assert.Check(t, reg.MatchString(stdout), "Output does not match: "+reg.String(), info)
 	}
 }

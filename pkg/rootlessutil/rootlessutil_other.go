@@ -23,7 +23,7 @@
 package rootlessutil
 
 import (
-	"fmt"
+	"errors"
 
 	"github.com/rootless-containers/rootlesskit/v2/pkg/api/client"
 )
@@ -45,7 +45,7 @@ func IsRootlessParent() bool {
 
 // Always errors out on non-Linux platforms.
 func XDGRuntimeDir() (string, error) {
-	return "", fmt.Errorf("can only query XDG env vars on Linux")
+	return "", errors.New("can only query XDG env vars on Linux")
 }
 
 // Always returns -1 on non-Linux platforms.
@@ -55,16 +55,16 @@ func ParentEUID() int {
 
 // Always errors out on non-Linux platforms.
 func NewRootlessKitClient() (client.Client, error) {
-	return nil, fmt.Errorf("cannot instantiate RootlessKit client on non-Linux hosts")
+	return nil, errors.New("cannot instantiate RootlessKit client on non-Linux hosts")
 }
 
 // Always errors out on non-Linux platforms.
 func ParentMain(hostGatewayIP string) error {
-	return fmt.Errorf("cannot use RootlessKit on main entry point on non-Linux hosts")
+	return errors.New("cannot use RootlessKit on main entry point on non-Linux hosts")
 }
 
 func RootlessContainredSockAddress() (string, error) {
-	return "", fmt.Errorf("cannot inspect RootlessKit state on non-Linux hosts")
+	return "", errors.New("cannot inspect RootlessKit state on non-Linux hosts")
 }
 
 func DetachedNetNS() (string, error) {

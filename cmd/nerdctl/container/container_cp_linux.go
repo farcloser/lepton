@@ -18,7 +18,6 @@ package container
 
 import (
 	"errors"
-	"fmt"
 	"path/filepath"
 	"strings"
 
@@ -102,16 +101,16 @@ func processCpOptions(cmd *cobra.Command, args []string) (types.ContainerCpOptio
 	}
 
 	if (srcSpec.Container != nil && destSpec.Container != nil) || (len(srcSpec.Path) == 0 && len(destSpec.Path) == 0) {
-		return types.ContainerCpOptions{}, fmt.Errorf("one of src or dest must be a local file specification")
+		return types.ContainerCpOptions{}, errors.New("one of src or dest must be a local file specification")
 	}
 	if srcSpec.Container == nil && destSpec.Container == nil {
-		return types.ContainerCpOptions{}, fmt.Errorf("one of src or dest must be a container file specification")
+		return types.ContainerCpOptions{}, errors.New("one of src or dest must be a container file specification")
 	}
 	if srcSpec.Path == "-" {
-		return types.ContainerCpOptions{}, fmt.Errorf("support for reading a tar archive from stdin is not implemented yet")
+		return types.ContainerCpOptions{}, errors.New("support for reading a tar archive from stdin is not implemented yet")
 	}
 	if destSpec.Path == "-" {
-		return types.ContainerCpOptions{}, fmt.Errorf("support for writing a tar archive to stdout is not implemented yet")
+		return types.ContainerCpOptions{}, errors.New("support for writing a tar archive to stdout is not implemented yet")
 	}
 
 	container2host := srcSpec.Container != nil

@@ -440,7 +440,7 @@ func (e *CNIEnv) createDefaultNetworkConfig(bridgeIP string) error {
 		Subnets:    []string{bridgeCIDR},
 		Gateway:    bridgeGatewayIP,
 		IPAMDriver: "default",
-		Labels:     []string{fmt.Sprintf("%s=true", labels.DefaultNetwork)},
+		Labels:     []string{labels.DefaultNetwork + "=true"},
 	}
 
 	_, err := e.CreateNetwork(opts)

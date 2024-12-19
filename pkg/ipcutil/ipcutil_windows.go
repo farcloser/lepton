@@ -16,17 +16,17 @@
 
 package ipcutil
 
-import "fmt"
+import "errors"
 
 // makeShareableDevshm returns devshm directory path on host when there is no error.
 func makeShareableDevshm(shmPath, shmSize string) error {
-	return fmt.Errorf("windows does not support shareable devshm")
+	return errors.New("windows does not support shareable devshm")
 }
 
 // cleanUpPlatformSpecificIPC cleans up platform specific IPC.
 func cleanUpPlatformSpecificIPC(ipc IPC) error {
 	if ipc.Mode == Shareable {
-		return fmt.Errorf("windows does not support shareable devshm")
+		return errors.New("windows does not support shareable devshm")
 	}
 	return nil
 }

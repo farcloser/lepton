@@ -17,8 +17,6 @@
 package image
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
@@ -81,7 +79,7 @@ func processImageListOptions(cmd *cobra.Command, args []string) (*types.ImageLis
 		if err != nil {
 			return nil, err
 		}
-		filters = []string{fmt.Sprintf("name==%s", parsedReference)}
+		filters = []string{"name==" + parsedReference.String()}
 	}
 	quiet, err := cmd.Flags().GetBool("quiet")
 	if err != nil {

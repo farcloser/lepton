@@ -18,7 +18,6 @@ package compose
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/spf13/cobra"
 
@@ -159,7 +158,7 @@ func composeRunAction(cmd *cobra.Command, args []string) error {
 	}
 
 	if servicePorts && publish != nil && len(publish) > 0 {
-		return fmt.Errorf("--service-ports and --publish(-p) cannot exist simultaneously")
+		return errors.New("--service-ports and --publish(-p) cannot exist simultaneously")
 	}
 	// https://github.com/containerd/nerdctl/blob/v0.22.2/cmd/nerdctl/run.go#L475
 	if interactive && detach {

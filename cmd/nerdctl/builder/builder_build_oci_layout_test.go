@@ -87,7 +87,7 @@ CMD ["echo", "test-build-context-oci-layout"]`
 			} else {
 				cmd = helpers.Command()
 			}
-			cmd.WithArgs("build", buildCtx, fmt.Sprintf("--build-context=parent=oci-layout://%s", filepath.Join(buildCtx, "parent")), "--tag", data.Identifier("-child"))
+			cmd.WithArgs("build", buildCtx, "--build-context=parent=oci-layout://"+filepath.Join(buildCtx, "parent"), "--tag", data.Identifier("-child"))
 			if nerdtest.IsDocker() {
 				// Need to load the container image from the builder to be able to run it.
 				cmd.WithArgs("--load")

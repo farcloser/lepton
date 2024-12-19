@@ -235,7 +235,7 @@ services:
 			//  docker and nerdctl have different DNS resolution behaviors.
 			// it uses the ID in the /etc/hosts file, so we need to fetch the ID first.
 			if testutil.GetTarget() == testutil.Docker {
-				base.Cmd("ps", "--filter", fmt.Sprintf("name=%s", name), "--format", "{{.ID}}").AssertOutWithFunc(func(stdout string) error {
+				base.Cmd("ps", "--filter", "name="+name, "--format", "{{.ID}}").AssertOutWithFunc(func(stdout string) error {
 					host = strings.TrimSpace(stdout)
 					return nil
 				})

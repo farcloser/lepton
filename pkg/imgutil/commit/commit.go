@@ -22,6 +22,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"runtime"
 	"strings"
@@ -340,7 +341,7 @@ func writeContentsForImage(ctx context.Context, snName string, baseImg container
 
 	// config should reference to snapshotter
 	labelOpt := content.WithLabels(map[string]string{
-		fmt.Sprintf("containerd.io/gc.ref.snapshot.%s", snName): specs.ChainID(newConfig.RootFS.DiffIDs).String(),
+		"containerd.io/gc.ref.snapshot." + snName: specs.ChainID(newConfig.RootFS.DiffIDs).String(),
 	})
 	err = content.WriteBlob(ctx, cs, configDesc.Digest.String(), bytes.NewReader(newConfigJSON), configDesc, labelOpt)
 	if err != nil {
@@ -364,7 +365,7 @@ func createDiff(ctx context.Context, name string, sn snapshots.Snapshotter, cs c
 
 	diffIDStr, ok := info.Labels["containerd.io/uncompressed"]
 	if !ok {
-		return specs.Descriptor{}, digest.Digest(""), fmt.Errorf("invalid differ response with no diffID")
+		return specs.Descriptor{}, digest.Digest(""), errors.New("invalid differ response with no diffID")
 	}
 
 	diffID, err := digest.Parse(diffIDStr)

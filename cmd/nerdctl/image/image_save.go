@@ -17,7 +17,7 @@
 package image
 
 import (
-	"fmt"
+	"errors"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -93,7 +93,7 @@ func saveAction(cmd *cobra.Command, args []string) error {
 		output = f
 		defer f.Close()
 	} else if out, ok := output.(*os.File); ok && term.IsTerminal(out.Fd()) {
-		return fmt.Errorf("cowardly refusing to save to a terminal. Use the -o flag or redirect")
+		return errors.New("cowardly refusing to save to a terminal. Use the -o flag or redirect")
 	}
 	options.Stdout = output
 

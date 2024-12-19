@@ -24,6 +24,7 @@
 package mountutil
 
 import (
+	"errors"
 	"fmt"
 	"path/filepath"
 	"regexp"
@@ -118,7 +119,7 @@ func splitVolumeSpec(raw string) ([]string, error) {
 	raw = strings.TrimSpace(raw)
 	raw = strings.TrimLeft(raw, ":")
 	if raw == "" {
-		return nil, fmt.Errorf("invalid empty volume specification")
+		return nil, errors.New("invalid empty volume specification")
 	}
 
 	const (
@@ -250,7 +251,7 @@ func validateNamedPipeSpec(source string, dst string) (bool, error) {
 	destType := parseSourceType(dst)
 
 	if (destType == Npipe && sourceType != Npipe) || (sourceType == Npipe && destType != Npipe) {
-		return false, fmt.Errorf("invalid volume specification. named pipes can only be mapped to named pipes")
+		return false, errors.New("invalid volume specification. named pipes can only be mapped to named pipes")
 	}
 	return true, nil
 }

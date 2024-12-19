@@ -17,6 +17,7 @@
 package tabutil
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 )
@@ -41,7 +42,7 @@ func NewReader(header string) *TabReader {
 
 func (r *TabReader) ParseHeader(header string) error {
 	if len(r.headers) == 0 {
-		return fmt.Errorf("no header")
+		return errors.New("no header")
 	}
 	for i := range r.headers {
 		start := strings.Index(header, r.headers[i])

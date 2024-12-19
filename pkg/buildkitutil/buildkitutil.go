@@ -97,7 +97,7 @@ func GetWorkerLabels(buildkitHost string) (labels map[string]string, _ error) {
 		return nil, err
 	}
 	if len(workers) == 0 {
-		return nil, fmt.Errorf("no worker available")
+		return nil, errors.New("no worker available")
 	}
 	metadata := map[string]json.RawMessage{}
 	if err := json.Unmarshal(workers[0], &metadata); err != nil {
@@ -105,7 +105,7 @@ func GetWorkerLabels(buildkitHost string) (labels map[string]string, _ error) {
 	}
 	labelsRaw, ok := metadata["labels"]
 	if !ok {
-		return nil, fmt.Errorf("worker doesn't have labels")
+		return nil, errors.New("worker doesn't have labels")
 	}
 	labels = map[string]string{}
 	if err := json.Unmarshal(labelsRaw, &labels); err != nil {

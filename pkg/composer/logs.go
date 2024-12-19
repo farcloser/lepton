@@ -119,7 +119,7 @@ func (c *Composer) logs(ctx context.Context, containers []containerd.Container, 
 			}
 		}
 		if lo.LatestRun {
-			args = append(args, fmt.Sprintf("--since=%s", state.startedAt))
+			args = append(args, "--since="+state.startedAt)
 		}
 
 		args = append(args, id)

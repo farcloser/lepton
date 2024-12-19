@@ -18,7 +18,6 @@ package container
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/spf13/cobra"
 
@@ -55,7 +54,7 @@ func topAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	if rootlessutil.IsRootless() && infoutil.CgroupsVersion() == "1" {
-		return fmt.Errorf("top requires cgroup v2 for rootless containers, see https://rootlesscontaine.rs/getting-started/common/cgroup2/")
+		return errors.New("top requires cgroup v2 for rootless containers, see https://rootlesscontaine.rs/getting-started/common/cgroup2/")
 	}
 
 	if globalOptions.CgroupManager == "none" {

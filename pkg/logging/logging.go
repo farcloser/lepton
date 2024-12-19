@@ -258,7 +258,7 @@ func startTail(ctx context.Context, logName string, w *fsnotify.Watcher) (bool, 
 	for {
 		select {
 		case <-ctx.Done():
-			return false, fmt.Errorf("context cancelled")
+			return false, errors.New("context cancelled")
 		case e := <-w.Events:
 			switch {
 			case e.Has(fsnotify.Write):

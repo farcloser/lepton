@@ -17,7 +17,6 @@
 package container
 
 import (
-	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -56,8 +55,8 @@ func TestRestartPIDContainer(t *testing.T) {
 	base.Cmd("run", "-d", "--name", baseContainerName, testutil.AlpineImage, "sleep", nerdtest.Infinity).AssertOK()
 	defer base.Cmd("rm", "-f", baseContainerName).Run()
 
-	sharedContainerName := fmt.Sprintf("%s-shared", baseContainerName)
-	base.Cmd("run", "-d", "--name", sharedContainerName, fmt.Sprintf("--pid=container:%s", baseContainerName), testutil.AlpineImage, "sleep", nerdtest.Infinity).AssertOK()
+	sharedContainerName := baseContainerName + "-shared"
+	base.Cmd("run", "-d", "--name", sharedContainerName, "--pid=container:"+baseContainerName, testutil.AlpineImage, "sleep", nerdtest.Infinity).AssertOK()
 	defer base.Cmd("rm", "-f", sharedContainerName).Run()
 
 	base.Cmd("restart", baseContainerName).AssertOK()
@@ -82,9 +81,9 @@ func TestRestartIPCContainer(t *testing.T) {
 	defer base.Cmd("rm", "-f", baseContainerName).Run()
 	base.Cmd("run", "-d", "--shm-size", shmSize, "--ipc", "shareable", "--name", baseContainerName, testutil.AlpineImage, "sleep", nerdtest.Infinity).AssertOK()
 
-	sharedContainerName := fmt.Sprintf("%s-shared", baseContainerName)
+	sharedContainerName := baseContainerName + "-shared"
 	defer base.Cmd("rm", "-f", sharedContainerName).Run()
-	base.Cmd("run", "-d", "--name", sharedContainerName, fmt.Sprintf("--ipc=container:%s", baseContainerName), testutil.AlpineImage, "sleep", nerdtest.Infinity).AssertOK()
+	base.Cmd("run", "-d", "--name", sharedContainerName, "--ipc=container:"+baseContainerName, testutil.AlpineImage, "sleep", nerdtest.Infinity).AssertOK()
 
 	base.Cmd("stop", baseContainerName).Run()
 	base.Cmd("stop", sharedContainerName).Run()

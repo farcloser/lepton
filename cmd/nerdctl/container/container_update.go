@@ -170,7 +170,7 @@ func getUpdateOption(cmd *cobra.Command, globalOptions types.GlobalCommandOption
 				return options, fmt.Errorf("failed to parse memory-swap bytes %q: %w", memSwap, err)
 			}
 			if mem64 > 0 && memSwap64 > 0 && memSwap64 < mem64 {
-				return options, fmt.Errorf("minimum memoryswap limit should be larger than memory limit, see usage")
+				return options, errors.New("minimum memoryswap limit should be larger than memory limit, see usage")
 			}
 		}
 	} else {
@@ -191,7 +191,7 @@ func getUpdateOption(cmd *cobra.Command, globalOptions types.GlobalCommandOption
 		}
 	}
 	if mem64 > 0 && memReserve64 > 0 && mem64 < memReserve64 {
-		return options, fmt.Errorf("minimum memory limit can not be less than memory reservation limit, see usage")
+		return options, errors.New("minimum memory limit can not be less than memory reservation limit, see usage")
 	}
 
 	kernelMemStr, err := cmd.Flags().GetString("kernel-memory")
@@ -218,7 +218,7 @@ func getUpdateOption(cmd *cobra.Command, globalOptions types.GlobalCommandOption
 		return options, err
 	}
 	if blkioWeight != 0 && !infoutil.BlockIOWeight(globalOptions.CgroupManager) {
-		return options, fmt.Errorf("kernel support for cgroup blkio weight missing, weight discarded")
+		return options, errors.New("kernel support for cgroup blkio weight missing, weight discarded")
 	}
 	if blkioWeight > 0 && blkioWeight < 10 || blkioWeight > 1000 {
 		return options, errors.New("range of blkio weight is from 10 to 1000")

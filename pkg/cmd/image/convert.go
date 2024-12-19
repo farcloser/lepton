@@ -166,7 +166,7 @@ func getZstdchunkedConverter(options types.ImageConvertOptions) (converter.Conve
 
 	if options.ZstdChunkedRecordIn != "" {
 		if !options.GOptions.Experimental {
-			return nil, fmt.Errorf("zstdchunked-record-in requires experimental mode to be enabled")
+			return nil, errors.New("zstdchunked-record-in requires experimental mode to be enabled")
 		}
 
 		log.L.Warn("--zstdchunked-record-in flag is experimental and subject to change")

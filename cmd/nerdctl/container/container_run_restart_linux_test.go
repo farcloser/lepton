@@ -56,7 +56,7 @@ func TestRunRestart(t *testing.T) {
 		testutil.NginxAlpineImage).AssertOK()
 
 	check := func(httpGetRetry int) error {
-		resp, err := nettestutil.HTTPGet(fmt.Sprintf("http://%s", net.JoinHostPort("127.0.0.1", strconv.Itoa(hostPort))), httpGetRetry, false)
+		resp, err := nettestutil.HTTPGet("http://"+net.JoinHostPort("127.0.0.1", strconv.Itoa(hostPort)), httpGetRetry, false)
 		if err != nil {
 			return err
 		}
@@ -159,7 +159,7 @@ func TestUpdateRestartPolicy(t *testing.T) {
 	assert.Equal(t, inspect.RestartCount, 2)
 }
 
-// The test is to add a restart policy to a container which has not restart policy before,
+// The test is to add a restart policy to a container with no prior restart policy,
 // and check it can work correctly.
 func TestAddRestartPolicy(t *testing.T) {
 	base := testutil.NewBase(t)
@@ -171,12 +171,12 @@ func TestAddRestartPolicy(t *testing.T) {
 	base.Cmd("run", "-d", "--name", tID, testutil.NginxAlpineImage).AssertOK()
 	base.Cmd("update", "--restart=on-failure", tID).AssertOK()
 	inspect := base.InspectContainer(tID)
-	orgialPid := inspect.State.Pid
-	exec.Command("kill", "-9", fmt.Sprintf("%v", orgialPid)).Run()
+	originalPid := inspect.State.Pid
+	exec.Command("kill", "-9", strconv.Itoa(originalPid)).Run()
 
 	check := func(log poll.LogT) poll.Result {
 		inspect := base.InspectContainer(tID)
-		if inspect.State != nil && inspect.State.Status == "running" && inspect.State.Pid != orgialPid {
+		if inspect.State != nil && inspect.State.Status == "running" && inspect.State.Pid != originalPid {
 			return poll.Success()
 		}
 		return poll.Continue("container is not yet running")

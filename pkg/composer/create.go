@@ -18,6 +18,7 @@ package composer
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -200,7 +201,7 @@ func (c *Composer) createServiceContainer(ctx context.Context, service *servicep
 
 	// FIXME
 	if service.Unparsed.StdinOpen != service.Unparsed.Tty {
-		return "", fmt.Errorf("currently StdinOpen(-i) and Tty(-t) should be same")
+		return "", errors.New("currently StdinOpen(-i) and Tty(-t) should be same")
 	}
 
 	err = cmd.Run()

@@ -171,7 +171,7 @@ func TestRunSecurityOptSeccomp(t *testing.T) {
 
 func TestRunApparmor(t *testing.T) {
 	base := testutil.NewBase(t)
-	defaultProfile := fmt.Sprintf("%s-default", base.Target)
+	defaultProfile := base.Target + "-default"
 	if !apparmorutil.CanLoadNewProfile() && !apparmorutil.CanApplySpecificExistingProfile(defaultProfile) {
 		t.Skipf("needs to be able to apply %q profile", defaultProfile)
 	}
@@ -179,7 +179,7 @@ func TestRunApparmor(t *testing.T) {
 	if _, err := os.Stat(attrCurrentPath); err != nil {
 		attrCurrentPath = "/proc/self/attr/current"
 	}
-	attrCurrentEnforceExpected := fmt.Sprintf("%s (enforce)\n", defaultProfile)
+	attrCurrentEnforceExpected := defaultProfile + " (enforce)\n"
 	base.Cmd("run", "--rm", testutil.AlpineImage, "cat", attrCurrentPath).AssertOutExactly(attrCurrentEnforceExpected)
 	base.Cmd("run", "--rm", "--security-opt", "apparmor="+defaultProfile, testutil.AlpineImage, "cat", attrCurrentPath).AssertOutExactly(attrCurrentEnforceExpected)
 	base.Cmd("run", "--rm", "--security-opt", "apparmor=unconfined", testutil.AlpineImage, "cat", attrCurrentPath).AssertOutContains("unconfined")
@@ -225,7 +225,7 @@ func TestRunSystemPathsUnconfined(t *testing.T) {
 	unconfinedContainerOutput := result.Combined()
 
 	for _, path := range confined {
-		assert.Assert(t, !strings.Contains(unconfinedContainerOutput, path), fmt.Sprintf("%s should not be masked when unconfined", path))
+		assert.Assert(t, !strings.Contains(unconfinedContainerOutput, path), path+" should not be masked when unconfined")
 	}
 
 	for _, path := range []string{
@@ -243,7 +243,7 @@ func TestRunSystemPathsUnconfined(t *testing.T) {
 		// Not each distribution will support every read-only path here.
 		if strings.Contains(result.Combined(), path) {
 			result = base.Cmd("run", "--rm", "--security-opt", "systempaths=unconfined", testutil.AlpineImage, "sh", "-euxc", findmntPath).Run()
-			assert.Assert(t, !strings.Contains(result.Combined(), "ro,"), fmt.Sprintf("%s should not be read-only when unconfined", path))
+			assert.Assert(t, !strings.Contains(result.Combined(), "ro,"), path+" should not be read-only when unconfined")
 		}
 	}
 }

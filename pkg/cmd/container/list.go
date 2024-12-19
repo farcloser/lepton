@@ -19,6 +19,7 @@ package container
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"sort"
 	"strings"
@@ -85,7 +86,7 @@ func filterContainers(ctx context.Context, client *containerd.Client, filters []
 	// prepareContainers func will use this map to avoid call formatter.ContainerStatus again.
 	for _, c := range containers {
 		if c.ID() == "" {
-			return nil, nil, fmt.Errorf("container id is nill")
+			return nil, nil, errors.New("container id is nill")
 		}
 		wg.Add(1)
 		go func(ctx context.Context, c containerd.Container) {

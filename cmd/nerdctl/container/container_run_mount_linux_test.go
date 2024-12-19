@@ -58,10 +58,10 @@ func TestRunVolume(t *testing.T) {
 	base.Cmd("run",
 		"-d",
 		"--name", containerName,
-		"-v", fmt.Sprintf("%s:/mnt1", rwDir),
-		"-v", fmt.Sprintf("%s:/mnt2:ro", roDir),
-		"-v", fmt.Sprintf("%s:/mnt3", rwVolName),
-		"-v", fmt.Sprintf("%s:/mnt4:ro", roVolName),
+		"-v", rwDir+":/mnt1",
+		"-v", roDir+":/mnt2:ro",
+		"-v", rwVolName+":/mnt3",
+		"-v", roVolName+":/mnt4:ro",
 		testutil.AlpineImage,
 		"top",
 	).AssertOK()
@@ -72,15 +72,15 @@ func TestRunVolume(t *testing.T) {
 	base.Cmd("rm", "-f", containerName).AssertOK()
 	base.Cmd("run",
 		"--rm",
-		"-v", fmt.Sprintf("%s:/mnt1", rwDir),
-		"-v", fmt.Sprintf("%s:/mnt3", rwVolName),
+		"-v", rwDir+":/mnt1",
+		"-v", rwVolName+":/mnt3",
 		testutil.AlpineImage,
 		"cat", "/mnt1/file1", "/mnt3/file3",
 	).AssertOutExactly("str1str3")
 	base.Cmd("run",
 		"--rm",
-		"-v", fmt.Sprintf("%s:/mnt3/mnt1", rwDir),
-		"-v", fmt.Sprintf("%s:/mnt3", rwVolName),
+		"-v", rwDir+":/mnt3/mnt1",
+		"-v", rwVolName+":/mnt3",
 		testutil.AlpineImage,
 		"cat", "/mnt3/mnt1/file1", "/mnt3/file3",
 	).AssertOutExactly("str1str3")
@@ -192,7 +192,7 @@ CMD ["cat", "/mnt/initial_file"]
 	tmpDir, err := os.MkdirTemp(t.TempDir(), "hostDir")
 	assert.NilError(t, err)
 
-	base.Cmd("run", "-v", fmt.Sprintf("%s:/mnt", tmpDir), "--rm", imageName).AssertFail()
+	base.Cmd("run", "-v", tmpDir+":/mnt", "--rm", imageName).AssertFail()
 }
 
 func TestRunCopyingUpInitialContentsOnVolumeShouldRetainSymlink(t *testing.T) {
@@ -468,7 +468,7 @@ func TestRunVolumeBindMode(t *testing.T) {
 
 	base.Cmd("run",
 		"--rm",
-		"-v", fmt.Sprintf("%s:/mnt1:bind", tmpDir1),
+		"-v", tmpDir1+":/mnt1:bind",
 		testutil.AlpineImage,
 		"sh", "-euxc", "apk add findmnt -q && findmnt -nR /mnt1",
 	).AssertOutWithFunc(func(stdout string) error {
@@ -484,7 +484,7 @@ func TestRunVolumeBindMode(t *testing.T) {
 
 	base.Cmd("run",
 		"--rm",
-		"-v", fmt.Sprintf("%s:/mnt1:rbind", tmpDir1),
+		"-v", tmpDir1+":/mnt1:rbind",
 		testutil.AlpineImage,
 		"sh", "-euxc", "apk add findmnt -q && findmnt -nR /mnt1",
 	).AssertOutWithFunc(func(stdout string) error {
@@ -667,10 +667,10 @@ func TestRunVolumesFrom(t *testing.T) {
 	base.Cmd("run",
 		"-d",
 		"--name", fromContainerName,
-		"-v", fmt.Sprintf("%s:/mnt1", rwDir),
-		"-v", fmt.Sprintf("%s:/mnt2:ro", roDir),
-		"-v", fmt.Sprintf("%s:/mnt3", rwVolName),
-		"-v", fmt.Sprintf("%s:/mnt4:ro", roVolName),
+		"-v", rwDir+":/mnt1",
+		"-v", roDir+":/mnt2:ro",
+		"-v", rwVolName+":/mnt3",
+		"-v", roVolName+":/mnt4:ro",
 		testutil.AlpineImage,
 		"top",
 	).AssertOK()
@@ -704,8 +704,7 @@ func TestBindMountWhenHostFolderDoesNotExist(t *testing.T) {
 	}
 	defer os.RemoveAll(hostDir)
 	hp := filepath.Join(hostDir, "does-not-exist")
-	base.Cmd("run", "--name", containerName, "-d", "-v", fmt.Sprintf("%s:/tmp",
-		hp), testutil.AlpineImage).AssertOK()
+	base.Cmd("run", "--name", containerName, "-d", "-v", hp+":/tmp", testutil.AlpineImage).AssertOK()
 	base.Cmd("rm", "-f", containerName).AssertOK()
 
 	// Host directory should get created

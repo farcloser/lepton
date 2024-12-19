@@ -18,6 +18,7 @@ package container
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -193,7 +194,7 @@ func generatePIDOpts(ctx context.Context, client *containerd.Client, pid string)
 	default: // container:<id|name>
 		parsed := strings.Split(pid, ":")
 		if len(parsed) < 2 || parsed[0] != "container" {
-			return nil, "", fmt.Errorf("invalid pid namespace. Set --pid=[host|container:<name|id>")
+			return nil, "", errors.New("invalid pid namespace. Set --pid=[host|container:<name|id>")
 		}
 
 		containerName := parsed[1]

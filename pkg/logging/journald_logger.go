@@ -186,10 +186,10 @@ func FetchLogs(stdout, stderr io.Writer, journalctlArgs []string, stopChannel ch
 // exec's and redirects `journalctl`s outputs to the provided io.Writers.
 func viewLogsJournald(lvopts LogViewOptions, stdout, stderr io.Writer, stopChannel chan os.Signal) error {
 	if !checkExecutableAvailableInPath("journalctl") {
-		return fmt.Errorf("`journalctl` executable could not be found in PATH, cannot use Journald to view logs")
+		return errors.New("`journalctl` executable could not be found in PATH, cannot use Journald to view logs")
 	}
 	shortID := lvopts.ContainerID[:12]
-	var journalctlArgs = []string{fmt.Sprintf("SYSLOG_IDENTIFIER=%s", shortID), "--output=cat"}
+	var journalctlArgs = []string{"SYSLOG_IDENTIFIER=" + shortID, "--output=cat"}
 	if lvopts.Follow {
 		journalctlArgs = append(journalctlArgs, "-f")
 	}

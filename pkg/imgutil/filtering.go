@@ -84,15 +84,15 @@ func ParseFilters(filters []string) (*Filters, error) {
 					return nil, err
 				}
 
-				f.Before = append(f.Before, fmt.Sprintf("name==%s", parsedReference.String()))
-				f.Before = append(f.Before, fmt.Sprintf("name==%s", tempFilterToken[1]))
+				f.Before = append(f.Before, "name=="+parsedReference.String())
+				f.Before = append(f.Before, "name=="+tempFilterToken[1])
 			} else if tempFilterToken[0] == FilterSinceType {
 				parsedReference, err := referenceutil.Parse(tempFilterToken[1])
 				if err != nil {
 					return nil, err
 				}
-				f.Since = append(f.Since, fmt.Sprintf("name==%s", parsedReference.String()))
-				f.Since = append(f.Since, fmt.Sprintf("name==%s", tempFilterToken[1]))
+				f.Since = append(f.Since, "name=="+parsedReference.String())
+				f.Since = append(f.Since, "name=="+tempFilterToken[1])
 			} else if tempFilterToken[0] == FilterUntilType {
 				if len(tempFilterToken[0]) == 0 {
 					return nil, errNoUntilTimestamp

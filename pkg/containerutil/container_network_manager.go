@@ -299,7 +299,7 @@ func (m *containerNetworkManager) getNetworkingContainerForArgument(ctx context.
 func (m *containerNetworkManager) InternalNetworkingOptionLabels(ctx context.Context) (types.NetworkOptions, error) {
 	opts := m.netOpts
 	if m.netOpts.NetworkSlice == nil || len(m.netOpts.NetworkSlice) != 1 {
-		return opts, fmt.Errorf("conflicting options: exactly one network specification is allowed when using '--network=container:<container>'")
+		return opts, errors.New("conflicting options: exactly one network specification is allowed when using '--network=container:<container>'")
 	}
 	// MacAddress is not allowed with container networking
 	opts.MACAddress = ""
@@ -309,7 +309,7 @@ func (m *containerNetworkManager) InternalNetworkingOptionLabels(ctx context.Con
 		return opts, err
 	}
 	containerID := container.ID()
-	opts.NetworkSlice = []string{fmt.Sprintf("container:%s", containerID)}
+	opts.NetworkSlice = []string{"container:" + containerID}
 	return opts, nil
 }
 
@@ -644,7 +644,7 @@ func validateUtsSettings(netOpts types.NetworkOptions) error {
 	// Docker considers this a validation error so keep compat.
 	// https://docs.docker.com/engine/reference/run/#uts-settings---uts
 	if utsNamespace == UtsNamespaceHost && netOpts.Hostname != "" {
-		return fmt.Errorf("conflicting options: cannot set a --hostname with --uts=host")
+		return errors.New("conflicting options: cannot set a --hostname with --uts=host")
 	}
 
 	return nil
@@ -657,7 +657,7 @@ func validateUtsSettings(netOpts types.NetworkOptions) error {
 // This sets world readable permissions on /etc/hostname, ignoring umask
 func writeEtcHostnameForContainer(globalOptions types.GlobalCommandOptions, hostname string, containerID string) ([]oci.SpecOpts, error) {
 	if containerID == "" {
-		return nil, fmt.Errorf("container ID is required for setting up hostname file")
+		return nil, errors.New("container ID is required for setting up hostname file")
 	}
 
 	dataStore, err := clientutil.DataStore(globalOptions.DataRoot, globalOptions.Address)
@@ -710,10 +710,10 @@ func NetworkOptionsFromSpec(spec *specs.Spec) (types.NetworkOptions, error) {
 	opts := types.NetworkOptions{}
 
 	if spec == nil {
-		return opts, fmt.Errorf("cannot determine networking options from nil spec")
+		return opts, errors.New("cannot determine networking options from nil spec")
 	}
 	if spec.Annotations == nil {
-		return opts, fmt.Errorf("cannot determine networking options from nil spec.Annotations")
+		return opts, errors.New("cannot determine networking options from nil spec.Annotations")
 	}
 
 	opts.Hostname = spec.Hostname

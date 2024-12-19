@@ -18,6 +18,7 @@ package logging
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"math"
 	"net/url"
@@ -103,7 +104,7 @@ func (f *FluentdLogger) Init(dataStore, ns, id string) error {
 func (f *FluentdLogger) PreProcess(_ context.Context, _ string, config *logging.Config) error {
 	if runtime.GOOS == "windows" {
 		// TODO: support fluentd on windows
-		return fmt.Errorf("logging to fluentd is not supported on windows")
+		return errors.New("logging to fluentd is not supported on windows")
 	}
 	fluentConfig, err := parseFluentdConfig(f.Opts)
 	if err != nil {
@@ -162,7 +163,7 @@ func parseAddress(address string) (*fluentdLocation, error) {
 	switch tempURL.Scheme {
 	case "unix":
 		if strings.TrimLeft(tempURL.Path, "/") == "" {
-			return nil, fmt.Errorf("unix socket path must not be empty")
+			return nil, errors.New("unix socket path must not be empty")
 		}
 		return &fluentdLocation{
 			protocol: tempURL.Scheme,

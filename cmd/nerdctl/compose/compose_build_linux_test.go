@@ -43,7 +43,7 @@ services:
     - 8081:80
 `, imageSvc0, imageSvc1)
 
-	dockerfile := fmt.Sprintf(`FROM %s`, testutil.AlpineImage)
+	dockerfile := "FROM " + testutil.AlpineImage
 
 	testutil.RequiresBuild(t)
 	testutil.RegisterBuildCacheCleanup(t)

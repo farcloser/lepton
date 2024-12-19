@@ -19,13 +19,14 @@
 package buildkitutil
 
 import (
+	"errors"
 	"fmt"
 	"path/filepath"
 )
 
 func getBuildkitHostCandidates(namespace string) ([]string, error) {
 	if namespace == "" {
-		return []string{}, fmt.Errorf("namespace must be specified")
+		return []string{}, errors.New("namespace must be specified")
 	}
 	// Try candidate locations of the current containerd namespace.
 	run := getRuntimeVariableDataDir()

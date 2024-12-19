@@ -126,8 +126,8 @@ func TestVolumeInspect(t *testing.T) {
 							}
 							labels := *dc[0].Labels
 							assert.Assert(t, len(labels) == 2, fmt.Sprintf("two results, not %d", len(labels)))
-							assert.Assert(t, labels["foo"] == "fooval", fmt.Sprintf("label foo should be fooval, not %s", labels["foo"]))
-							assert.Assert(t, labels["bar"] == "barval", fmt.Sprintf("label bar should be barval, not %s", labels["bar"]))
+							assert.Assert(t, labels["foo"] == "fooval", "label foo should be fooval, not "+labels["foo"])
+							assert.Assert(t, labels["bar"] == "barval", "label bar should be barval, not "+labels["bar"])
 						},
 					),
 				}

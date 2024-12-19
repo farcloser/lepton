@@ -596,7 +596,7 @@ services:
 
 	// Cases where pull is required
 	for _, pull := range []string{"missing", "always"} {
-		t.Run(fmt.Sprintf("pull=%s", pull), func(t *testing.T) {
+		t.Run("pull="+pull, func(t *testing.T) {
 			base.Cmd("rmi", "-f", testutil.CommonImage).Run()
 			base.Cmd("images").AssertOutNotContains(testutil.CommonImage)
 			t.Cleanup(func() {

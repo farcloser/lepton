@@ -19,6 +19,7 @@ package container
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -86,7 +87,7 @@ func parseChanges(userChanges []string) (commit.Changes, error) {
 	var changes commit.Changes
 	for _, change := range userChanges {
 		if change == "" {
-			return commit.Changes{}, fmt.Errorf("received an empty value in change flag")
+			return commit.Changes{}, errors.New("received an empty value in change flag")
 		}
 		changeFields := strings.Fields(change)
 

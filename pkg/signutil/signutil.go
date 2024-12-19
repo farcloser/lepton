@@ -18,6 +18,7 @@ package signutil
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/containerd/log"
@@ -30,7 +31,7 @@ func Sign(rawRef string, experimental bool, options types.ImageSignOptions) erro
 	switch options.Provider {
 	case "cosign":
 		if !experimental {
-			return fmt.Errorf("cosign only work with enable experimental feature")
+			return errors.New("cosign only work with enable experimental feature")
 		}
 
 		if err := SignCosign(rawRef, options.CosignKey); err != nil {
@@ -38,7 +39,7 @@ func Sign(rawRef string, experimental bool, options types.ImageSignOptions) erro
 		}
 	case "notation":
 		if !experimental {
-			return fmt.Errorf("notation only work with enable experimental feature")
+			return errors.New("notation only work with enable experimental feature")
 		}
 
 		if err := SignNotation(rawRef, options.NotationKeyName); err != nil {
@@ -57,7 +58,7 @@ func Verify(ctx context.Context, rawRef string, hostsDirs []string, experimental
 	switch options.Provider {
 	case "cosign":
 		if !experimental {
-			return "", fmt.Errorf("cosign only work with enable experimental feature")
+			return "", errors.New("cosign only work with enable experimental feature")
 		}
 
 		if ref, err = VerifyCosign(ctx, rawRef, options.CosignKey, hostsDirs, options.CosignCertificateIdentity, options.CosignCertificateIdentityRegexp, options.CosignCertificateOidcIssuer, options.CosignCertificateOidcIssuerRegexp); err != nil {
@@ -65,7 +66,7 @@ func Verify(ctx context.Context, rawRef string, hostsDirs []string, experimental
 		}
 	case "notation":
 		if !experimental {
-			return "", fmt.Errorf("notation only work with enable experimental feature")
+			return "", errors.New("notation only work with enable experimental feature")
 		}
 
 		if ref, err = VerifyNotation(ctx, rawRef, hostsDirs); err != nil {

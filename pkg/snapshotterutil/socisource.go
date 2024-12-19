@@ -38,6 +38,7 @@ package snapshotterutil
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"go.farcloser.world/containers/specs"
@@ -79,7 +80,7 @@ func SociAppendDefaultLabelsHandlerWrapper(indexDigest string, wrapper func(imag
 							c.Annotations = make(map[string]string)
 						}
 
-						c.Annotations[TargetSizeLabel] = fmt.Sprintf("%d", c.Size)
+						c.Annotations[TargetSizeLabel] = strconv.FormatInt(c.Size, 10)
 						c.Annotations[TargetSociIndexDigestLabel] = indexDigest
 
 						remainingLayerDigestsCount := len(strings.Split(c.Annotations[ctdsnapshotters.TargetImageLayersLabel], ","))

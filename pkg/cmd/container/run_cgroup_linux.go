@@ -127,7 +127,7 @@ func generateCgroupOpts(id string, options types.ContainerCreateOptions) ([]oci.
 				return nil, fmt.Errorf("failed to parse memory-swap bytes %q: %w", options.MemorySwap, err)
 			}
 			if mem64 > 0 && memSwap64 > 0 && memSwap64 < mem64 {
-				return nil, fmt.Errorf("minimum memoryswap limit should be larger than memory limit, see usage")
+				return nil, errors.New("minimum memoryswap limit should be larger than memory limit, see usage")
 			}
 		}
 	} else {
@@ -142,7 +142,7 @@ func generateCgroupOpts(id string, options types.ContainerCreateOptions) ([]oci.
 		opts = append(opts, oci.WithMemorySwap(memSwap64))
 	}
 	if mem64 > 0 && memReserve64 > 0 && mem64 < memReserve64 {
-		return nil, fmt.Errorf("minimum memory limit can not be less than memory reservation limit, see usage")
+		return nil, errors.New("minimum memory limit can not be less than memory reservation limit, see usage")
 	}
 	if options.MemorySwappiness64 > 100 || options.MemorySwappiness64 < -1 {
 		return nil, fmt.Errorf("invalid value: %v, valid memory swappiness range is 0-100", options.MemorySwappiness64)

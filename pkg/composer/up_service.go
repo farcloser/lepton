@@ -134,7 +134,7 @@ func (c *Composer) upServiceContainer(ctx context.Context, service *serviceparse
 
 	// FIXME
 	if service.Unparsed.StdinOpen != service.Unparsed.Tty {
-		return "", fmt.Errorf("currently StdinOpen(-i) and Tty(-t) should be same")
+		return "", errors.New("currently StdinOpen(-i) and Tty(-t) should be same")
 	}
 
 	var runFlagD bool

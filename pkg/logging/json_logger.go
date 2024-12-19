@@ -99,7 +99,7 @@ func (jsonLogger *JSONLogger) PreProcess(ctx context.Context, dataStore string, 
 			return err
 		}
 		if capVal <= 0 {
-			return fmt.Errorf("max-size must be a positive number")
+			return errors.New("max-size must be a positive number")
 		}
 		l.MaxBytes = capVal
 	}
@@ -111,7 +111,7 @@ func (jsonLogger *JSONLogger) PreProcess(ctx context.Context, dataStore string, 
 			return err
 		}
 		if maxFile < 1 {
-			return fmt.Errorf("max-file cannot be less than 1")
+			return errors.New("max-file cannot be less than 1")
 		}
 	}
 	// MaxBackups does not include file to write logs to

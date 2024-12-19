@@ -167,7 +167,7 @@ func TestHnsEndpointsRemovedAfterAttachedRun(t *testing.T) {
 	// NOTE: because we cannot set/obtain the ID of the container to check for the exact HNS
 	// endpoint name, we record the number of HNS endpoints on the testing network and
 	// ensure it remains constant until after the test.
-	existingEndpoints, err := listHnsEndpointsRegex(fmt.Sprintf(".*_%s", testNet.Name))
+	existingEndpoints, err := listHnsEndpointsRegex(".*_" + testNet.Name)
 	assert.NilError(t, err)
 	originalEndpointsCount := len(existingEndpoints)
 
@@ -182,7 +182,7 @@ func TestHnsEndpointsRemovedAfterAttachedRun(t *testing.T) {
 		"ipconfig", "/all",
 	).AssertOK()
 
-	existingEndpoints, err = listHnsEndpointsRegex(fmt.Sprintf(".*_%s", testNet.Name))
+	existingEndpoints, err = listHnsEndpointsRegex(".*_" + testNet.Name)
 	assert.NilError(t, err)
 	assert.Equal(t, originalEndpointsCount, len(existingEndpoints), "the number of HNS endpoints should equal pre-test amount")
 }

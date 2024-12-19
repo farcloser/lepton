@@ -64,7 +64,7 @@ func composeUpAction(cmd *cobra.Command, services []string) error {
 	}
 	abortOnContainerExit, err := cmd.Flags().GetBool("abort-on-container-exit")
 	if detach && abortOnContainerExit {
-		return fmt.Errorf("--abort-on-container-exit flag is incompatible with flag --detach")
+		return errors.New("--abort-on-container-exit flag is incompatible with flag --detach")
 	}
 	if err != nil {
 		return err
