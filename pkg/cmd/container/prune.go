@@ -41,7 +41,7 @@ func Prune(ctx context.Context, client *containerd.Client, options types.Contain
 			deleted = append(deleted, c.ID())
 			continue
 		}
-		if errors.As(err, &ErrContainerStatus{}) {
+		if errors.As(err, &StatusError{}) {
 			continue
 		}
 		log.G(ctx).WithError(err).Warnf("failed to remove container %s", c.ID())

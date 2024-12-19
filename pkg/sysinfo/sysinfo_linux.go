@@ -41,7 +41,7 @@ import (
 
 var (
 	readMountinfoOnce sync.Once
-	readMountinfoErr  error
+	errReadMountinfo  error
 	cgroupMountinfo   []*mountinfo.Info
 )
 
@@ -52,12 +52,12 @@ var (
 // expensive), so it is assumed that cgroup mounts are not being changed.
 func readCgroupMountinfo() ([]*mountinfo.Info, error) {
 	readMountinfoOnce.Do(func() {
-		cgroupMountinfo, readMountinfoErr = mountinfo.GetMounts(
+		cgroupMountinfo, errReadMountinfo = mountinfo.GetMounts(
 			mountinfo.FSTypeFilter("cgroup"),
 		)
 	})
 
-	return cgroupMountinfo, readMountinfoErr
+	return cgroupMountinfo, errReadMountinfo
 }
 
 func findCgroupV1Mountpoints() (map[string]string, error) {
