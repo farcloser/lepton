@@ -89,12 +89,12 @@ func ReadLogs(opts *LogViewOptions, stdout, stderr io.Writer, stopChannel chan o
 	var logPath = opts.LogPath
 	evaluated, err := filepath.EvalSymlinks(logPath)
 	if err != nil {
-		return fmt.Errorf("failed to try resolving symlinks in path %q: %v", logPath, err)
+		return fmt.Errorf("failed to try resolving symlinks in path %q: %w", logPath, err)
 	}
 	logPath = evaluated
 	f, err := os.Open(logPath)
 	if err != nil {
-		return fmt.Errorf("failed to open log file %q: %v", logPath, err)
+		return fmt.Errorf("failed to open log file %q: %w", logPath, err)
 	}
 	defer func() {
 		f.Close()
@@ -103,11 +103,11 @@ func ReadLogs(opts *LogViewOptions, stdout, stderr io.Writer, stopChannel chan o
 	// Search start point based on tail line.
 	start, err := tail.FindTailLineStartIndex(f, opts.Tail)
 	if err != nil {
-		return fmt.Errorf("failed to tail %d lines of log file %q: %v", opts.Tail, logPath, err)
+		return fmt.Errorf("failed to tail %d lines of log file %q: %w", opts.Tail, logPath, err)
 	}
 
 	if _, err := f.Seek(start, io.SeekStart); err != nil {
-		return fmt.Errorf("failed to seek in log file %q: %v", logPath, err)
+		return fmt.Errorf("failed to seek in log file %q: %w", logPath, err)
 	}
 
 	var watcher *fsnotify.Watcher
@@ -136,14 +136,14 @@ func ReadLogs(opts *LogViewOptions, stdout, stderr io.Writer, stopChannel chan o
 			}
 			l, err := r.ReadBytes(eol[0])
 			if err != nil {
-				if err != io.EOF { // This is an real error
-					return fmt.Errorf("failed to read log file %q: %v", logPath, err)
+				if !errors.Is(err, io.EOF) { // This is an real error
+					return fmt.Errorf("failed to read log file %q: %w", logPath, err)
 				}
 				if opts.Follow {
 					// Reset seek so that if this is an incomplete line,
 					// it will be read again.
 					if _, err := f.Seek(-int64(len(l)), io.SeekCurrent); err != nil {
-						return fmt.Errorf("failed to reset seek in log file %q: %v", logPath, err)
+						return fmt.Errorf("failed to reset seek in log file %q: %w", logPath, err)
 					}
 
 					if watcher == nil {
@@ -201,7 +201,7 @@ func ReadLogs(opts *LogViewOptions, stdout, stderr io.Writer, stopChannel chan o
 			}
 			// Write the log line into the stream.
 			if err := writer.write(msg, isNewLine); err != nil {
-				if err == errMaximumWrite {
+				if errors.Is(err, errMaximumWrite) {
 					log.L.Debugf("finished parsing log file, hit bytes limit path: %s", logPath)
 					return nil
 				}
@@ -325,7 +325,7 @@ func ParseCRILog(log []byte, msg *logMessage) error {
 	}
 	msg.timestamp, err = time.Parse(time.RFC3339Nano, string(log[:idx]))
 	if err != nil {
-		return fmt.Errorf("unexpected timestamp format %q: %v", time.RFC3339Nano, err)
+		return fmt.Errorf("unexpected timestamp format %q: %w", time.RFC3339Nano, err)
 	}
 
 	// Parse stream type

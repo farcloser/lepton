@@ -194,12 +194,12 @@ func viewLogsJSONFileDirect(lvopts LogViewOptions, jsonLogFilePath string, stdou
 					time.Sleep(5 * time.Millisecond)
 					if retryTimes == 0 {
 						log.L.Infof("finished parsing log JSON filefile, path: %s, line: %s", jsonLogFilePath, string(line))
-						return fmt.Errorf("error occurred while doing read of JSON logfile %q: %s, retryTimes: %d", jsonLogFilePath, err, retryTimes)
+						return fmt.Errorf("error occurred while doing read of JSON logfile %q: %w, retryTimes: %d", jsonLogFilePath, err, retryTimes)
 					}
 					retryTimes--
 					backBytes = len(line)
 				} else {
-					return fmt.Errorf("error occurred while doing read of JSON logfile %q: %s", jsonLogFilePath, err)
+					return fmt.Errorf("error occurred while doing read of JSON logfile %q: %w", jsonLogFilePath, err)
 				}
 			} else {
 				retryTimes = 2
@@ -210,7 +210,7 @@ func viewLogsJSONFileDirect(lvopts LogViewOptions, jsonLogFilePath string, stdou
 				// Get the current file handler's seek.
 				lastPos, err := fin.Seek(int64(-backBytes), io.SeekCurrent)
 				if err != nil {
-					return fmt.Errorf("error occurred while trying to seek JSON logfile %q at position %d: %s", jsonLogFilePath, lastPos, err)
+					return fmt.Errorf("error occurred while trying to seek JSON logfile %q at position %d: %w", jsonLogFilePath, lastPos, err)
 				}
 
 				if watcher == nil {

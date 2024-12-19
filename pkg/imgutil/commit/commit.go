@@ -396,7 +396,7 @@ func applyDiffLayer(ctx context.Context, name string, baseImg specs.Image, sn sn
 			// NOTE: the snapshotter should be hold by lease. Even
 			// if the cleanup fails, the containerd gc can delete it.
 			if err := sn.Remove(ctx, key); err != nil {
-				log.G(ctx).Warnf("failed to cleanup aborted apply %s: %s", key, err)
+				log.G(ctx).WithError(err).Warnf("failed to cleanup aborted apply %s", key)
 			}
 		}
 	}()

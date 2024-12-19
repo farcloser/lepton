@@ -137,12 +137,12 @@ func TestSyslogNetwork(t *testing.T) {
 			if !isTLS {
 				exp := fmt.Sprintf("<%d>", pri|syslog.LOG_INFO) + "%d %s %s " + tag + " %d " + tag + " - " + msg + "\n"
 				if n, err := fmt.Sscanf(rcvd, exp, &version, &timestamp, &parsedHostname, &pid); n != 4 || err != nil || hostname != parsedHostname {
-					return fmt.Errorf("s.Info() = '%q', didn't match '%q' (%d %s)", rcvd, exp, n, err)
+					return fmt.Errorf("s.Info() = '%q', didn't match '%q' (%d %w)", rcvd, exp, n, err)
 				}
 			} else {
 				exp := "%d " + fmt.Sprintf("<%d>", pri|syslog.LOG_INFO) + "%d %s %s " + tag + " %d " + tag + " - " + msg + "\n"
 				if n, err := fmt.Sscanf(rcvd, exp, &length, &version, &timestamp, &parsedHostname, &pid); n != 5 || err != nil || hostname != parsedHostname {
-					return fmt.Errorf("s.Info() = '%q', didn't match '%q' (%d %s)", rcvd, exp, n, err)
+					return fmt.Errorf("s.Info() = '%q', didn't match '%q' (%d %w)", rcvd, exp, n, err)
 				}
 			}
 			return nil
@@ -183,12 +183,12 @@ func TestSyslogFacilities(t *testing.T) {
 			if !isTLS {
 				exp := fmt.Sprintf("<%d>", pri|syslog.LOG_INFO) + "%d %s %s " + tag + " %d " + tag + " - " + msg + "\n"
 				if n, err := fmt.Sscanf(rcvd, exp, &version, &timestamp, &parsedHostname, &pid); n != 4 || err != nil || hostname != parsedHostname {
-					return fmt.Errorf("s.Info() = '%q', didn't match '%q' (%d %s)", rcvd, exp, n, err)
+					return fmt.Errorf("s.Info() = '%q', didn't match '%q' (%d %w)", rcvd, exp, n, err)
 				}
 			} else {
 				exp := "%d " + fmt.Sprintf("<%d>", pri|syslog.LOG_INFO) + "%d %s %s " + tag + " %d " + tag + " - " + msg + "\n"
 				if n, err := fmt.Sscanf(rcvd, exp, &length, &version, &timestamp, &parsedHostname, &pid); n != 5 || err != nil || hostname != parsedHostname {
-					return fmt.Errorf("s.Info() = '%q', didn't match '%q' (%d %s)", rcvd, exp, n, err)
+					return fmt.Errorf("s.Info() = '%q', didn't match '%q' (%d %w)", rcvd, exp, n, err)
 				}
 			}
 			return nil
@@ -209,7 +209,7 @@ func TestSyslogFormat(t *testing.T) {
 			var pid int
 			exp := fmt.Sprintf("<%d>", pri|syslog.LOG_INFO) + "%s %s %s " + tag + "[%d]: " + msg + "\n"
 			if n, err := fmt.Sscanf(rcvd, exp, &mon, &day, &hrs, &pid); n != 4 || err != nil {
-				return fmt.Errorf("s.Info() = '%q', didn't match '%q' (%d %s)", rcvd, exp, n, err)
+				return fmt.Errorf("s.Info() = '%q', didn't match '%q' (%d %w)", rcvd, exp, n, err)
 			}
 			return nil
 		},
@@ -218,7 +218,7 @@ func TestSyslogFormat(t *testing.T) {
 			var pid int
 			exp := fmt.Sprintf("<%d>", pri|syslog.LOG_INFO) + "%s %s %s %s " + tag + "[%d]: " + msg + "\n"
 			if n, err := fmt.Sscanf(rcvd, exp, &mon, &day, &hrs, &parsedHostname, &pid); n != 5 || err != nil || hostname != parsedHostname {
-				return fmt.Errorf("s.Info() = '%q', didn't match '%q' (%d %s)", rcvd, exp, n, err)
+				return fmt.Errorf("s.Info() = '%q', didn't match '%q' (%d %w)", rcvd, exp, n, err)
 			}
 			return nil
 		},
@@ -228,12 +228,12 @@ func TestSyslogFormat(t *testing.T) {
 			if !isTLS {
 				exp := fmt.Sprintf("<%d>", pri|syslog.LOG_INFO) + "%d %s %s " + tag + " %d " + tag + " - " + msg + "\n"
 				if n, err := fmt.Sscanf(rcvd, exp, &version, &timestamp, &parsedHostname, &pid); n != 4 || err != nil || hostname != parsedHostname {
-					return fmt.Errorf("s.Info() = '%q', didn't match '%q' (%d %s)", rcvd, exp, n, err)
+					return fmt.Errorf("s.Info() = '%q', didn't match '%q' (%d %w)", rcvd, exp, n, err)
 				}
 			} else {
 				exp := "%d " + fmt.Sprintf("<%d>", pri|syslog.LOG_INFO) + "%d %s %s " + tag + " %d " + tag + " - " + msg + "\n"
 				if n, err := fmt.Sscanf(rcvd, exp, &length, &version, &timestamp, &parsedHostname, &pid); n != 5 || err != nil || hostname != parsedHostname {
-					return fmt.Errorf("s.Info() = '%q', didn't match '%q' (%d %s)", rcvd, exp, n, err)
+					return fmt.Errorf("s.Info() = '%q', didn't match '%q' (%d %w)", rcvd, exp, n, err)
 				}
 			}
 			return nil
@@ -244,12 +244,12 @@ func TestSyslogFormat(t *testing.T) {
 			if !isTLS {
 				exp := fmt.Sprintf("<%d>", pri|syslog.LOG_INFO) + "%d %s %s " + tag + " %d " + tag + " - " + msg + "\n"
 				if n, err := fmt.Sscanf(rcvd, exp, &version, &timestamp, &parsedHostname, &pid); n != 4 || err != nil || hostname != parsedHostname {
-					return fmt.Errorf("s.Info() = '%q', didn't match '%q' (%d %s)", rcvd, exp, n, err)
+					return fmt.Errorf("s.Info() = '%q', didn't match '%q' (%d %w)", rcvd, exp, n, err)
 				}
 			} else {
 				exp := "%d " + fmt.Sprintf("<%d>", pri|syslog.LOG_INFO) + "%d %s %s " + tag + " %d " + tag + " - " + msg + "\n"
 				if n, err := fmt.Sscanf(rcvd, exp, &length, &version, &timestamp, &parsedHostname, &pid); n != 5 || err != nil || hostname != parsedHostname {
-					return fmt.Errorf("s.Info() = '%q', didn't match '%q' (%d %s)", rcvd, exp, n, err)
+					return fmt.Errorf("s.Info() = '%q', didn't match '%q' (%d %w)", rcvd, exp, n, err)
 				}
 			}
 			return nil

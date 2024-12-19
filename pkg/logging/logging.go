@@ -144,12 +144,12 @@ func LoadLogConfig(dataStore, ns, id string) (LogConfig, error) {
 	logConfigFilePath := LogConfigFilePath(dataStore, ns, id)
 	logConfigData, err := os.ReadFile(logConfigFilePath)
 	if err != nil {
-		return logConfig, fmt.Errorf("failed to read log config file %q: %s", logConfigFilePath, err)
+		return logConfig, fmt.Errorf("failed to read log config file %q: %w", logConfigFilePath, err)
 	}
 
 	err = json.Unmarshal(logConfigData, &logConfig)
 	if err != nil {
-		return logConfig, fmt.Errorf("failed to load JSON logging config file %q: %s", logConfigFilePath, err)
+		return logConfig, fmt.Errorf("failed to load JSON logging config file %q: %w", logConfigFilePath, err)
 	}
 	return logConfig, nil
 }
@@ -192,7 +192,7 @@ func loggingProcessAdapter(ctx context.Context, driver Driver, dataStore string,
 				dataChan <- strings.TrimSuffix(s, "\n")
 			}
 
-			if err != nil && err != io.EOF {
+			if err != nil && !errors.Is(err, io.EOF) {
 				log.L.WithError(err).Error("failed to read log")
 			}
 		}
@@ -241,7 +241,7 @@ func loggerFunc(dataStore string) (logging.LoggerFunc, error) {
 func NewLogFileWatcher(dir string) (*fsnotify.Watcher, error) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
-		return nil, fmt.Errorf("failed to create fsnotify watcher: %v", err)
+		return nil, fmt.Errorf("failed to create fsnotify watcher: %w", err)
 	}
 	if err = watcher.Add(dir); err != nil {
 		watcher.Close()

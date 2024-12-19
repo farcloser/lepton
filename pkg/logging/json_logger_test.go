@@ -25,6 +25,8 @@ import (
 	"runtime"
 	"testing"
 	"time"
+
+	"gotest.tools/v3/assert"
 )
 
 func TestReadRotatedJSONLog(t *testing.T) {
@@ -71,7 +73,8 @@ func TestReadRotatedJSONLog(t *testing.T) {
 		log.Stream = "stdout"
 		log.Time = time.Now().Format(time.RFC3339Nano)
 		time.Sleep(1 * time.Millisecond)
-		logData, _ := json.Marshal(log)
+		logData, err := json.Marshal(log)
+		assert.NilError(t, err)
 		file.Write(logData)
 
 		if line == 5 {

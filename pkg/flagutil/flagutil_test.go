@@ -154,7 +154,7 @@ func TestParseEnvFileNonExistentFile(t *testing.T) {
 	if err == nil {
 		t.Fatal("ParseEnvFile succeeded; expected failure")
 	}
-	if _, ok := errors.Unwrap(err).(*os.PathError); !ok {
+	if _, ok := errors.Unwrap(err).(*os.PathError); !ok { //nolint:errorlint
 		t.Fatalf("Expected a PathError, got [%v]", err)
 	}
 }

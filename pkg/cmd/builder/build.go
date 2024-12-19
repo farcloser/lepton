@@ -119,7 +119,7 @@ func Build(ctx context.Context, client *containerd.Client, options types.Builder
 		imageService := client.ImageService()
 		image, err := imageService.Get(ctx, tags[0])
 		if err != nil {
-			return fmt.Errorf("unable to tag image: %s", err)
+			return fmt.Errorf("unable to tag image: %w", err)
 		}
 		for _, targetRef := range tags[1:] {
 			image.Name = targetRef
@@ -134,7 +134,7 @@ func Build(ctx context.Context, client *containerd.Client, options types.Builder
 					}
 					continue
 				}
-				return fmt.Errorf("unable to tag image: %s", err)
+				return fmt.Errorf("unable to tag image: %w", err)
 			}
 		}
 	}

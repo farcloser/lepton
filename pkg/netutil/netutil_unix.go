@@ -349,7 +349,7 @@ func removeBridgeNetworkInterface(netIf string) error {
 		link, err := netlink.LinkByName(netIf)
 		if err == nil {
 			if err := netlink.LinkDel(link); err != nil {
-				return fmt.Errorf("failed to remove network interface %s: %v", netIf, err)
+				return fmt.Errorf("failed to remove network interface %s: %w", netIf, err)
 			}
 		}
 		return nil

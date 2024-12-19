@@ -61,17 +61,17 @@ func Attach(ctx context.Context, client *containerd.Client, req string, options 
 	defer func() {
 		containerLabels, err := container.Labels(ctx)
 		if err != nil {
-			log.G(ctx).WithError(err).Errorf("failed to getting container labels: %s", err)
+			log.G(ctx).WithError(err).Error("failed to get container labels")
 			return
 		}
 		rm, err := containerutil.DecodeContainerRmOptLabel(containerLabels[labels.ContainerAutoRemove])
 		if err != nil {
-			log.G(ctx).WithError(err).Errorf("failed to decode string to bool value: %s", err)
+			log.G(ctx).WithError(err).Error("failed to decode string to bool value")
 			return
 		}
 		if rm && cStatus.Status == containerd.Stopped {
 			if err = RemoveContainer(ctx, container, options.GOptions, true, true, client); err != nil {
-				log.L.WithError(err).Warnf("failed to remove container %s: %s", req, err)
+				log.L.WithError(err).Warnf("failed to remove container %s", req)
 			}
 		}
 	}()

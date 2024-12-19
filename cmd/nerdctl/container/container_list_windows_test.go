@@ -103,7 +103,7 @@ func TestListProcessContainer(t *testing.T) {
 		tab := tabutil.NewReader("CONTAINER ID\tIMAGE\tCOMMAND\tCREATED\tSTATUS\tPORTS\tNAMES\tSIZE")
 		err := tab.ParseHeader(lines[0])
 		if err != nil {
-			return fmt.Errorf("failed to parse header: %v", err)
+			return fmt.Errorf("failed to parse header: %w", err)
 		}
 
 		container, _ := tab.ReadRow(lines[1], "NAMES")
@@ -153,7 +153,7 @@ func TestListHyperVContainer(t *testing.T) {
 		tab := tabutil.NewReader("CONTAINER ID\tIMAGE\tCOMMAND\tCREATED\tSTATUS\tPORTS\tNAMES\tSIZE")
 		err := tab.ParseHeader(lines[0])
 		if err != nil {
-			return fmt.Errorf("failed to parse header: %v", err)
+			return fmt.Errorf("failed to parse header: %w", err)
 		}
 
 		container, _ := tab.ReadRow(lines[1], "NAMES")
@@ -194,7 +194,7 @@ func TestListProcessContainerWideMode(t *testing.T) {
 		tab := tabutil.NewReader("CONTAINER ID\tIMAGE\tCOMMAND\tCREATED\tSTATUS\tPORTS\tNAMES\tRUNTIME\tPLATFORM\tSIZE")
 		err := tab.ParseHeader(lines[0])
 		if err != nil {
-			return fmt.Errorf("failed to parse header: %v", err)
+			return fmt.Errorf("failed to parse header: %w", err)
 		}
 
 		container, _ := tab.ReadRow(lines[1], "NAMES")
@@ -233,7 +233,7 @@ func TestListProcessContainerWithLabels(t *testing.T) {
 		// 2. the results has no guarantee to show only configured labels.
 		labelsMap, err := strutil.ParseCSVMap(lines[0])
 		if err != nil {
-			return fmt.Errorf("failed to parse labels: %v", err)
+			return fmt.Errorf("failed to parse labels: %w", err)
 		}
 
 		for i := range testContainer.labels {

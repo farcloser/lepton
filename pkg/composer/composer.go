@@ -108,7 +108,10 @@ func New(o Options, client *containerd.Client) (*Composer, error) {
 	}
 
 	if o.DebugPrintFull {
-		projectJSON, _ := json.MarshalIndent(project, "", "    ")
+		projectJSON, err := json.MarshalIndent(project, "", "    ")
+		if err != nil {
+			return nil, err
+		}
 		log.L.Debug("printing project JSON")
 		log.L.Debugf("%s", projectJSON)
 	}
