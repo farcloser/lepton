@@ -27,6 +27,8 @@ import (
 	"text/template"
 	"time"
 
+	"go.farcloser.world/containers/cgroups"
+
 	eventstypes "github.com/containerd/containerd/api/events"
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/events"
@@ -41,7 +43,6 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/eventutil"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 	"github.com/containerd/nerdctl/v2/pkg/idutil/containerwalker"
-	"github.com/containerd/nerdctl/v2/pkg/infoutil"
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
 	"github.com/containerd/nerdctl/v2/pkg/statsutil"
 )
@@ -85,7 +86,7 @@ func (s *stats) isKnownContainer(cid string) (int, bool) {
 func Stats(ctx context.Context, client *containerd.Client, containerIDs []string, options types.ContainerStatsOptions) error {
 	// NOTE: rootless container does not rely on cgroupv1.
 	// more details about possible ways to resolve this concern: #223
-	if rootlessutil.IsRootless() && infoutil.CgroupsVersion() == "1" {
+	if rootlessutil.IsRootless() && cgroups.Version() < 2 {
 		return errors.New("stats requires cgroup v2 for rootless containers, see https://rootlesscontaine.rs/getting-started/common/cgroup2/")
 	}
 

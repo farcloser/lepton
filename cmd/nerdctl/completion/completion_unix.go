@@ -78,7 +78,7 @@ func SnapshotterNames(cmd *cobra.Command, args []string, toComplete string) ([]s
 		return nil, cobra.ShellCompDirectiveError
 	}
 	defer cancel()
-	snapshotterPlugins, err := infoutil.GetSnapshotterNames(ctx, client.IntrospectionService())
+	snapshotterPlugins, err := infoutil.GetSnapshotterNames(ctx, client)
 	if err != nil {
 		return nil, cobra.ShellCompDirectiveError
 	}

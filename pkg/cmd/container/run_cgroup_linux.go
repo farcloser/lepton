@@ -23,6 +23,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"go.farcloser.world/containers/cgroups"
 	"go.farcloser.world/containers/specs"
 	"go.farcloser.world/core/units"
 
@@ -165,7 +166,7 @@ func generateCgroupOpts(id string, options types.ContainerCreateOptions) ([]oci.
 		opts = append(opts, oci.WithPidsLimit(options.PidsLimit))
 	}
 
-	if len(options.CgroupConf) > 0 && infoutil.CgroupsVersion() == "1" {
+	if len(options.CgroupConf) > 0 && cgroups.Version() < 2 {
 		return nil, errors.New("cannot use --cgroup-conf without cgroup v2")
 	}
 
