@@ -30,7 +30,7 @@ var (
 	// Changing this can be done at build time with -X (from Makefile), and is mostly of interest for people looking
 	// to build their own cli, leveraging the codebase as a library.
 	RootName  = "nerdctl"
-	EnvPrefix = "NERDCTL_"
+	EnvPrefix = "NERDCTL"
 )
 
 const unknown = "<unknown>"

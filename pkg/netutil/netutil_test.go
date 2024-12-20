@@ -223,7 +223,7 @@ func TestNetworkWithDefaultNameAlreadyExists(t *testing.T) {
 	buf := &bytes.Buffer{}
 	assert.NilError(t, tpl.ExecuteTemplate(buf, "test", values))
 
-	// Filename is irrelevant as long as it's not nerdctl's.
+	// Filename is irrelevant as long as it's not ours.
 	testConfFile := filepath.Join(cniConfTestDir, testutil.Identifier(t)+".conf")
 	err = os.WriteFile(testConfFile, buf.Bytes(), 0o600)
 	assert.NilError(t, err)
