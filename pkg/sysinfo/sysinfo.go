@@ -22,7 +22,7 @@
 */
 
 // Package sysinfo stores information about which features a kernel supports.
-package sysinfo // import "github.com/docker/docker/"
+package sysinfo // import "github.com/docker/docker/pkg/sysinfo"
 
 import "github.com/docker/docker/pkg/parsers"
 
@@ -49,12 +49,6 @@ type SysInfo struct {
 	// Whether IPv4 forwarding is supported or not, if this was disabled, networking will not work
 	IPv4ForwardingDisabled bool
 
-	// Whether bridge-nf-call-iptables is supported or not
-	BridgeNFCallIPTablesDisabled bool
-
-	// Whether bridge-nf-call-ip6tables is supported or not
-	BridgeNFCallIP6TablesDisabled bool
-
 	// Whether the cgroup has the mountpoint of "devices" or not
 	CgroupDevicesEnabled bool
 
@@ -67,10 +61,6 @@ type SysInfo struct {
 	// client; they are not intended to be parsed / used for other purposes,
 	// and do not have a fixed format.
 	Warnings []string
-
-	// cgMounts is the list of cgroup v1 mount paths, indexed by subsystem, to
-	// inspect availability of subsystems.
-	cgMounts map[string]string //nolint:unused,nolintlint
 
 	// cg2GroupPath is the cgroup v2 group path to inspect availability of the controllers.
 	cg2GroupPath string //nolint:unused,nolintlint

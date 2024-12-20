@@ -199,14 +199,6 @@ func fulfillPlatformInfo(info *dockercompat.Info) {
 	if !info.IPv4Forwarding {
 		info.Warnings = append(info.Warnings, "WARNING: IPv4 forwarding is disabled")
 	}
-	info.BridgeNfIptables = !mobySysInfo.BridgeNFCallIPTablesDisabled
-	if !info.BridgeNfIptables {
-		info.Warnings = append(info.Warnings, "WARNING: bridge-nf-call-iptables is disabled")
-	}
-	info.BridgeNfIP6tables = !mobySysInfo.BridgeNFCallIP6TablesDisabled
-	if !info.BridgeNfIP6tables {
-		info.Warnings = append(info.Warnings, "WARNING: bridge-nf-call-ip6tables is disabled")
-	}
 	info.NCPU = sysinfo.NumCPU()
 	memLimit, err := meminfo.Read()
 	if err != nil {

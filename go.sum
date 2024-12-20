@@ -19,8 +19,8 @@ github.com/blang/semver/v4 v4.0.0/go.mod h1:IbckMUScFkM3pff0VJDNKRiT6TG/YpiHIM2y
 github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 h1:DDGfHa7BWjL4YnC6+E63dPcxHo2sUxDIu8g3QgEJdRY=
 github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869/go.mod h1:Ekp36dRnpXw/yCqJaO+ZrUyxD+3VXMFFr56k5XYrpB4=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
-github.com/cilium/ebpf v0.17.0 h1:wAgiAWE86w8DxbR/UJ9KsaaoUfjrO0yhg5yE7f898As=
-github.com/cilium/ebpf v0.17.0/go.mod h1:vay2FaYSmIlv3r8dNACd4mW/OCaZLJKJOo+IHBvCIO8=
+github.com/cilium/ebpf v0.17.1 h1:G8mzU81R2JA1nE5/8SRubzqvBMmAmri2VL8BIZPWvV0=
+github.com/cilium/ebpf v0.17.1/go.mod h1:vay2FaYSmIlv3r8dNACd4mW/OCaZLJKJOo+IHBvCIO8=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
 github.com/cncf/udpa/go v0.0.0-20191209042840-269d4d468f6f/go.mod h1:M8M6+tZqaGXZJjfX53e64911xZQV5JYwmTeXPW+k8Sc=
 github.com/compose-spec/compose-go/v2 v2.4.6 h1:QiqXQ2L/f0OCbAl41bPpeiGAWVRIQ+GEDrYxO+dRPhQ=
@@ -295,8 +295,8 @@ github.com/yuchanns/srslog v1.1.0/go.mod h1:HsLjdv3XV02C3kgBW2bTyW6i88OQE+VYJZIx
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
-go.farcloser.world/containers v0.0.0-20241220004039-23bc116de6cb h1:MDOmDKr+dHfbLAB0NgtYHK/L1dAIST5EObz5ZcaV3No=
-go.farcloser.world/containers v0.0.0-20241220004039-23bc116de6cb/go.mod h1:tVJLFcqxdygbKleohufw0zcqFHlrByaOBfbg1VR0yT4=
+go.farcloser.world/containers v0.0.0-20241220224521-7bd134e55384 h1:1q5OqJkcSDqXrQpdno81w5CXFr85iJZqc32NqTx6oAo=
+go.farcloser.world/containers v0.0.0-20241220224521-7bd134e55384/go.mod h1:tVJLFcqxdygbKleohufw0zcqFHlrByaOBfbg1VR0yT4=
 go.farcloser.world/core v0.0.0-20241218235125-95d33951c312 h1:uoOZGpA8bI19ugU7IDPUZ4/DPJkGhZLrjxpe+7vBQxM=
 go.farcloser.world/core v0.0.0-20241218235125-95d33951c312/go.mod h1:/P1HGCJOWn3iH56GqBWW/nRDBbomIELteS4Ha4Z+OCA=
 go.opencensus.io v0.24.0 h1:y73uSU6J157QMP2kn2r30vwW1A2W2WFwSCGnAVxeaD0=
