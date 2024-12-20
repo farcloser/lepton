@@ -51,7 +51,7 @@ func (ht *HostsToml) Save(dir string, hostIP string, port int) error {
 	}
 
 	hostsSubDir := filepath.Join(dir, hostSubDir)
-	err = os.MkdirAll(hostsSubDir, 0700)
+	err = os.MkdirAll(hostsSubDir, 0o700)
 	if err != nil {
 		return err
 	}

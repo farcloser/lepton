@@ -42,8 +42,7 @@ func Logs(ctx context.Context, client *containerd.Client, container string, opti
 		return err
 	}
 
-	switch options.GOptions.Namespace {
-	case "moby":
+	if options.GOptions.Namespace == "moby" {
 		log.G(ctx).Warn("Currently, `logs` only supports containers created with `run -d` or CRI")
 	}
 

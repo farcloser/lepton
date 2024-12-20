@@ -67,11 +67,11 @@ func (jsonLogger *JSONLogger) Init(dataStore, ns, id string) error {
 	} else {
 		jsonFilePath = jsonfile.Path(dataStore, ns, id)
 	}
-	if err := os.MkdirAll(filepath.Dir(jsonFilePath), 0700); err != nil {
+	if err := os.MkdirAll(filepath.Dir(jsonFilePath), 0o700); err != nil {
 		return err
 	}
 	if _, err := os.Stat(jsonFilePath); errors.Is(err, os.ErrNotExist) {
-		if writeErr := os.WriteFile(jsonFilePath, []byte{}, 0600); writeErr != nil {
+		if writeErr := os.WriteFile(jsonFilePath, []byte{}, 0o600); writeErr != nil {
 			return writeErr
 		}
 	}
@@ -234,9 +234,9 @@ func viewLogsJSONFileDirect(lvopts LogViewOptions, jsonLogFilePath string, stdou
 					newF, err := openFileShareDelete(jsonLogFilePath)
 					if err != nil {
 						if errors.Is(err, os.ErrNotExist) {
-							//If the user application outputs logs too quickly,
-							//There is a slight possibility the log file has just been rotated,
-							//try opening it once more.
+							// If the user application outputs logs too quickly,
+							// There is a slight possibility the log file has just been rotated,
+							// try opening it once more.
 							time.Sleep(10 * time.Millisecond)
 						}
 						newF, err = openFileShareDelete(jsonLogFilePath)

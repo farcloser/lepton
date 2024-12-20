@@ -111,7 +111,7 @@ func Create(ctx context.Context, client *containerd.Client, args []string, netMa
 	if err != nil {
 		return nil, nil, err
 	}
-	if err := os.MkdirAll(internalLabels.stateDir, 0700); err != nil {
+	if err := os.MkdirAll(internalLabels.stateDir, 0o700); err != nil {
 		return nil, nil, err
 	}
 
@@ -841,7 +841,7 @@ func generateLogConfig(dataStore string, id string, logDriver string, logOpt []s
 		}
 
 		logConfigFilePath := logging.LogConfigFilePath(dataStore, ns, id)
-		if err = os.WriteFile(logConfigFilePath, logConfigB, 0600); err != nil {
+		if err = os.WriteFile(logConfigFilePath, logConfigB, 0o600); err != nil {
 			return logConfig, err
 		}
 

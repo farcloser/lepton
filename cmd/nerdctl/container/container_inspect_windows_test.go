@@ -54,7 +54,7 @@ func TestInspectHyperVContainerContainsLabel(t *testing.T) {
 	inspect := base.InspectContainer(testContainer)
 	lbs := inspect.Config.Labels
 
-	//check with HCS if the container is ineed a VM
+	// check with HCS if the container is ineed a VM
 	isHypervContainer, err := testutil.HyperVContainer(inspect)
 	if err != nil {
 		t.Fatalf("unable to list HCS containers: %s", err)

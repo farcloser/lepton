@@ -28,8 +28,10 @@ import (
 	"gotest.tools/v3/icmd"
 )
 
-const ExitCodeGenericFail = -1
-const ExitCodeNoCheck = -2
+const (
+	ExitCodeGenericFail = -1
+	ExitCodeNoCheck     = -2
+)
 
 // GenericCommand is a concrete Command implementation
 type GenericCommand struct {

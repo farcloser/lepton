@@ -28,7 +28,7 @@ import (
 func TestTop(t *testing.T) {
 	testCase := nerdtest.Setup()
 
-	//more details https://github.com/containerd/nerdctl/pull/223#issuecomment-851395178
+	// more details https://github.com/containerd/nerdctl/pull/223#issuecomment-851395178
 	if runtime.GOOS == "linux" {
 		testCase.Require = nerdtest.CgroupsAccessible
 	}

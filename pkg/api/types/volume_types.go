@@ -54,7 +54,7 @@ type VolumeListOptions struct {
 type VolumePruneOptions struct {
 	Stdout   io.Writer
 	GOptions GlobalCommandOptions
-	//Remove all unused volumes, not just anonymous ones
+	// Remove all unused volumes, not just anonymous ones
 	All bool
 	// Do not prompt for confirmation
 	Force bool

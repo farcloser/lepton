@@ -20,7 +20,6 @@ import (
 	"context"
 	"errors"
 	"io"
-	"os"
 
 	"go.farcloser.world/containers/specs"
 
@@ -38,9 +37,6 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/signutil"
 	"github.com/containerd/nerdctl/v2/pkg/strutil"
 )
-
-//nolint:unused
-var locked *os.File
 
 // New returns a new *composer.Composer.
 func New(client *containerd.Client, globalOptions types.GlobalCommandOptions, options composer.Options, stdout, stderr io.Writer) (*composer.Composer, error) {

@@ -78,7 +78,7 @@ func containerTop(ctx context.Context, stdio io.Writer, client *containerd.Clien
 		return nil
 	}
 
-	//TO DO handle restarting case: wait for container to restart and then launch top command
+	// TODO handle restarting case: wait for container to restart and then launch top command
 
 	procs, err := task.Pids(ctx)
 	if err != nil {

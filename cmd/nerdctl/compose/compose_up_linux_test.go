@@ -275,7 +275,7 @@ services:
 	envFile := `TAG=1.19-alpine-org`
 	comp.WriteFile("envFile", envFile)
 
-	//env-file is relative to the current working directory and not the project directory
+	// env-file is relative to the current working directory and not the project directory
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "--env-file", "envFile", "up", "-d").AssertFail()
 	defer base.ComposeCmd("-f", comp.YAMLFullPath(), "down", "-v").Run()
 }

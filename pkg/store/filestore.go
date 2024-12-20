@@ -152,7 +152,7 @@ func (vs *fileStore) Exists(key ...string) (bool, error) {
 
 	path := filepath.Join(append([]string{vs.dir}, key...)...)
 
-	_, err := os.Stat(filepath.Join(path))
+	_, err := os.Stat(path)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			return false, nil

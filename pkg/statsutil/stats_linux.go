@@ -164,14 +164,14 @@ func calculateCgroup2MemUsage(metrics *v2.Metrics) float64 {
 func calculateCgroupBlockIO(metrics *v1.Metrics) (uint64, uint64) {
 	var blkRead, blkWrite uint64
 	for _, bioEntry := range metrics.Blkio.IoServiceBytesRecursive {
-		if len(bioEntry.Op) == 0 {
+		if bioEntry.Op == "" {
 			continue
 		}
 		switch bioEntry.Op[0] {
 		case 'r', 'R':
-			blkRead = blkRead + bioEntry.Value
+			blkRead += bioEntry.Value
 		case 'w', 'W':
-			blkWrite = blkWrite + bioEntry.Value
+			blkWrite += bioEntry.Value
 		}
 	}
 	return blkRead, blkWrite
@@ -186,11 +186,11 @@ func calculateCgroup2IO(metrics *v2.Metrics) (uint64, uint64) {
 		}
 
 		if iOEntry.Rios != 0 {
-			ioRead = ioRead + iOEntry.Rbytes
+			ioRead += iOEntry.Rbytes
 		}
 
 		if iOEntry.Wios != 0 {
-			ioWrite = ioWrite + iOEntry.Wbytes
+			ioWrite += iOEntry.Wbytes
 		}
 	}
 

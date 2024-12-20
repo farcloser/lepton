@@ -122,7 +122,7 @@ func Profiles() ([]Profile, error) {
 
 // Unload unloads a profile. Needs access to /sys/kernel/security/apparmor/.remove .
 func Unload(target string) error {
-	remover, err := os.OpenFile("/sys/kernel/security/apparmor/.remove", os.O_RDWR|os.O_TRUNC, 0644)
+	remover, err := os.OpenFile("/sys/kernel/security/apparmor/.remove", os.O_RDWR|os.O_TRUNC, 0o644)
 	if err != nil {
 		return err
 	}

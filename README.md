@@ -6,6 +6,7 @@ Requires:
 - containerd 2.0+
 - golang 1.23+
 - cni plugins 1.6+
+- cgroup v2 (see https://rootlesscontaine.rs/getting-started/common/cgroup2/)
 
 Enhanced:
 - rewritten cp

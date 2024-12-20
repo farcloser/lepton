@@ -426,13 +426,11 @@ func TestLoginAgainstVariants(t *testing.T) {
 							c.WithInsecure(false).
 								Run(base, regHost).
 								AssertOK()
-						} else {
+						} else if !rl.IsLocalhost() {
 							// TODO: remove specialization when we fix the localhost mess
-							if !rl.IsLocalhost() {
-								c.WithInsecure(false).
-									Run(base, regHost).
-									AssertFail()
-							}
+							c.WithInsecure(false).
+								Run(base, regHost).
+								AssertFail()
 						}
 
 						// c. Insecure flag set to true

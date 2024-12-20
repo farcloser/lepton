@@ -107,10 +107,10 @@ func (c *Composer) logCopyMsg(ctx context.Context, container containerd.Containe
 		msg = "DRY-RUN MODE - "
 	}
 	if direction == fromService {
-		msg = msg + fmt.Sprintf("copy %s:%s to %s", containerName, srcPath, dstPath)
+		msg += fmt.Sprintf("copy %s:%s to %s", containerName, srcPath, dstPath)
 	}
 	if direction == toService {
-		msg = msg + fmt.Sprintf("copy %s to %s:%s", srcPath, containerName, dstPath)
+		msg += fmt.Sprintf("copy %s to %s:%s", srcPath, containerName, dstPath)
 	}
 	log.G(ctx).Info(msg)
 	return nil

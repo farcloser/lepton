@@ -39,7 +39,7 @@ func TestContainerFromNative(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	os.WriteFile(filepath.Join(tempStateDir, "resolv.conf"), []byte(""), 0644)
+	os.WriteFile(filepath.Join(tempStateDir, "resolv.conf"), []byte(""), 0o644)
 	defer os.RemoveAll(tempStateDir)
 
 	testcase := []struct {
@@ -258,7 +258,7 @@ func TestNetworkSettingsFromNative(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	os.WriteFile(filepath.Join(tempStateDir, "resolv.conf"), []byte(""), 0644)
+	os.WriteFile(filepath.Join(tempStateDir, "resolv.conf"), []byte(""), 0o644)
 	defer os.RemoveAll(tempStateDir)
 
 	testcase := []struct {

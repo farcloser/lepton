@@ -10,145 +10,69 @@ run:
   allow-serial-runners: true
 
 linters:
-  disable-all: true
-  enable:
-    - depguard
-    - gofmt
-    - goimports
-    - govet
-    - ineffassign
-    - misspell
-    - nakedret
-    - prealloc
-    - typecheck
-    # - asciicheck
-    # - bodyclose
-    # - dogsled
-    # - dupl
-    # - errcheck
-    # - errorlint
-    # - exhaustive
-    # - exhaustivestruct
-    # - exportloopref
-    # - funlen
-    # - gci
-    # - gochecknoglobals
-    # - gochecknoinits
-    # - gocognit
-    # - goconst
-    # - gocritic
-    # - gocyclo
-    # - godot
-    # - godox
-    # - goerr113
-    # - gofumpt
-    # - goheader
-    # - golint
-    # - gomnd
-    # - gomodguard
-    # - goprintffuncname
-    # - gosec (gas)
-    - gosimple  # (megacheck)
-    # - interfacer
-    # - lll
-    # - maligned
-    # - nestif
-    # - nlreturn
-    # - noctx
-    # - nolintlint
-    - revive
-    # - rowserrcheck
-    # - scopelint
-    # - sqlclosecheck
-    - staticcheck
-    - stylecheck
-    # - testpackage
-    # - tparallel
-    - unconvert
-    # - unparam
-    - unused
-    # - whitespace
-    # - wrapcheck
-    # - wsl
+  disable-all: false
+  enable-all: true
+  disable:
+    # I like namedreturns occasionally
+    - nonamedreturns
+    # Deprecated
+    - exportloopref
+    # Too annoying
+    - exhaustruct  # this is fine without, usually
+    - funlen  # somewhat ridiculous
+    - cyclop  # who cares! :D
+    - godox  # just leave it alone
+    # TODO(apostasie) Temporary out until we wrap up all of them
+    - wrapcheck
+
+    # We us go-imports instead
+    - gci
+
+    # To be enabled
+    - intrange
+    - copyloopvar
+    - wsl
+    - nlreturn
+    - gochecknoglobals
+    - godot
+    - lll
+    - varnamelen
+    - thelper
+    - protogetter
+    - gosec
+    - err113
+    - gofumpt
+    - exhaustive
+    - musttag
+    - paralleltest
+    - testpackage
+    - nestif
+    - contextcheck
+    - gocyclo
+    - forcetypeassert
+    - gocognit
+    - errcheck
+    - dupl
+    - whitespace
+    - mnd
+    - ireturn
+    - nilnil
+    - tparallel
+    - tagliatelle
+    - goconst
+    - maintidx
+
 linters-settings:
   gocritic:
-    enabled-checks:
-      # Diagnostic
+    disabled-checks:
       - appendAssign
-      - argOrder
-      - badCond
-      - caseOrder
-      - codegenComment
-      - commentedOutCode
-      - deprecatedComment
-      - dupArg
-      - dupBranchBody
-      - dupCase
-      - dupSubExpr
-      - exitAfterDefer
-      - flagDeref
-      - flagName
-      - nilValReturn
-      - offBy1
-      - sloppyReassign
-      - weakCond
-      - octalLiteral
-
-      # Performance
-      - appendCombine
-      - equalFold
-      - hugeParam
-      - indexAlloc
-      - rangeExprCopy
-      - rangeValCopy
-
-      # Style
-      - assignOp
-      - boolExprSimplify
-      - captLocal
-      - commentFormatting
-      - commentedOutImport
-      - defaultCaseOrder
-      - docStub
-      - elseif
-      - emptyFallthrough
-      - emptyStringTest
-      - hexLiteral
       - ifElseChain
-      - methodExprCall
-      - regexpMust
-      - singleCaseSwitch
-      - sloppyLen
-      - stringXbytes
-      - switchTrue
-      - typeAssertChain
-      - typeSwitchVar
-      - underef
-      - unlabelStmt
-      - unlambda
-      - unslice
-      - valSwap
-      - wrapperFunc
-      - yodaStyleExpr
-
-      # Opinionated
-      - builtinShadow
-      - importShadow
-      - initClause
-      - nestingReduce
-      - paramTypeCombine
-      - ptrToRefParam
-      - typeUnparen
-      - unnamedResult
-      - unnecessaryBlock
 
   depguard:
     rules:
       main:
         files:
           - "$all"
-#        allow:
-#          - $gostd
         deny:
           - pkg: "github.com/hashicorp/golang-lru"
             desc: "Do not allow direct use of IBM patented NewARC"

@@ -21,16 +21,16 @@ package labels
 import "github.com/containerd/nerdctl/v2/pkg/version"
 
 const (
-	//Compose Project Name
+	// Compose Project Name
 	ComposeProject = "com.docker.compose.project"
 
-	//Compose Service Name
+	// Compose Service Name
 	ComposeService = "com.docker.compose.service"
 
-	//Compose Network Name
+	// Compose Network Name
 	ComposeNetwork = "com.docker.compose.network"
 
-	//Compose Volume Name
+	// Compose Volume Name
 	ComposeVolume = "com.docker.compose.volume"
 )
 

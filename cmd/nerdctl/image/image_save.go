@@ -86,7 +86,7 @@ func saveAction(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	} else if outputPath != "" {
-		f, err := os.OpenFile(outputPath, os.O_CREATE|os.O_WRONLY, 0644)
+		f, err := os.OpenFile(outputPath, os.O_CREATE|os.O_WRONLY, 0o644)
 		if err != nil {
 			return err
 		}

@@ -169,7 +169,7 @@ func tryLoginWithRegHost(ctx context.Context, rh docker.RegistryHost) error {
 	}
 	var ress []*http.Response
 	for i := 0; i < 10; i++ {
-		req, err := http.NewRequest(http.MethodGet, u.String(), nil)
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 		if err != nil {
 			return err
 		}

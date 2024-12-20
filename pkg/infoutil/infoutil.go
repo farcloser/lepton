@@ -231,8 +231,7 @@ func parseRuncVersion(runcVersionStdout []byte) (*dockercompat.ComponentVersion,
 			log.L.Warnf("unable to determine one of runc details, got: %s, %d", detail, len(detail))
 			continue
 		}
-		switch strings.TrimSpace(detail[0]) {
-		case "commit":
+		if strings.TrimSpace(detail[0]) == "commit" {
 			details["GitCommit"] = strings.TrimSpace(detail[1])
 		}
 	}

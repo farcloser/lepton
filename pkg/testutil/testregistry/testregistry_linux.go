@@ -163,7 +163,6 @@ acl:
 		_, err = nettestutil.HTTPGet(fmt.Sprintf("%s://%s/auth", scheme, joined), 30, true)
 		return err
 	}()
-
 	if err != nil {
 		cl := base.Cmd("logs", containerName).Run()
 		base.T.Logf("%s:\n%s\n%s\n=========================\n%s", containerName, cl.Cmd, cl.Stdout(), cl.Stderr())
@@ -186,7 +185,6 @@ acl:
 			base.T.Logf("%s: %q", containerName, base.Cmd("logs", containerName).Run().String())
 		},
 	}
-
 }
 
 // Auth is an interface to pass to the test registry for configuring authentication
@@ -233,7 +231,7 @@ func (ba *BasicAuth) Params(base *testutil.Base) []string {
 		encryptedPass, _ := bcrypt.GenerateFromPassword([]byte(pass), bcrypt.DefaultCost)
 		tmpDir, _ := os.MkdirTemp(base.T.TempDir(), "htpasswd")
 		ba.HtFile = filepath.Join(tmpDir, "htpasswd")
-		_ = os.WriteFile(ba.HtFile, []byte(fmt.Sprintf(`%s:%s`, ba.Username, string(encryptedPass[:]))), 0600)
+		_ = os.WriteFile(ba.HtFile, []byte(fmt.Sprintf(`%s:%s`, ba.Username, string(encryptedPass))), 0o600)
 	}
 	ret := []string{
 		"--env", "REGISTRY_AUTH=htpasswd",
@@ -359,7 +357,6 @@ func NewRegistry(base *testutil.Base, ca *testca.CA, port int, auth Auth, boundC
 
 		return hDir, nil
 	}()
-
 	if err != nil {
 		cl := base.Cmd("logs", containerName).Run()
 		base.T.Logf("%s:\n%s\n%s\n=========================\n%s", containerName, cl.Cmd, cl.Stdout(), cl.Stderr())

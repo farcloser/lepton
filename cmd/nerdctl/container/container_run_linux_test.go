@@ -184,7 +184,7 @@ func TestRunIpcHost(t *testing.T) {
 	base := testutil.NewBase(t)
 	testFilePath := filepath.Join("/dev/shm",
 		fmt.Sprintf("%s-%d-%s", testutil.Identifier(t), os.Geteuid(), base.Target))
-	err := os.WriteFile(testFilePath, []byte(""), 0644)
+	err := os.WriteFile(testFilePath, []byte(""), 0o644)
 	assert.NilError(base.T, err)
 	defer os.Remove(testFilePath)
 
@@ -198,7 +198,7 @@ func TestRunAddHost(t *testing.T) {
 		var found bool
 		sc := bufio.NewScanner(bytes.NewBufferString(stdout))
 		for sc.Scan() {
-			//removing spaces and tabs separating items
+			// removing spaces and tabs separating items
 			line := strings.ReplaceAll(sc.Text(), " ", "")
 			line = strings.ReplaceAll(line, "\t", "")
 			if strings.Contains(line, "10.0.0.1testing.example.com") {
@@ -214,7 +214,7 @@ func TestRunAddHost(t *testing.T) {
 		var found int
 		sc := bufio.NewScanner(bytes.NewBufferString(stdout))
 		for sc.Scan() {
-			//removing spaces and tabs separating items
+			// removing spaces and tabs separating items
 			line := strings.ReplaceAll(sc.Text(), " ", "")
 			line = strings.ReplaceAll(line, "\t", "")
 			if strutil.InStringSlice([]string{"10.0.0.1test", "10.0.0.1test1"}, line) {
@@ -247,7 +247,7 @@ func TestRunAddHostWithCustomHostGatewayIP(t *testing.T) {
 		var found bool
 		sc := bufio.NewScanner(bytes.NewBufferString(stdout))
 		for sc.Scan() {
-			//removing spaces and tabs separating items
+			// removing spaces and tabs separating items
 			line := strings.ReplaceAll(sc.Text(), " ", "")
 			line = strings.ReplaceAll(line, "\t", "")
 			if strings.Contains(line, "192.168.5.2test") {
@@ -404,7 +404,7 @@ func TestRunSigProxy(t *testing.T) {
 func TestRunWithFluentdLogDriver(t *testing.T) {
 	base := testutil.NewBase(t)
 	tempDirectory := t.TempDir()
-	err := os.Chmod(tempDirectory, 0777)
+	err := os.Chmod(tempDirectory, 0o777)
 	assert.NilError(t, err)
 
 	containerName := testutil.Identifier(t)
@@ -433,7 +433,7 @@ func TestRunWithFluentdLogDriver(t *testing.T) {
 func TestRunWithFluentdLogDriverWithLogOpt(t *testing.T) {
 	base := testutil.NewBase(t)
 	tempDirectory := t.TempDir()
-	err := os.Chmod(tempDirectory, 0777)
+	err := os.Chmod(tempDirectory, 0o777)
 	assert.NilError(t, err)
 
 	containerName := testutil.Identifier(t)

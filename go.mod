@@ -54,7 +54,7 @@ require (
 	github.com/vishvananda/netlink v1.3.0
 	github.com/vishvananda/netns v0.0.5
 	github.com/yuchanns/srslog v1.1.0
-	go.farcloser.world/containers v0.0.0-20241218222123-7d33d08bddcd
+	go.farcloser.world/containers v0.0.0-20241220004039-23bc116de6cb
 	go.farcloser.world/core v0.0.0-20241218235125-95d33951c312
 	go.uber.org/mock v0.5.0
 	golang.org/x/crypto v0.31.0
@@ -125,7 +125,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.33.0 // indirect
 	golang.org/x/exp v0.0.0-20241217172543-b2144cdd0a67 // indirect
 	golang.org/x/mod v0.22.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20241216192217-9240e9c98484 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20241219192143-6b3ec007d9bb // indirect
 	google.golang.org/grpc v1.69.2 // indirect
 	google.golang.org/protobuf v1.36.0 // indirect
 	sigs.k8s.io/yaml v1.4.0 // indirect

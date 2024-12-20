@@ -152,7 +152,7 @@ services:
 	const envFileContent = `
 image: hello-world
 `
-	assert.NilError(t, os.WriteFile(envFile, []byte(envFileContent), 0644))
+	assert.NilError(t, os.WriteFile(envFile, []byte(envFileContent), 0o644))
 
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "--env-file", envFile, "config").AssertOutContains("image: hello-world")
 }

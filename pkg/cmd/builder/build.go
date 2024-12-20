@@ -109,7 +109,7 @@ func Build(ctx context.Context, client *containerd.Client, options types.Builder
 		if err != nil {
 			return err
 		}
-		if err := os.WriteFile(options.IidFile, []byte(id), 0644); err != nil {
+		if err := os.WriteFile(options.IidFile, []byte(id), 0o644); err != nil {
 			return err
 		}
 	}
@@ -250,7 +250,7 @@ func generateBuildctlArgs(ctx context.Context, client *containerd.Client, option
 			tags[idx] = parsedReference.String()
 		}
 	} else if len(tags) == 0 {
-		output = output + ",dangling-name-prefix=<none>"
+		output += ",dangling-name-prefix=<none>"
 	}
 
 	buildctlArgs = buildkitutil.BuildctlBaseArgs(options.BuildKitHost)

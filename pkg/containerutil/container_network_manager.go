@@ -476,11 +476,11 @@ func copyFileContent(src string, dst string) error {
 	if err != nil {
 		return err
 	}
-	err = os.WriteFile(dst, data, 0644)
+	err = os.WriteFile(dst, data, 0o644)
 	if err != nil {
 		return err
 	}
-	err = os.Chmod(dst, 0644)
+	err = os.Chmod(dst, 0o644)
 	if err != nil {
 		return err
 	}
@@ -671,11 +671,11 @@ func writeEtcHostnameForContainer(globalOptions types.GlobalCommandOptions, host
 	}
 
 	hostnamePath := filepath.Join(stateDir, "hostname")
-	if err := os.WriteFile(hostnamePath, []byte(hostname+"\n"), 0644); err != nil {
+	if err := os.WriteFile(hostnamePath, []byte(hostname+"\n"), 0o644); err != nil {
 		return nil, err
 	}
 
-	err = os.Chmod(hostnamePath, 0644)
+	err = os.Chmod(hostnamePath, 0o644)
 	if err != nil {
 		return nil, err
 	}

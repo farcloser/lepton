@@ -174,7 +174,7 @@ manipulate it further using `helpers.Read` and`helpers.Write`.
 Currently, the following keys are defined:
 - `DockerConfig` allowing to set custom content for the `$DOCKER_CONFIG/config.json` file
 - `Namespace` (default to `nerdctl-test` if unspecified, but see "mode private")
-- `NerdctlToml` to set custom content for the `$NERDCTL_TOML` file
+- `NerdishctlToml` to set custom content for the `$NERDCTL_TOML` file
 - `HostsDir` to specify the value of the arg `--hosts-dir`
 - `DataRoot` to specify the value of the arg `--data-root`
 - `Debug` to enable debug (works for both nerdctl and docker)

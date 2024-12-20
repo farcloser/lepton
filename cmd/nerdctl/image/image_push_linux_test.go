@@ -29,6 +29,7 @@ import (
 
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
+	"github.com/containerd/nerdctl/v2/pkg/testutil/nettestutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/testregistry"
 )
@@ -202,7 +203,7 @@ func TestPush(t *testing.T) {
 					return &test.Expected{
 						Output: func(stdout string, info string, t *testing.T) {
 							blobURL := fmt.Sprintf("http://%s/v2/%s/blobs/%s", net.JoinHostPort(registryNoAuthHTTPRandom.IP.String(), strconv.Itoa(registryNoAuthHTTPRandom.Port)), data.Identifier(), testutil.NonDistBlobDigest)
-							resp, err := http.Get(blobURL)
+							resp, err := nettestutil.HTTPGet(blobURL, 1, false)
 							assert.Assert(t, err, "error making http request")
 							if resp.Body != nil {
 								resp.Body.Close()
@@ -234,7 +235,7 @@ func TestPush(t *testing.T) {
 					return &test.Expected{
 						Output: func(stdout string, info string, t *testing.T) {
 							blobURL := fmt.Sprintf("http://%s/v2/%s/blobs/%s", net.JoinHostPort(registryNoAuthHTTPRandom.IP.String(), strconv.Itoa(registryNoAuthHTTPRandom.Port)), data.Identifier(), testutil.NonDistBlobDigest)
-							resp, err := http.Get(blobURL)
+							resp, err := nettestutil.HTTPGet(blobURL, 1, false)
 							assert.Assert(t, err, "error making http request")
 							if resp.Body != nil {
 								resp.Body.Close()

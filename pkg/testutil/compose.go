@@ -33,7 +33,7 @@ type ComposeDir struct {
 }
 
 func (cd *ComposeDir) WriteFile(name, content string) {
-	if err := os.WriteFile(filepath.Join(cd.dir, name), []byte(content), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(cd.dir, name), []byte(content), 0o644); err != nil {
 		cd.t.Fatal(err)
 	}
 }

@@ -115,7 +115,7 @@ func LastIPInSubnet(addr *net.IPNet) (net.IP, error) {
 		return cidr.IP, nil
 	}
 	for i := range cidr.IP {
-		cidr.IP[i] = cidr.IP[i] | ^cidr.Mask[i]
+		cidr.IP[i] |= ^cidr.Mask[i]
 	}
 	return cidr.IP, nil
 }

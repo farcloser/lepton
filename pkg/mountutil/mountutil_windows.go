@@ -138,11 +138,7 @@ func splitVolumeSpec(raw string) ([]string, error) {
 		rxWindows = `^` + rxSource + rxDestination + `(?:` + rxMode + `)?$`
 	)
 
-	compiledRegex, err := regexp.Compile(rxWindows)
-	if err != nil {
-		return nil, fmt.Errorf("error compiling regex: %w", err)
-	}
-	return splitRawSpec(raw, compiledRegex)
+	return splitRawSpec(raw, regexp.MustCompile(rxWindows))
 }
 
 func isNamedPipe(s string) bool {

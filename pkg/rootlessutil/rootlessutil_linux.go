@@ -80,7 +80,7 @@ func RootlessContainredSockAddress() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(fmt.Sprintf("/proc/%d/root/run/containerd/containerd.sock", childPid)), nil
+	return fmt.Sprintf("/proc/%d/root/run/containerd/containerd.sock", childPid), nil
 }
 
 // DetachedNetNS returns non-empty netns path if RootlessKit is running with --detach-netns mode.

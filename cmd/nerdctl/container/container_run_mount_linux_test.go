@@ -153,11 +153,11 @@ CMD ["cat", "/mnt/initial_file"]
 
 	base.Cmd("build", "-t", imageName, buildCtx).AssertOK()
 
-	//AnonymousVolume
+	// AnonymousVolume
 	base.Cmd("run", "--rm", imageName).AssertOutExactly("hi\n")
 	base.Cmd("run", "-v", "/mnt", "--rm", imageName).AssertOutExactly("hi\n")
 
-	//NamedVolume should be automatically created
+	// NamedVolume should be automatically created
 	base.Cmd("run", "-v", volName+":/mnt", "--rm", imageName).AssertOutExactly("hi\n")
 }
 
@@ -180,15 +180,15 @@ CMD ["cat", "/mnt/initial_file"]
 	buildCtx := helpers.CreateBuildContext(t, dockerfile)
 
 	base.Cmd("build", "-t", imageName, buildCtx).AssertOK()
-	//AnonymousVolume
+	// AnonymousVolume
 	base.Cmd("run", "--rm", imageName).AssertOutExactly("hi\n")
 	base.Cmd("run", "-v", "/mnt", "--rm", imageName).AssertOutExactly("hi\n")
 
-	//NamedVolume
+	// NamedVolume
 	base.Cmd("volume", "create", volName).AssertOK()
 	base.Cmd("run", "-v", volName+":/mnt", "--rm", imageName).AssertOutExactly("hi\n")
 
-	//mount bind
+	// mount bind
 	tmpDir, err := os.MkdirTemp(t.TempDir(), "hostDir")
 	assert.NilError(t, err)
 
@@ -381,7 +381,7 @@ func TestRunMountBindMode(t *testing.T) {
 	}
 	defer os.RemoveAll(tmpDir1)
 	tmpDir1Mnt := filepath.Join(tmpDir1, "mnt")
-	if err := os.MkdirAll(tmpDir1Mnt, 0700); err != nil {
+	if err := os.MkdirAll(tmpDir1Mnt, 0o700); err != nil {
 		t.Fatal(err)
 	}
 
@@ -447,7 +447,7 @@ func TestRunVolumeBindMode(t *testing.T) {
 	}
 	defer os.RemoveAll(tmpDir1)
 	tmpDir1Mnt := filepath.Join(tmpDir1, "mnt")
-	if err := os.MkdirAll(tmpDir1Mnt, 0700); err != nil {
+	if err := os.MkdirAll(tmpDir1Mnt, 0o700); err != nil {
 		t.Fatal(err)
 	}
 

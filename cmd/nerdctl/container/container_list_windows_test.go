@@ -132,7 +132,7 @@ func TestListHyperVContainer(t *testing.T) {
 
 	base, testContainer := preparePsTestContainer(t, "list", true, true)
 	inspect := base.InspectContainer(testContainer.name)
-	//check with HCS if the container is ineed a VM
+	// check with HCS if the container is ineed a VM
 	isHypervContainer, err := testutil.HyperVContainer(inspect)
 	if err != nil {
 		t.Fatalf("unable to list HCS containers: %s", err)

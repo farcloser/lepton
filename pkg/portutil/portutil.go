@@ -113,7 +113,7 @@ func ParseFlagP(s string) ([]cni.PortMapping, error) {
 		res.ContainerPort = int32(startPort) + i
 		res.HostPort = int32(startHostPort) + i
 		if ip == "" {
-			//TODO handle ipv6
+			// TODO handle ipv6
 			res.HostIP = "0.0.0.0"
 		} else {
 			// TODO handle ipv6

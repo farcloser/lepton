@@ -40,7 +40,7 @@ func TestRemoveHyperVContainer(t *testing.T) {
 
 	base.EnsureContainerStarted(tID)
 	inspect := base.InspectContainer(tID)
-	//check with HCS if the container is ineed a VM
+	// check with HCS if the container is ineed a VM
 	isHypervContainer, err := testutil.HyperVContainer(inspect)
 	if err != nil {
 		t.Fatalf("unable to list HCS containers: %s", err)

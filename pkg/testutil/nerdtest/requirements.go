@@ -32,17 +32,19 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
 )
 
-var BuildkitHost test.ConfigKey = "BuildkitHost"
+var (
+	BuildkitHost test.ConfigKey = "BuildkitHost"
 
-// These are used for ambient requirements
-var ipv6 test.ConfigKey = "IPv6Test"
-var kubernetes test.ConfigKey = "KubeTest"
-var flaky test.ConfigKey = "FlakyTest"
-var only test.ConfigValue = "Only"
+	// These are used for ambient requirements
+	ipv6       test.ConfigKey   = "IPv6Test"
+	kubernetes test.ConfigKey   = "KubeTest"
+	flaky      test.ConfigKey   = "FlakyTest"
+	only       test.ConfigValue = "Only"
 
-// These are used for down the road configuration and custom behavior inside command
-var modePrivate test.ConfigKey = "PrivateMode"
-var enabled test.ConfigValue = "Enabled"
+	// These are used for down the road configuration and custom behavior inside command
+	modePrivate test.ConfigKey   = "PrivateMode"
+	enabled     test.ConfigValue = "Enabled"
+)
 
 // OnlyIPv6 marks a test as suitable to be run exclusively inside an ipv6 environment
 // This is an ambient requirement

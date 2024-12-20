@@ -92,7 +92,7 @@ func CreateSocketDir() error {
 	}
 	dirPath := filepath.Join(xdgRuntimeDir, "bypass4netns")
 	if _, err := os.Stat(dirPath); os.IsNotExist(err) {
-		err = os.MkdirAll(dirPath, 0775)
+		err = os.MkdirAll(dirPath, 0o775)
 		if err != nil {
 			return err
 		}

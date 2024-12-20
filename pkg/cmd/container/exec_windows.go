@@ -21,6 +21,6 @@ import (
 )
 
 func setExecCapabilities(pspec *specs.Process) error {
-	//no op windows
+	// no op windows
 	return nil
 }

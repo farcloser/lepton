@@ -117,7 +117,7 @@ func ensureContainerStarted(helpers test.Helpers, con string) {
 	}
 }
 
-func NewCesantaAuthServer(data test.Data, helpers test.Helpers, ca *ca.CA, port int, user, pass string, tls bool) *TokenAuthServer {
+func NewCesantaAuthServer(data test.Data, helpers test.Helpers, authority *ca.CA, port int, user, pass string, tls bool) *TokenAuthServer {
 	// listen on 0.0.0.0 to enable 127.0.0.1
 	listenIP := net.ParseIP("0.0.0.0")
 	hostIP, err := nettestutil.NonLoopbackIPv4()
@@ -166,7 +166,7 @@ func NewCesantaAuthServer(data test.Data, helpers test.Helpers, ca *ca.CA, port 
 	err = cc.Save(configFileName)
 	assert.NilError(helpers.T(), err, fmt.Errorf("failed writing configuration: %w", err))
 
-	cert := ca.NewCert(hostIP.String())
+	cert := authority.NewCert(hostIP.String())
 	// FIXME: this will fail in many circumstances. Review strategy on how to acquire a free port.
 	// We probably have better code for that already somewhere.
 	port, err = portlock.Acquire(port)

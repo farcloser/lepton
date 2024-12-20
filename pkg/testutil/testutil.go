@@ -547,9 +547,7 @@ var (
 	flagTestKube       bool
 	flagVerbose        bool
 	flagTestFlaky      bool
-)
 
-var (
 	testLockFile = filepath.Join(os.TempDir(), "test-prevent-concurrency", ".lock")
 )
 

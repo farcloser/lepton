@@ -188,7 +188,7 @@ func loggingProcessAdapter(ctx context.Context, driver Driver, dataStore string,
 			var s string
 			s, err = r.ReadString('\n')
 
-			if len(s) > 0 {
+			if s != "" {
 				dataChan <- strings.TrimSuffix(s, "\n")
 			}
 

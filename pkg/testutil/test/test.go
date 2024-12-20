@@ -75,8 +75,10 @@ type Data interface {
 	TempDir() string
 }
 
-type ConfigKey string
-type ConfigValue string
+type (
+	ConfigKey   string
+	ConfigValue string
+)
 
 // Config is meant to hold information relevant to the binary (eg: flags defining certain behaviors, etc.)
 type Config interface {
@@ -153,9 +155,7 @@ type Testable interface {
 	AmbientRequirements(testCase *Case, t *testing.T)
 }
 
-var (
-	registeredTestable Testable
-)
+var registeredTestable Testable
 
 func Customize(testable Testable) {
 	registeredTestable = testable
