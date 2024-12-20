@@ -1,6 +1,6 @@
 # Lepton
 
-lepton is an experimental containerd cli started as a friendly fork of nerdctl.
+lepton is an experimental containerd cli started as a friendly fork of nerdctl in December 2024.
 
 Requires:
 - containerd 2.0+
