@@ -390,6 +390,7 @@ nerdtest.Rootful // a test requires Rootful
 nerdtest.Build // a test requires buildkit
 nerdtest.CGroup // a test requires cgroup
 nerdtest.NerdctlNeedsFixing // indicates that a test cannot be run on nerdctl yet as a fix is required
+nerdtest.NerdishctlNeedsFixing // indicates that a test cannot be run with any binary based on upstream nerdctl library yet as a fix is required
 nerdtest.BrokenTest // indicates that a test needs to be fixed and has been restricted to run only in certain cases
 nerdtest.OnlyIPv6 // a test is meant to run solely in the ipv6 environment
 nerdtest.OnlyKubernetes // a test is meant to run solely in the Kubernetes environment
