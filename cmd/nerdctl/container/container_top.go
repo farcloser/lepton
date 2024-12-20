@@ -20,6 +20,7 @@ import (
 	"errors"
 
 	"github.com/spf13/cobra"
+	"go.farcloser.world/containers/cgroups"
 
 	containerd "github.com/containerd/containerd/v2/client"
 
@@ -28,7 +29,6 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
-	"github.com/containerd/nerdctl/v2/pkg/infoutil"
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
 )
 
@@ -53,7 +53,7 @@ func topAction(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	if rootlessutil.IsRootless() && infoutil.CgroupsVersion() == "1" {
+	if rootlessutil.IsRootless() && cgroups.Version() < 2 {
 		return errors.New("top requires cgroup v2 for rootless containers, see https://rootlesscontaine.rs/getting-started/common/cgroup2/")
 	}
 

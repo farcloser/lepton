@@ -22,8 +22,6 @@ import (
 
 	"github.com/docker/docker/pkg/meminfo"
 
-	"github.com/containerd/cgroups/v3"
-
 	"github.com/containerd/nerdctl/v2/pkg/apparmorutil"
 	"github.com/containerd/nerdctl/v2/pkg/defaults"
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
@@ -32,14 +30,6 @@ import (
 )
 
 const UnameO = "GNU/Linux"
-
-func CgroupsVersion() string {
-	if cgroups.Mode() == cgroups.Unified {
-		return "2"
-	}
-
-	return "1"
-}
 
 func fulfillSecurityOptions(info *dockercompat.Info) {
 	if apparmorutil.CanApplyExistingProfile() {

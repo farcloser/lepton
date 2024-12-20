@@ -103,7 +103,7 @@ func parseMountFlags(volStore volumestore.VolumeStore, options types.ContainerCr
 	}
 
 	for _, v := range strutil.DedupeStrSlice(options.Tmpfs) {
-		x, err := mountutil.ProcessFlagTmpfs(v)
+		x, err := mountutil.ProcessFlagTmpfs(v) //nolint:staticcheck,nolintlint
 		if err != nil {
 			return nil, err
 		}
@@ -111,7 +111,7 @@ func parseMountFlags(volStore volumestore.VolumeStore, options types.ContainerCr
 	}
 
 	for _, v := range strutil.DedupeStrSlice(options.Mount) {
-		x, err := mountutil.ProcessFlagMount(v, volStore)
+		x, err := mountutil.ProcessFlagMount(v, volStore) //nolint:staticcheck,nolintlint
 		if err != nil {
 			return nil, err
 		}

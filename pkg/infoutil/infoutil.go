@@ -18,18 +18,20 @@ package infoutil
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
 	"runtime"
+	"strconv"
 	"strings"
 	"time"
 
+	"go.farcloser.world/containers/cgroups"
 	"go.farcloser.world/core/version/semver"
 
 	containerd "github.com/containerd/containerd/v2/client"
-	"github.com/containerd/containerd/v2/core/introspection"
-	ptypes "github.com/containerd/containerd/v2/pkg/protobuf/types"
+	"github.com/containerd/containerd/v2/pkg/protobuf/types"
 	"github.com/containerd/log"
 
 	"github.com/containerd/nerdctl/v2/pkg/buildkitutil"
@@ -38,78 +40,108 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/version"
 )
 
+const (
+	snapshotterPluginsPrefix = "io.containerd.snapshotter."
+)
+
+var (
+	ErrUnableToRetrieveHostname = errors.New("unable to retrieve hostname")
+	ErrContainerdFailure        = errors.New("unable to communicate with containerd")
+)
+
 func NativeDaemonInfo(ctx context.Context, client *containerd.Client) (*native.DaemonInfo, error) {
 	introService := client.IntrospectionService()
+
+	plugins, err := introService.Plugins(ctx)
+	if err != nil {
+		return nil, errors.Join(ErrContainerdFailure, err)
+	}
+
+	server, err := introService.Server(ctx)
+	if err != nil {
+		return nil, errors.Join(ErrContainerdFailure, err)
+	}
+
+	ver, err := client.VersionService().Version(ctx, &types.Empty{})
+	if err != nil {
+		return nil, errors.Join(ErrContainerdFailure, err)
+	}
+
+	return &native.DaemonInfo{
+		Plugins: plugins,
+		Server:  server,
+		Version: ver,
+	}, nil
+}
+
+func Info(ctx context.Context, client *containerd.Client, snapshotter, cgroupManager string) (*dockercompat.Info, error) {
+	introService := client.IntrospectionService()
+
 	plugins, err := introService.Plugins(ctx)
 	if err != nil {
 		return nil, err
 	}
+
 	server, err := introService.Server(ctx)
 	if err != nil {
 		return nil, err
 	}
-	versionService := client.VersionService()
-	version, err := versionService.Version(ctx, &ptypes.Empty{})
-	if err != nil {
-		return nil, err
-	}
 
-	daemonInfo := &native.DaemonInfo{
-		Plugins: plugins,
-		Server:  server,
-		Version: version,
-	}
-	return daemonInfo, nil
-}
-
-func Info(ctx context.Context, client *containerd.Client, snapshotter, cgroupManager string) (*dockercompat.Info, error) {
 	daemonVersion, err := client.Version(ctx)
 	if err != nil {
 		return nil, err
 	}
-	introService := client.IntrospectionService()
-	daemonIntro, err := introService.Server(ctx)
-	if err != nil {
-		return nil, err
-	}
-	snapshotterPlugins, err := GetSnapshotterNames(ctx, introService)
-	if err != nil {
-		return nil, err
+
+	var snapshotterPlugins []string
+	for _, p := range plugins.Plugins {
+		if strings.HasPrefix(p.Type, snapshotterPluginsPrefix) && p.InitErr == nil {
+			snapshotterPlugins = append(snapshotterPlugins, p.ID)
+		}
 	}
 
-	var info dockercompat.Info
-	info.ID = daemonIntro.UUID
-	// Storage drivers and logging drivers are not really Server concept for nerdctl, but mimics `docker info` output
-	info.Driver = snapshotter
-	info.Plugins.Storage = snapshotterPlugins
-	info.SystemTime = time.Now().Format(time.RFC3339Nano)
-	info.LoggingDriver = "json-file" // hard-coded
-	info.CgroupDriver = cgroupManager
-	info.CgroupVersion = CgroupsVersion()
-	info.KernelVersion = UnameR()
-	info.OperatingSystem = DistroName()
-	info.OSType = runtime.GOOS
-	info.Architecture = UnameM()
-	info.Name, err = os.Hostname()
+	hostname, err := os.Hostname()
 	if err != nil {
-		return nil, err
+		return nil, errors.Join(ErrUnableToRetrieveHostname, err)
 	}
-	info.ServerVersion = daemonVersion.Version
-	fulfillPlatformInfo(&info)
-	return &info, nil
+
+	var info = &dockercompat.Info{
+		ID:   server.UUID,
+		Name: hostname,
+		// Storage drivers and logging drivers are not really Server concept for nerdctl, but mimics `docker info` output
+		Driver: snapshotter,
+		Plugins: dockercompat.PluginsInfo{
+			Storage: snapshotterPlugins,
+		},
+		SystemTime:      time.Now().Format(time.RFC3339Nano),
+		LoggingDriver:   "json-file", // hard-coded
+		CgroupDriver:    cgroupManager,
+		CgroupVersion:   strconv.Itoa(cgroups.Version()),
+		KernelVersion:   UnameR(),
+		OperatingSystem: DistroName(),
+		OSType:          runtime.GOOS,
+		Architecture:    UnameM(),
+		ServerVersion:   daemonVersion.Version,
+	}
+
+	fulfillPlatformInfo(info)
+
+	return info, nil
 }
 
-func GetSnapshotterNames(ctx context.Context, introService introspection.Service) ([]string, error) {
+func GetSnapshotterNames(ctx context.Context, client *containerd.Client) ([]string, error) {
 	var names []string
-	plugins, err := introService.Plugins(ctx)
+
+	plugins, err := client.IntrospectionService().Plugins(ctx)
 	if err != nil {
 		return nil, err
 	}
+
 	for _, p := range plugins.Plugins {
-		if strings.HasPrefix(p.Type, "io.containerd.snapshotter.") && p.InitErr == nil {
+		if strings.HasPrefix(p.Type, snapshotterPluginsPrefix) && p.InitErr == nil {
 			names = append(names, p.ID)
 		}
 	}
+
 	return names, nil
 }
 
@@ -142,6 +174,7 @@ func ServerVersion(ctx context.Context, client *containerd.Client) (*dockercompa
 			runcVersion(),
 		},
 	}
+
 	return v, nil
 }
 
@@ -150,10 +183,12 @@ func ServerSemVer(ctx context.Context, client *containerd.Client) (*semver.Versi
 	if err != nil {
 		return nil, err
 	}
+
 	sv, err := semver.NewVersion(v.Version)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse the containerd version %q: %w", v.Version, err)
 	}
+
 	return sv, nil
 }
 
@@ -175,12 +210,14 @@ func buildctlVersion() dockercompat.ComponentVersion {
 		log.L.Warn(err)
 		return dockercompat.ComponentVersion{Name: "buildctl"}
 	}
+
 	return *v
 }
 
 func parseBuildctlVersion(buildctlVersionStdout []byte) (*dockercompat.ComponentVersion, error) {
 	fields := strings.Fields(strings.TrimSpace(string(buildctlVersionStdout)))
 	var v *dockercompat.ComponentVersion
+
 	switch len(fields) {
 	case 4:
 		v = &dockercompat.ComponentVersion{
@@ -199,6 +236,7 @@ func parseBuildctlVersion(buildctlVersionStdout []byte) (*dockercompat.Component
 	if v.Name != "buildctl" {
 		return nil, fmt.Errorf("unable to determine buildctl version, got %q", string(buildctlVersionStdout))
 	}
+
 	return v, nil
 }
 
@@ -208,11 +246,13 @@ func runcVersion() dockercompat.ComponentVersion {
 		log.L.Warnf("unable to determine runc version: %s", err.Error())
 		return dockercompat.ComponentVersion{Name: "runc"}
 	}
+
 	v, err := parseRuncVersion(stdout)
 	if err != nil {
 		log.L.Warn(err)
 		return dockercompat.ComponentVersion{Name: "runc"}
 	}
+
 	return *v
 }
 
@@ -222,6 +262,7 @@ func parseRuncVersion(runcVersionStdout []byte) (*dockercompat.ComponentVersion,
 	if len(firstLine) != 3 || firstLine[0] != "runc" {
 		return nil, fmt.Errorf("unable to determine runc version, got: %s", string(runcVersionStdout))
 	}
+
 	version := firstLine[2]
 
 	details := map[string]string{}
@@ -246,9 +287,10 @@ func parseRuncVersion(runcVersionStdout []byte) (*dockercompat.ComponentVersion,
 // BlockIOWeight return whether Block IO weight is supported or not
 func BlockIOWeight(cgroupManager string) bool {
 	var info dockercompat.Info
-	info.CgroupVersion = CgroupsVersion()
+	info.CgroupVersion = strconv.Itoa(cgroups.Version())
 	info.CgroupDriver = cgroupManager
 	mobySysInfo := mobySysInfo(&info)
+
 	// blkio weight is not available on cgroup v1 since kernel 5.0.
 	// On cgroup v2, blkio weight is implemented using io.weight
 	return mobySysInfo.BlkioWeight

@@ -29,37 +29,42 @@ func NewInfoCommand() *cobra.Command {
 	var infoCommand = &cobra.Command{
 		Use:           "info",
 		Args:          cobra.NoArgs,
-		Short:         "Display system-wide information",
+		Short:         "Display information about the system",
 		RunE:          infoAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
+
 	infoCommand.Flags().String("mode", "dockercompat", `Information mode, "dockercompat" for Docker-compatible output, "native" for containerd-native output`)
-	infoCommand.RegisterFlagCompletionFunc("mode", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	_ = infoCommand.RegisterFlagCompletionFunc("mode", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return []string{"dockercompat", "native"}, cobra.ShellCompDirectiveNoFileComp
 	})
+
 	infoCommand.Flags().StringP("format", "f", "", "Format the output using the given Go template, e.g, '{{json .}}'")
-	infoCommand.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	_ = infoCommand.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return []string{"json"}, cobra.ShellCompDirectiveNoFileComp
 	})
+
 	return infoCommand
 }
 
-func processInfoOptions(cmd *cobra.Command) (types.SystemInfoOptions, error) {
+func processInfoOptions(cmd *cobra.Command) (*types.SystemInfoOptions, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return types.SystemInfoOptions{}, err
+		return nil, err
 	}
 
 	mode, err := cmd.Flags().GetString("mode")
 	if err != nil {
-		return types.SystemInfoOptions{}, err
+		return nil, err
 	}
+
 	format, err := cmd.Flags().GetString("format")
 	if err != nil {
-		return types.SystemInfoOptions{}, err
+		return nil, err
 	}
-	return types.SystemInfoOptions{
+
+	return &types.SystemInfoOptions{
 		GOptions: globalOptions,
 		Mode:     mode,
 		Format:   format,

@@ -20,13 +20,14 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/containerd/nerdctl/v2/pkg/infoutil"
+	"go.farcloser.world/containers/cgroups"
+
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 )
 
 func TestComposeTop(t *testing.T) {
-	if rootlessutil.IsRootless() && infoutil.CgroupsVersion() == "1" {
+	if rootlessutil.IsRootless() && cgroups.Version() < 2 {
 		t.Skip("test skipped for rootless containers on cgroup v1")
 	}
 

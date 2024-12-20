@@ -189,11 +189,6 @@ func isWindowsServer(sw windowsInfoUtil) bool {
 	return osvi.ProductType == verNTServer
 }
 
-// Cgroups not supported on Windows
-func CgroupsVersion() string {
-	return ""
-}
-
 func fulfillPlatformInfo(info *dockercompat.Info) {
 	mobySysInfo := mobySysInfo(info)
 

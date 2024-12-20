@@ -143,8 +143,11 @@ type RemoteSnapshotterFlags struct {
 
 // ImagePullOptions specifies options for `(image) pull`.
 type ImagePullOptions struct {
-	Stdout        io.Writer
-	Stderr        io.Writer
+	Stdout io.Writer
+	Stderr io.Writer
+	// ProgressOutputToStdout directs progress output to stdout instead of stderr
+	ProgressOutputToStdout bool
+
 	GOptions      GlobalCommandOptions
 	VerifyOptions ImageVerifyOptions
 	// Unpack the image for the current single platform.
