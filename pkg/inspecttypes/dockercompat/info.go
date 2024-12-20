@@ -25,7 +25,7 @@
 package dockercompat
 
 // Info mimics a `docker info` object.
-// From https://github.com/moby/moby/blob/v20.10.8/api/types/types.go#L146-L216
+// From https://github.com/moby/moby/blob/v27.4.1/api/types/system/info.go
 type Info struct {
 	ID          string
 	Driver      string
@@ -41,14 +41,14 @@ type Info struct {
 	IPv4Forwarding    bool
 	BridgeNfIptables  bool
 	BridgeNfIP6tables bool `json:"BridgeNfIp6tables"`
-	// Nfd is omitted because it does not make sense for nerdctl
+	// Nfd is omitted because it does not make sense for us
 	OomKillDisable bool
-	// NGoroutines is omitted because it does not make sense for nerdctl
+	// NGoroutines is omitted because it does not make sense for us
 	SystemTime    string
 	LoggingDriver string
 	CgroupDriver  string
 	CgroupVersion string `json:",omitempty"`
-	// NEventsListener is omitted because it does not make sense for nerdctl
+	// NEventsListener is omitted because it does not make sense for us
 	KernelVersion   string
 	OperatingSystem string
 	OSType          string

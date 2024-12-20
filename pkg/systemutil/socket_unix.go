@@ -29,6 +29,6 @@ func IsSocketAccessible(s string) error {
 	if err != nil {
 		return err
 	}
-	// set AT_EACCESS to allow running nerdctl as a setuid binary
+	// set AT_EACCESS to allow running ourselves as a setuid binary
 	return unix.Faccessat(-1, abs, unix.R_OK|unix.W_OK, unix.AT_EACCESS)
 }

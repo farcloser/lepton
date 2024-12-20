@@ -295,8 +295,8 @@ github.com/yuchanns/srslog v1.1.0/go.mod h1:HsLjdv3XV02C3kgBW2bTyW6i88OQE+VYJZIx
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
-go.farcloser.world/containers v0.0.0-20241218222123-7d33d08bddcd h1:2egbrg9oGtlEmRQFK8FfQG9qnS3U4Embnhf11DL4Ur0=
-go.farcloser.world/containers v0.0.0-20241218222123-7d33d08bddcd/go.mod h1:ZXHYwP/8pAa4bKXNVdI62QTuo9pu32ESYXPXHBAqlfc=
+go.farcloser.world/containers v0.0.0-20241220004039-23bc116de6cb h1:MDOmDKr+dHfbLAB0NgtYHK/L1dAIST5EObz5ZcaV3No=
+go.farcloser.world/containers v0.0.0-20241220004039-23bc116de6cb/go.mod h1:tVJLFcqxdygbKleohufw0zcqFHlrByaOBfbg1VR0yT4=
 go.farcloser.world/core v0.0.0-20241218235125-95d33951c312 h1:uoOZGpA8bI19ugU7IDPUZ4/DPJkGhZLrjxpe+7vBQxM=
 go.farcloser.world/core v0.0.0-20241218235125-95d33951c312/go.mod h1:/P1HGCJOWn3iH56GqBWW/nRDBbomIELteS4Ha4Z+OCA=
 go.opencensus.io v0.24.0 h1:y73uSU6J157QMP2kn2r30vwW1A2W2WFwSCGnAVxeaD0=
@@ -443,8 +443,8 @@ google.golang.org/appengine v1.4.0/go.mod h1:xpcJRLb0r/rnEns0DIKYYv+WjYCduHsrkT7
 google.golang.org/genproto v0.0.0-20180817151627-c66870c02cf8/go.mod h1:JiN7NxoALGmiZfu7CAH4rXhgtRTLTxftemlI0sWmxmc=
 google.golang.org/genproto v0.0.0-20190819201941-24fa4b261c55/go.mod h1:DMBHOl98Agz4BDEuKkezgsaosCRResVns1a3J2ZsMNc=
 google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013/go.mod h1:NbSheEEYHJ7i3ixzK3sjbqSGDJWnxyFXZblF3eUsNvo=
-google.golang.org/genproto/googleapis/rpc v0.0.0-20241216192217-9240e9c98484 h1:Z7FRVJPSMaHQxD0uXU8WdgFh8PseLM8Q8NzhnpMrBhQ=
-google.golang.org/genproto/googleapis/rpc v0.0.0-20241216192217-9240e9c98484/go.mod h1:lcTa1sDdWEIHMWlITnIczmw5w60CF9ffkb8Z+DVmmjA=
+google.golang.org/genproto/googleapis/rpc v0.0.0-20241219192143-6b3ec007d9bb h1:3oy2tynMOP1QbTC0MsNNAV+Se8M2Bd0A5+x1QHyw+pI=
+google.golang.org/genproto/googleapis/rpc v0.0.0-20241219192143-6b3ec007d9bb/go.mod h1:lcTa1sDdWEIHMWlITnIczmw5w60CF9ffkb8Z+DVmmjA=
 google.golang.org/grpc v1.19.0/go.mod h1:mqu4LbDTu4XGKhr4mRzUsmM4RtVoemTSY81AxZiDr8c=
 google.golang.org/grpc v1.23.0/go.mod h1:Y5yQAOtifL1yxbo5wqy6BxZv8vAUGQwXBOALyacEbxg=
 google.golang.org/grpc v1.25.1/go.mod h1:c3i+UQWmh7LiEpx4sFZnkU36qjEYZ0imhYfXVyQciAY=
