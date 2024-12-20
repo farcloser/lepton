@@ -485,7 +485,7 @@ configs:
 	assert.NilError(t, err)
 
 	for _, f := range []string{"secret1", "secret2", "secret3", "config1", "config2"} {
-		err = os.WriteFile(filepath.Join(project.WorkingDir, f), []byte("content-"+f), 0444)
+		err = os.WriteFile(filepath.Join(project.WorkingDir, f), []byte("content-"+f), 0o444)
 		assert.NilError(t, err)
 	}
 
