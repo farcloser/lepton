@@ -82,7 +82,7 @@ func (b *Base) Cmd(args ...string) *Cmd {
 	return cmd
 }
 
-// ComposeCmd executes `-n nerdctl-test compose` or `docker-compose`
+// ComposeCmd executes `-n prefix-test compose` or `docker-compose`
 func (b *Base) ComposeCmd(args ...string) *Cmd {
 	binary := b.Binary
 	binaryArgs := append(b.Args, append([]string{"compose"}, args...)...)
@@ -136,7 +136,7 @@ func (b *Base) CmdWithHelper(helper []string, args ...string) *Cmd {
 
 func (b *Base) systemctlTarget() string {
 	switch b.Target {
-	case Nerdctl:
+	case Nerdishctl, Nerdctl:
 		return "containerd.service"
 	case Docker:
 		return "docker.service"
@@ -271,8 +271,8 @@ func (b *Base) Info() dockercompat.Info {
 
 func (b *Base) InfoNative() native.Info {
 	b.T.Helper()
-	if GetTarget() != Nerdctl {
-		b.T.Skip("InfoNative() should not be called for non-nerdctl target")
+	if GetTarget() != Nerdctl && GetTarget() != Nerdishctl {
+		b.T.Skip("InfoNative() should not be called for non-nerdishctl target")
 	}
 	cmdResult := b.Cmd("info", "--mode", "native", "--format", "{{ json . }}").Run()
 	assert.Equal(b.T, cmdResult.ExitCode, 0)
@@ -285,8 +285,8 @@ func (b *Base) InfoNative() native.Info {
 
 func (b *Base) ContainerdAddress() string {
 	b.T.Helper()
-	if GetTarget() != Nerdctl {
-		b.T.Skip("ContainerdAddress() should not be called for non-nerdctl target")
+	if GetTarget() != Nerdctl && GetTarget() != Nerdishctl {
+		b.T.Skip("ContainerdAddress() should not be called for non-nerdishctl target")
 	}
 	if os.Geteuid() == 0 {
 		return defaults.DefaultAddress
@@ -541,6 +541,8 @@ const (
 )
 
 var (
+	Nerdishctl = version.RootName
+
 	flagTestTarget     Target
 	flagTestKillDaemon bool
 	flagTestIPv6       bool
@@ -552,7 +554,7 @@ var (
 )
 
 func M(m *testing.M) {
-	flag.StringVar(&flagTestTarget, "test.target", Nerdctl, "target to test")
+	flag.StringVar(&flagTestTarget, "test.target", Nerdishctl, "target to test")
 	flag.BoolVar(&flagTestKillDaemon, "test.allow-kill-daemon", false, "enable tests that kill the daemon")
 	flag.BoolVar(&flagTestIPv6, "test.only-ipv6", false, "enable tests on IPv6")
 	flag.BoolVar(&flagTestKube, "test.only-kubernetes", false, "enable tests on Kubernetes")
@@ -646,7 +648,7 @@ func DockerIncompatible(t testing.TB) {
 }
 
 func RequiresBuild(t testing.TB) {
-	if GetTarget() == Nerdctl {
+	if GetTarget() == Nerdctl || GetTarget() == Nerdishctl {
 		buildkitHost, err := buildkitutil.GetBuildkitHost(Namespace)
 		if err != nil {
 			t.Skipf("test requires buildkitd: %+v", err)
@@ -790,18 +792,14 @@ func newBase(t *testing.T, ns string, ipv6Compatible bool, kubernetesCompatible 
 		t.Skip("legacy tests are considered flaky by default and are skipped unless in the flaky environment")
 	}
 	var err error
+	base.Binary, err = exec.LookPath(base.Target)
+	if err != nil {
+		t.Fatal(err)
+	}
 	switch base.Target {
-	case Nerdctl:
-		base.Binary, err = exec.LookPath(base.Target)
-		if err != nil {
-			t.Fatal(err)
-		}
+	case Nerdctl, Nerdishctl:
 		base.Args = []string{"--namespace=" + ns}
 	case Docker:
-		base.Binary, err = exec.LookPath(base.Target)
-		if err != nil {
-			t.Fatal(err)
-		}
 		if err := exec.Command("docker", "compose", "version").Run(); err != nil {
 			t.Fatal(err)
 		}

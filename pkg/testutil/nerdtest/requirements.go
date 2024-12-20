@@ -112,11 +112,25 @@ var Docker = &test.Requirement{
 var NerdctlNeedsFixing = func(issueLink string) *test.Requirement {
 	return &test.Requirement{
 		Check: func(data test.Data, helpers test.Helpers) (ret bool, mess string) {
-			ret = getTarget() == targetDocker
+			ret = getTarget() != targetNerdctl
 			if ret {
-				mess = "current target is docker"
+				mess = "current target is not " + getTarget()
 			} else {
-				mess = "current target is nerdctl, but we will skip as nerdctl currently has issue: " + issueLink
+				mess = "current target is " + getTarget() + ", but we will skip as it currently has issue: " + issueLink
+			}
+			return ret, mess
+		},
+	}
+}
+
+var NerdishctlNeedsFixing = func(issueLink string) *test.Requirement {
+	return &test.Requirement{
+		Check: func(data test.Data, helpers test.Helpers) (ret bool, mess string) {
+			ret = getTarget() != targetNerdishctl && getTarget() != targetNerdctl
+			if ret {
+				mess = "current target is not " + getTarget()
+			} else {
+				mess = "current target is " + getTarget() + ", but we will skip as it currently has issue: " + issueLink
 			}
 			return ret, mess
 		},
@@ -140,7 +154,7 @@ var BrokenTest = func(message string, req *test.Requirement) *test.Requirement {
 var Rootless = &test.Requirement{
 	Check: func(data test.Data, helpers test.Helpers) (ret bool, mess string) {
 		// Make sure we DO not return "IsRootless true" for docker
-		ret = getTarget() == targetNerdctl && rootlessutil.IsRootless()
+		ret = (getTarget() == targetNerdctl || getTarget() == targetNerdishctl) && rootlessutil.IsRootless()
 		if ret {
 			mess = "environment is root-less"
 		} else {
@@ -175,7 +189,7 @@ var CgroupsAccessible = test.Require(
 	CGroup,
 	&test.Requirement{
 		Check: func(data test.Data, helpers test.Helpers) (ret bool, mess string) {
-			isRootLess := getTarget() == targetNerdctl && rootlessutil.IsRootless()
+			isRootLess := (getTarget() == targetNerdctl || getTarget() == targetNerdishctl) && rootlessutil.IsRootless()
 			if isRootLess {
 				stdout := helpers.Capture("info", "--format", "{{ json . }}")
 				var dinf dockercompat.Info
@@ -244,7 +258,7 @@ var Registry = test.Require(
 	})(),
 )
 
-// Build marks a test as suitable only if buildkitd is enabled (only tested for nerdctl obviously)
+// Build marks a test as suitable only if buildkitd is enabled (only tested for nerdishctl obviously)
 var Build = &test.Requirement{
 	Check: func(data test.Data, helpers test.Helpers) (bool, string) {
 		// FIXME: shouldn't we run buildkitd in a container? At least for testing, that would be so much easier than
@@ -252,7 +266,7 @@ var Build = &test.Requirement{
 		ret := true
 		mess := "buildkitd is enabled"
 
-		if getTarget() == targetNerdctl {
+		if getTarget() == targetNerdishctl || getTarget() == targetNerdctl {
 			bkHostAddr, err := buildkitutil.GetBuildkitHost(defaultNamespace)
 			if err != nil {
 				ret = false
@@ -290,11 +304,11 @@ var Private = &test.Requirement{
 		data.Set("_deletenamespace", namespace)
 		// FIXME: is this necessary? Should NoParallel be subsumed into config?
 		helpers.Write(modePrivate, enabled)
-		return true, "private mode creates a dedicated namespace for nerdctl, and disable parallelism for docker"
+		return true, "private mode creates a dedicated namespace for nerdishctl, and disable parallelism for docker"
 	},
 
 	Cleanup: func(data test.Data, helpers test.Helpers) {
-		if getTarget() == targetNerdctl {
+		if getTarget() == targetNerdishctl || getTarget() == targetNerdctl {
 			// FIXME: there are conditions where we still have some stuff in there and this fails...
 			containerList := strings.TrimSpace(helpers.Capture("ps", "-aq"))
 			if containerList != "" {

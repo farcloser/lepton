@@ -95,33 +95,33 @@ func TestConfig(t *testing.T) {
 			Description: "TOML > Default",
 			Command:     test.Command("info", "-f", "{{.Driver}}"),
 			Expected:    test.Expects(0, nil, test.Equals("dummy-snapshotter-via-toml\n")),
-			Config:      test.WithConfig(nerdtest.NerdctlToml, `snapshotter = "dummy-snapshotter-via-toml"`),
+			Config:      test.WithConfig(nerdtest.NerdishctlToml, `snapshotter = "dummy-snapshotter-via-toml"`),
 		},
 		{
 			Description: "Cli > TOML > Default",
 			Command:     test.Command("info", "-f", "{{.Driver}}", "--snapshotter=dummy-snapshotter-via-cli"),
 			Expected:    test.Expects(0, nil, test.Equals("dummy-snapshotter-via-cli\n")),
-			Config:      test.WithConfig(nerdtest.NerdctlToml, `snapshotter = "dummy-snapshotter-via-toml"`),
+			Config:      test.WithConfig(nerdtest.NerdishctlToml, `snapshotter = "dummy-snapshotter-via-toml"`),
 		},
 		{
 			Description: "Env > TOML > Default",
 			Command:     test.Command("info", "-f", "{{.Driver}}"),
 			Env:         map[string]string{"CONTAINERD_SNAPSHOTTER": "dummy-snapshotter-via-env"},
 			Expected:    test.Expects(0, nil, test.Equals("dummy-snapshotter-via-env\n")),
-			Config:      test.WithConfig(nerdtest.NerdctlToml, `snapshotter = "dummy-snapshotter-via-toml"`),
+			Config:      test.WithConfig(nerdtest.NerdishctlToml, `snapshotter = "dummy-snapshotter-via-toml"`),
 		},
 		{
 			Description: "Cli > Env > TOML > Default",
 			Command:     test.Command("info", "-f", "{{.Driver}}", "--snapshotter=dummy-snapshotter-via-cli"),
 			Env:         map[string]string{"CONTAINERD_SNAPSHOTTER": "dummy-snapshotter-via-env"},
 			Expected:    test.Expects(0, nil, test.Equals("dummy-snapshotter-via-cli\n")),
-			Config:      test.WithConfig(nerdtest.NerdctlToml, `snapshotter = "dummy-snapshotter-via-toml"`),
+			Config:      test.WithConfig(nerdtest.NerdishctlToml, `snapshotter = "dummy-snapshotter-via-toml"`),
 		},
 		{
 			Description: "Broken config",
 			Command:     test.Command("info"),
 			Expected:    test.Expects(1, []error{errors.New("failed to load nerdctl config")}, nil),
-			Config: test.WithConfig(nerdtest.NerdctlToml, `# containerd config, not nerdctl config
+			Config: test.WithConfig(nerdtest.NerdishctlToml, `# containerd config, not nerdctl config
 version = 2`),
 		},
 	}

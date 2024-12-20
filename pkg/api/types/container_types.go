@@ -49,9 +49,9 @@ type ContainerCreateOptions struct {
 	// GOptions is the global options
 	GOptions GlobalCommandOptions
 
-	// CliCmd is the command name of nerdctl
+	// CliCmd is the command name
 	CliCmd string
-	// CliArgs is the arguments of nerdctl
+	// CliArgs is the arguments
 	CliArgs []string
 
 	// InRun is true when it's generated in the `run` command
@@ -221,7 +221,7 @@ type ContainerCreateOptions struct {
 	// Name assign a name to the container
 	Name string
 	// Label set meta data on a container
-	// (not passed through to the OCI runtime since nerdctl v2.0, with an exception for "prefix/bypass4netns")
+	// (not passed through to the OCI runtime since v2.0, with an exception for "nerdctl/bypass4netns")
 	Label []string
 	// LabelFile read in a line delimited file of labels
 	LabelFile []string

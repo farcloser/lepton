@@ -392,11 +392,11 @@ func (e *CNIEnv) GetDefaultNetworkConfig() (*NetworkConfig, error) {
 			log.L.Warnf("returning the first network bearing the %q default network name out of the multiple found: %#v", DefaultNetworkName, nameMatches)
 		}
 
-		// Warn the user if the default network was not created by nerdctl.
+		// Warn the user if the default network was not created by us.
 		match := nameMatches[0]
 		_, statErr := os.Stat(e.getConfigPathForNetworkName(DefaultNetworkName))
 		if match.CliID == nil || statErr != nil {
-			log.L.Warnf("default network named %q does not have an internal nerdctl ID or nerdctl-managed config file, it was most likely NOT created by nerdctl", DefaultNetworkName)
+			log.L.Warnf("default network named %q does not have an internal ID or managed config file, it was most likely NOT created by us", DefaultNetworkName)
 		}
 
 		return nameMatches[0], nil

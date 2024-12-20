@@ -17,6 +17,7 @@
 package nerdtest
 
 import (
+	"fmt"
 	"os/exec"
 
 	"gotest.tools/v3/assert"
@@ -38,7 +39,7 @@ func BuildCtlCommand(helpers test.Helpers, args ...string) test.TestableCommand 
 func KubeCtlCommand(helpers test.Helpers, args ...string) test.TestableCommand {
 	kubectl, _ := exec.LookPath("kubectl")
 	cmd := helpers.Custom(kubectl)
-	cmd.WithArgs("--namespace=nerdctl-test-k8s")
+	cmd.WithArgs(fmt.Sprintf("--namespace=%s-test-k8s", getTarget()))
 	cmd.WithArgs(args...)
 	return cmd
 }

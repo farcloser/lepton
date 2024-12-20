@@ -20,6 +20,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -55,26 +56,24 @@ func newNerdCommand(conf test.Config, t *testing.T) *nerdCommand {
 	var err error
 	var binary string
 	trgt := getTarget()
+	envPrefix := strings.ToUpper(trgt)
+	binary, err = exec.LookPath(trgt)
+	if err != nil {
+		t.Fatalf("unable to find binary %q: %v", trgt, err)
+	}
+
 	switch trgt {
 	case targetNerdctl, targetNerdishctl:
-		binary, err = exec.LookPath(trgt)
-		if err != nil {
-			t.Fatalf("unable to find binary %q: %v", trgt, err)
-		}
 		// Set the default namespace if we do not have something already
 		if conf.Read(Namespace) == "" {
 			conf.Write(Namespace, test.ConfigValue(defaultNamespace))
 		}
 	case targetDocker:
-		binary, err = exec.LookPath(trgt)
-		if err != nil {
-			t.Fatalf("unable to find binary %q: %v", trgt, err)
-		}
 		if err = exec.Command("docker", "compose", "version").Run(); err != nil {
 			t.Fatalf("docker does not support compose: %v", err)
 		}
 	default:
-		t.Fatalf("unknown target %q", getTarget())
+		t.Fatalf("unknown target %q", trgt)
 	}
 
 	// Create the base command, with the right binary, t
@@ -85,12 +84,12 @@ func newNerdCommand(conf test.Config, t *testing.T) *nerdCommand {
 		"LS_COLORS",
 		"DOCKER_CONFIG",
 		"CONTAINERD_SNAPSHOTTER",
-		version.EnvPrefix + "_TOML",
+		envPrefix + "_TOML",
 		"CONTAINERD_ADDRESS",
 		"CNI_PATH",
 		"NETCONFPATH",
-		version.EnvPrefix + "_EXPERIMENTAL",
-		version.EnvPrefix + "_HOST_GATEWAY_IP",
+		envPrefix + "_EXPERIMENTAL",
+		envPrefix + "_HOST_GATEWAY_IP",
 	})
 	return ret
 }
@@ -118,7 +117,7 @@ func (nc *nerdCommand) Background(timeout time.Duration) {
 	nc.GenericCommand.Background(timeout)
 }
 
-// Run does override the generic command run, as we are testing both docker and nerdctl
+// Run does override the generic command run
 func (nc *nerdCommand) prep() {
 	nc.T().Helper()
 
@@ -130,33 +129,35 @@ func (nc *nerdCommand) prep() {
 	if customDCConfig := nc.GenericCommand.Config.Read(DockerConfig); customDCConfig != "" {
 		if !nc.hasWrittenDockerConfig {
 			dest := filepath.Join(nc.Env["DOCKER_CONFIG"], "config.json")
-			err := os.WriteFile(dest, []byte(customDCConfig), 0400)
+			err := os.WriteFile(dest, []byte(customDCConfig), 0o400)
 			assert.NilError(nc.T(), err, "failed to write custom docker config json file for test")
 			nc.hasWrittenDockerConfig = true
 		}
 	}
 
-	if getTarget() == targetDocker {
+	trgt := getTarget()
+	if trgt == targetDocker {
 		// Allow debugging with docker syntax
 		if nc.Config.Read(Debug) != "" {
 			nc.PrependArgs("--log-level=debug")
 		}
-	} else if getTarget() == targetNerdctl {
+	} else if trgt == targetNerdishctl || trgt == targetNerdctl {
 		// Set the namespace
 		if nc.Config.Read(Namespace) != "" {
 			nc.PrependArgs("--namespace=" + string(nc.Config.Read(Namespace)))
 		}
 
+		envPrefix := strings.ToUpper(trgt)
 		// If no PREFIX_TOML was explicitly provided, set it to the private dir
-		if nc.Env[version.EnvPrefix+"_TOML"] == "" {
-			nc.Env[version.EnvPrefix+"_TOML"] = filepath.Join(nc.GenericCommand.TempDir, version.RootName+".toml")
+		if nc.Env[envPrefix+"_TOML"] == "" {
+			nc.Env[envPrefix+"_TOML"] = filepath.Join(nc.GenericCommand.TempDir, trgt+".toml")
 		}
 
 		// If we have custom toml content, write it if it does not exist already
-		if nc.Config.Read(NerdctlToml) != "" {
+		if nc.Config.Read(NerdishctlToml) != "" {
 			if !nc.hasWrittenToml {
-				dest := nc.Env[version.EnvPrefix+"_TOML"]
-				err := os.WriteFile(dest, []byte(nc.Config.Read(NerdctlToml)), 0400)
+				dest := nc.Env[envPrefix+"_TOML"]
+				err := os.WriteFile(dest, []byte(nc.Config.Read(NerdishctlToml)), 0o400)
 				assert.NilError(nc.T(), err, "failed to write cli toml config file")
 				nc.hasWrittenToml = true
 			}

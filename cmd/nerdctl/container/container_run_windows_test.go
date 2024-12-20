@@ -124,7 +124,7 @@ func TestRunWithTtyAndDetached(t *testing.T) {
 	testCase := nerdtest.Setup()
 
 	// This test is currently disabled, as it is failing most of the time.
-	testCase.Require = nerdtest.NerdctlNeedsFixing("https://github.com/containerd/nerdctl/issues/3437")
+	testCase.Require = nerdtest.NerdishctlNeedsFixing("https://github.com/containerd/nerdctl/issues/3437")
 
 	testCase.Setup = func(data test.Data, helpers test.Helpers) {
 		// with -t, success, the container should run with tty support.

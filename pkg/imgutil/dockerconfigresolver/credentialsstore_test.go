@@ -157,7 +157,7 @@ func TestBrokenCredentialsStore(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				err = os.Chmod(filepath.Join(tmpDir, "config.json"), 0400)
+				err = os.Chmod(filepath.Join(tmpDir, "config.json"), 0o400)
 				if err != nil {
 					t.Fatal(err)
 				}

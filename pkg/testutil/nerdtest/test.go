@@ -23,29 +23,29 @@ import (
 )
 
 var (
-	DockerConfig test.ConfigKey = "DockerConfig"
-	Namespace    test.ConfigKey = "Namespace"
-	NerdctlToml  test.ConfigKey = "NerdctlToml"
-	HostsDir     test.ConfigKey = "HostsDir"
-	DataRoot     test.ConfigKey = "DataRoot"
-	Debug        test.ConfigKey = "Debug"
+	DockerConfig   test.ConfigKey = "DockerConfig"
+	Namespace      test.ConfigKey = "Namespace"
+	NerdishctlToml test.ConfigKey = "NerdishctlToml"
+	HostsDir       test.ConfigKey = "HostsDir"
+	DataRoot       test.ConfigKey = "DataRoot"
+	Debug          test.ConfigKey = "Debug"
 )
 
 func Setup() *test.Case {
-	test.Customize(&nerdctlSetup{})
+	test.Customize(&nerdishctlSetup{})
 	return &test.Case{
 		Env: map[string]string{},
 	}
 }
 
-type nerdctlSetup struct {
+type nerdishctlSetup struct {
 }
 
-func (ns *nerdctlSetup) CustomCommand(testCase *test.Case, t *testing.T) test.CustomizableCommand {
+func (ns *nerdishctlSetup) CustomCommand(testCase *test.Case, t *testing.T) test.CustomizableCommand {
 	return newNerdCommand(testCase.Config, t)
 }
 
-func (ns *nerdctlSetup) AmbientRequirements(testCase *test.Case, t *testing.T) {
+func (ns *nerdishctlSetup) AmbientRequirements(testCase *test.Case, t *testing.T) {
 	// Ambient requirements, bail out now if these do not match
 	if environmentHasIPv6() && testCase.Config.Read(ipv6) != only {
 		t.Skip("runner skips non-IPv6 compatible tests in the IPv6 environment")
