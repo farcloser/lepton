@@ -84,8 +84,6 @@ func (s *stats) isKnownContainer(cid string) (int, bool) {
 
 // Stats displays a live stream of container(s) resource usage statistics.
 func Stats(ctx context.Context, client *containerd.Client, containerIDs []string, options types.ContainerStatsOptions) error {
-	// NOTE: rootless container does not rely on cgroupv1.
-	// more details about possible ways to resolve this concern: #223
 	if rootlessutil.IsRootless() && cgroups.Version() < 2 {
 		return errors.New("stats requires cgroup v2 for rootless containers, see https://rootlesscontaine.rs/getting-started/common/cgroup2/")
 	}

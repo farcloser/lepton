@@ -25,40 +25,16 @@ import (
 
 	"github.com/vishvananda/netlink"
 
-	v1 "github.com/containerd/cgroups/v3/cgroup1/stats"
 	v2 "github.com/containerd/cgroups/v3/cgroup2/stats"
 )
 
 func calculateMemPercent(limit float64, usedNo float64) float64 {
-	// Limit will never be 0 unless the container is not running and we haven't
+	// Limit will never be 0 unless the container is not running, and we haven't
 	// got any data from cgroup
 	if limit != 0 {
 		return usedNo / limit * 100.0
 	}
 	return 0
-}
-
-func SetCgroupStatsFields(previousStats *ContainerStats, data *v1.Metrics, links []netlink.Link) (StatsEntry, error) {
-	cpuPercent := calculateCgroupCPUPercent(previousStats, data)
-	blkRead, blkWrite := calculateCgroupBlockIO(data)
-	mem := calculateCgroupMemUsage(data)
-	memLimit := getCgroupMemLimit(float64(data.Memory.Usage.Limit))
-	memPercent := calculateMemPercent(memLimit, mem)
-	pidsStatsCurrent := data.Pids.Current
-	netRx, netTx := calculateCgroupNetwork(links)
-
-	return StatsEntry{
-		CPUPercentage:    cpuPercent,
-		Memory:           mem,
-		MemoryPercentage: memPercent,
-		MemoryLimit:      memLimit,
-		NetworkRx:        netRx,
-		NetworkTx:        netTx,
-		BlockRead:        float64(blkRead),
-		BlockWrite:       float64(blkWrite),
-		PidsCurrent:      pidsStatsCurrent,
-	}, nil
-
 }
 
 func SetCgroup2StatsFields(previousStats *ContainerStats, metrics *v2.Metrics, links []netlink.Link) (StatsEntry, error) {
@@ -114,22 +90,6 @@ func getHostMemLimit() float64 {
 	return float64(^uint64(0))
 }
 
-func calculateCgroupCPUPercent(previousStats *ContainerStats, metrics *v1.Metrics) float64 {
-	var (
-		cpuPercent = 0.0
-		// calculate the change for the cpu usage of the container in between readings
-		cpuDelta = float64(metrics.CPU.Usage.Total) - float64(previousStats.CgroupCPU)
-		// calculate the change for the entire system between readings
-		systemDelta = float64(metrics.CPU.Usage.Kernel) - float64(previousStats.CgroupSystem)
-		onlineCPUs  = float64(len(metrics.CPU.Usage.PerCPU))
-	)
-
-	if systemDelta > 0.0 && cpuDelta > 0.0 {
-		cpuPercent = (cpuDelta / systemDelta) * onlineCPUs * 100.0
-	}
-	return cpuPercent
-}
-
 // PercpuUsage is not supported in CgroupV2
 func calculateCgroup2CPUPercent(previousStats *ContainerStats, metrics *v2.Metrics) float64 {
 	var (
@@ -147,34 +107,11 @@ func calculateCgroup2CPUPercent(previousStats *ContainerStats, metrics *v2.Metri
 	return cpuPercent
 }
 
-func calculateCgroupMemUsage(metrics *v1.Metrics) float64 {
-	if v := metrics.Memory.TotalInactiveFile; v < metrics.Memory.Usage.Usage {
-		return float64(metrics.Memory.Usage.Usage - v)
-	}
-	return float64(metrics.Memory.Usage.Usage)
-}
-
 func calculateCgroup2MemUsage(metrics *v2.Metrics) float64 {
 	if v := metrics.Memory.InactiveFile; v < metrics.Memory.Usage {
 		return float64(metrics.Memory.Usage - v)
 	}
 	return float64(metrics.Memory.Usage)
-}
-
-func calculateCgroupBlockIO(metrics *v1.Metrics) (uint64, uint64) {
-	var blkRead, blkWrite uint64
-	for _, bioEntry := range metrics.Blkio.IoServiceBytesRecursive {
-		if bioEntry.Op == "" {
-			continue
-		}
-		switch bioEntry.Op[0] {
-		case 'r', 'R':
-			blkRead += bioEntry.Value
-		case 'w', 'W':
-			blkWrite += bioEntry.Value
-		}
-	}
-	return blkRead, blkWrite
 }
 
 func calculateCgroup2IO(metrics *v2.Metrics) (uint64, uint64) {

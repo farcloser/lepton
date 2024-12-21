@@ -129,47 +129,6 @@ func TestRunCgroupV2(t *testing.T) {
 
 }
 
-func TestRunCgroupV1(t *testing.T) {
-	t.Parallel()
-	switch cgroups.Mode() {
-	case cgroups.Legacy, cgroups.Hybrid:
-	default:
-		t.Skip("test requires cgroup v1")
-	}
-	base := testutil.NewBase(t)
-	info := base.Info()
-	switch info.CgroupDriver {
-	case "none", "":
-		t.Skip("test requires cgroup driver")
-	}
-	if !info.MemoryLimit {
-		t.Skip("test requires MemoryLimit")
-	}
-	if !info.CPUShares {
-		t.Skip("test requires CPUShares")
-	}
-	if !info.CPUSet {
-		t.Skip("test requires CPUSet")
-	}
-	if !info.PidsLimit {
-		t.Skip("test requires PidsLimit")
-	}
-	quota := "/sys/fs/cgroup/cpu/cpu.cfs_quota_us"
-	period := "/sys/fs/cgroup/cpu/cpu.cfs_period_us"
-	cpusetMems := "/sys/fs/cgroup/cpuset/cpuset.mems"
-	memoryLimit := "/sys/fs/cgroup/memory/memory.limit_in_bytes"
-	memoryReservation := "/sys/fs/cgroup/memory/memory.soft_limit_in_bytes"
-	memorySwap := "/sys/fs/cgroup/memory/memory.memsw.limit_in_bytes"
-	memorySwappiness := "/sys/fs/cgroup/memory/memory.swappiness"
-	pidsLimit := "/sys/fs/cgroup/pids/pids.max"
-	cpuShare := "/sys/fs/cgroup/cpu/cpu.shares"
-	cpusetCpus := "/sys/fs/cgroup/cpuset/cpuset.cpus"
-
-	const expected = "42000\n100000\n0\n44040192\n6291456\n104857600\n0\n42\n2000\n0-1\n"
-	base.Cmd("run", "--rm", "--cpus", "0.42", "--cpuset-mems", "0", "--memory", "42m", "--memory-reservation", "6m", "--memory-swap", "100m", "--memory-swappiness", "0", "--pids-limit", "42", "--cpu-shares", "2000", "--cpuset-cpus", "0-1", testutil.AlpineImage, "cat", quota, period, cpusetMems, memoryLimit, memoryReservation, memorySwap, memorySwappiness, pidsLimit, cpuShare, cpusetCpus).AssertOutExactly(expected)
-	base.Cmd("run", "--rm", "--cpu-quota", "42000", "--cpu-period", "100000", "--cpuset-mems", "0", "--memory", "42m", "--memory-reservation", "6m", "--memory-swap", "100m", "--memory-swappiness", "0", "--pids-limit", "42", "--cpu-shares", "2000", "--cpuset-cpus", "0-1", testutil.AlpineImage, "cat", quota, period, cpusetMems, memoryLimit, memoryReservation, memorySwap, memorySwappiness, pidsLimit, cpuShare, cpusetCpus).AssertOutExactly(expected)
-}
-
 func TestRunDevice(t *testing.T) {
 	if os.Geteuid() != 0 || userns.RunningInUserNS() {
 		t.Skip("test requires the root in the initial user namespace")

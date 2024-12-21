@@ -26,7 +26,6 @@ import (
 	"github.com/vishvananda/netlink"
 	"github.com/vishvananda/netns"
 
-	v1 "github.com/containerd/cgroups/v3/cgroup1/stats"
 	v2 "github.com/containerd/cgroups/v3/cgroup2/stats"
 
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/native"
@@ -37,13 +36,10 @@ import (
 func setContainerStatsAndRenderStatsEntry(previousStats *statsutil.ContainerStats, firstSet bool, anydata interface{}, pid int, interfaces []native.NetInterface) (statsEntry statsutil.StatsEntry, err error) {
 
 	var (
-		data  *v1.Metrics
 		data2 *v2.Metrics
 	)
 
 	switch v := anydata.(type) {
-	case *v1.Metrics:
-		data = v
 	case *v2.Metrics:
 		data2 = v
 	default:
@@ -94,16 +90,7 @@ func setContainerStatsAndRenderStatsEntry(previousStats *statsutil.ContainerStat
 		}
 	}
 
-	if data != nil {
-		if !firstSet {
-			statsEntry, err = statsutil.SetCgroupStatsFields(previousStats, data, nlinks)
-		}
-		previousStats.CgroupCPU = data.CPU.Usage.Total
-		previousStats.CgroupSystem = data.CPU.Usage.Kernel
-		if err != nil {
-			return
-		}
-	} else if data2 != nil {
+	if data2 != nil {
 		if !firstSet {
 			statsEntry, err = statsutil.SetCgroup2StatsFields(previousStats, data2, nlinks)
 		}

@@ -19,9 +19,7 @@ package defaults
 import (
 	"os"
 
-	"github.com/containerd/cgroups/v3"
-
-	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
+	"go.farcloser.world/containers/cgroups"
 )
 
 func IsSystemdAvailable() bool {
@@ -32,22 +30,16 @@ func IsSystemdAvailable() bool {
 	return fi.IsDir()
 }
 
-// CgroupManager defaults to:
-// - "systemd"  on v2 (rootful & rootless)
-// - "cgroupfs" on v1 rootful
-// - "none"     on v1 rootless
+// CgroupManager defaults to "systemd"  on v2 (rootful & rootless), "none" otherwise
 func CgroupManager() string {
-	if cgroups.Mode() == cgroups.Unified && IsSystemdAvailable() {
+	if cgroups.Version() == cgroups.Version2 && IsSystemdAvailable() {
 		return "systemd"
 	}
-	if rootlessutil.IsRootless() {
-		return "none"
-	}
-	return "cgroupfs"
+	return "none"
 }
 
 func CgroupnsMode() string {
-	if cgroups.Mode() == cgroups.Unified {
+	if cgroups.Version() == cgroups.Version2 {
 		return "private"
 	}
 	return "host"

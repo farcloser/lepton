@@ -47,8 +47,6 @@ func NewTopCommand() *cobra.Command {
 }
 
 func topAction(cmd *cobra.Command, args []string) error {
-	// NOTE: rootless container does not rely on cgroupv1.
-	// more details about possible ways to resolve this concern: #223
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return err
