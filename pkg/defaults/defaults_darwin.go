@@ -32,10 +32,6 @@ func DataRoot() string {
 	return ""
 }
 
-func CgroupManager() string {
-	return ""
-}
-
 func HostsDirs() []string {
 	return []string{}
 }

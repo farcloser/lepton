@@ -51,7 +51,7 @@ func generateCgroupOpts(id string, options types.ContainerCreateOptions) ([]oci.
 		log.L.Warn("Disabling the OOM killer on containers without setting a '-m/--memory' limit may be dangerous.")
 	}
 
-	if options.GOptions.CgroupManager == "none" {
+	if options.GOptions.CgroupManager == cgroups.NoneManager {
 		if !rootlessutil.IsRootless() {
 			return nil, errors.New(`cgroup-manager "none" is only supported for rootless`)
 		}
@@ -68,7 +68,7 @@ func generateCgroupOpts(id string, options types.ContainerCreateOptions) ([]oci.
 	}
 
 	var opts []oci.SpecOpts //nolint:prealloc
-	path, err := generateCgroupPath(id, options.GOptions.CgroupManager, options.CgroupParent)
+	path, err := generateCgroupPath(id, string(options.GOptions.CgroupManager), options.CgroupParent)
 	if err != nil {
 		return nil, err
 	}
@@ -190,12 +190,12 @@ func generateCgroupOpts(id string, options types.ContainerCreateOptions) ([]oci.
 	opts = append(opts, withBlkioWeight(options.BlkioWeight))
 
 	switch options.Cgroupns {
-	case "private":
+	case cgroups.PrivateNsMode:
 		ns := specs.LinuxNamespace{
 			Type: specs.CgroupNamespace,
 		}
 		opts = append(opts, oci.WithLinuxNamespace(ns))
-	case "host":
+	case cgroups.HostNsMode:
 		opts = append(opts, oci.WithHostNamespace(specs.CgroupNamespace))
 	default:
 		return nil, fmt.Errorf("unknown cgroupns mode %q", options.Cgroupns)

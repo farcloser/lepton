@@ -21,12 +21,13 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"testing"
 
 	"github.com/moby/sys/userns"
+	"go.farcloser.world/containers/cgroups"
 	"gotest.tools/v3/assert"
 
-	"github.com/containerd/cgroups/v3"
 	"github.com/containerd/continuity/testutil/loopback"
 
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
@@ -36,13 +37,13 @@ import (
 
 func TestRunCgroupV2(t *testing.T) {
 	t.Parallel()
-	if cgroups.Mode() != cgroups.Unified {
+	if cgroups.Version() != cgroups.Version2 {
 		t.Skip("test requires cgroup v2")
 	}
 	base := testutil.NewBase(t)
 	info := base.Info()
 	switch info.CgroupDriver {
-	case "none", "":
+	case cgroups.NoneManager, "":
 		t.Skip("test requires cgroup driver")
 	}
 
@@ -102,7 +103,7 @@ func TestRunCgroupV2(t *testing.T) {
 	update := []string{"update", "--cpu-quota", "42000", "--cpuset-mems", "0", "--cpu-period", "100000",
 		"--memory", "42m",
 		"--pids-limit", "42", "--cpu-shares", "2000", "--cpuset-cpus", "0-1"}
-	if base.Target == testutil.Docker && info.CgroupVersion == "2" && info.SwapLimit {
+	if base.Target == testutil.Docker && info.CgroupVersion == strconv.Itoa(int(cgroups.Version2)) && info.SwapLimit {
 		// Workaround for Docker with cgroup v2:
 		// > Error response from daemon: Cannot update container 67c13276a13dd6a091cdfdebb355aa4e1ecb15fbf39c2b5c9abee89053e88fce:
 		// > Memory limit should be smaller than already set memoryswap limit, update the memoryswap at the same time
@@ -237,14 +238,14 @@ func TestParseDevice(t *testing.T) {
 
 func TestRunCgroupConf(t *testing.T) {
 	t.Parallel()
-	if cgroups.Mode() != cgroups.Unified {
+	if cgroups.Version() != cgroups.Version2 {
 		t.Skip("test requires cgroup v2")
 	}
 	testutil.DockerIncompatible(t) // Docker lacks --cgroup-conf
 	base := testutil.NewBase(t)
 	info := base.Info()
 	switch info.CgroupDriver {
-	case "none", "":
+	case cgroups.NoneManager, "":
 		t.Skip("test requires cgroup driver")
 	}
 	if !info.MemoryLimit {
@@ -259,7 +260,7 @@ func TestRunCgroupParent(t *testing.T) {
 	base := testutil.NewBase(t)
 	info := base.Info()
 	switch info.CgroupDriver {
-	case "none", "":
+	case cgroups.NoneManager, "":
 		t.Skip("test requires cgroup driver")
 	}
 
@@ -267,7 +268,7 @@ func TestRunCgroupParent(t *testing.T) {
 	t.Logf("Using %q cgroup driver", info.CgroupDriver)
 
 	parent := "/foobarbaz"
-	if info.CgroupDriver == "systemd" {
+	if info.CgroupDriver == cgroups.SystemdManager {
 		// Path separators aren't allowed in systemd path. runc
 		// explicitly checks for this.
 		// https://github.com/opencontainers/runc/blob/016a0d29d1750180b2a619fc70d6fe0d80111be0/libcontainer/cgroups/systemd/common.go#L65-L68
@@ -298,7 +299,7 @@ func TestRunCgroupParent(t *testing.T) {
 
 	id := base.InspectContainer(containerName).ID
 	expected := filepath.Join(parent, id)
-	if info.CgroupDriver == "systemd" {
+	if info.CgroupDriver == cgroups.SystemdManager {
 		expected = filepath.Join(parent, "nerdctl-"+id)
 		if base.Target == testutil.Docker {
 			expected = filepath.Join(parent, "docker-"+id)
@@ -309,7 +310,7 @@ func TestRunCgroupParent(t *testing.T) {
 
 func TestRunBlkioWeightCgroupV2(t *testing.T) {
 	t.Parallel()
-	if cgroups.Mode() != cgroups.Unified {
+	if cgroups.Version() != cgroups.Version2 {
 		t.Skip("test requires cgroup v2")
 	}
 	if _, err := os.Stat("/sys/module/bfq"); err != nil {
@@ -318,7 +319,7 @@ func TestRunBlkioWeightCgroupV2(t *testing.T) {
 	base := testutil.NewBase(t)
 	info := base.Info()
 	switch info.CgroupDriver {
-	case "none", "":
+	case cgroups.NoneManager, "":
 		t.Skip("test requires cgroup driver")
 	}
 	containerName := testutil.Identifier(t)

@@ -55,7 +55,7 @@ func topAction(cmd *cobra.Command, args []string) error {
 		return errors.New("top requires cgroup v2 for rootless containers, see https://rootlesscontaine.rs/getting-started/common/cgroup2/")
 	}
 
-	if globalOptions.CgroupManager == "none" {
+	if globalOptions.CgroupManager == cgroups.NoneManager {
 		return errors.New("cgroup manager must not be \"none\"")
 	}
 	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)

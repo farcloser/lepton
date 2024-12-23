@@ -17,16 +17,18 @@
 package native
 
 import (
+	"go.farcloser.world/containers/cgroups"
+
 	"github.com/containerd/containerd/api/services/introspection/v1"
 	"github.com/containerd/containerd/api/services/version/v1"
 )
 
 type Info struct {
-	Namespace     string      `json:"Namespace,omitempty"`
-	Snapshotter   string      `json:"Snapshotter,omitempty"`
-	CgroupManager string      `json:"CgroupManager,omitempty"`
-	Rootless      bool        `json:"Rootless,omitempty"`
-	Daemon        *DaemonInfo `json:"Daemon,omitempty"`
+	Namespace     string          `json:"Namespace,omitempty"`
+	Snapshotter   string          `json:"Snapshotter,omitempty"`
+	CgroupManager cgroups.Manager `json:"CgroupManager,omitempty"`
+	Rootless      bool            `json:"Rootless,omitempty"`
+	Daemon        *DaemonInfo     `json:"Daemon,omitempty"`
 }
 
 type DaemonInfo struct {

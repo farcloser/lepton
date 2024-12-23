@@ -21,8 +21,10 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 
+	"go.farcloser.world/containers/cgroups"
 	"gotest.tools/v3/assert"
 
 	"github.com/containerd/nerdctl/v2/pkg/buildkitutil"
@@ -195,7 +197,7 @@ var CgroupsAccessible = test.Require(
 				var dinf dockercompat.Info
 				err := json.Unmarshal([]byte(stdout), &dinf)
 				assert.NilError(helpers.T(), err, "failed to parse docker info")
-				return dinf.CgroupVersion == "2", "we are rootless, and cgroup version is not 2"
+				return dinf.CgroupVersion == strconv.Itoa(int(cgroups.Version2)), "we are rootless, and cgroup version is not 2"
 			}
 			return true, ""
 		},

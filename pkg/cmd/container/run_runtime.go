@@ -20,6 +20,7 @@ import (
 	"context"
 	"strings"
 
+	"go.farcloser.world/containers/cgroups"
 	"go.farcloser.world/containers/specs"
 
 	runcoptions "github.com/containerd/containerd/api/types/runc/options"
@@ -30,20 +31,21 @@ import (
 	"github.com/containerd/log"
 )
 
-func generateRuntimeCOpts(cgroupManager, runtimeStr string) []containerd.NewContainerOpts {
+func generateRuntimeCOpts(cgroupManager cgroups.Manager, runtimeStr string) []containerd.NewContainerOpts {
 	runtime := plugins.RuntimeRuncV2
+
 	var (
 		runcOpts    runcoptions.Options
 		runtimeOpts interface{} = &runcOpts
 	)
-	if cgroupManager == "systemd" {
-		runcOpts.SystemdCgroup = true
-	}
+
+	runcOpts.SystemdCgroup = cgroupManager == cgroups.SystemdManager
+
 	if runtimeStr != "" {
 		if strings.HasPrefix(runtimeStr, "io.containerd.") || runtimeStr == "wtf.sbk.runj.v1" {
 			runtime = runtimeStr
 			if !strings.HasPrefix(runtimeStr, "io.containerd.runc.") {
-				if cgroupManager == "systemd" {
+				if cgroupManager == cgroups.SystemdManager {
 					log.L.Warnf("cannot set cgroup manager to %q for runtime %q", cgroupManager, runtimeStr)
 				}
 				runtimeOpts = nil
@@ -54,6 +56,7 @@ func generateRuntimeCOpts(cgroupManager, runtimeStr string) []containerd.NewCont
 		}
 	}
 	o := containerd.WithRuntime(runtime, runtimeOpts)
+
 	return []containerd.NewContainerOpts{o}
 }
 
@@ -63,12 +66,15 @@ func WithSysctls(sysctls map[string]string) oci.SpecOpts {
 		if s.Linux == nil {
 			s.Linux = &specs.Linux{}
 		}
+
 		if s.Linux.Sysctl == nil {
 			s.Linux.Sysctl = make(map[string]string)
 		}
+
 		for k, v := range sysctls {
 			s.Linux.Sysctl[k] = v
 		}
+
 		return nil
 	}
 }

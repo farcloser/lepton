@@ -20,189 +20,88 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"sync"
-	"time"
 
+	"go.farcloser.world/containers/stats"
 	"go.farcloser.world/core/units"
 )
 
-// StatsEntry represents the statistics data collected from a container
-type StatsEntry struct {
-	Name             string
-	ID               string
-	CPUPercentage    float64
-	Memory           float64
-	MemoryLimit      float64
-	MemoryPercentage float64
-	NetworkRx        float64
-	NetworkTx        float64
-	BlockRead        float64
-	BlockWrite       float64
-	PidsCurrent      uint64
-	IsInvalid        bool
+// Rendering a FormattedStatsEntry from StatsEntry
+func RenderEntry(in *stats.Entry) FormattedStatsEntry {
+	return FormattedStatsEntry{
+		Entry: *in,
+	}
 }
 
 // FormattedStatsEntry represents a formatted StatsEntry
 type FormattedStatsEntry struct {
-	Name     string
-	ID       string
-	CPUPerc  string
-	MemUsage string
-	MemPerc  string
-	NetIO    string
-	BlockIO  string
-	PIDs     string
+	stats.Entry
 }
 
-// Stats represents an entity to store containers statistics synchronously
-type Stats struct {
-	mutex sync.RWMutex
-	StatsEntry
-	err error
-}
-
-// ContainerStats represents the runtime container stats
-type ContainerStats struct {
-	Time                        time.Time
-	CgroupCPU, Cgroup2CPU       uint64
-	CgroupSystem, Cgroup2System uint64
-}
-
-// NewStats is from https://github.com/docker/cli/blob/3fb4fb83dfb5db0c0753a8316f21aea54dab32c5/cli/command/container/formatter_stats.go#L113-L116
-func NewStats(containerID string) *Stats {
-	return &Stats{StatsEntry: StatsEntry{ID: containerID}}
-}
-
-// SetStatistics is from https://github.com/docker/cli/blob/3fb4fb83dfb5db0c0753a8316f21aea54dab32c5/cli/command/container/formatter_stats.go#L87-L93
-func (cs *Stats) SetStatistics(s StatsEntry) {
-	cs.mutex.Lock()
-	defer cs.mutex.Unlock()
-	cs.StatsEntry = s
-}
-
-// GetStatistics is from https://github.com/docker/cli/blob/3fb4fb83dfb5db0c0753a8316f21aea54dab32c5/cli/command/container/formatter_stats.go#L95-L100
-func (cs *Stats) GetStatistics() StatsEntry {
-	cs.mutex.Lock()
-	defer cs.mutex.Unlock()
-	return cs.StatsEntry
-}
-
-// GetError is from https://github.com/docker/cli/blob/3fb4fb83dfb5db0c0753a8316f21aea54dab32c5/cli/command/container/formatter_stats.go#L51-L57
-func (cs *Stats) GetError() error {
-	cs.mutex.Lock()
-	defer cs.mutex.Unlock()
-	return cs.err
-}
-
-// SetErrorAndReset is from https://github.com/docker/cli/blob/3fb4fb83dfb5db0c0753a8316f21aea54dab32c5/cli/command/container/formatter_stats.go#L59-L75
-func (cs *Stats) SetErrorAndReset(err error) {
-	cs.mutex.Lock()
-	defer cs.mutex.Unlock()
-	cs.CPUPercentage = 0
-	cs.Memory = 0
-	cs.MemoryPercentage = 0
-	cs.MemoryLimit = 0
-	cs.NetworkRx = 0
-	cs.NetworkTx = 0
-	cs.BlockRead = 0
-	cs.BlockWrite = 0
-	cs.PidsCurrent = 0
-	cs.err = err
-	cs.IsInvalid = true
-}
-
-// SetError is from https://github.com/docker/cli/blob/3fb4fb83dfb5db0c0753a8316f21aea54dab32c5/cli/command/container/formatter_stats.go#L77-L85
-func (cs *Stats) SetError(err error) {
-	cs.mutex.Lock()
-	defer cs.mutex.Unlock()
-	cs.err = err
-	if err != nil {
-		cs.IsInvalid = true
-	}
-}
-
-// Rendering a FormattedStatsEntry from StatsEntry
-func RenderEntry(in *StatsEntry, noTrunc bool) FormattedStatsEntry {
-	return FormattedStatsEntry{
-		Name:     in.EntryName(noTrunc),
-		ID:       in.EntryID(noTrunc),
-		CPUPerc:  in.CPUPerc(),
-		MemUsage: in.MemUsage(),
-		MemPerc:  in.MemPerc(),
-		NetIO:    in.NetIO(),
-		BlockIO:  in.BlockIO(),
-		PIDs:     in.PIDs(),
-	}
-}
-
-/*
-a set of functions to format container stats
-*/
-func (s *StatsEntry) EntryName(noTrunc bool) string {
-	if len(s.Name) > 1 {
+func (s *FormattedStatsEntry) Name(noTrunc bool) string {
+	if len(s.Entry.Name) > 1 {
 		if !noTrunc {
 			var truncLen int
-			if strings.HasPrefix(s.Name, "k8s://") {
+			if strings.HasPrefix(s.Entry.Name, "k8s://") {
 				truncLen = 24
 			} else {
 				truncLen = 12
 			}
-			if len(s.Name) > truncLen {
-				return s.Name[:truncLen]
+			if len(s.Entry.Name) > truncLen {
+				return s.Entry.Name[:truncLen]
 			}
 		}
-		return s.Name
+		return s.Entry.Name
 	}
 	return "--"
 }
 
-func (s *StatsEntry) EntryID(noTrunc bool) string {
+func (s *FormattedStatsEntry) ID(noTrunc bool) string {
 	if !noTrunc {
-		if len(s.ID) > 12 {
-			return s.ID[:12]
+		if len(s.Entry.ID) > 12 {
+			return s.Entry.ID[:12]
 		}
 	}
-	return s.ID
+	return s.Entry.ID
 }
 
-func (s *StatsEntry) CPUPerc() string {
-	if s.IsInvalid {
+func (s *FormattedStatsEntry) CPUPerc() string {
+	if s.Entry.IsInvalid {
 		return "--"
 	}
-	return fmt.Sprintf("%.2f%%", s.CPUPercentage)
+	return fmt.Sprintf("%.2f%%", s.Entry.CPUPercentage)
 }
 
-func (s *StatsEntry) MemUsage() string {
-	if s.IsInvalid {
+func (s *FormattedStatsEntry) MemUsage() string {
+	if s.Entry.IsInvalid {
 		return "-- / --"
 	}
-	return fmt.Sprintf("%s / %s", units.BytesSize(s.Memory), units.BytesSize(s.MemoryLimit))
+	return fmt.Sprintf("%s / %s", units.BytesSize(s.Entry.Memory), units.BytesSize(s.Entry.MemoryLimit))
 }
 
-func (s *StatsEntry) MemPerc() string {
-	if s.IsInvalid {
+func (s *FormattedStatsEntry) MemPerc() string {
+	if s.Entry.IsInvalid {
 		return "--"
 	}
-	return fmt.Sprintf("%.2f%%", s.MemoryPercentage)
+	return fmt.Sprintf("%.2f%%", s.Entry.MemoryPercentage)
 }
 
-func (s *StatsEntry) NetIO() string {
-	if s.IsInvalid {
+func (s *FormattedStatsEntry) NetIO() string {
+	if s.Entry.IsInvalid {
 		return "--"
 	}
-	return fmt.Sprintf("%s / %s", units.HumanSizeWithPrecision(s.NetworkRx, 3), units.HumanSizeWithPrecision(s.NetworkTx, 3))
+	return fmt.Sprintf("%s / %s", units.HumanSizeWithPrecision(s.Entry.NetworkRx, 3), units.HumanSizeWithPrecision(s.Entry.NetworkTx, 3))
 }
 
-func (s *StatsEntry) BlockIO() string {
-	if s.IsInvalid {
+func (s *FormattedStatsEntry) BlockIO() string {
+	if s.Entry.IsInvalid {
 		return "--"
 	}
-	return fmt.Sprintf("%s / %s", units.HumanSizeWithPrecision(s.BlockRead, 3), units.HumanSizeWithPrecision(s.BlockWrite, 3))
+	return fmt.Sprintf("%s / %s", units.HumanSizeWithPrecision(s.BlockRead, 3), units.HumanSizeWithPrecision(s.Entry.BlockWrite, 3))
 }
 
-func (s *StatsEntry) PIDs() string {
-	if s.IsInvalid {
+func (s *FormattedStatsEntry) PIDs() string {
+	if s.Entry.IsInvalid {
 		return "--"
 	}
-	return strconv.FormatUint(s.PidsCurrent, 10)
+	return strconv.FormatUint(s.Entry.PidsCurrent, 10)
 }

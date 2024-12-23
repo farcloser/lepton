@@ -17,10 +17,13 @@
 package container
 
 import (
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/native"
-	"github.com/containerd/nerdctl/v2/pkg/statsutil"
+	"context"
+
+	"go.farcloser.world/containers/stats"
+
+	"github.com/containerd/containerd/v2/client"
 )
 
-func setContainerStatsAndRenderStatsEntry(previousStats *statsutil.ContainerStats, firstSet bool, anydata interface{}, pid int, interfaces []native.NetInterface) (statsutil.StatsEntry, error) {
-	return statsutil.StatsEntry{}, nil
+func setContainerStatsAndRenderStatsEntry(ctx context.Context, container client.Container, previousStats *stats.ContainerStats) (statsEntry stats.Entry, err error) {
+	return stats.Entry{}, nil
 }

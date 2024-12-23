@@ -50,7 +50,7 @@ func TestCompletion(t *testing.T) {
 				Description: "--cgroup-manager",
 				Require:     test.Not(test.Windows),
 				Command:     test.Command("__complete", "--cgroup-manager", ""),
-				Expected:    test.Expects(0, nil, test.Contains("cgroupfs\n")),
+				Expected:    test.Expects(0, nil, test.Contains("systemd\n")),
 			},
 			{
 				Description: "--snapshotter",
@@ -169,7 +169,7 @@ func TestCompletion(t *testing.T) {
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 					return helpers.Custom("nerdctl", "__complete", "--cgroup-manager", "")
 				},
-				Expected: test.Expects(0, nil, test.Contains("cgroupfs\n")),
+				Expected: test.Expects(0, nil, test.Contains("systemd\n")),
 			},
 			{
 				Description: "no namespace empty",

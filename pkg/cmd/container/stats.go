@@ -28,6 +28,7 @@ import (
 	"time"
 
 	"go.farcloser.world/containers/cgroups"
+	stats2 "go.farcloser.world/containers/stats"
 
 	eventstypes "github.com/containerd/containerd/api/events"
 	containerd "github.com/containerd/containerd/v2/client"
@@ -38,7 +39,6 @@ import (
 
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/clientutil"
-	"github.com/containerd/nerdctl/v2/pkg/containerinspector"
 	"github.com/containerd/nerdctl/v2/pkg/containerutil"
 	"github.com/containerd/nerdctl/v2/pkg/eventutil"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
@@ -47,13 +47,13 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/statsutil"
 )
 
-type stats struct {
+type statsStruct struct {
 	mu sync.Mutex
-	cs []*statsutil.Stats
+	cs []*stats2.Stats
 }
 
 // add is from https://github.com/docker/cli/blob/3fb4fb83dfb5db0c0753a8316f21aea54dab32c5/cli/command/container/stats_helpers.go#L26-L34
-func (s *stats) add(cs *statsutil.Stats) bool {
+func (s *statsStruct) add(cs *stats2.Stats) bool {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if _, exists := s.isKnownContainer(cs.ID); !exists {
@@ -64,7 +64,7 @@ func (s *stats) add(cs *statsutil.Stats) bool {
 }
 
 // remove is from https://github.com/docker/cli/blob/3fb4fb83dfb5db0c0753a8316f21aea54dab32c5/cli/command/container/stats_helpers.go#L36-L42
-func (s *stats) remove(id string) {
+func (s *statsStruct) remove(id string) {
 	s.mu.Lock()
 	if i, exists := s.isKnownContainer(id); exists {
 		s.cs = append(s.cs[:i], s.cs[i+1:]...)
@@ -73,7 +73,7 @@ func (s *stats) remove(id string) {
 }
 
 // isKnownContainer is from https://github.com/docker/cli/blob/3fb4fb83dfb5db0c0753a8316f21aea54dab32c5/cli/command/container/stats_helpers.go#L44-L51
-func (s *stats) isKnownContainer(cid string) (int, bool) {
+func (s *statsStruct) isKnownContainer(cid string) (int, bool) {
 	for i, c := range s.cs {
 		if c.ID == cid {
 			return i, true
@@ -108,7 +108,7 @@ func Stats(ctx context.Context, client *containerd.Client, containerIDs []string
 
 	// waitFirst is a WaitGroup to wait first stat data's reach for each container
 	waitFirst := &sync.WaitGroup{}
-	cStats := stats{}
+	cStats := statsStruct{}
 
 	monitorContainerEvents := func(started chan<- struct{}, c chan *events.Envelope) {
 		eventsClient := client.EventService()
@@ -144,7 +144,7 @@ func Stats(ctx context.Context, client *containerd.Client, containerIDs []string
 					continue
 				}
 			}
-			s := statsutil.NewStats(c.ID())
+			s := stats2.NewStats(c.ID())
 			if cStats.add(s) {
 				waitFirst.Add(1)
 				go collect(ctx, options.GOptions, s, waitFirst, c.ID(), !options.NoStream)
@@ -175,7 +175,7 @@ func Stats(ctx context.Context, client *containerd.Client, containerIDs []string
 					return
 				}
 			}
-			s := statsutil.NewStats(datacc.ID)
+			s := stats2.NewStats(datacc.ID)
 			if cStats.add(s) {
 				waitFirst.Add(1)
 				go collect(ctx, options.GOptions, s, waitFirst, datacc.ID, !options.NoStream)
@@ -218,7 +218,7 @@ func Stats(ctx context.Context, client *containerd.Client, containerIDs []string
 		walker := &containerwalker.ContainerWalker{
 			Client: client,
 			OnFound: func(ctx context.Context, found containerwalker.Found) error {
-				s := statsutil.NewStats(found.Container.ID())
+				s := stats2.NewStats(found.Container.ID())
 				if cStats.add(s) {
 					waitFirst.Add(1)
 					go collect(ctx, options.GOptions, s, waitFirst, found.Container.ID(), !options.NoStream)
@@ -251,7 +251,7 @@ func Stats(ctx context.Context, client *containerd.Client, containerIDs []string
 	var firstTick = true
 	for range ticker.C {
 		cleanScreen()
-		ccstats := []statsutil.StatsEntry{}
+		ccstats := []stats2.Entry{}
 		cStats.mu.Lock()
 		for _, c := range cStats.cs {
 			if err := c.GetError(); err != nil {
@@ -272,7 +272,7 @@ func Stats(ctx context.Context, client *containerd.Client, containerIDs []string
 			if c.ID == "" {
 				continue
 			}
-			rc := statsutil.RenderEntry(&c, options.NoTrunc)
+			rc := statsutil.RenderEntry(&c)
 			if !firstTick {
 				if tmpl != nil {
 					var b bytes.Buffer
@@ -284,14 +284,14 @@ func Stats(ctx context.Context, client *containerd.Client, containerIDs []string
 					}
 				} else {
 					if _, err := fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
-						rc.ID,
-						rc.Name,
-						rc.CPUPerc,
-						rc.MemUsage,
-						rc.MemPerc,
-						rc.NetIO,
-						rc.BlockIO,
-						rc.PIDs,
+						rc.ID(options.NoTrunc),
+						rc.Name(options.NoTrunc),
+						rc.CPUPerc(),
+						rc.MemUsage(),
+						rc.MemPerc(),
+						rc.NetIO(),
+						rc.BlockIO(),
+						rc.PIDs(),
 					); err != nil {
 						break
 					}
@@ -324,7 +324,7 @@ func Stats(ctx context.Context, client *containerd.Client, containerIDs []string
 	return err
 }
 
-func collect(ctx context.Context, globalOptions types.GlobalCommandOptions, s *statsutil.Stats, waitFirst *sync.WaitGroup, id string, _noStream bool) {
+func collect(ctx context.Context, globalOptions types.GlobalCommandOptions, s *stats2.Stats, waitFirst *sync.WaitGroup, id string, _noStream bool) {
 	log.G(ctx).Debugf("collecting stats for %s", s.ID)
 	var (
 		getFirst = true
@@ -354,48 +354,23 @@ func collect(ctx context.Context, globalOptions types.GlobalCommandOptions, s *s
 	}
 
 	go func() {
-		previousStats := new(statsutil.ContainerStats)
+		previousStats := new(stats2.ContainerStats)
 		firstSet := true
 		for {
-			// task is in the for loop to avoid nil task just after Container creation
-			task, err := container.Task(ctx, nil)
-			if err != nil {
-				u <- err
-				continue
-			}
-
-			// labels is in the for loop to avoid nil labels just after Container creation
-			clabels, err := container.Labels(ctx)
-			if err != nil {
-				u <- err
-				continue
-			}
-
-			metric, err := task.Metrics(ctx)
-			if err != nil {
-				u <- err
-				continue
-			}
-			anydata, err := typeurl.UnmarshalAny(metric.Data)
-			if err != nil {
-				u <- err
-				continue
-			}
-
-			netNS, err := containerinspector.InspectNetNS(ctx, int(task.Pid()))
+			labels, err := container.Labels(ctx)
 			if err != nil {
 				u <- err
 				continue
 			}
 
 			// when (firstSet == true), we only set container stats without rendering stat entry
-			statsEntry, err := setContainerStatsAndRenderStatsEntry(previousStats, firstSet, anydata, int(task.Pid()), netNS.Interfaces)
+			statsEntry, err := setContainerStatsAndRenderStatsEntry(ctx, container, previousStats)
 			if err != nil {
 				u <- err
 				continue
 			}
-			statsEntry.Name = containerutil.GetContainerName(clabels)
-			statsEntry.ID = container.ID()
+
+			statsEntry.Name = containerutil.GetContainerName(labels)
 
 			if firstSet {
 				firstSet = false

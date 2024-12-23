@@ -24,6 +24,8 @@
 
 package dockercompat
 
+import "go.farcloser.world/containers/cgroups"
+
 // Info mimics a `docker info` object.
 // From https://github.com/moby/moby/blob/v27.4.1/api/types/system/info.go
 type Info struct {
@@ -44,7 +46,7 @@ type Info struct {
 	// NGoroutines is omitted because it does not make sense for us
 	SystemTime    string
 	LoggingDriver string
-	CgroupDriver  string
+	CgroupDriver  cgroups.Manager
 	CgroupVersion string `json:",omitempty"`
 	// NEventsListener is omitted because it does not make sense for us
 	KernelVersion   string

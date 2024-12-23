@@ -27,6 +27,7 @@ import (
 	"github.com/pelletier/go-toml/v2"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"go.farcloser.world/containers/cgroups"
 	"go.farcloser.world/core/filesystem"
 
 	"github.com/containerd/log"
@@ -178,7 +179,7 @@ func initRootCmdFlags(rootCmd *cobra.Command, tomlPath string) (*pflag.FlagSet, 
 	helpers.AddPersistentStringFlag(rootCmd, "cni-path", nil, nil, nil, aliasToBeInherited, cfg.CNIPath, "CNI_PATH", "cni plugins binary directory")
 	helpers.AddPersistentStringFlag(rootCmd, "cni-netconfpath", nil, nil, nil, aliasToBeInherited, cfg.CNINetConfPath, "NETCONFPATH", "cni config directory")
 	rootCmd.PersistentFlags().String("data-root", cfg.DataRoot, "Root directory of persistent nerdctl state (managed by nerdctl, not by containerd)")
-	rootCmd.PersistentFlags().String("cgroup-manager", cfg.CgroupManager, `Cgroup manager to use ("cgroupfs"|"systemd")`)
+	rootCmd.PersistentFlags().String("cgroup-manager", string(cfg.CgroupManager), `Cgroup manager to use ("systemd")`)
 	rootCmd.RegisterFlagCompletionFunc("cgroup-manager", completion.CgroupManagerNames)
 	rootCmd.PersistentFlags().Bool("insecure-registry", cfg.InsecureRegistry, "skips verifying HTTPS certs, and allows falling back to plain HTTP")
 	// hosts-dir is defined as StringSlice, not StringArray, to allow specifying "--hosts-dir=/etc/containerd/certs.d,/etc/docker/certs.d"
@@ -237,9 +238,9 @@ Config file ($%s_TOML): %s
 		cgroupManager := globalOptions.CgroupManager
 		if runtime.GOOS == "linux" {
 			switch cgroupManager {
-			case "systemd", "cgroupfs", "none":
+			case cgroups.SystemdManager, cgroups.NoneManager:
 			default:
-				return fmt.Errorf("invalid cgroup-manager %q (supported values: \"systemd\", \"cgroupfs\", \"none\")", cgroupManager)
+				return fmt.Errorf("invalid cgroup-manager %q (supported values: \"systemd\", \"none\")", cgroupManager)
 			}
 		}
 

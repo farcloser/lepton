@@ -21,6 +21,7 @@ import (
 	"runtime"
 
 	"github.com/spf13/cobra"
+	"go.farcloser.world/containers/cgroups"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
@@ -199,7 +200,8 @@ func processContainerCreateOptions(cmd *cobra.Command) (types.ContainerCreateOpt
 	if err != nil {
 		return opt, err
 	}
-	opt.Cgroupns, err = cmd.Flags().GetString("cgroupns")
+	cgroupmode, err := cmd.Flags().GetString("cgroupns")
+	opt.Cgroupns = cgroups.Mode(cgroupmode)
 	if err != nil {
 		return opt, err
 	}
