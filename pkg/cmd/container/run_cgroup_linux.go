@@ -33,6 +33,7 @@ import (
 
 	"go.farcloser.world/lepton/pkg/api/options"
 	"go.farcloser.world/lepton/pkg/infoutil"
+	"go.farcloser.world/lepton/pkg/inspecttypes/dockercompat"
 	"go.farcloser.world/lepton/pkg/rootlessutil"
 	"go.farcloser.world/lepton/pkg/version"
 )
@@ -43,7 +44,7 @@ type customMemoryOptions struct {
 	disableOOMKiller  *bool
 }
 
-func generateCgroupOpts(id string, options *options.ContainerCreate) ([]oci.SpecOpts, error) {
+func generateCgroupOpts(id string, options *options.ContainerCreate, internalLabels *internalLabels) ([]oci.SpecOpts, error) {
 	if options.KernelMemory != "" {
 		log.L.Warnf("The --kernel-memory flag is no longer supported. This flag is a noop.")
 	}
@@ -208,6 +209,11 @@ func generateCgroupOpts(id string, options *options.ContainerCreate) ([]oci.Spec
 			return nil, fmt.Errorf("failed to parse device %q: %w", f, err)
 		}
 		opts = append(opts, oci.WithDevices(devPath, conPath, mode))
+		var deviceMap dockercompat.DeviceMapping
+		deviceMap.PathOnHost = devPath
+		deviceMap.PathInContainer = conPath
+		deviceMap.CgroupPermissions = mode
+		internalLabels.deviceMapping = append(internalLabels.deviceMapping, deviceMap)
 	}
 
 	return opts, nil
