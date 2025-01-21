@@ -22,7 +22,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"go.farcloser.world/containers/digest"
 	"io"
 	"sort"
 	"strings"
@@ -30,6 +29,7 @@ import (
 	"text/template"
 	"time"
 
+	"go.farcloser.world/containers/digest"
 	"go.farcloser.world/containers/specs"
 	"go.farcloser.world/core/units"
 
@@ -159,7 +159,7 @@ func printImages(ctx context.Context, client *containerd.Client, imageList []ima
 			}
 			imageNoTag = append(imageNoTag, img)
 		}
-		//Ensure that dangling images without a repo:tag are displayed correctly.
+		// Ensure that dangling images without a repo:tag are displayed correctly.
 		for _, ima := range imageNoTag {
 			if !imageDigest[ima.Target.Digest] {
 				finalImageList = append(finalImageList, ima)

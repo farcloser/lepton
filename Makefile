@@ -75,7 +75,7 @@ define footer
 endef
 
 # Tasks
-lint: lint-go-all lint-imports lint-yaml lint-shell lint-commits lint-headers lint-mod lint-licenses-all
+lint: lint-go-all lint-imports lint-yaml lint-shell lint-commits lint-mod lint-licenses-all lint-headers
 test: test-unit race-unit bench-unit
 unit: test-unit race-unit bench-unit
 fix: fix-mod fix-imports fix-go-all

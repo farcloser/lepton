@@ -129,9 +129,9 @@ func (w *ImageWalker) WalkCriRm(ctx context.Context, req string) (int, error) {
 	parsedReference, err := referenceutil.Parse(req)
 	if err == nil {
 		parsedReferenceStr = parsedReference.String()
-		filters = append(filters, fmt.Sprintf("name==%s", parsedReferenceStr))
+		filters = append(filters, "name=="+parsedReferenceStr)
 	}
-	//Get the image ID , if reg == imageTag use
+	// Get the image ID , if reg == imageTag use
 	image, err := w.Client.GetImage(ctx, parsedReferenceStr)
 	if err != nil {
 		repo = req
@@ -140,7 +140,7 @@ func (w *ImageWalker) WalkCriRm(ctx context.Context, req string) (int, error) {
 	}
 
 	filters = append(filters,
-		fmt.Sprintf("name==%s", req),
+		"name=="+req,
 		fmt.Sprintf("target.digest~=^sha256:%s.*$", regexp.QuoteMeta(repo)),
 		fmt.Sprintf("target.digest~=^%s.*$", regexp.QuoteMeta(repo)),
 	)
@@ -155,7 +155,7 @@ func (w *ImageWalker) WalkCriRm(ctx context.Context, req string) (int, error) {
 	uniqueImages := make(map[digest.Digest]bool)
 	nameMatchIndex := -1
 
-	//Distinguish between tag and non-tag
+	// Distinguish between tag and non-tag
 	for _, img := range images {
 		ref := img.Name
 		parsed, err := referenceutil.Parse(ref)
@@ -192,10 +192,10 @@ func (w *ImageWalker) WalkCriRm(ctx context.Context, req string) (int, error) {
 		if ok, e := w.OnFoundCriRm(ctx, f); e != nil {
 			return -1, e
 		} else if ok {
-			tagNum = tagNum - 1
+			tagNum--
 		}
 	}
-	//If the corresponding imageTag does not exist, delete the repoDigests
+	// If the corresponding imageTag does not exist, delete the repoDigests
 	if tagNum == 0 {
 		for i, img := range imagesRepo {
 			f := Found{
