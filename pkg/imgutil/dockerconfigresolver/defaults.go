@@ -25,9 +25,10 @@ import (
 type scheme string
 
 const (
-	standardHTTPSPort        = "443"
-	schemeHTTP        scheme = "http"
-	schemeHTTPS       scheme = "https"
+	StandardHTTPSPort = "443"
+
+	schemeHTTPS scheme = "https"
+	schemeHTTP  scheme = "http"
 	// See https://github.com/moby/moby/blob/v27.1.1/registry/config.go#L42-L48
 	//nolint:misspell
 	// especially Sebastiaan comments on future domain consolidation

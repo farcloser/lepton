@@ -22,6 +22,7 @@ import (
 	"errors"
 	"fmt"
 	"runtime"
+	"time"
 
 	"github.com/spf13/cobra"
 	"go.farcloser.world/containers/specs"
@@ -241,7 +242,7 @@ func getUpdateOption(cmd *cobra.Command, globalOptions types.GlobalCommandOption
 	return options, nil
 }
 
-func updateContainer(ctx context.Context, client *containerd.Client, id string, opts updateResourceOptions, cmd *cobra.Command) error {
+func updateContainer(ctx context.Context, client *containerd.Client, id string, opts updateResourceOptions, cmd *cobra.Command) (retErr error) {
 	container, err := client.LoadContainer(ctx, id)
 	if err != nil {
 		return err
@@ -266,16 +267,18 @@ func updateContainer(ctx context.Context, client *containerd.Client, id string, 
 		if spec.Linux.Resources == nil {
 			spec.Linux.Resources = &specs.LinuxResources{}
 		}
-		if spec.Linux.Resources.BlockIO == nil {
-			spec.Linux.Resources.BlockIO = &specs.LinuxBlockIO{}
-		}
 		if cmd.Flags().Changed("blkio-weight") {
+			if spec.Linux.Resources.BlockIO == nil {
+				spec.Linux.Resources.BlockIO = &specs.LinuxBlockIO{}
+			}
 			if spec.Linux.Resources.BlockIO.Weight != &opts.BlkioWeight {
 				spec.Linux.Resources.BlockIO.Weight = &opts.BlkioWeight
 			}
 		}
-		if spec.Linux.Resources.CPU == nil {
-			spec.Linux.Resources.CPU = &specs.LinuxCPU{}
+		if cmd.Flags().Changed("cpu-shares") || cmd.Flags().Changed("cpu-quota") || cmd.Flags().Changed("cpu-period") || cmd.Flags().Changed("cpus") || cmd.Flags().Changed("cpuset-mems") || cmd.Flags().Changed("cpuset-cpus") {
+			if spec.Linux.Resources.CPU == nil {
+				spec.Linux.Resources.CPU = &specs.LinuxCPU{}
+			}
 		}
 		if cmd.Flags().Changed("cpu-shares") {
 			if spec.Linux.Resources.CPU.Shares != &opts.CPUShares {
@@ -308,8 +311,10 @@ func updateContainer(ctx context.Context, client *containerd.Client, id string, 
 				spec.Linux.Resources.CPU.Cpus = opts.CpusetCpus
 			}
 		}
-		if spec.Linux.Resources.Memory == nil {
-			spec.Linux.Resources.Memory = &specs.LinuxMemory{}
+		if cmd.Flags().Changed("memory") || cmd.Flags().Changed("memory-reservation") {
+			if spec.Linux.Resources.Memory == nil {
+				spec.Linux.Resources.Memory = &specs.LinuxMemory{}
+			}
 		}
 		if cmd.Flags().Changed("memory") {
 			if spec.Linux.Resources.Memory.Limit != &opts.MemoryLimitInBytes {
@@ -324,10 +329,10 @@ func updateContainer(ctx context.Context, client *containerd.Client, id string, 
 				spec.Linux.Resources.Memory.Reservation = &opts.MemoryReservation
 			}
 		}
-		if spec.Linux.Resources.Pids == nil {
-			spec.Linux.Resources.Pids = &specs.LinuxPids{}
-		}
 		if cmd.Flags().Changed("pids-limit") {
+			if spec.Linux.Resources.Pids == nil {
+				spec.Linux.Resources.Pids = &specs.LinuxPids{}
+			}
 			if spec.Linux.Resources.Pids.Limit != opts.PidsLimit {
 				spec.Linux.Resources.Pids.Limit = opts.PidsLimit
 			}
@@ -335,12 +340,18 @@ func updateContainer(ctx context.Context, client *containerd.Client, id string, 
 	}
 
 	if err := updateContainerSpec(ctx, container, spec); err != nil {
-		log.G(ctx).WithError(err).Errorf("Failed to update spec %+v for container %q", spec, id)
-		// reset spec on error.
-		if err := updateContainerSpec(ctx, container, oldSpec); err != nil {
-			log.G(ctx).WithError(err).Errorf("Failed to update spec %+v for container %q", oldSpec, id)
-		}
+		return fmt.Errorf("failed to update spec %+v for container %q", spec, id)
 	}
+	defer func() {
+		if retErr != nil {
+			deferCtx, deferCancel := context.WithTimeout(ctx, 1*time.Minute)
+			defer deferCancel()
+			// Reset spec on error.
+			if err := updateContainerSpec(deferCtx, container, oldSpec); err != nil {
+				log.G(ctx).WithError(err).Errorf("Failed to update spec %+v for container %q", oldSpec, id)
+			}
+		}
+	}()
 
 	restart, err := cmd.Flags().GetString("restart")
 	if err != nil {

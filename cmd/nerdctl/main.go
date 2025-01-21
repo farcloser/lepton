@@ -188,6 +188,7 @@ func initRootCmdFlags(rootCmd *cobra.Command, tomlPath string) (*pflag.FlagSet, 
 	helpers.AddPersistentBoolFlag(rootCmd, "experimental", nil, nil, cfg.Experimental, version.EnvPrefix+"_EXPERIMENTAL", "Control experimental: https://github.com/containerd/nerdctl/blob/main/docs/experimental.md")
 	helpers.AddPersistentStringFlag(rootCmd, "host-gateway-ip", nil, nil, nil, aliasToBeInherited, cfg.HostGatewayIP, version.EnvPrefix+"_HOST_GATEWAY_IP", "IP address that the special 'host-gateway' string in --add-host resolves to. Defaults to the IP address of the host. It has no effect without setting --add-host")
 	helpers.AddPersistentStringFlag(rootCmd, "bridge-ip", nil, nil, nil, aliasToBeInherited, cfg.BridgeIP, version.EnvPrefix+"_BRIDGE_IP", "IP address for the default nerdctl bridge network")
+	rootCmd.PersistentFlags().Bool("kube-hide-dupe", cfg.KubeHideDupe, "Deduplicate images for Kubernetes with namespace k8s.io")
 	return aliasToBeInherited, nil
 }
 
