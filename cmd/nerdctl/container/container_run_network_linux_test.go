@@ -30,8 +30,8 @@ import (
 	"time"
 
 	"github.com/containernetworking/plugins/pkg/ns"
-	"github.com/opencontainers/go-digest"
 	"github.com/vishvananda/netlink"
+	"go.farcloser.world/containers/digest"
 	"gotest.tools/v3/assert"
 	"gotest.tools/v3/icmd"
 
@@ -376,7 +376,7 @@ func TestRunWithInvalidPortThenCleanUp(t *testing.T) {
 						getAddrHash := func(addr string) string {
 							const addrHashLen = 8
 
-							d := digest.SHA256.FromString(addr)
+							d := digest.FromString(addr)
 							h := d.Encoded()[0:addrHashLen]
 
 							return h

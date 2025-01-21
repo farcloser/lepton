@@ -73,6 +73,7 @@ linters-settings:
       main:
         files:
           - "$all"
+        listMode: strict
         deny:
           - pkg: "github.com/hashicorp/golang-lru"
             desc: "Do not allow direct use of IBM patented NewARC"
@@ -82,6 +83,11 @@ linters-settings:
             desc: "we use Sentry"
           - pkg: "github.com/pkg/errors"
             desc: "should be replaced by standard lib errors package"
+          - pkg: "github.com/opencontainers"
+            desc: "use farcloser containers library instead"
+          - pkg: "github.com/containerd/cgroups"
+            desc: "use farcloser containers library instead"
+          # - pkg: "github.com/vishvananda"
 
       pkg:
         files:
