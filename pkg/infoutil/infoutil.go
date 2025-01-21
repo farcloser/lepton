@@ -74,7 +74,7 @@ func NativeDaemonInfo(ctx context.Context, client *containerd.Client) (*native.D
 	}, nil
 }
 
-func Info(ctx context.Context, client *containerd.Client, snapshotter, cgroupManager string) (*dockercompat.Info, error) {
+func Info(ctx context.Context, client *containerd.Client, snapshotter string, cgroupManager cgroups.Manager) (*dockercompat.Info, error) {
 	introService := client.IntrospectionService()
 
 	plugins, err := introService.Plugins(ctx)
@@ -115,7 +115,7 @@ func Info(ctx context.Context, client *containerd.Client, snapshotter, cgroupMan
 		SystemTime:      time.Now().Format(time.RFC3339Nano),
 		LoggingDriver:   "json-file", // hard-coded
 		CgroupDriver:    cgroupManager,
-		CgroupVersion:   strconv.Itoa(cgroups.Version()),
+		CgroupVersion:   strconv.Itoa(int(cgroups.Version())),
 		KernelVersion:   UnameR(),
 		OperatingSystem: DistroName(),
 		OSType:          runtime.GOOS,
@@ -285,9 +285,9 @@ func parseRuncVersion(runcVersionStdout []byte) (*dockercompat.ComponentVersion,
 }
 
 // BlockIOWeight return whether Block IO weight is supported or not
-func BlockIOWeight(cgroupManager string) bool {
+func BlockIOWeight(cgroupManager cgroups.Manager) bool {
 	var info dockercompat.Info
-	info.CgroupVersion = strconv.Itoa(cgroups.Version())
+	info.CgroupVersion = strconv.Itoa(int(cgroups.Version()))
 	info.CgroupDriver = cgroupManager
 	mobySysInfo := mobySysInfo(&info)
 

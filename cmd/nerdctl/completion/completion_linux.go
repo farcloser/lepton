@@ -18,10 +18,9 @@ package completion
 
 import (
 	"github.com/spf13/cobra"
+	"go.farcloser.world/containers/cgroups"
 
 	"github.com/containerd/nerdctl/v2/pkg/apparmorutil"
-	ncdefaults "github.com/containerd/nerdctl/v2/pkg/defaults"
-	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
 )
 
 func ApparmorProfiles(cmd *cobra.Command) ([]string, cobra.ShellCompDirective) {
@@ -37,12 +36,10 @@ func ApparmorProfiles(cmd *cobra.Command) ([]string, cobra.ShellCompDirective) {
 }
 
 func CgroupManagerNames(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-	candidates := []string{"cgroupfs"}
-	if ncdefaults.IsSystemdAvailable() {
-		candidates = append(candidates, "systemd")
-	}
-	if rootlessutil.IsRootless() {
-		candidates = append(candidates, "none")
+	availableManagers := cgroups.AvailableManagers()
+	candidates := make([]string, len(availableManagers))
+	for i, manager := range availableManagers {
+		candidates[i] = string(manager)
 	}
 	return candidates, cobra.ShellCompDirectiveNoFileComp
 }

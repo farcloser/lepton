@@ -18,15 +18,17 @@ package infoutil
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/docker/docker/pkg/meminfo"
+	"go.farcloser.world/containers/cgroups"
+	"go.farcloser.world/containers/sysinfo"
 
 	"github.com/containerd/nerdctl/v2/pkg/apparmorutil"
 	"github.com/containerd/nerdctl/v2/pkg/defaults"
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
-	"github.com/containerd/nerdctl/v2/pkg/sysinfo"
 )
 
 const UnameO = "GNU/Linux"
@@ -42,7 +44,7 @@ WARNING: AppArmor profile %q is not loaded.
 		}
 	}
 	info.SecurityOptions = append(info.SecurityOptions, "name=seccomp,profile="+defaults.SeccompProfileName)
-	if defaults.CgroupnsMode() == "private" {
+	if cgroups.DefaultMode() == cgroups.PrivateNsMode {
 		info.SecurityOptions = append(info.SecurityOptions, "name=cgroupns")
 	}
 	if rootlessutil.IsRootlessChild() {
@@ -58,8 +60,8 @@ func fulfillPlatformInfo(info *dockercompat.Info) {
 	fulfillSecurityOptions(info)
 	mobySysInfo := mobySysInfo(info)
 
-	if info.CgroupDriver == "none" {
-		if info.CgroupVersion == "2" {
+	if info.CgroupDriver == cgroups.NoneManager {
+		if info.CgroupVersion == strconv.Itoa(int(cgroups.Version2)) {
 			info.Warnings = append(info.Warnings, "WARNING: Running in rootless-mode without cgroups. Systemd is required to enable cgroups in rootless-mode.")
 		} else {
 			info.Warnings = append(info.Warnings, "WARNING: Running in rootless-mode without cgroups. To enable cgroups in rootless-mode, you need to boot the system in cgroup v2 mode.")
@@ -94,7 +96,7 @@ func fulfillPlatformInfo(info *dockercompat.Info) {
 			info.Warnings = append(info.Warnings, "WARNING: No pids limit support")
 		}
 		info.OomKillDisable = mobySysInfo.OomKillDisable
-		if !info.OomKillDisable && info.CgroupVersion == "1" {
+		if !info.OomKillDisable && info.CgroupVersion == strconv.Itoa(int(cgroups.Version1)) {
 			// no warning for cgroup v2
 			info.Warnings = append(info.Warnings, "WARNING: No oom kill disable support")
 		}
@@ -113,11 +115,11 @@ func fulfillPlatformInfo(info *dockercompat.Info) {
 }
 
 func mobySysInfo(info *dockercompat.Info) *sysinfo.SysInfo {
-	var mobySysInfoOpts []sysinfo.Opt
-	if info.CgroupDriver == "systemd" && info.CgroupVersion == "2" && rootlessutil.IsRootless() {
-		g := fmt.Sprintf("/user.slice/user-%d.slice", rootlessutil.ParentEUID())
-		mobySysInfoOpts = append(mobySysInfoOpts, sysinfo.WithCgroup2GroupPath(g))
+	g := "/"
+	if info.CgroupDriver == cgroups.SystemdManager && info.CgroupVersion == strconv.Itoa(int(cgroups.Version2)) && rootlessutil.IsRootless() {
+		g = fmt.Sprintf("/user.slice/user-%d.slice", rootlessutil.ParentEUID())
 	}
-	mobySysInfo := sysinfo.New(mobySysInfoOpts...)
-	return mobySysInfo
+	inf, _, _ := sysinfo.New(g)
+	// FIXME: log warnings and errors
+	return inf
 }

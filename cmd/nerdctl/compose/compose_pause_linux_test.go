@@ -20,13 +20,15 @@ import (
 	"fmt"
 	"testing"
 
+	"go.farcloser.world/containers/cgroups"
+
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 )
 
 func TestComposePauseAndUnpause(t *testing.T) {
 	base := testutil.NewBase(t)
 	switch base.Info().CgroupDriver {
-	case "none", "":
+	case cgroups.NoneManager, "":
 		t.Skip("requires cgroup (for pausing)")
 	}
 

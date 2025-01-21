@@ -30,7 +30,7 @@ import (
 	"strings"
 
 	"github.com/go-viper/mapstructure/v2"
-	"github.com/vishvananda/netlink"
+	"go.farcloser.world/containers/netlink"
 	"go.farcloser.world/core/version/semver"
 
 	"github.com/containerd/log"
@@ -346,11 +346,8 @@ func guessFirewallPluginVersion(stderr string) (*semver.Version, error) {
 
 func removeBridgeNetworkInterface(netIf string) error {
 	return rootlessutil.WithDetachedNetNSIfAny(func() error {
-		link, err := netlink.LinkByName(netIf)
-		if err == nil {
-			if err := netlink.LinkDel(link); err != nil {
-				return fmt.Errorf("failed to remove network interface %s: %w", netIf, err)
-			}
+		if err := netlink.LinkDel(netIf); errors.Is(err, netlink.ErrRemoveFail) {
+			return err
 		}
 		return nil
 	})

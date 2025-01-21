@@ -49,14 +49,6 @@ func IsSystemdAvailable() bool {
 	return false
 }
 
-func CgroupManager() string {
-	return ""
-}
-
-func CgroupnsMode() string {
-	return ""
-}
-
 func CliTOML() string {
 	ucd, err := os.UserConfigDir()
 	if err != nil {

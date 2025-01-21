@@ -19,6 +19,8 @@ package types
 import (
 	"io"
 	"time"
+
+	"go.farcloser.world/containers/cgroups"
 )
 
 // ContainerStartOptions specifies options for the `(container) start`.
@@ -143,7 +145,7 @@ type ContainerCreateOptions struct {
 	// BlkioWeight specifies the block IO (relative weight), between 10 and 1000, or 0 to disable (default 0)
 	BlkioWeight uint16
 	// Cgroupns specifies the cgroup namespace to use
-	Cgroupns string
+	Cgroupns cgroups.Mode
 	// CgroupParent specifies the optional parent cgroup for the container
 	CgroupParent string
 	// Device specifies add a host device to the container

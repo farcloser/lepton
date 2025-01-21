@@ -16,18 +16,7 @@
 
 package statsutil
 
-import (
-	"bufio"
-	"os"
-	"strconv"
-	"strings"
-	"time"
-
-	"github.com/vishvananda/netlink"
-
-	v2 "github.com/containerd/cgroups/v3/cgroup2/stats"
-)
-
+/*
 func calculateMemPercent(limit float64, usedNo float64) float64 {
 	// Limit will never be 0 unless the container is not running, and we haven't
 	// got any data from cgroup
@@ -37,7 +26,7 @@ func calculateMemPercent(limit float64, usedNo float64) float64 {
 	return 0
 }
 
-func SetCgroup2StatsFields(previousStats *ContainerStats, metrics *v2.Metrics, links []netlink.Link) (StatsEntry, error) {
+func SetCgroup2StatsFields(previousStats *stats.ContainerStats, metrics *v2.Metrics, links []netlink.Link) (stats.StatsEntry, error) {
 	cpuPercent := calculateCgroup2CPUPercent(previousStats, metrics)
 	blkRead, blkWrite := calculateCgroup2IO(metrics)
 	mem := calculateCgroup2MemUsage(metrics)
@@ -46,7 +35,7 @@ func SetCgroup2StatsFields(previousStats *ContainerStats, metrics *v2.Metrics, l
 	pidsStatsCurrent := metrics.Pids.Current
 	netRx, netTx := calculateCgroupNetwork(links)
 
-	return StatsEntry{
+	return stats.StatsEntry{
 		CPUPercentage:    cpuPercent,
 		Memory:           mem,
 		MemoryPercentage: memPercent,
@@ -91,7 +80,7 @@ func getHostMemLimit() float64 {
 }
 
 // PercpuUsage is not supported in CgroupV2
-func calculateCgroup2CPUPercent(previousStats *ContainerStats, metrics *v2.Metrics) float64 {
+func calculateCgroup2CPUPercent(previousStats *stats.ContainerStats, metrics *v2.Metrics) float64 {
 	var (
 		cpuPercent = 0.0
 		// calculate the change for the cpu usage of the container in between readings
@@ -146,3 +135,4 @@ func calculateCgroupNetwork(links []netlink.Link) (float64, float64) {
 	}
 	return rx, tx
 }
+*/

@@ -17,6 +17,8 @@
 package config
 
 import (
+	"go.farcloser.world/containers/cgroups"
+
 	"github.com/containerd/containerd/v2/defaults"
 	"github.com/containerd/containerd/v2/pkg/namespaces"
 
@@ -26,20 +28,20 @@ import (
 // Config corresponds to nerdctl.toml .
 // See docs/config.md .
 type Config struct {
-	Debug            bool     `toml:"debug"`
-	DebugFull        bool     `toml:"debug_full"`
-	Address          string   `toml:"address"`
-	Namespace        string   `toml:"namespace"`
-	Snapshotter      string   `toml:"snapshotter"`
-	CNIPath          string   `toml:"cni_path"`
-	CNINetConfPath   string   `toml:"cni_netconfpath"`
-	DataRoot         string   `toml:"data_root"`
-	CgroupManager    string   `toml:"cgroup_manager"`
-	InsecureRegistry bool     `toml:"insecure_registry"`
-	HostsDir         []string `toml:"hosts_dir"`
-	Experimental     bool     `toml:"experimental"`
-	HostGatewayIP    string   `toml:"host_gateway_ip"`
-	BridgeIP         string   `toml:"bridge_ip, omitempty"`
+	Debug            bool            `toml:"debug"`
+	DebugFull        bool            `toml:"debug_full"`
+	Address          string          `toml:"address"`
+	Namespace        string          `toml:"namespace"`
+	Snapshotter      string          `toml:"snapshotter"`
+	CNIPath          string          `toml:"cni_path"`
+	CNINetConfPath   string          `toml:"cni_netconfpath"`
+	DataRoot         string          `toml:"data_root"`
+	CgroupManager    cgroups.Manager `toml:"cgroup_manager"`
+	InsecureRegistry bool            `toml:"insecure_registry"`
+	HostsDir         []string        `toml:"hosts_dir"`
+	Experimental     bool            `toml:"experimental"`
+	HostGatewayIP    string          `toml:"host_gateway_ip"`
+	BridgeIP         string          `toml:"bridge_ip, omitempty"`
 }
 
 // New creates a default Config object statically,
@@ -54,7 +56,7 @@ func New() *Config {
 		CNIPath:          ncdefaults.CNIPath(),
 		CNINetConfPath:   ncdefaults.CNINetConfPath(),
 		DataRoot:         ncdefaults.DataRoot(),
-		CgroupManager:    ncdefaults.CgroupManager(),
+		CgroupManager:    cgroups.DefaultManager(),
 		InsecureRegistry: false,
 		HostsDir:         ncdefaults.HostsDirs(),
 		Experimental:     true,

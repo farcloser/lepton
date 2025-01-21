@@ -20,6 +20,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"go.farcloser.world/containers/cgroups"
 
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 )
@@ -112,7 +113,7 @@ func ProcessRootCmdFlags(cmd *cobra.Command) (types.GlobalCommandOptions, error)
 		CNIPath:          cniPath,
 		CNINetConfPath:   cniConfigPath,
 		DataRoot:         dataRoot,
-		CgroupManager:    cgroupManager,
+		CgroupManager:    cgroups.Manager(cgroupManager),
 		InsecureRegistry: insecureRegistry,
 		HostsDir:         hostsDir,
 		Experimental:     experimental,

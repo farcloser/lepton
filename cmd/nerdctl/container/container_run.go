@@ -23,6 +23,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"go.farcloser.world/containers/cgroups"
 
 	"github.com/containerd/console"
 	"github.com/containerd/log"
@@ -151,10 +152,10 @@ func setCreateFlags(cmd *cobra.Command) {
 	cmd.Flags().Int64("pids-limit", -1, "Tune container pids limit (set -1 for unlimited)")
 	cmd.Flags().StringSlice("cgroup-conf", nil, "Configure cgroup v2 (key=value)")
 	cmd.Flags().Uint16("blkio-weight", 0, "Block IO (relative weight), between 10 and 1000, or 0 to disable (default 0)")
-	cmd.Flags().String("cgroupns", defaults.CgroupnsMode(), `Cgroup namespace to use, the default depends on the cgroup version ("host"|"private")`)
+	cmd.Flags().String("cgroupns", string(cgroups.DefaultMode()), `Cgroup namespace to use, the default depends on the cgroup version ("host"|"private")`)
 	cmd.Flags().String("cgroup-parent", "", "Optional parent cgroup for the container")
 	cmd.RegisterFlagCompletionFunc("cgroupns", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{"host", "private"}, cobra.ShellCompDirectiveNoFileComp
+		return []string{string(cgroups.HostNsMode), string(cgroups.PrivateNsMode)}, cobra.ShellCompDirectiveNoFileComp
 	})
 	cmd.Flags().String("cpuset-cpus", "", "CPUs in which to allow execution (0-3, 0,1)")
 	cmd.Flags().String("cpuset-mems", "", "MEMs in which to allow execution (0-3, 0,1)")

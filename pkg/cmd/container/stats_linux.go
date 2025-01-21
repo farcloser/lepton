@@ -17,90 +17,36 @@
 package container
 
 import (
-	"errors"
-	"fmt"
-	"net"
-	"strings"
+	"context"
 	"time"
 
-	"github.com/vishvananda/netlink"
-	"github.com/vishvananda/netns"
+	"go.farcloser.world/containers/stats"
 
-	v2 "github.com/containerd/cgroups/v3/cgroup2/stats"
-
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/native"
-	"github.com/containerd/nerdctl/v2/pkg/statsutil"
+	"github.com/containerd/containerd/v2/client"
+	"github.com/containerd/typeurl/v2"
 )
 
-//nolint:nakedret
-func setContainerStatsAndRenderStatsEntry(previousStats *statsutil.ContainerStats, firstSet bool, anydata interface{}, pid int, interfaces []native.NetInterface) (statsEntry statsutil.StatsEntry, err error) {
-
-	var (
-		data2 *v2.Metrics
-	)
-
-	switch v := anydata.(type) {
-	case *v2.Metrics:
-		data2 = v
-	default:
-		err = errors.New("cannot convert metric data to cgroups.Metrics")
-		return
+func setContainerStatsAndRenderStatsEntry(ctx context.Context, container client.Container, previousStats *stats.ContainerStats) (statsEntry stats.Entry, err error) {
+	task, err := container.Task(ctx, nil)
+	if err != nil {
+		return statsEntry, err
 	}
 
-	var nlinks []netlink.Link
+	pid := int(task.Pid())
 
-	if !firstSet {
-		var (
-			nlink    netlink.Link
-			nlHandle *netlink.Handle
-			ns       netns.NsHandle
-		)
-
-		ns, err = netns.GetFromPid(pid)
-		if err != nil {
-			err = fmt.Errorf("failed to retrieve the statistics in netns %s: %w", ns, err)
-			return
-		}
-		defer func() {
-			err = ns.Close()
-		}()
-
-		nlHandle, err = netlink.NewHandleAt(ns)
-		if err != nil {
-			err = fmt.Errorf("failed to retrieve the statistics in netns %s: %w", ns, err)
-			return
-		}
-		defer nlHandle.Close()
-
-		for _, v := range interfaces {
-			nlink, err = nlHandle.LinkByIndex(v.Index)
-			if err != nil {
-				err = fmt.Errorf("failed to retrieve the statistics for %s in netns %s: %w", v.Name, ns, err)
-				return
-			}
-			// exclude inactive interface
-			if nlink.Attrs().Flags&net.FlagUp != 0 {
-
-				// exclude loopback interface
-				if nlink.Attrs().Flags&net.FlagLoopback != 0 || strings.HasPrefix(nlink.Attrs().Name, "lo") {
-					continue
-				}
-				nlinks = append(nlinks, nlink)
-			}
-		}
+	metric, err := task.Metrics(ctx)
+	if err != nil {
+		return statsEntry, err
+	}
+	anydata, err := typeurl.UnmarshalAny(metric.Data)
+	if err != nil {
+		return statsEntry, err
 	}
 
-	if data2 != nil {
-		if !firstSet {
-			statsEntry, err = statsutil.SetCgroup2StatsFields(previousStats, data2, nlinks)
-		}
-		previousStats.Cgroup2CPU = data2.CPU.UsageUsec * 1000
-		previousStats.Cgroup2System = data2.CPU.SystemUsec * 1000
-		if err != nil {
-			return
-		}
-	}
+	statsEntry, err = stats.SetCgroup2StatsFields(previousStats, anydata, pid)
+
 	previousStats.Time = time.Now()
+	statsEntry.ID = container.ID()
 
-	return
+	return statsEntry, err
 }

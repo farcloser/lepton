@@ -8,9 +8,6 @@ Requires:
 - cni plugins 1.6+
 - cgroup v2 (see https://rootlesscontaine.rs/getting-started/common/cgroup2/)
 
-Enhanced:
-- rewritten cp
-
 Removed:
 - freebsd
 - stargz (partly)
@@ -18,16 +15,26 @@ Removed:
 - overlaybd
 - nydus
 - IPFS
+- cgroup v1 support
 
-Not tested anymore:
-- containerd v1.6 and v1.7
-- ubuntu 22.04
+Not tested anymore (might still work):
+- containerd pre v2 (v1.7, v1.6)
+- ubuntu 22.04 and earlier
 
-Sync status with nerdctl:
-- forked at https://github.com/containerd/nerdctl/commit/7e97f0618ceb160b044e95810e17fccf21fea3df on Dec 14, 2024
+Other differences / similarities with nerdctl:
+
+From nerdctl, in Lepton:
+- forked from nerdctl at https://github.com/containerd/nerdctl/commit/7e97f0618ceb160b044e95810e17fccf21fea3df on Dec 14, 2024
 - cherry-picked:
   - ef02692a91c04006d5750ae81516a40ff3bb6450 (update containerd (2.0.1), runc (1.2.3), buildKit (0.18.2), stargz-snapshotter (0.16.3))
   - 3dbd24cfd21aa47c1b396554aa4431264276bec1 (fix pull image process output from stderr to stdout)
+
+From nerdctl, not imported in Lepton:
+- any dependabot up (already have them)
+
+From lepton, not in nerdct (yet):
+- "rewrite cp": (https://github.com/containerd/nerdctl/pull/3323)
+
 
 <!--
 [[⬇️ **Download]**](https://github.com/containerd/nerdctl/releases)
