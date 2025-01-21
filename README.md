@@ -25,16 +25,7 @@ Other differences / similarities with nerdctl:
 
 From nerdctl, in Lepton:
 - forked from nerdctl at https://github.com/containerd/nerdctl/commit/7e97f0618ceb160b044e95810e17fccf21fea3df on Dec 14, 2024
-- cherry-picked:
-  - ef02692a91c04006d5750ae81516a40ff3bb6450 (update containerd (2.0.1), runc (1.2.3), buildKit (0.18.2), stargz-snapshotter (0.16.3))
-  - 3dbd24cfd21aa47c1b396554aa4431264276bec1 (fix pull image process output from stderr to stdout)
-
-From nerdctl, not imported in Lepton:
-- any dependabot up (already have them)
-
-From lepton, not in nerdct (yet):
-- "rewrite cp": (https://github.com/containerd/nerdctl/pull/3323)
-
+- resynced with upstream on: 2025/01/21
 
 <!--
 [[⬇️ **Download]**](https://github.com/containerd/nerdctl/releases)
