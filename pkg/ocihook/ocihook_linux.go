@@ -17,15 +17,14 @@
 package ocihook
 
 import (
-	"github.com/containerd/containerd/v2/contrib/apparmor"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/apparmorutil"
+	"github.com/containerd/nerdctl/v2/leptonic/apparmor"
 	"github.com/containerd/nerdctl/v2/pkg/defaults"
 )
 
 func loadAppArmor() {
-	if !apparmorutil.CanLoadNewProfile() {
+	if !apparmor.CanLoadNewProfile() {
 		return
 	}
 	// ensure that the default profile is loaded to the host

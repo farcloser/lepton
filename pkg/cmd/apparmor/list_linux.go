@@ -23,8 +23,8 @@ import (
 	"text/tabwriter"
 	"text/template"
 
+	"github.com/containerd/nerdctl/v2/leptonic/apparmor"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/apparmorutil"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 )
 
@@ -52,7 +52,7 @@ func List(options types.ApparmorListOptions) error {
 		}
 	}
 
-	profiles, err := apparmorutil.Profiles()
+	profiles, err := apparmor.Profiles()
 	if err != nil {
 		return err
 	}

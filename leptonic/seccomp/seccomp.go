@@ -14,8 +14,4 @@
    limitations under the License.
 */
 
-// Package apparmorutil provides utilities for AppArmor
-package apparmorutil
-
-// This apparmor.go is split from apparmorutil_linux.go, to avoid
-// "build constraints exclude all Go files" error on non-Linux
+package seccomp

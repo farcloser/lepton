@@ -51,7 +51,7 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/vishvananda/netlink v1.3.0
 	github.com/yuchanns/srslog v1.1.0
-	go.farcloser.world/containers v0.0.0-20241224044045-01c92c12fe7e
+	go.farcloser.world/containers v0.0.0-20250122010831-d9da7262e7ef
 	go.farcloser.world/core v0.0.0-20241223212339-e4f71616f6d2
 	go.uber.org/mock v0.5.0
 	golang.org/x/crypto v0.32.0
