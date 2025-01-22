@@ -25,12 +25,9 @@ import (
 	"os"
 	"strings"
 
-	"go.farcloser.world/containers/specs"
 	"go.farcloser.world/core/compression/zstd"
 
 	containerd "github.com/containerd/containerd/v2/client"
-	"github.com/containerd/containerd/v2/core/content"
-	"github.com/containerd/containerd/v2/core/images"
 	"github.com/containerd/containerd/v2/core/images/converter"
 	"github.com/containerd/containerd/v2/core/images/converter/uncompress"
 	"github.com/containerd/log"
@@ -76,12 +73,12 @@ func Convert(ctx context.Context, client *containerd.Client, srcRawRef, targetRa
 		return err
 	}
 
-	zstd := options.Zstd
+	zstdOpts := options.Zstd
 	zstdchunked := options.ZstdChunked
-	var finalize func(ctx context.Context, cs content.Store, ref string, desc *specs.Descriptor) (*images.Image, error)
-	if zstd || zstdchunked {
+
+	if zstdOpts || zstdchunked {
 		convertCount := 0
-		if zstd {
+		if zstdOpts {
 			convertCount++
 		}
 		if zstdchunked {
@@ -94,7 +91,7 @@ func Convert(ctx context.Context, client *containerd.Client, srcRawRef, targetRa
 		var convertFunc converter.ConvertFunc
 		var convertType string
 		switch {
-		case zstd:
+		case zstdOpts:
 			convertFunc, err = getZstdConverter(options)
 			if err != nil {
 				return err
@@ -133,24 +130,7 @@ func Convert(ctx context.Context, client *containerd.Client, srcRawRef, targetRa
 	res := converterutil.ConvertedImageInfo{
 		Image: newImg.Name + "@" + newImg.Target.Digest.String(),
 	}
-	if finalize != nil {
-		ctx, done, err := client.WithLease(ctx)
-		if err != nil {
-			return err
-		}
-		defer done(ctx)
-		newI, err := finalize(ctx, client.ContentStore(), targetRef, &newImg.Target)
-		if err != nil {
-			return err
-		}
-		is := client.ImageService()
-		_ = is.Delete(ctx, newI.Name)
-		finimg, err := is.Create(ctx, *newI)
-		if err != nil {
-			return err
-		}
-		res.ExtraImages = append(res.ExtraImages, finimg.Name+"@"+finimg.Target.Digest.String())
-	}
+
 	return printConvertedImage(options.Stdout, options, res)
 }
 
