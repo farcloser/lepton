@@ -28,7 +28,7 @@ import (
 	"github.com/containerd/containerd/v2/core/images"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/referenceutil"
+	"github.com/containerd/nerdctl/v2/leptonic/reference"
 )
 
 // Filter types supported to filter images.
@@ -79,7 +79,7 @@ func ParseFilters(filters []string) (*Filters, error) {
 				}
 				f.Dangling = &isDangling
 			} else if tempFilterToken[0] == FilterBeforeType {
-				parsedReference, err := referenceutil.Parse(tempFilterToken[1])
+				parsedReference, err := reference.Parse(tempFilterToken[1])
 				if err != nil {
 					return nil, err
 				}
@@ -87,7 +87,7 @@ func ParseFilters(filters []string) (*Filters, error) {
 				f.Before = append(f.Before, "name=="+parsedReference.String())
 				f.Before = append(f.Before, "name=="+tempFilterToken[1])
 			} else if tempFilterToken[0] == FilterSinceType {
-				parsedReference, err := referenceutil.Parse(tempFilterToken[1])
+				parsedReference, err := reference.Parse(tempFilterToken[1])
 				if err != nil {
 					return nil, err
 				}
@@ -325,7 +325,7 @@ func matchesAllLabels(imageCfgLabels map[string]string, filterLabels map[string]
 func matchesReferences(image images.Image, referencePatterns []string) (bool, error) {
 	var matches int
 
-	parsedReference, err := referenceutil.Parse(image.Name)
+	parsedReference, err := reference.Parse(image.Name)
 	if err != nil {
 		return false, err
 	}

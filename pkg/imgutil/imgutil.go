@@ -37,12 +37,12 @@ import (
 	"github.com/containerd/log"
 	"github.com/containerd/platforms"
 
+	"github.com/containerd/nerdctl/v2/leptonic/reference"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/errutil"
 	"github.com/containerd/nerdctl/v2/pkg/idutil/imagewalker"
 	"github.com/containerd/nerdctl/v2/pkg/imgutil/dockerconfigresolver"
 	"github.com/containerd/nerdctl/v2/pkg/imgutil/pull"
-	"github.com/containerd/nerdctl/v2/pkg/referenceutil"
 )
 
 // EnsuredImage contains the image existed in containerd and its metadata.
@@ -125,7 +125,7 @@ func EnsureImage(ctx context.Context, client *containerd.Client, rawRef string, 
 		return nil, fmt.Errorf("image not available: %q", rawRef)
 	}
 
-	parsedReference, err := referenceutil.Parse(rawRef)
+	parsedReference, err := reference.Parse(rawRef)
 	if err != nil {
 		return nil, err
 	}
@@ -166,7 +166,7 @@ func EnsureImage(ctx context.Context, client *containerd.Client, rawRef string, 
 
 // ResolveDigest resolves `rawRef` and returns its descriptor digest.
 func ResolveDigest(ctx context.Context, rawRef string, insecure bool, hostsDirs []string) (string, error) {
-	parsedReference, err := referenceutil.Parse(rawRef)
+	parsedReference, err := reference.Parse(rawRef)
 	if err != nil {
 		return "", err
 	}
@@ -360,7 +360,7 @@ func ReadImageConfig(ctx context.Context, img containerd.Image) (specs.Image, sp
 func ParseRepoTag(imgName string) (string, string) {
 	log.L.Debugf("raw image name=%q", imgName)
 
-	parsedReference, err := referenceutil.Parse(imgName)
+	parsedReference, err := reference.Parse(imgName)
 	if err != nil {
 		log.L.WithError(err).Debugf("unparsable image name %q", imgName)
 		return "", ""

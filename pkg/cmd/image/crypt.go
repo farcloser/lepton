@@ -29,9 +29,9 @@ import (
 	"github.com/containerd/imgcrypt/v2/images/encryption"
 	"github.com/containerd/imgcrypt/v2/images/encryption/parsehelpers"
 
+	"github.com/containerd/nerdctl/v2/leptonic/reference"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/platformutil"
-	"github.com/containerd/nerdctl/v2/pkg/referenceutil"
 )
 
 func Crypt(ctx context.Context, client *containerd.Client, srcRawRef, targetRawRef string, encrypt bool, options types.ImageCryptOptions) error {
@@ -40,13 +40,13 @@ func Crypt(ctx context.Context, client *containerd.Client, srcRawRef, targetRawR
 		return errors.New("src and target image need to be specified")
 	}
 
-	parsedRerefence, err := referenceutil.Parse(srcRawRef)
+	parsedRerefence, err := reference.Parse(srcRawRef)
 	if err != nil {
 		return err
 	}
 	srcRef := parsedRerefence.String()
 
-	parsedRerefence, err = referenceutil.Parse(targetRawRef)
+	parsedRerefence, err = reference.Parse(targetRawRef)
 	if err != nil {
 		return err
 	}

@@ -37,12 +37,12 @@ import (
 	"github.com/containerd/log"
 	"github.com/containerd/platforms"
 
+	"github.com/containerd/nerdctl/v2/leptonic/reference"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/buildkitutil"
 	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/containerutil"
 	"github.com/containerd/nerdctl/v2/pkg/platformutil"
-	"github.com/containerd/nerdctl/v2/pkg/referenceutil"
 	"github.com/containerd/nerdctl/v2/pkg/strutil"
 )
 
@@ -236,7 +236,7 @@ func generateBuildctlArgs(ctx context.Context, client *containerd.Client, option
 	}
 	if tags = strutil.DedupeStrSlice(options.Tag); len(tags) > 0 {
 		ref := tags[0]
-		parsedReference, err := referenceutil.Parse(ref)
+		parsedReference, err := reference.Parse(ref)
 		if err != nil {
 			return "", nil, false, "", nil, nil, err
 		}
@@ -244,7 +244,7 @@ func generateBuildctlArgs(ctx context.Context, client *containerd.Client, option
 
 		// pick the first tag and add it to output
 		for idx, tag := range tags {
-			parsedReference, err = referenceutil.Parse(tag)
+			parsedReference, err = reference.Parse(tag)
 			if err != nil {
 				return "", nil, false, "", nil, nil, err
 			}

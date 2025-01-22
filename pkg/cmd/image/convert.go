@@ -35,10 +35,10 @@ import (
 	zstdchunkedconvert "github.com/containerd/stargz-snapshotter/nativeconverter/zstdchunked"
 	"github.com/containerd/stargz-snapshotter/recorder"
 
+	"github.com/containerd/nerdctl/v2/leptonic/reference"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	converterutil "github.com/containerd/nerdctl/v2/pkg/imgutil/converter"
 	"github.com/containerd/nerdctl/v2/pkg/platformutil"
-	"github.com/containerd/nerdctl/v2/pkg/referenceutil"
 )
 
 func Convert(ctx context.Context, client *containerd.Client, srcRawRef, targetRawRef string, options types.ImageConvertOptions) error {
@@ -49,13 +49,13 @@ func Convert(ctx context.Context, client *containerd.Client, srcRawRef, targetRa
 		return errors.New("src and target image need to be specified")
 	}
 
-	parsedReference, err := referenceutil.Parse(srcRawRef)
+	parsedReference, err := reference.Parse(srcRawRef)
 	if err != nil {
 		return err
 	}
 	srcRef := parsedReference.String()
 
-	parsedReference, err = referenceutil.Parse(targetRawRef)
+	parsedReference, err = reference.Parse(targetRawRef)
 	if err != nil {
 		return err
 	}

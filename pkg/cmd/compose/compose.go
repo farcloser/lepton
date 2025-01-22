@@ -27,13 +27,13 @@ import (
 	"github.com/containerd/errdefs"
 	"github.com/containerd/platforms"
 
+	"github.com/containerd/nerdctl/v2/leptonic/reference"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/volume"
 	"github.com/containerd/nerdctl/v2/pkg/composer"
 	"github.com/containerd/nerdctl/v2/pkg/composer/serviceparser"
 	"github.com/containerd/nerdctl/v2/pkg/imgutil"
 	"github.com/containerd/nerdctl/v2/pkg/netutil"
-	"github.com/containerd/nerdctl/v2/pkg/referenceutil"
 	"github.com/containerd/nerdctl/v2/pkg/signutil"
 	"github.com/containerd/nerdctl/v2/pkg/strutil"
 )
@@ -82,7 +82,7 @@ func New(client *containerd.Client, globalOptions types.GlobalCommandOptions, op
 	options.VolumeExists = volStore.Exists
 
 	options.ImageExists = func(ctx context.Context, rawRef string) (bool, error) {
-		parsedReference, err := referenceutil.Parse(rawRef)
+		parsedReference, err := reference.Parse(rawRef)
 		if err != nil {
 			return false, err
 		}

@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package referenceutil
+package reference
 
 import (
 	"errors"

@@ -40,11 +40,11 @@ import (
 	"github.com/containerd/log"
 	"github.com/containerd/platforms"
 
+	"github.com/containerd/nerdctl/v2/leptonic/reference"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/containerdutil"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 	"github.com/containerd/nerdctl/v2/pkg/imgutil"
-	"github.com/containerd/nerdctl/v2/pkg/referenceutil"
 )
 
 // ListCommandHandler `List` and print images matching filters in `options`.
@@ -148,7 +148,7 @@ func printImages(ctx context.Context, client *containerd.Client, imageList []ima
 		imageDigest := make(map[digest.Digest]bool)
 		var imageNoTag []images.Image
 		for _, img := range imageList {
-			parsed, err := referenceutil.Parse(img.Name)
+			parsed, err := reference.Parse(img.Name)
 			if err != nil {
 				continue
 			}
