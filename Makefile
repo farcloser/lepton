@@ -124,16 +124,10 @@ lint-mod:
 	@cd $(MAKEFILE_DIR) && go mod tidy --diff
 	$(call footer, $@)
 
-# FIXME: go-licenses cannot find LICENSE from root of repo when submodule is imported:
-# https://github.com/google/go-licenses/issues/186
-# This is impacting gotest.tools
 lint-licenses:
 	$(call title, $@)
-	@cd $(MAKEFILE_DIR) && go-licenses check --include_tests --allowed_licenses=Apache-2.0,BSD-2-Clause,BSD-3-Clause,MIT \
-	  --ignore gotest.tools \
-	  --ignore github.com/containerd/stargz-snapshotter/estargz \
-	  ./...
-	@echo "WARNING: you need to manually verify licenses for:\n- gotest.tools\n- github.com/containerd/stargz-snapshotter/estargz"
+	@cd $(MAKEFILE_DIR) \
+		&& ./make-lint-licenses.sh
 	$(call footer, $@)
 
 #	&& GOOS=darwin make lint-licenses
