@@ -1,5 +1,5 @@
 /*
-   Copyright The containerd Authors.
+   Copyright Farcloser.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 */
 
 // Forked from https://github.com/containerd/containerd/blob/main/pkg/cri/store/container/metadata.go
-// Copyright The containerd Authors.
+// Copyright Farcloser.
 // Licensed under the Apache License, Version 2.0
 // NOTE: we just want to get the key information of metadata( such as logpath), not all the metadata.
 
