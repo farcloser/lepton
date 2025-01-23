@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package apparmorutil
+package apparmor
 
 import (
 	"os"
@@ -25,9 +25,43 @@ import (
 
 	"github.com/moby/sys/userns"
 
-	"github.com/containerd/containerd/v2/pkg/apparmor"
-	"github.com/containerd/log"
+	"github.com/containerd/containerd/v2/contrib/apparmor"
+	"github.com/containerd/containerd/v2/pkg/oci"
 )
+
+var (
+	appArmorSupported bool
+	checkAppArmor     sync.Once
+
+	paramEnabled     bool
+	paramEnabledOnce sync.Once
+)
+
+func LoadDefaultProfile(name string) error {
+	return apparmor.LoadDefaultProfile(name)
+}
+
+func DumpDefaultProfile(name string) (string, error) {
+	return apparmor.DumpDefaultProfile(name)
+}
+
+func WithProfile(name string) oci.SpecOpts {
+	return apparmor.WithProfile(name)
+}
+
+// CanApplySpecificExistingProfile attempts to run `aa-exec -p <NAME> -- true` to check whether
+// the profile can be applied.
+//
+// CanApplySpecificExistingProfile does NOT depend on /sys/kernel/security/apparmor/profiles ,
+// which might not be accessible from user namespaces (because securityfs cannot be mounted in a user namespace)
+func CanApplySpecificExistingProfile(profileName string) bool {
+	if !CanApplyExistingProfile() {
+		return false
+	}
+	cmd := exec.Command("aa-exec", "-p", profileName, "--", "true")
+	_, err := cmd.CombinedOutput()
+	return err == nil
+}
 
 // CanLoadNewProfile returns whether the current process can load a new AppArmor profile.
 //
@@ -37,13 +71,8 @@ import (
 //
 // Related: https://gitlab.com/apparmor/apparmor/-/blob/v3.0.3/libraries/libapparmor/src/kernel.c#L311
 func CanLoadNewProfile() bool {
-	return !userns.RunningInUserNS() && os.Geteuid() == 0 && apparmor.HostSupports()
+	return !userns.RunningInUserNS() && os.Geteuid() == 0 && hostSupports()
 }
-
-var (
-	paramEnabled     bool
-	paramEnabledOnce sync.Once
-)
 
 // CanApplyExistingProfile returns whether the current process can apply an existing AppArmor profile
 // to processes.
@@ -62,22 +91,18 @@ func CanApplyExistingProfile() bool {
 	return paramEnabled
 }
 
-// CanApplySpecificExistingProfile attempts to run `aa-exec -p <NAME> -- true` to check whether
-// the profile can be applied.
-//
-// CanApplySpecificExistingProfile does NOT depend on /sys/kernel/security/apparmor/profiles ,
-// which might not be accessible from user namespaces (because securityfs cannot be mounted in a user namespace)
-func CanApplySpecificExistingProfile(profileName string) bool {
-	if !CanApplyExistingProfile() {
-		return false
-	}
-	cmd := exec.Command("aa-exec", "-p", profileName, "--", "true")
-	out, err := cmd.CombinedOutput()
+// Unload unloads a profile. Needs access to /sys/kernel/security/apparmor/.remove .
+func Unload(target string) error {
+	// FIXME: not safe
+	remover, err := os.OpenFile("/sys/kernel/security/apparmor/.remove", os.O_RDWR|os.O_TRUNC, 0o644)
 	if err != nil {
-		log.L.WithError(err).Debugf("failed to run %v: %q", cmd.Args, string(out))
-		return false
+		return err
 	}
-	return true
+	if _, err := remover.WriteString(target); err != nil {
+		remover.Close()
+		return err
+	}
+	return remover.Close()
 }
 
 type Profile struct {
@@ -92,6 +117,7 @@ type Profile struct {
 //
 // So, Profiles cannot be called from rootless child.
 func Profiles() ([]Profile, error) {
+	// FIXME: not safe
 	const profilesPath = "/sys/kernel/security/apparmor/policy/profiles"
 	ents, err := os.ReadDir(profilesPath)
 	if err != nil {
@@ -102,7 +128,7 @@ func Profiles() ([]Profile, error) {
 		namePath := filepath.Join(profilesPath, ent.Name(), "name")
 		b, err := os.ReadFile(namePath)
 		if err != nil {
-			log.L.WithError(err).Warnf("failed to read %q", namePath)
+			// log.L.WithError(err).Warnf("failed to read %q", namePath)
 			continue
 		}
 		profile := Profile{
@@ -110,9 +136,7 @@ func Profiles() ([]Profile, error) {
 		}
 		modePath := filepath.Join(profilesPath, ent.Name(), "mode")
 		b, err = os.ReadFile(modePath)
-		if err != nil {
-			log.L.WithError(err).Warnf("failed to read %q", namePath)
-		} else {
+		if err == nil {
 			profile.Mode = strings.TrimSpace(string(b))
 		}
 		res[i] = profile
@@ -120,15 +144,20 @@ func Profiles() ([]Profile, error) {
 	return res, nil
 }
 
-// Unload unloads a profile. Needs access to /sys/kernel/security/apparmor/.remove .
-func Unload(target string) error {
-	remover, err := os.OpenFile("/sys/kernel/security/apparmor/.remove", os.O_RDWR|os.O_TRUNC, 0o644)
-	if err != nil {
-		return err
-	}
-	if _, err := remover.WriteString(target); err != nil {
-		remover.Close()
-		return err
-	}
-	return remover.Close()
+// hostSupports returns true if apparmor is enabled for the host, if
+// apparmor_parser is enabled, and if we are not running docker-in-docker.
+//
+// This is derived from libcontainer/apparmor.IsEnabled(), with the addition
+// of checks for apparmor_parser to be present and docker-in-docker.
+func hostSupports() bool {
+	checkAppArmor.Do(func() {
+		// see https://github.com/opencontainers/runc/blob/0d49470392206f40eaab3b2190a57fe7bb3df458/libcontainer/apparmor/apparmor_linux.go
+		if _, err := os.Stat("/sys/kernel/security/apparmor"); err == nil && os.Getenv("container") == "" {
+			if _, err = os.Stat("/sbin/apparmor_parser"); err == nil {
+				buf, err := os.ReadFile("/sys/module/apparmor/parameters/enabled")
+				appArmorSupported = err == nil && len(buf) > 1 && buf[0] == 'Y'
+			}
+		}
+	})
+	return appArmorSupported
 }

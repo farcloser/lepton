@@ -15,15 +15,3 @@
 */
 
 package apparmor
-
-import (
-	"github.com/containerd/log"
-
-	"github.com/containerd/nerdctl/v2/leptonic/apparmor"
-	"github.com/containerd/nerdctl/v2/pkg/defaults"
-)
-
-func Load() error {
-	log.L.Infof("Loading profile %q", defaults.AppArmorProfileName)
-	return apparmor.LoadDefaultProfile(defaults.AppArmorProfileName)
-}

@@ -25,7 +25,7 @@ import (
 	"go.farcloser.world/containers/cgroups"
 	"go.farcloser.world/containers/sysinfo"
 
-	"github.com/containerd/nerdctl/v2/pkg/apparmorutil"
+	"github.com/containerd/nerdctl/v2/leptonic/apparmor"
 	"github.com/containerd/nerdctl/v2/pkg/defaults"
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
@@ -34,9 +34,9 @@ import (
 const UnameO = "GNU/Linux"
 
 func fulfillSecurityOptions(info *dockercompat.Info) {
-	if apparmorutil.CanApplyExistingProfile() {
+	if apparmor.CanApplyExistingProfile() {
 		info.SecurityOptions = append(info.SecurityOptions, "name=apparmor")
-		if rootlessutil.IsRootless() && !apparmorutil.CanApplySpecificExistingProfile(defaults.AppArmorProfileName) {
+		if rootlessutil.IsRootless() && !apparmor.CanApplySpecificExistingProfile(defaults.AppArmorProfileName) {
 			info.Warnings = append(info.Warnings, fmt.Sprintf(strings.TrimSpace(`
 WARNING: AppArmor profile %q is not loaded.
          Use 'sudo nerdctl apparmor load' if you prefer to use AppArmor with rootless mode.

@@ -21,6 +21,8 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/containerd/log"
+
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/apparmor"
 	"github.com/containerd/nerdctl/v2/pkg/defaults"
@@ -44,6 +46,7 @@ func apparmorUnloadAction(cmd *cobra.Command, args []string) error {
 	if len(args) > 0 {
 		target = args[0]
 	}
+	log.L.Infof("Unloading profile %q", target)
 	return apparmor.Unload(target)
 }
 

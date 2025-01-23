@@ -26,7 +26,7 @@ import (
 
 	"gotest.tools/v3/assert"
 
-	"github.com/containerd/nerdctl/v2/pkg/apparmorutil"
+	"github.com/containerd/nerdctl/v2/leptonic/apparmor"
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 )
@@ -172,7 +172,7 @@ func TestRunSecurityOptSeccomp(t *testing.T) {
 func TestRunApparmor(t *testing.T) {
 	base := testutil.NewBase(t)
 	defaultProfile := base.Target + "-default"
-	if !apparmorutil.CanLoadNewProfile() && !apparmorutil.CanApplySpecificExistingProfile(defaultProfile) {
+	if !apparmor.CanLoadNewProfile() && !apparmor.CanApplySpecificExistingProfile(defaultProfile) {
 		t.Skipf("needs to be able to apply %q profile", defaultProfile)
 	}
 	attrCurrentPath := "/proc/self/attr/apparmor/current"

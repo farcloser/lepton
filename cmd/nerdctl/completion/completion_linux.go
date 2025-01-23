@@ -20,11 +20,11 @@ import (
 	"github.com/spf13/cobra"
 	"go.farcloser.world/containers/cgroups"
 
-	"github.com/containerd/nerdctl/v2/pkg/apparmorutil"
+	"github.com/containerd/nerdctl/v2/leptonic/apparmor"
 )
 
 func ApparmorProfiles(cmd *cobra.Command) ([]string, cobra.ShellCompDirective) {
-	profiles, err := apparmorutil.Profiles()
+	profiles, err := apparmor.Profiles()
 	if err != nil {
 		return nil, cobra.ShellCompDirectiveError
 	}

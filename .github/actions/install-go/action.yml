@@ -13,7 +13,7 @@ inputs:
   # We are just abusing the system here for convenience, since a composite action does not let you define env.
   # This here is the one, central location where we would update go versions when there is a newly supported go version.
   _current:
-    default: "1.23.4"
+    default: "1.23.5"
     description: "What we consider the current blessed go version (typically the latest patch release of the last major.minor version)"
   _stable:
     default: "1.23.x"

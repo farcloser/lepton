@@ -299,8 +299,8 @@ github.com/yuchanns/srslog v1.1.0/go.mod h1:HsLjdv3XV02C3kgBW2bTyW6i88OQE+VYJZIx
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
-go.farcloser.world/containers v0.0.0-20241224044045-01c92c12fe7e h1:z3ZsLLw0ImweuWT3Sjr558szNsksdc7Cs+yXJVepR+o=
-go.farcloser.world/containers v0.0.0-20241224044045-01c92c12fe7e/go.mod h1:SpOb1mIA60LwEspCn4NfnRN7gQN6HX9YwR8GHVHng2s=
+go.farcloser.world/containers v0.0.0-20250122010831-d9da7262e7ef h1:l/2wLLPSkKRsURBOcBcCUvcoLfAFoSmLwCMcB8gRfAQ=
+go.farcloser.world/containers v0.0.0-20250122010831-d9da7262e7ef/go.mod h1:BBCerKEHyBihAqtqCCXviJRvWQ6hF9ZKYEdt7MZa7bw=
 go.farcloser.world/core v0.0.0-20241223212339-e4f71616f6d2 h1:52W3p6365mXHY1RdvWHOOT+/iRfThQMn5pL9SOnHwkk=
 go.farcloser.world/core v0.0.0-20241223212339-e4f71616f6d2/go.mod h1:/P1HGCJOWn3iH56GqBWW/nRDBbomIELteS4Ha4Z+OCA=
 go.opencensus.io v0.24.0 h1:y73uSU6J157QMP2kn2r30vwW1A2W2WFwSCGnAVxeaD0=

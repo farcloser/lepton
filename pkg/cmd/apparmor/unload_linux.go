@@ -17,12 +17,9 @@
 package apparmor
 
 import (
-	"github.com/containerd/log"
-
-	"github.com/containerd/nerdctl/v2/pkg/apparmorutil"
+	"github.com/containerd/nerdctl/v2/leptonic/apparmor"
 )
 
 func Unload(target string) error {
-	log.L.Infof("Unloading profile %q", target)
-	return apparmorutil.Unload(target)
+	return apparmor.Unload(target)
 }

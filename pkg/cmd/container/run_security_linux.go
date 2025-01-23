@@ -17,17 +17,20 @@
 package container
 
 import (
+	"context"
 	"errors"
 	"strings"
 	"sync"
 
-	"github.com/containerd/containerd/v2/contrib/apparmor"
-	"github.com/containerd/containerd/v2/contrib/seccomp"
+	"go.farcloser.world/containers/specs"
+
+	"github.com/containerd/containerd/v2/core/containers"
 	"github.com/containerd/containerd/v2/pkg/cap"
 	"github.com/containerd/containerd/v2/pkg/oci"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/apparmorutil"
+	"github.com/containerd/nerdctl/v2/leptonic/apparmor"
+	"github.com/containerd/nerdctl/v2/leptonic/seccomp"
 	"github.com/containerd/nerdctl/v2/pkg/defaults"
 	"github.com/containerd/nerdctl/v2/pkg/maputil"
 	"github.com/containerd/nerdctl/v2/pkg/strutil"
@@ -49,6 +52,19 @@ const (
 	systemPathsUnconfined = "unconfined"
 )
 
+func seccompWithDefaultProfile() oci.SpecOpts {
+	return func(_ context.Context, _ oci.Client, _ *containers.Container, s *specs.Spec) error {
+		seccomp.LoadDefaultProfile(s)
+		return nil
+	}
+}
+
+func seccompWithProfile(profile string) oci.SpecOpts {
+	return func(_ context.Context, _ oci.Client, _ *containers.Container, s *specs.Spec) (err error) {
+		return seccomp.LoadProfile(s, profile)
+	}
+}
+
 func generateSecurityOpts(privileged bool, securityOptsMap map[string]string) ([]oci.SpecOpts, error) {
 	for k := range securityOptsMap {
 		switch k {
@@ -64,14 +80,14 @@ func generateSecurityOpts(privileged bool, securityOptsMap map[string]string) ([
 		}
 
 		if seccompProfile != "unconfined" {
-			opts = append(opts, seccomp.WithProfile(seccompProfile))
+			opts = append(opts, seccompWithProfile(seccompProfile))
 		}
 	} else {
-		opts = append(opts, seccomp.WithDefaultProfile())
+		opts = append(opts, seccompWithDefaultProfile())
 	}
 
-	canLoadNewAppArmor := apparmorutil.CanLoadNewProfile()
-	canApplyExistingProfile := apparmorutil.CanApplyExistingProfile()
+	canLoadNewAppArmor := apparmor.CanLoadNewProfile()
+	canApplyExistingProfile := apparmor.CanApplyExistingProfile()
 	if aaProfile, ok := securityOptsMap["apparmor"]; ok {
 		if aaProfile == "" {
 			return nil, errors.New("invalid security-opt \"apparmor\"")
@@ -89,7 +105,7 @@ func generateSecurityOpts(privileged bool, securityOptsMap map[string]string) ([
 				return nil, err
 			}
 		}
-		if apparmorutil.CanApplySpecificExistingProfile(defaults.AppArmorProfileName) {
+		if apparmor.CanApplySpecificExistingProfile(defaults.AppArmorProfileName) {
 			opts = append(opts, apparmor.WithProfile(defaults.AppArmorProfileName))
 		}
 	}
