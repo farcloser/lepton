@@ -27,7 +27,7 @@ import (
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/images"
 
-	"github.com/containerd/nerdctl/v2/pkg/referenceutil"
+	"github.com/containerd/nerdctl/v2/leptonic/reference"
 )
 
 type Found struct {
@@ -72,7 +72,7 @@ func (w *ImageWalker) Walk(ctx context.Context, req string) (int, error) {
 	var filters []string
 	var parsedReferenceStr string
 
-	parsedReference, err := referenceutil.Parse(req)
+	parsedReference, err := reference.Parse(req)
 	if err == nil {
 		parsedReferenceStr = parsedReference.String()
 		filters = append(filters, "name=="+parsedReferenceStr)
@@ -126,7 +126,7 @@ func (w *ImageWalker) WalkCriRm(ctx context.Context, req string) (int, error) {
 	var imageTag, imagesRepo []images.Image
 	var tagNum int
 
-	parsedReference, err := referenceutil.Parse(req)
+	parsedReference, err := reference.Parse(req)
 	if err == nil {
 		parsedReferenceStr = parsedReference.String()
 		filters = append(filters, "name=="+parsedReferenceStr)
@@ -158,7 +158,7 @@ func (w *ImageWalker) WalkCriRm(ctx context.Context, req string) (int, error) {
 	// Distinguish between tag and non-tag
 	for _, img := range images {
 		ref := img.Name
-		parsed, err := referenceutil.Parse(ref)
+		parsed, err := reference.Parse(ref)
 		if err != nil {
 			continue
 		}

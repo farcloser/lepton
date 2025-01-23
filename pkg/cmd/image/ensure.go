@@ -28,13 +28,13 @@ import (
 	"github.com/containerd/containerd/v2/core/images"
 	"github.com/containerd/log"
 
+	"github.com/containerd/nerdctl/v2/leptonic/reference"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/containerdutil"
 	"github.com/containerd/nerdctl/v2/pkg/errutil"
 	"github.com/containerd/nerdctl/v2/pkg/imgutil/dockerconfigresolver"
 	"github.com/containerd/nerdctl/v2/pkg/imgutil/fetch"
 	"github.com/containerd/nerdctl/v2/pkg/platformutil"
-	"github.com/containerd/nerdctl/v2/pkg/referenceutil"
 )
 
 func EnsureAllContent(ctx context.Context, client *containerd.Client, srcName string, options types.GlobalCommandOptions) error {
@@ -61,7 +61,7 @@ func EnsureAllContent(ctx context.Context, client *containerd.Client, srcName st
 }
 
 func ensureOne(ctx context.Context, client *containerd.Client, rawRef string, target specs.Descriptor, platform specs.Platform, options types.GlobalCommandOptions) error {
-	parsedReference, err := referenceutil.Parse(rawRef)
+	parsedReference, err := reference.Parse(rawRef)
 	if err != nil {
 		return err
 	}

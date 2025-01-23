@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package referenceutil
+package reference
 
 import (
 	"testing"
@@ -23,7 +23,7 @@ import (
 	"gotest.tools/v3/assert"
 )
 
-func TestReferenceUtil(t *testing.T) {
+func TestReference(t *testing.T) {
 	needles := map[string]struct {
 		Error         string
 		String        string

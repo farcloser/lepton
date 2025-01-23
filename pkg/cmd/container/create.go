@@ -40,6 +40,7 @@ import (
 	"github.com/containerd/go-cni"
 	"github.com/containerd/log"
 
+	"github.com/containerd/nerdctl/v2/leptonic/reference"
 	"github.com/containerd/nerdctl/v2/pkg/annotations"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/clientutil"
@@ -59,7 +60,6 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/mountutil"
 	"github.com/containerd/nerdctl/v2/pkg/namestore"
 	"github.com/containerd/nerdctl/v2/pkg/platformutil"
-	"github.com/containerd/nerdctl/v2/pkg/referenceutil"
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
 	"github.com/containerd/nerdctl/v2/pkg/store"
 	"github.com/containerd/nerdctl/v2/pkg/strutil"
@@ -124,7 +124,7 @@ func Create(ctx context.Context, client *containerd.Client, args []string, netMa
 	}
 	opts = append(opts, platformOpts...)
 
-	if _, err := referenceutil.Parse(args[0]); errors.Is(err, referenceutil.ErrLoadOCIArchiveRequired) {
+	if _, err := reference.Parse(args[0]); errors.Is(err, reference.ErrLoadOCIArchiveRequired) {
 		imageRef := args[0]
 
 		// Load and create the platform specified by the user.
@@ -290,7 +290,7 @@ func Create(ctx context.Context, client *containerd.Client, args []string, netMa
 		if ensuredImage != nil {
 			imageRef = ensuredImage.Ref
 		}
-		parsedReference, err := referenceutil.Parse(imageRef)
+		parsedReference, err := reference.Parse(imageRef)
 		// Ignore cases where the imageRef is ""
 		if err != nil && imageRef != "" {
 			return nil, generateRemoveOrphanedDirsFunc(ctx, id, dataStore, internalLabels), err

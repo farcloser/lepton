@@ -36,8 +36,11 @@ import (
 
 func createFileWithSize(mountPoint string, size int64) error {
 	token := make([]byte, size)
-	_, _ = rand.Read(token)
-	err := os.WriteFile(filepath.Join(mountPoint, "test-file"), token, 0o644)
+	_, err := rand.Read(token)
+	if err != nil {
+		panic(err)
+	}
+	err = os.WriteFile(filepath.Join(mountPoint, "test-file"), token, 0o644)
 	return err
 }
 

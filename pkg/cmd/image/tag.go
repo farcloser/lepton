@@ -24,9 +24,9 @@ import (
 	"github.com/containerd/errdefs"
 	"github.com/containerd/log"
 
+	"github.com/containerd/nerdctl/v2/leptonic/reference"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/idutil/imagewalker"
-	"github.com/containerd/nerdctl/v2/pkg/referenceutil"
 )
 
 func Tag(ctx context.Context, client *containerd.Client, options types.ImageTagOptions) error {
@@ -49,7 +49,7 @@ func Tag(ctx context.Context, client *containerd.Client, options types.ImageTagO
 		return fmt.Errorf("%s: not found", options.Source)
 	}
 
-	parsedReference, err := referenceutil.Parse(options.Target)
+	parsedReference, err := reference.Parse(options.Target)
 	if err != nil {
 		return err
 	}

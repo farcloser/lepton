@@ -28,22 +28,21 @@ import (
 	"github.com/containerd/containerd/v2/core/remotes"
 	"github.com/containerd/containerd/v2/core/remotes/docker"
 	dockerconfig "github.com/containerd/containerd/v2/core/remotes/docker/config"
-	"github.com/containerd/containerd/v2/pkg/reference"
 	"github.com/containerd/log"
 
+	"github.com/containerd/nerdctl/v2/leptonic/reference"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/errutil"
 	"github.com/containerd/nerdctl/v2/pkg/imgutil/dockerconfigresolver"
 	"github.com/containerd/nerdctl/v2/pkg/imgutil/push"
 	"github.com/containerd/nerdctl/v2/pkg/platformutil"
-	"github.com/containerd/nerdctl/v2/pkg/referenceutil"
 	"github.com/containerd/nerdctl/v2/pkg/signutil"
 	"github.com/containerd/nerdctl/v2/pkg/snapshotterutil"
 )
 
 // Push pushes an image specified by `rawRef`.
 func Push(ctx context.Context, client *containerd.Client, rawRef string, options types.ImagePushOptions) error {
-	parsedReference, err := referenceutil.Parse(rawRef)
+	parsedReference, err := reference.Parse(rawRef)
 	if err != nil {
 		return err
 	}

@@ -28,17 +28,17 @@ import (
 	"github.com/containerd/containerd/v2/core/images"
 	"github.com/containerd/log"
 
+	"github.com/containerd/nerdctl/v2/leptonic/reference"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/containerdutil"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 	"github.com/containerd/nerdctl/v2/pkg/imageinspector"
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
-	"github.com/containerd/nerdctl/v2/pkg/referenceutil"
 )
 
 func inspectIdentifier(ctx context.Context, client *containerd.Client, identifier string) ([]images.Image, string, string, error) {
 	// Figure out what we have here - digest, tag, name
-	parsedReference, err := referenceutil.Parse(identifier)
+	parsedReference, err := reference.Parse(identifier)
 	if err != nil {
 		return nil, "", "", err
 	}
@@ -130,7 +130,7 @@ func Inspect(ctx context.Context, client *containerd.Client, identifiers []strin
 			}
 
 			// If dockercompat: does the candidate have a name? Get it if so
-			parsedReference, err := referenceutil.Parse(candidateNativeImage.Image.Name)
+			parsedReference, err := reference.Parse(candidateNativeImage.Image.Name)
 			if err != nil {
 				log.G(ctx).WithError(err).WithField("name", candidateNativeImage.Image.Name).Error("the found image has an unparsable name")
 				continue
