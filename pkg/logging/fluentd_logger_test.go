@@ -20,61 +20,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/fluent/fluent-logger-golang/fluent"
+	"github.com/containerd/nerdctl/v2/leptonic/fluentd"
 )
-
-func TestParseAddress(t *testing.T) {
-	type args struct {
-		address string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    *fluentdLocation
-		wantErr bool
-	}{
-		{name: "empty", args: args{address: ""}, want: &fluentdLocation{protocol: "tcp", host: "127.0.0.1", port: 24224}, wantErr: false},
-		{name: "unix", args: args{address: "unix:///var/run/fluentd/fluentd.sock"}, want: &fluentdLocation{protocol: "unix", path: "/var/run/fluentd/fluentd.sock"}, wantErr: false},
-		{name: "tcp", args: args{address: "tcp://127.0.0.1:24224"}, want: &fluentdLocation{protocol: "tcp", host: "127.0.0.1", port: 24224}, wantErr: false},
-		{name: "tcpWithPath", args: args{address: "tcp://127.0.0.1:24224/1234"}, want: nil, wantErr: true},
-		{name: "unixWithEmpty", args: args{address: "unix://"}, want: nil, wantErr: true},
-		{name: "invalidPath", args: args{address: "://asd123"}, want: nil, wantErr: true},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := parseAddress(tt.args.address)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("parseAddress() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("parseAddress() got = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestValidateFluentdLoggerOpts(t *testing.T) {
-	type args struct {
-		config map[string]string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-		{name: "empty", args: args{config: map[string]string{}}, wantErr: false},
-		{name: "invalid", args: args{config: map[string]string{"foo": "bar"}}, wantErr: true},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := ValidateFluentdLoggerOpts(tt.args.config); (err != nil) != tt.wantErr {
-				t.Errorf("ValidateFluentdLoggerOpts() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
 
 func TestParseFluentdConfig(t *testing.T) {
 	type args struct {
@@ -83,152 +30,91 @@ func TestParseFluentdConfig(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    fluent.Config
+		want    *fluentd.Config
 		wantErr bool
 	}{
 		{"DefaultLocation", args{
 			config: map[string]string{}},
-			fluent.Config{
-				FluentPort:             defaultPort,
-				FluentHost:             defaultHost,
-				FluentNetwork:          defaultProtocol,
-				FluentSocketPath:       "",
-				BufferLimit:            defaultBufferLimit,
-				RetryWait:              int(defaultRetryWait),
-				MaxRetry:               defaultMaxRetries,
-				Async:                  false,
-				AsyncReconnectInterval: 0,
-				SubSecondPrecision:     false,
-				RequestAck:             false}, false},
+			(func() *fluentd.Config {
+				cfg := fluentd.NewConfig()
+				return cfg
+			})(),
+			false,
+		},
 		{"InputLocation", args{
 			config: map[string]string{
 				fluentAddress: "tcp://127.0.0.1:123",
 			}},
-			fluent.Config{
-				FluentPort:             123,
-				FluentHost:             "127.0.0.1",
-				FluentNetwork:          defaultProtocol,
-				FluentSocketPath:       "",
-				BufferLimit:            defaultBufferLimit,
-				RetryWait:              int(defaultRetryWait),
-				MaxRetry:               defaultMaxRetries,
-				Async:                  false,
-				AsyncReconnectInterval: 0,
-				SubSecondPrecision:     false,
-				RequestAck:             false}, false},
-		{"InvalidLocation", args{config: map[string]string{fluentAddress: "://asd123"}}, fluent.Config{}, true},
+			(func() *fluentd.Config {
+				cfg := fluentd.NewConfig()
+				cfg.FluentPort = 123
+				cfg.FluentHost = "127.0.0.1"
+				return cfg
+			})(), false},
+		{"InvalidLocation", args{config: map[string]string{fluentAddress: "://asd123"}}, nil, true},
 		{"InputAsyncOption", args{
 			config: map[string]string{
 				fluentdAsync: "true",
 			}},
-			fluent.Config{
-				FluentPort:             defaultPort,
-				FluentHost:             defaultHost,
-				FluentNetwork:          defaultProtocol,
-				FluentSocketPath:       "",
-				BufferLimit:            defaultBufferLimit,
-				RetryWait:              int(defaultRetryWait),
-				MaxRetry:               defaultMaxRetries,
-				Async:                  true,
-				AsyncReconnectInterval: 0,
-				SubSecondPrecision:     false,
-				RequestAck:             false}, false},
+			(func() *fluentd.Config {
+				cfg := fluentd.NewConfig()
+				cfg.Async = true
+				return cfg
+			})(), false},
 		{"InputAsyncReconnectOption", args{
 			config: map[string]string{
 				fluentdAsyncReconnectInterval: "100ms",
 			}},
-			fluent.Config{
-				FluentPort:             defaultPort,
-				FluentHost:             defaultHost,
-				FluentNetwork:          defaultProtocol,
-				FluentSocketPath:       "",
-				BufferLimit:            defaultBufferLimit,
-				RetryWait:              int(defaultRetryWait),
-				MaxRetry:               defaultMaxRetries,
-				Async:                  false,
-				AsyncReconnectInterval: 100,
-				SubSecondPrecision:     false,
-				RequestAck:             false}, false},
+			(func() *fluentd.Config {
+				cfg := fluentd.NewConfig()
+				cfg.AsyncReconnectInterval = 100
+				return cfg
+			})(), false},
 		{"InputBufferLimitOption", args{
 			config: map[string]string{
 				fluentdBufferLimit: "1000",
 			}},
-			fluent.Config{
-				FluentPort:             defaultPort,
-				FluentHost:             defaultHost,
-				FluentNetwork:          defaultProtocol,
-				FluentSocketPath:       "",
-				BufferLimit:            1000,
-				RetryWait:              int(defaultRetryWait),
-				MaxRetry:               defaultMaxRetries,
-				Async:                  false,
-				AsyncReconnectInterval: 0,
-				SubSecondPrecision:     false,
-				RequestAck:             false}, false},
+			(func() *fluentd.Config {
+				cfg := fluentd.NewConfig()
+				cfg.BufferLimit = 1000
+				return cfg
+			})(), false},
 		{"InputRetryWaitOption", args{
 			config: map[string]string{
 				fluentdRetryWait: "10s",
 			}},
-			fluent.Config{
-				FluentPort:             defaultPort,
-				FluentHost:             defaultHost,
-				FluentNetwork:          defaultProtocol,
-				FluentSocketPath:       "",
-				BufferLimit:            defaultBufferLimit,
-				RetryWait:              10000,
-				MaxRetry:               defaultMaxRetries,
-				Async:                  false,
-				AsyncReconnectInterval: 0,
-				SubSecondPrecision:     false,
-				RequestAck:             false}, false},
+			(func() *fluentd.Config {
+				cfg := fluentd.NewConfig()
+				cfg.RetryWait = 10000
+				return cfg
+			})(), false},
 		{"InputMaxRetriesOption", args{
 			config: map[string]string{
 				fluentdMaxRetries: "100",
 			}},
-			fluent.Config{
-				FluentPort:             defaultPort,
-				FluentHost:             defaultHost,
-				FluentNetwork:          defaultProtocol,
-				FluentSocketPath:       "",
-				BufferLimit:            defaultBufferLimit,
-				RetryWait:              int(defaultRetryWait),
-				MaxRetry:               100,
-				Async:                  false,
-				AsyncReconnectInterval: 0,
-				SubSecondPrecision:     false,
-				RequestAck:             false}, false},
+			(func() *fluentd.Config {
+				cfg := fluentd.NewConfig()
+				cfg.MaxRetry = 100
+				return cfg
+			})(), false},
 		{"InputSubSecondPrecision", args{
 			config: map[string]string{
 				fluentdSubSecondPrecision: "true",
 			}},
-			fluent.Config{
-				FluentPort:             defaultPort,
-				FluentHost:             defaultHost,
-				FluentNetwork:          defaultProtocol,
-				FluentSocketPath:       "",
-				BufferLimit:            defaultBufferLimit,
-				RetryWait:              int(defaultRetryWait),
-				MaxRetry:               defaultMaxRetries,
-				Async:                  false,
-				AsyncReconnectInterval: 0,
-				SubSecondPrecision:     true,
-				RequestAck:             false}, false},
+			(func() *fluentd.Config {
+				cfg := fluentd.NewConfig()
+				cfg.SubSecondPrecision = true
+				return cfg
+			})(), false},
 		{"InputRequestAck", args{
 			config: map[string]string{
 				fluentRequestAck: "true",
 			}},
-			fluent.Config{
-				FluentPort:             defaultPort,
-				FluentHost:             defaultHost,
-				FluentNetwork:          defaultProtocol,
-				FluentSocketPath:       "",
-				BufferLimit:            defaultBufferLimit,
-				RetryWait:              int(defaultRetryWait),
-				MaxRetry:               defaultMaxRetries,
-				Async:                  false,
-				AsyncReconnectInterval: 0,
-				SubSecondPrecision:     false,
-				RequestAck:             true}, false},
+			(func() *fluentd.Config {
+				cfg := fluentd.NewConfig()
+				cfg.RequestAck = true
+				return cfg
+			})(), false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

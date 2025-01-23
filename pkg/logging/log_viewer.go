@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
 	"path/filepath"
 
 	"github.com/containerd/log"
@@ -157,10 +156,4 @@ func (lv *ContainerLogViewer) PrintLogsTo(stdout, stderr io.Writer) error {
 	}
 
 	return viewerFunc(lv.logViewingOptions, stdout, stderr, lv.stopChannel)
-}
-
-// Convenience wrapper for exec.LookPath.
-func checkExecutableAvailableInPath(executable string) bool {
-	_, err := exec.LookPath(executable)
-	return err == nil
 }

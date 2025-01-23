@@ -26,9 +26,9 @@ import (
 	"sync"
 	"time"
 
-	timetypes "github.com/docker/docker/api/types/time"
-
 	"github.com/containerd/log"
+
+	timetypes "github.com/containerd/nerdctl/v2/leptonic/time"
 )
 
 // Entry is compatible with Docker "json-file" logs
