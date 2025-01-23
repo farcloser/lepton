@@ -1,5 +1,5 @@
 /*
-   Copyright The containerd Authors.
+   Copyright Farcloser.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -26,9 +26,9 @@ import (
 	"sync"
 	"time"
 
-	timetypes "github.com/docker/docker/api/types/time"
-
 	"github.com/containerd/log"
+
+	timetypes "github.com/containerd/nerdctl/v2/leptonic/time"
 )
 
 // Entry is compatible with Docker "json-file" logs

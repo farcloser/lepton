@@ -1,5 +1,5 @@
 /*
-   Copyright The containerd Authors.
+   Copyright Farcloser.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
 	"path/filepath"
 
 	"github.com/containerd/log"
@@ -157,10 +156,4 @@ func (lv *ContainerLogViewer) PrintLogsTo(stdout, stderr io.Writer) error {
 	}
 
 	return viewerFunc(lv.logViewingOptions, stdout, stderr, lv.stopChannel)
-}
-
-// Convenience wrapper for exec.LookPath.
-func checkExecutableAvailableInPath(executable string) bool {
-	_, err := exec.LookPath(executable)
-	return err == nil
 }
