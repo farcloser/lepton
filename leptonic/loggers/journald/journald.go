@@ -144,10 +144,20 @@ func ReadLogs(lvopts LogViewOptions, stdout, stderr io.Writer, stopChannel chan 
 	}
 
 	// Setup killing goroutine:
+	killed := false
 	go func() {
 		<-stopChannel
+		killed = true
 		_ = cmd.Process.Kill()
 	}()
+
+	err := cmd.Wait()
+	var exitError *exec.ExitError
+	if errors.As(err, &exitError) {
+		if !killed && exitError.ExitCode() != 0 {
+			return errors.New("journalctl command exited with non-zero exit code")
+		}
+	}
 
 	return nil
 }
