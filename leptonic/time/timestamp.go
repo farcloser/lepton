@@ -17,16 +17,13 @@
 package time // import "github.com/containerd/nerdctl/v2/leptonic/time"
 
 import (
-	"errors"
 	"fmt"
 	"math"
 	"strconv"
 	"strings"
 	"time"
-)
 
-var (
-	ErrInvalidArgument = errors.New("invalid argument")
+	"github.com/containerd/nerdctl/v2/leptonic/errs"
 )
 
 // These are additional predefined layouts for use in Time.Format and Time.Parse
@@ -108,7 +105,7 @@ func GetTimestamp(value string, reference time.Time) (string, error) {
 			return "", err // was probably an RFC3339 like timestamp but the parser failed with an error
 		}
 		if _, _, err := parseTimestamp(value); err != nil {
-			return "", fmt.Errorf("%w: %q", ErrInvalidArgument, value)
+			return "", fmt.Errorf("%w: %q", errs.ErrInvalidArgument, value)
 		}
 		return value, nil // unix timestamp in and out case (meaning: the value passed at the command line is already in the right format for passing to the server)
 	}
