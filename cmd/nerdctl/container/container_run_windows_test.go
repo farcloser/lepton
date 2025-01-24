@@ -24,6 +24,7 @@ import (
 
 	"gotest.tools/v3/assert"
 
+	"github.com/containerd/nerdctl/v2/leptonic/testtooling"
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
@@ -77,7 +78,7 @@ func TestRunHyperVContainer(t *testing.T) {
 	testutil.DockerIncompatible(t)
 	base := testutil.NewBase(t)
 
-	if !testutil.HyperVSupported() {
+	if !testtooling.HyperVSupported() {
 		t.Skip("HyperV is not enabled, skipping test")
 	}
 

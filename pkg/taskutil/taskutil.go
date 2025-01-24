@@ -36,7 +36,7 @@ import (
 	"github.com/containerd/containerd/v2/pkg/cio"
 	"github.com/containerd/log"
 
-	cio2 "github.com/containerd/nerdctl/v2/leptonic/io"
+	cio2 "github.com/containerd/nerdctl/v2/leptonic/cio"
 	"github.com/containerd/nerdctl/v2/pkg/consoleutil"
 	"github.com/containerd/nerdctl/v2/pkg/infoutil"
 )

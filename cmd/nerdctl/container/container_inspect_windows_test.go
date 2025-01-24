@@ -21,6 +21,7 @@ import (
 
 	"gotest.tools/v3/assert"
 
+	"github.com/containerd/nerdctl/v2/leptonic/testtooling"
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 )
 
@@ -40,7 +41,7 @@ func TestInspectProcessContainerContainsLabel(t *testing.T) {
 }
 
 func TestInspectHyperVContainerContainsLabel(t *testing.T) {
-	if !testutil.HyperVSupported() {
+	if !testtooling.HyperVSupported() {
 		t.Skip("HyperV is not enabled, skipping test")
 	}
 
@@ -55,7 +56,7 @@ func TestInspectHyperVContainerContainsLabel(t *testing.T) {
 	lbs := inspect.Config.Labels
 
 	// check with HCS if the container is ineed a VM
-	isHypervContainer, err := testutil.HyperVContainer(inspect)
+	isHypervContainer, err := testtooling.HyperVContainer(inspect.ID)
 	if err != nil {
 		t.Fatalf("unable to list HCS containers: %s", err)
 	}

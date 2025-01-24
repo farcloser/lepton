@@ -21,6 +21,7 @@ import (
 
 	"gotest.tools/v3/assert"
 
+	"github.com/containerd/nerdctl/v2/leptonic/testtooling"
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 )
 
@@ -28,7 +29,7 @@ func TestRemoveHyperVContainer(t *testing.T) {
 	base := testutil.NewBase(t)
 	tID := testutil.Identifier(t)
 
-	if !testutil.HyperVSupported() {
+	if !testtooling.HyperVSupported() {
 		t.Skip("HyperV is not enabled, skipping test")
 	}
 
@@ -41,7 +42,7 @@ func TestRemoveHyperVContainer(t *testing.T) {
 	base.EnsureContainerStarted(tID)
 	inspect := base.InspectContainer(tID)
 	// check with HCS if the container is ineed a VM
-	isHypervContainer, err := testutil.HyperVContainer(inspect)
+	isHypervContainer, err := testtooling.HyperVContainer(inspect.ID)
 	if err != nil {
 		t.Fatalf("unable to list HCS containers: %s", err)
 	}

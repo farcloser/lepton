@@ -19,6 +19,7 @@ package container
 import (
 	"testing"
 
+	"github.com/containerd/nerdctl/v2/leptonic/testtooling"
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
 )
@@ -41,7 +42,7 @@ func TestRenameHyperVContainer(t *testing.T) {
 	testContainerName := testutil.Identifier(t)
 	base := testutil.NewBase(t)
 
-	if !testutil.HyperVSupported() {
+	if !testtooling.HyperVSupported() {
 		t.Skip("HyperV is not enabled, skipping test")
 	}
 
