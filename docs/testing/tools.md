@@ -53,7 +53,7 @@ verify the commands does fail without comparing the code, and -2 will not verify
 code at all).
 
 `errors` is a slice of go `error`, that allows you to compare what is seen on stderr
-with existing errors (for example: `errdefs.ErrNotFound`), or more generally
+with existing errors (for example: `errs.ErrNotFound`), or more generally
 any string you want to match.
 
 `outputCompare` can be either your own comparison function, or
@@ -116,7 +116,7 @@ import (
 
 	"gotest.tools/v3/assert"
 
-	"github.com/containerd/errdefs"
+	"github.com/containerd/nerdctl/v2/leptonic/errs"
 
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
@@ -134,7 +134,7 @@ func TestMyThing(t *testing.T) {
 				ExitCode: 1,
 				Errors: []error{
 					errors.New("foobla"),
-					errdefs.ErrNotFound,
+					errs.ErrNotFound,
 				},
 				Output: func(stdout string, info string, t *testing.T) {
 					assert.Assert(t, stdout == data.Get("sometestdata"), info)
@@ -225,8 +225,7 @@ import (
 
 	"gotest.tools/v3/assert"
 
-	"github.com/containerd/errdefs"
-
+	"github.com/containerd/nerdctl/v2/leptonic/errs"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
 )
@@ -245,7 +244,7 @@ func TestMyThing(t *testing.T) {
 				ExitCode: 1,
 				Errors: []error{
 					errors.New("foobla"),
-					errdefs.ErrNotFound,
+					errs.ErrNotFound,
 				},
 				Output: func(stdout string, info string, t *testing.T) {
 					assert.Assert(t, stdout == data.Get("sometestdata"), info)
@@ -304,8 +303,7 @@ import (
 
 	"gotest.tools/v3/assert"
 
-	"github.com/containerd/errdefs"
-
+    "github.com/containerd/nerdctl/v2/leptonic/errs"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
 )
@@ -332,7 +330,7 @@ func TestMyThing(t *testing.T) {
 				ExitCode: 1,
 				Errors: []error{
 					errors.New("foobla"),
-					errdefs.ErrNotFound,
+					errs.ErrNotFound,
 				},
 				Output: func(stdout string, info string, t *testing.T) {
 					assert.Assert(t, stdout == data.Get("sometestdata"), info)

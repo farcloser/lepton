@@ -41,6 +41,7 @@ import (
 	"github.com/containerd/go-cni"
 	"github.com/containerd/log"
 
+	"github.com/containerd/nerdctl/v2/leptonic/errs"
 	"github.com/containerd/nerdctl/v2/pkg/annotations"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/clientutil"
@@ -61,7 +62,6 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/namestore"
 	"github.com/containerd/nerdctl/v2/pkg/platformutil"
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
-	"github.com/containerd/nerdctl/v2/pkg/store"
 	"github.com/containerd/nerdctl/v2/pkg/strutil"
 )
 
@@ -910,7 +910,7 @@ func generateGcFunc(ctx context.Context, container containerd.Container, ns, id,
 				log.G(ctx).WithError(errE).Warnf("failed to instantiate container name store during cleanup for container %q", id)
 			}
 			// Double-releasing may happen with containers started with --rm, so, ignore NotFound errors
-			if errE := containerNameStore.Release(name, id); errE != nil && !errors.Is(errE, store.ErrNotFound) {
+			if errE := containerNameStore.Release(name, id); errE != nil && !errors.Is(errE, errs.ErrNotFound) {
 				log.G(ctx).WithError(errE).Warnf("failed to release container name store for container %q (%s)", name, id)
 			}
 		}

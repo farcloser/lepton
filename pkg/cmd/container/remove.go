@@ -30,6 +30,7 @@ import (
 	"github.com/containerd/errdefs"
 	"github.com/containerd/log"
 
+	"github.com/containerd/nerdctl/v2/leptonic/errs"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/containerutil"
@@ -39,7 +40,6 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/labels"
 	"github.com/containerd/nerdctl/v2/pkg/mountutil/volumestore"
 	"github.com/containerd/nerdctl/v2/pkg/namestore"
-	"github.com/containerd/nerdctl/v2/pkg/store"
 )
 
 // StatusError represents an error that container is in a status unexpected
@@ -223,7 +223,7 @@ func RemoveContainer(ctx context.Context, c containerd.Container, globalOptions 
 		// Enforce release name here in case the poststop hook name release fails - soft failure
 		if name != "" {
 			// Double-releasing may happen with containers started with --rm, so, ignore NotFound errors
-			if err := nameStore.Release(name, id); err != nil && !errors.Is(err, store.ErrNotFound) {
+			if err := nameStore.Release(name, id); err != nil && !errors.Is(err, errs.ErrNotFound) {
 				log.G(ctx).WithError(err).Warnf("failed to release container name %s", name)
 			}
 		}

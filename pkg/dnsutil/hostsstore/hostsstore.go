@@ -37,9 +37,9 @@ import (
 
 	types100 "github.com/containernetworking/cni/pkg/types/100"
 
-	"github.com/containerd/errdefs"
 	"github.com/containerd/log"
 
+	"github.com/containerd/nerdctl/v2/leptonic/errs"
 	"github.com/containerd/nerdctl/v2/pkg/store"
 )
 
@@ -63,7 +63,7 @@ func New(dataStore string, namespace string) (retStore Store, err error) {
 	}()
 
 	if dataStore == "" || namespace == "" {
-		return nil, store.ErrInvalidArgument
+		return nil, errs.ErrInvalidArgument
 	}
 
 	st, err := store.New(filepath.Join(dataStore, hostsDirBasename, namespace), 0, 0o644)
@@ -112,7 +112,7 @@ func (x *hostsStore) Acquire(meta Meta) (err error) {
 		}
 
 		if err = os.WriteFile(loc, []byte{}, 0o644); err != nil {
-			return errors.Join(store.ErrSystemFailure, err)
+			return errors.Join(errs.ErrSystemFailure, err)
 		}
 
 		// os.WriteFile relies on syscall.Open. Unless there are ACLs, the effective mode of the file will be matched
@@ -120,7 +120,7 @@ func (x *hostsStore) Acquire(meta Meta) (err error) {
 		// See https://www.man7.org/linux/man-pages/man2/open.2.html for details.
 		// Since we must make sure that these files are world readable, explicitly chmod them here.
 		if err = os.Chmod(loc, 0o644); err != nil {
-			err = errors.Join(store.ErrSystemFailure, err)
+			err = errors.Join(errs.ErrSystemFailure, err)
 		}
 
 		var content []byte
@@ -181,7 +181,7 @@ func (x *hostsStore) AllocHostsFile(id string, content []byte) (location string,
 
 		err = os.WriteFile(loc, content, 0o644)
 		if err != nil {
-			err = errors.Join(store.ErrSystemFailure, err)
+			err = errors.Join(errs.ErrSystemFailure, err)
 		}
 
 		// os.WriteFile relies on syscall.Open. Unless there are ACLs, the effective mode of the file will be matched
@@ -189,7 +189,7 @@ func (x *hostsStore) AllocHostsFile(id string, content []byte) (location string,
 		// See https://www.man7.org/linux/man-pages/man2/open.2.html for details.
 		// Since we must make sure that these files are world readable, explicitly chmod them here.
 		if err = os.Chmod(loc, 0o644); err != nil {
-			err = errors.Join(store.ErrSystemFailure, err)
+			err = errors.Join(errs.ErrSystemFailure, err)
 		}
 
 		return err
@@ -295,7 +295,7 @@ func (x *hostsStore) updateAllHosts() (err error) {
 	for _, entry := range entries {
 		myMeta, ok := metasByEntry[entry]
 		if !ok {
-			log.L.WithError(errdefs.ErrNotFound).Debugf("hostsstore metadata %q not found in %q?", metaJSON, entry)
+			log.L.WithError(errs.ErrNotFound).Debugf("hostsstore metadata %q not found in %q?", metaJSON, entry)
 			continue
 		}
 

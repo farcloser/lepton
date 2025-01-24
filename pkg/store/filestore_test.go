@@ -21,6 +21,8 @@ import (
 	"time"
 
 	"gotest.tools/v3/assert"
+
+	"github.com/containerd/nerdctl/v2/leptonic/errs"
 )
 
 func TestFileStoreBasics(t *testing.T) {
@@ -41,13 +43,13 @@ func TestFileStoreBasics(t *testing.T) {
 	defer tempStore.Release()
 
 	_, err = tempStore.Get("nonexistent")
-	assert.ErrorIs(t, err, ErrNotFound, "getting a non existent key should ErrNotFound")
+	assert.ErrorIs(t, err, errs.ErrNotFound, "getting a non existent key should ErrNotFound")
 
 	err = tempStore.Delete("nonexistent")
-	assert.ErrorIs(t, err, ErrNotFound, "deleting a non existent key should ErrNotFound")
+	assert.ErrorIs(t, err, errs.ErrNotFound, "deleting a non existent key should ErrNotFound")
 
 	_, err = tempStore.List("nonexistent")
-	assert.ErrorIs(t, err, ErrNotFound, "listing a non existent key should ErrNotFound")
+	assert.ErrorIs(t, err, errs.ErrNotFound, "listing a non existent key should ErrNotFound")
 
 	doesExist, err := tempStore.Exists("nonexistent")
 	assert.NilError(t, err, "exist should not error")
@@ -60,16 +62,16 @@ func TestFileStoreBasics(t *testing.T) {
 
 	// Invalid keys
 	_, err = tempStore.Get("..")
-	assert.ErrorIs(t, err, ErrInvalidArgument, "unsupported characters or patterns should return ErrInvalidArgument")
+	assert.ErrorIs(t, err, errs.ErrInvalidArgument, "unsupported characters or patterns should return ErrInvalidArgument")
 
 	err = tempStore.Set([]byte("foo"), "..")
-	assert.ErrorIs(t, err, ErrInvalidArgument, "unsupported characters or patterns should return ErrInvalidArgument")
+	assert.ErrorIs(t, err, errs.ErrInvalidArgument, "unsupported characters or patterns should return ErrInvalidArgument")
 
 	err = tempStore.Delete("..")
-	assert.ErrorIs(t, err, ErrInvalidArgument, "unsupported characters or patterns should return ErrInvalidArgument")
+	assert.ErrorIs(t, err, errs.ErrInvalidArgument, "unsupported characters or patterns should return ErrInvalidArgument")
 
 	_, err = tempStore.List("..")
-	assert.ErrorIs(t, err, ErrInvalidArgument, "unsupported characters or patterns should return ErrInvalidArgument")
+	assert.ErrorIs(t, err, errs.ErrInvalidArgument, "unsupported characters or patterns should return ErrInvalidArgument")
 
 	// Writing, reading, listing, deleting
 	err = tempStore.Set([]byte("foo"), "something")
