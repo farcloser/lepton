@@ -29,6 +29,7 @@ import (
 
 	"github.com/containerd/log"
 
+	"github.com/containerd/nerdctl/v2/leptonic/errs"
 	"github.com/containerd/nerdctl/v2/pkg/identifiers"
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/native"
 	"github.com/containerd/nerdctl/v2/pkg/store"
@@ -82,7 +83,7 @@ func New(dataStore, namespace string) (volStore VolumeStore, err error) {
 	}()
 
 	if dataStore == "" || namespace == "" {
-		return nil, store.ErrInvalidArgument
+		return nil, errs.ErrInvalidArgument
 	}
 
 	st, err := store.New(filepath.Join(dataStore, volumeDirBasename, namespace), 0, 0o644)
@@ -262,7 +263,7 @@ func (vs *volumeStore) Remove(generator func() ([]string, []error, error)) (remo
 				return err
 			} else if !doesExist {
 				// TODO: see above
-				warns = append(warns, fmt.Errorf("volume %q: %w", name, store.ErrNotFound))
+				warns = append(warns, fmt.Errorf("volume %q: %w", name, errs.ErrNotFound))
 				continue
 			} else if err = vs.manager.Delete(name); err != nil {
 				return err

@@ -26,29 +26,12 @@ package store
 
 import (
 	"errors"
-
-	"github.com/containerd/errdefs"
 )
 
 var (
-	// ErrInvalidArgument may be returned by Get, Set, List, or Delete by specific SafeStore implementations
-	// (eg: filesystem), when they want to impose implementation dependent restrictions on the identifiers
-	// (filesystems typically do).
-	ErrInvalidArgument = errdefs.ErrInvalidArgument
-	// ErrNotFound may be returned by Get or Delete when the requested key is not present in the store
-	ErrNotFound = errdefs.ErrNotFound
-	// ErrSystemFailure may be returned by implementations when an internal failure occurs.
-	// For example, for a filesystem implementation, failure to create a file will be wrapped by this error.
-	ErrSystemFailure = errors.New("system failure")
 	// ErrLockFailure may be returned by ReadLock, WriteLock, or Unlock, when the underlying locking mechanism fails.
 	// In the case of the filesystem implementation, inability to lock the directory will return it.
 	ErrLockFailure = errors.New("lock failure")
-	// ErrFaultyImplementation may be returned by Get or Set when the target key exists and is a dir,
-	// or by List when the target key is a file
-	// This is indicative the code using the store is not consistent with what it treats as group, and what it treats as key
-	// and is definitely a bug in that code
-	// Missing lock will also trigger this when detected.
-	ErrFaultyImplementation = errors.New("code needs to be fixed")
 )
 
 // Store represents a store that is able to grant an exclusive lock (ensuring concurrency safety,

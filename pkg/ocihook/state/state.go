@@ -30,6 +30,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/containerd/nerdctl/v2/leptonic/errs"
 	"github.com/containerd/nerdctl/v2/pkg/store"
 )
 
@@ -107,7 +108,7 @@ func (lf *Store) rawLoad() (err error) {
 	data, err := lf.safeStore.Get(lifecycleFile)
 	if err == nil {
 		err = json.Unmarshal(data, lf)
-	} else if errors.Is(err, store.ErrNotFound) {
+	} else if errors.Is(err, errs.ErrNotFound) {
 		err = nil
 	}
 

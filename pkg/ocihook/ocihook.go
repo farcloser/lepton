@@ -37,6 +37,7 @@ import (
 	"github.com/containerd/go-cni"
 	"github.com/containerd/log"
 
+	"github.com/containerd/nerdctl/v2/leptonic/errs"
 	"github.com/containerd/nerdctl/v2/pkg/bypass4netnsutil"
 	"github.com/containerd/nerdctl/v2/pkg/dnsutil/hostsstore"
 	"github.com/containerd/nerdctl/v2/pkg/labels"
@@ -45,7 +46,6 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/netutil/nettype"
 	"github.com/containerd/nerdctl/v2/pkg/ocihook/state"
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
-	"github.com/containerd/nerdctl/v2/pkg/store"
 	"github.com/containerd/nerdctl/v2/pkg/version"
 )
 
@@ -615,7 +615,7 @@ func onPostStop(opts *handlerOpts) error {
 	}
 	name := opts.state.Annotations[labels.Name]
 	// Double-releasing may happen with containers started with --rm, so, ignore NotFound errors
-	if err := namst.Release(name, opts.state.ID); err != nil && !errors.Is(err, store.ErrNotFound) {
+	if err := namst.Release(name, opts.state.ID); err != nil && !errors.Is(err, errs.ErrNotFound) {
 		return fmt.Errorf("failed to release container name %s: %w", name, err)
 	}
 	return nil

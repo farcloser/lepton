@@ -18,7 +18,6 @@ package container
 
 import (
 	"fmt"
-	"gotest.tools/v3/icmd"
 	"os/exec"
 	"runtime"
 	"strings"
@@ -26,6 +25,7 @@ import (
 	"time"
 
 	"gotest.tools/v3/assert"
+	"gotest.tools/v3/icmd"
 
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 )

@@ -24,6 +24,8 @@ import (
 	"sync"
 
 	"go.farcloser.world/core/filesystem"
+
+	"github.com/containerd/nerdctl/v2/leptonic/errs"
 )
 
 // This might improve performance in case of (mostly read) massively parallel concurrent scenarios
@@ -40,7 +42,7 @@ const (
 // That being said, this is still a much better solution than writing directly to the destination file.
 func New(rootPath string, dirPerm os.FileMode, filePerm os.FileMode) (Store, error) {
 	if rootPath == "" {
-		return nil, errors.Join(ErrInvalidArgument, errors.New("FileStore rootPath cannot be empty"))
+		return nil, errors.Join(errs.ErrInvalidArgument, errors.New("FileStore rootPath cannot be empty"))
 	}
 
 	if dirPerm == 0 {
@@ -52,7 +54,7 @@ func New(rootPath string, dirPerm os.FileMode, filePerm os.FileMode) (Store, err
 	}
 
 	if err := os.MkdirAll(rootPath, dirPerm); err != nil {
-		return nil, errors.Join(ErrSystemFailure, err)
+		return nil, errors.Join(errs.ErrSystemFailure, err)
 	}
 
 	return &fileStore{
@@ -92,7 +94,7 @@ func (vs *fileStore) Release() error {
 
 	if err := filesystem.Unlock(vs.locked); err != nil {
 		if errors.Is(err, filesystem.ErrLockIsNil) {
-			return errors.Join(ErrFaultyImplementation, fmt.Errorf("cannot unlock already unlocked volume store %q", vs.dir))
+			return errors.Join(errs.ErrFaultyImplementation, fmt.Errorf("cannot unlock already unlocked volume store %q", vs.dir))
 		}
 
 		return err
@@ -115,7 +117,7 @@ func (vs *fileStore) WithLock(fun func() error) (err error) {
 
 func (vs *fileStore) Get(key ...string) ([]byte, error) {
 	if vs.locked == nil {
-		return nil, errors.Join(ErrFaultyImplementation, errors.New("operations on the store must use locking"))
+		return nil, errors.Join(errs.ErrFaultyImplementation, errors.New("operations on the store must use locking"))
 	}
 
 	if err := validateAllPathComponents(key...); err != nil {
@@ -127,19 +129,19 @@ func (vs *fileStore) Get(key ...string) ([]byte, error) {
 	st, err := os.Stat(path)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			return nil, errors.Join(ErrNotFound, fmt.Errorf("%q does not exist", filepath.Join(key...)))
+			return nil, errors.Join(errs.ErrNotFound, fmt.Errorf("%q does not exist", filepath.Join(key...)))
 		}
 
-		return nil, errors.Join(ErrSystemFailure, err)
+		return nil, errors.Join(errs.ErrSystemFailure, err)
 	}
 
 	if st.IsDir() {
-		return nil, errors.Join(ErrFaultyImplementation, fmt.Errorf("%q is a directory and cannot be read as a file", path))
+		return nil, errors.Join(errs.ErrFaultyImplementation, fmt.Errorf("%q is a directory and cannot be read as a file", path))
 	}
 
 	content, err := os.ReadFile(filepath.Join(append([]string{vs.dir}, key...)...))
 	if err != nil {
-		return nil, errors.Join(ErrSystemFailure, err)
+		return nil, errors.Join(errs.ErrSystemFailure, err)
 	}
 
 	return content, nil
@@ -158,7 +160,7 @@ func (vs *fileStore) Exists(key ...string) (bool, error) {
 			return false, nil
 		}
 
-		return false, errors.Join(ErrSystemFailure, err)
+		return false, errors.Join(errs.ErrSystemFailure, err)
 	}
 
 	return true, nil
@@ -166,7 +168,7 @@ func (vs *fileStore) Exists(key ...string) (bool, error) {
 
 func (vs *fileStore) Set(data []byte, key ...string) error {
 	if vs.locked == nil {
-		return errors.Join(ErrFaultyImplementation, errors.New("operations on the store must use locking"))
+		return errors.Join(errs.ErrFaultyImplementation, errors.New("operations on the store must use locking"))
 	}
 
 	if err := validateAllPathComponents(key...); err != nil {
@@ -180,7 +182,7 @@ func (vs *fileStore) Set(data []byte, key ...string) error {
 		parent = filepath.Join(append([]string{parent}, key[0:len(key)-1]...)...)
 		err := os.MkdirAll(parent, vs.dirPerm)
 		if err != nil {
-			return errors.Join(ErrSystemFailure, err)
+			return errors.Join(errs.ErrSystemFailure, err)
 		}
 	}
 
@@ -188,7 +190,7 @@ func (vs *fileStore) Set(data []byte, key ...string) error {
 	st, err := os.Stat(dest)
 	if err == nil {
 		if st.IsDir() {
-			return errors.Join(ErrFaultyImplementation, fmt.Errorf("%q is a directory and cannot be written to", dest))
+			return errors.Join(errs.ErrFaultyImplementation, fmt.Errorf("%q is a directory and cannot be written to", dest))
 		}
 	}
 
@@ -197,13 +199,13 @@ func (vs *fileStore) Set(data []byte, key ...string) error {
 
 func (vs *fileStore) List(key ...string) ([]string, error) {
 	if vs.locked == nil {
-		return nil, errors.Join(ErrFaultyImplementation, errors.New("operations on the store must use locking"))
+		return nil, errors.Join(errs.ErrFaultyImplementation, errors.New("operations on the store must use locking"))
 	}
 
 	// Unlike Get, Set and Delete, List can have zero length key
 	for _, k := range key {
 		if err := filesystem.ValidatePathComponent(k); err != nil {
-			return nil, errors.Join(ErrInvalidArgument, err)
+			return nil, errors.Join(errs.ErrInvalidArgument, err)
 		}
 	}
 
@@ -212,19 +214,19 @@ func (vs *fileStore) List(key ...string) ([]string, error) {
 	st, err := os.Stat(path)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			return nil, errors.Join(ErrNotFound, err)
+			return nil, errors.Join(errs.ErrNotFound, err)
 		}
 
-		return nil, errors.Join(ErrSystemFailure, err)
+		return nil, errors.Join(errs.ErrSystemFailure, err)
 	}
 
 	if !st.IsDir() {
-		return nil, errors.Join(ErrFaultyImplementation, fmt.Errorf("%q is not a directory and cannot be enumerated", path))
+		return nil, errors.Join(errs.ErrFaultyImplementation, fmt.Errorf("%q is not a directory and cannot be enumerated", path))
 	}
 
 	dirEntries, err := os.ReadDir(path)
 	if err != nil {
-		return nil, errors.Join(ErrSystemFailure, err)
+		return nil, errors.Join(errs.ErrSystemFailure, err)
 	}
 
 	entries := []string{}
@@ -237,7 +239,7 @@ func (vs *fileStore) List(key ...string) ([]string, error) {
 
 func (vs *fileStore) Delete(key ...string) error {
 	if vs.locked == nil {
-		return errors.Join(ErrFaultyImplementation, errors.New("operations on the store must use locking"))
+		return errors.Join(errs.ErrFaultyImplementation, errors.New("operations on the store must use locking"))
 	}
 
 	if err := validateAllPathComponents(key...); err != nil {
@@ -249,14 +251,14 @@ func (vs *fileStore) Delete(key ...string) error {
 	_, err := os.Stat(path)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			return errors.Join(ErrNotFound, err)
+			return errors.Join(errs.ErrNotFound, err)
 		}
 
-		return errors.Join(ErrSystemFailure, err)
+		return errors.Join(errs.ErrSystemFailure, err)
 	}
 
 	if err = os.RemoveAll(path); err != nil {
-		return errors.Join(ErrSystemFailure, err)
+		return errors.Join(errs.ErrSystemFailure, err)
 	}
 
 	return nil
@@ -272,7 +274,7 @@ func (vs *fileStore) Location(key ...string) (string, error) {
 
 func (vs *fileStore) GroupEnsure(key ...string) error {
 	if vs.locked == nil {
-		return errors.Join(ErrFaultyImplementation, errors.New("operations on the store must use locking"))
+		return errors.Join(errs.ErrFaultyImplementation, errors.New("operations on the store must use locking"))
 	}
 
 	if err := validateAllPathComponents(key...); err != nil {
@@ -282,7 +284,7 @@ func (vs *fileStore) GroupEnsure(key ...string) error {
 	path := filepath.Join(append([]string{vs.dir}, key...)...)
 
 	if err := os.MkdirAll(path, vs.dirPerm); err != nil {
-		return errors.Join(ErrSystemFailure, err)
+		return errors.Join(errs.ErrSystemFailure, err)
 	}
 
 	return nil
@@ -290,7 +292,7 @@ func (vs *fileStore) GroupEnsure(key ...string) error {
 
 func (vs *fileStore) GroupSize(key ...string) (int64, error) {
 	if vs.locked == nil {
-		return 0, errors.Join(ErrFaultyImplementation, errors.New("operations on the store must use locking"))
+		return 0, errors.Join(errs.ErrFaultyImplementation, errors.New("operations on the store must use locking"))
 	}
 
 	if err := validateAllPathComponents(key...); err != nil {
@@ -302,14 +304,14 @@ func (vs *fileStore) GroupSize(key ...string) (int64, error) {
 	st, err := os.Stat(path)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			return 0, errors.Join(ErrNotFound, err)
+			return 0, errors.Join(errs.ErrNotFound, err)
 		}
 
-		return 0, errors.Join(ErrSystemFailure, err)
+		return 0, errors.Join(errs.ErrSystemFailure, err)
 	}
 
 	if !st.IsDir() {
-		return 0, errors.Join(ErrFaultyImplementation, fmt.Errorf("%q is not a directory", path))
+		return 0, errors.Join(errs.ErrFaultyImplementation, fmt.Errorf("%q is not a directory", path))
 	}
 
 	var size int64
@@ -334,12 +336,12 @@ func (vs *fileStore) GroupSize(key ...string) (int64, error) {
 // validateAllPathComponents will enforce validation for a slice of components
 func validateAllPathComponents(pathComponent ...string) error {
 	if len(pathComponent) == 0 {
-		return errors.Join(ErrInvalidArgument, errors.New("you must specify an identifier"))
+		return errors.Join(errs.ErrInvalidArgument, errors.New("you must specify an identifier"))
 	}
 
 	for _, key := range pathComponent {
 		if err := filesystem.ValidatePathComponent(key); err != nil {
-			return errors.Join(ErrInvalidArgument, err)
+			return errors.Join(errs.ErrInvalidArgument, err)
 		}
 	}
 

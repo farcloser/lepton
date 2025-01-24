@@ -27,6 +27,7 @@ import (
 
 	"github.com/containerd/log"
 
+	"github.com/containerd/nerdctl/v2/leptonic/errs"
 	"github.com/containerd/nerdctl/v2/pkg/identifiers"
 	"github.com/containerd/nerdctl/v2/pkg/store"
 )
@@ -37,7 +38,7 @@ var ErrNameStore = errors.New("name-store error")
 // New will return a NameStore for a given namespace.
 func New(stateDir, namespace string) (NameStore, error) {
 	if namespace == "" {
-		return nil, errors.Join(ErrNameStore, store.ErrInvalidArgument)
+		return nil, errors.Join(ErrNameStore, errs.ErrInvalidArgument)
 	}
 
 	st, err := store.New(filepath.Join(stateDir, namespace), 0, 0)
@@ -86,7 +87,7 @@ func (x *nameStore) Acquire(name, id string) (err error) {
 		var previousID []byte
 		previousID, err = x.safeStore.Get(name)
 		if err != nil {
-			if !errors.Is(err, store.ErrNotFound) {
+			if !errors.Is(err, errs.ErrNotFound) {
 				return err
 			}
 		} else if string(previousID) == "" {
