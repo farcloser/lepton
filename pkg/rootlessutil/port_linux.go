@@ -23,13 +23,14 @@ import (
 	"github.com/rootless-containers/rootlesskit/v2/pkg/api/client"
 	"github.com/rootless-containers/rootlesskit/v2/pkg/port"
 
-	"github.com/containerd/errdefs"
 	"github.com/containerd/go-cni"
+
+	"github.com/containerd/nerdctl/v2/leptonic/errs"
 )
 
 func NewRootlessCNIPortManager(client client.Client) (*RootlessCNIPortManager, error) {
 	if client == nil {
-		return nil, errdefs.ErrInvalidArgument
+		return nil, errs.ErrInvalidArgument
 	}
 	pm := &RootlessCNIPortManager{
 		Client: client,

@@ -28,6 +28,7 @@ import (
 
 	"github.com/coreos/go-systemd/v22/journal"
 
+	"github.com/containerd/nerdctl/v2/leptonic/errs"
 	timetypes "github.com/containerd/nerdctl/v2/leptonic/time"
 )
 
@@ -39,7 +40,6 @@ var (
 	ErrNotAvailable         = errors.New("the local systemd journal is not available for logging")
 	ErrCannotFindJournalctl = errors.New("could not find `journalctl` executable in PATH")
 	ErrFailedToStart        = errors.New("failed to start journalctl command with args")
-	ErrInvalidArgument      = errors.New("invalid argument")
 
 	clientPath     string
 	errClientPath  error
@@ -112,7 +112,7 @@ func ReadLogs(lvopts LogViewOptions, stdout, stderr io.Writer, stopChannel chan 
 		// using GetTimestamp from moby to keep time format consistency
 		ts, err := timetypes.GetTimestamp(lvopts.Since, time.Now())
 		if err != nil {
-			return errors.Join(fmt.Errorf("%w for \"since\"", ErrInvalidArgument), err)
+			return errors.Join(fmt.Errorf("%w for \"since\"", errs.ErrInvalidArgument), err)
 		}
 		date, err := prepareJournalCtlDate(ts)
 		if err != nil {
@@ -125,7 +125,7 @@ func ReadLogs(lvopts LogViewOptions, stdout, stderr io.Writer, stopChannel chan 
 		// using GetTimestamp from moby to keep time format consistency
 		ts, err := timetypes.GetTimestamp(lvopts.Until, time.Now())
 		if err != nil {
-			return errors.Join(fmt.Errorf("%w for \"until\"", ErrInvalidArgument), err)
+			return errors.Join(fmt.Errorf("%w for \"until\"", errs.ErrInvalidArgument), err)
 		}
 
 		date, err := prepareJournalCtlDate(ts)
@@ -144,10 +144,20 @@ func ReadLogs(lvopts LogViewOptions, stdout, stderr io.Writer, stopChannel chan 
 	}
 
 	// Setup killing goroutine:
+	killed := false
 	go func() {
 		<-stopChannel
+		killed = true
 		_ = cmd.Process.Kill()
 	}()
+
+	err := cmd.Wait()
+	var exitError *exec.ExitError
+	if errors.As(err, &exitError) {
+		if !killed && exitError.ExitCode() != 0 {
+			return errors.New("journalctl command exited with non-zero exit code")
+		}
+	}
 
 	return nil
 }

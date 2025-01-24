@@ -36,10 +36,10 @@ jobs:
         uses: ./.github/actions/install-go
         with:
           strategy: ${{ matrix.goversion }}
-      - name: "Install golangci"
+      - name: "Install linters"
         run: |
-          echo "::group:: make lint-install-linters"
-          make install-linters
+          echo "::group:: make install-dev-tools"
+          make install-dev-tools
           echo "::endgroup::"
       - name: "`make lint`"
         env:

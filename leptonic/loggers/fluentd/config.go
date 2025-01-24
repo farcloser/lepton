@@ -27,6 +27,8 @@ import (
 	"time"
 
 	"github.com/fluent/fluent-logger-golang/fluent"
+
+	"github.com/containerd/nerdctl/v2/leptonic/errs"
 )
 
 const (
@@ -43,7 +45,6 @@ var (
 	minReconnectInterval = int((100 * time.Millisecond).Milliseconds())
 	maxReconnectInterval = int((10 * time.Second).Milliseconds())
 
-	ErrInvalidArgument            = errors.New("invalid argument")
 	ErrUnixSocketPathMustExist    = errors.New("unix socket path must not be empty")
 	ErrUnsupportedProtocol        = errors.New("unsupported protocol")
 	ErrUnsupportedPathForProtocol = errors.New("path is not supported for this protocol")
@@ -74,7 +75,7 @@ func NewConfig() *Config {
 func (cfg *Config) SetAsyncReconnectInterval(asyncReconnectInterval int) error {
 	// Enforce limits on reconnect interval
 	if asyncReconnectInterval != 0 && (asyncReconnectInterval < minReconnectInterval || asyncReconnectInterval > maxReconnectInterval) {
-		return fmt.Errorf("%w: asyncReconnectInterval (%d) must be between %d and %d milliseconds", ErrInvalidArgument, asyncReconnectInterval, minReconnectInterval, maxReconnectInterval)
+		return fmt.Errorf("%w: asyncReconnectInterval (%d) must be between %d and %d milliseconds", errs.ErrInvalidArgument, asyncReconnectInterval, minReconnectInterval, maxReconnectInterval)
 	}
 
 	cfg.AsyncReconnectInterval = asyncReconnectInterval
@@ -123,7 +124,7 @@ func (cfg *Config) SetAddress(address string) error {
 	if p := tempURL.Port(); p != "" {
 		portNum, err := strconv.ParseUint(p, 10, 16)
 		if err != nil {
-			return errors.Join(fmt.Errorf("%w: invalid port %q", ErrInvalidArgument, p), err)
+			return errors.Join(fmt.Errorf("%w: invalid port %q", errs.ErrInvalidArgument, p), err)
 		}
 		cfg.FluentPort = int(portNum)
 	}

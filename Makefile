@@ -169,7 +169,7 @@ up:
 		&& go get -u ./...
 	$(call footer, $@)
 
-install-linters:
+install-dev-tools:
 	$(call title, $@)
 	# golangci: v1.62.2
 	# git-validation: main from 2023/11
@@ -181,7 +181,8 @@ install-linters:
 		&& go install github.com/vbatts/git-validation@679e5cad8c50f1605ab3d8a0a947aaf72fb24c07 \
 		&& go install github.com/kunalkushwaha/ltag@b0cfa33e4cc9383095dc584d3990b62c95096de0 \
 		&& go install github.com/google/go-licenses/v2@d01822334fba5896920a060f762ea7ecdbd086e8 \
-		&& go install github.com/incu6us/goimports-reviser/v3@f034195cc8a7ffc7cc70d60aa3a25500874eaf04
+		&& go install github.com/incu6us/goimports-reviser/v3@f034195cc8a7ffc7cc70d60aa3a25500874eaf04 \
+		&& go install gotest.tools/gotestsum@ac6dad9c7d87b969004f7749d1942938526c9716
 	$(call footer, $@)
 
 test-unit:
