@@ -38,6 +38,7 @@ import (
 	"github.com/containerd/errdefs"
 	"github.com/containerd/log"
 
+	"github.com/containerd/nerdctl/v2/leptonic/errs"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/labels"
 	"github.com/containerd/nerdctl/v2/pkg/netutil/nettype"
@@ -454,7 +455,7 @@ func (e *CNIEnv) createDefaultNetworkConfig(bridgeIP string) error {
 // generateNetworkConfig does not fill "File" field.
 func (e *CNIEnv) generateNetworkConfig(name string, labels []string, plugins []CNIPlugin) (*NetworkConfig, error) {
 	if name == "" || len(plugins) == 0 {
-		return nil, errdefs.ErrInvalidArgument
+		return nil, errs.ErrInvalidArgument
 	}
 	for _, f := range plugins {
 		p := filepath.Join(e.Path, f.GetPluginType())

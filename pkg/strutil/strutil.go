@@ -36,11 +36,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/containerd/errdefs"
+	"github.com/containerd/nerdctl/v2/leptonic/errs"
 )
 
 // InStringSlice checks whether a string is inside a string slice.
-// Comparison is case insensitive.
+// Comparison is case-insensitive.
 //
 // From https://github.com/containerd/containerd/blob/7c6d710bcfc81a30ac1e8cbb2e6a4c294184f7b7/pkg/cri/util/strings.go#L21-L30
 func InStringSlice(ss []string, str string) bool {
@@ -80,14 +80,14 @@ func SliceToSet(in []string) map[string]bool {
 // ParseCSVMap parses a string like "foo=x,bar=y" into a map
 func ParseCSVMap(s string) (map[string]string, error) {
 	csvR := csv.NewReader(strings.NewReader(s))
-	// s can contains quotes, but the csv reader needs LazyQuotes to recognize quotes as values.
+	// s can contain quotes, but the csv reader needs LazyQuotes to recognize quotes as values.
 	csvR.LazyQuotes = true
 	ra, err := csvR.ReadAll()
 	if err != nil {
 		return nil, fmt.Errorf("cannot parse %q: %w", s, err)
 	}
 	if len(ra) != 1 {
-		return nil, fmt.Errorf("expected a single line, got %d lines: %w", len(ra), errdefs.ErrInvalidArgument)
+		return nil, fmt.Errorf("expected a single line, got %d lines: %w", len(ra), errs.ErrInvalidArgument)
 	}
 	fields := ra[0]
 	m := make(map[string]string)

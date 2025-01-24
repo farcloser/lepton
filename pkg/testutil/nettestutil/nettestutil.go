@@ -24,7 +24,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/containerd/errdefs"
+	"github.com/containerd/nerdctl/v2/leptonic/errs"
 )
 
 func HTTPGet(urlStr string, attempts int, insecure bool) (*http.Response, error) {
@@ -33,7 +33,7 @@ func HTTPGet(urlStr string, attempts int, insecure bool) (*http.Response, error)
 		err  error
 	)
 	if attempts < 1 {
-		return nil, errdefs.ErrInvalidArgument
+		return nil, errs.ErrInvalidArgument
 	}
 	client := &http.Client{
 		Timeout: 3 * time.Second,
@@ -73,7 +73,7 @@ func NonLoopbackIPv4() (net.IP, error) {
 		}
 		return ipv4, nil
 	}
-	return nil, fmt.Errorf("non-loopback IPv4 address not found, attempted=%+v: %w", addrs, errdefs.ErrNotFound)
+	return nil, fmt.Errorf("non-loopback IPv4 address not found, attempted=%+v: %w", addrs, errs.ErrNotFound)
 }
 
 func GenerateMACAddress() (string, error) {
