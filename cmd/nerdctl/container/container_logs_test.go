@@ -18,6 +18,8 @@ package container
 
 import (
 	"fmt"
+	"gotest.tools/v3/icmd"
+	"os/exec"
 	"runtime"
 	"strings"
 	"testing"
@@ -109,8 +111,14 @@ func TestLogsWithInheritedFlags(t *testing.T) {
 }
 
 func TestLogsOfJournaldDriver(t *testing.T) {
-	t.Parallel()
 	testutil.RequireExecutable(t, "journalctl")
+	journalctl, _ := exec.LookPath("journalctl")
+	res := icmd.RunCmd(icmd.Command(journalctl, "-xe"))
+	if res.ExitCode != 0 {
+		t.Skip("current user is not allowed to access journal logs - presumably not a member of adm")
+	}
+
+	t.Parallel()
 	base := testutil.NewBase(t)
 	containerName := testutil.Identifier(t)
 
