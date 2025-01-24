@@ -24,7 +24,7 @@
 
 package dockercompat
 
-import "go.farcloser.world/containers/cgroups"
+import "go.farcloser.world/containers/security/cgroups"
 
 // Info mimics a `docker info` object.
 // From https://github.com/moby/moby/blob/v27.4.1/api/types/system/info.go

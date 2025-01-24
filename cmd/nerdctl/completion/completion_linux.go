@@ -18,9 +18,8 @@ package completion
 
 import (
 	"github.com/spf13/cobra"
-	"go.farcloser.world/containers/cgroups"
-
-	"github.com/containerd/nerdctl/v2/leptonic/apparmor"
+	"go.farcloser.world/containers/security/apparmor"
+	"go.farcloser.world/containers/security/cgroups"
 )
 
 func ApparmorProfiles(cmd *cobra.Command) ([]string, cobra.ShellCompDirective) {

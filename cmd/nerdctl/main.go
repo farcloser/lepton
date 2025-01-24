@@ -27,7 +27,7 @@ import (
 	"github.com/pelletier/go-toml/v2"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-	"go.farcloser.world/containers/cgroups"
+	"go.farcloser.world/containers/security/cgroups"
 	"go.farcloser.world/core/filesystem"
 
 	"github.com/containerd/log"

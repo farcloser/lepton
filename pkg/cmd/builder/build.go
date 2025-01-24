@@ -28,6 +28,7 @@ import (
 	"strconv"
 	"strings"
 
+	"go.farcloser.world/containers/reference"
 	"go.farcloser.world/containers/specs"
 
 	containerd "github.com/containerd/containerd/v2/client"
@@ -37,7 +38,6 @@ import (
 	"github.com/containerd/log"
 	"github.com/containerd/platforms"
 
-	"github.com/containerd/nerdctl/v2/leptonic/reference"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/buildkitutil"
 	"github.com/containerd/nerdctl/v2/pkg/clientutil"

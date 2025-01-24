@@ -17,7 +17,7 @@
 package config
 
 import (
-	"go.farcloser.world/containers/cgroups"
+	"go.farcloser.world/containers/security/cgroups"
 
 	"github.com/containerd/containerd/v2/defaults"
 	"github.com/containerd/containerd/v2/pkg/namespaces"

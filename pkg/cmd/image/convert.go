@@ -25,6 +25,7 @@ import (
 	"os"
 	"strings"
 
+	"go.farcloser.world/containers/reference"
 	"go.farcloser.world/core/compression/zstd"
 
 	containerd "github.com/containerd/containerd/v2/client"
@@ -35,7 +36,6 @@ import (
 	zstdchunkedconvert "github.com/containerd/stargz-snapshotter/nativeconverter/zstdchunked"
 	"github.com/containerd/stargz-snapshotter/recorder"
 
-	"github.com/containerd/nerdctl/v2/leptonic/reference"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	converterutil "github.com/containerd/nerdctl/v2/pkg/imgutil/converter"
 	"github.com/containerd/nerdctl/v2/pkg/platformutil"

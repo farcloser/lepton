@@ -36,7 +36,7 @@ import (
 	"github.com/containerd/containerd/v2/pkg/cio"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/cioutil"
+	cio2 "github.com/containerd/nerdctl/v2/leptonic/io"
 	"github.com/containerd/nerdctl/v2/pkg/consoleutil"
 	"github.com/containerd/nerdctl/v2/pkg/infoutil"
 )
@@ -120,7 +120,7 @@ func NewTask(ctx context.Context, client *containerd.Client, container container
 				return nil, err
 			}
 		}
-		ioCreator = cioutil.NewContainerIO(namespace, logURI, true, in, os.Stdout, os.Stderr)
+		ioCreator = cio2.NewContainerIO(namespace, logURI, true, in, os.Stdout, os.Stderr)
 	} else if flagD && logURI != "" {
 		u, err := url.Parse(logURI)
 		if err != nil {
@@ -148,7 +148,7 @@ func NewTask(ctx context.Context, client *containerd.Client, container container
 			}
 			in = stdinC
 		}
-		ioCreator = cioutil.NewContainerIO(namespace, logURI, false, in, os.Stdout, os.Stderr)
+		ioCreator = cio2.NewContainerIO(namespace, logURI, false, in, os.Stdout, os.Stderr)
 	}
 	t, err := container.NewTask(ctx, ioCreator)
 	if err != nil {

@@ -17,9 +17,10 @@
 package ocihook
 
 import (
+	"go.farcloser.world/containers/security/apparmor"
+
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/leptonic/apparmor"
 	"github.com/containerd/nerdctl/v2/pkg/defaults"
 )
 

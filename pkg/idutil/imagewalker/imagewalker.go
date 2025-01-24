@@ -23,11 +23,10 @@ import (
 	"strings"
 
 	"go.farcloser.world/containers/digest"
+	"go.farcloser.world/containers/reference"
 
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/images"
-
-	"github.com/containerd/nerdctl/v2/leptonic/reference"
 )
 
 type Found struct {

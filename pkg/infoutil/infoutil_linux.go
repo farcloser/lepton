@@ -22,10 +22,10 @@ import (
 	"strings"
 
 	"github.com/docker/docker/pkg/meminfo"
-	"go.farcloser.world/containers/cgroups"
+	"go.farcloser.world/containers/security/apparmor"
+	"go.farcloser.world/containers/security/cgroups"
 	"go.farcloser.world/containers/sysinfo"
 
-	"github.com/containerd/nerdctl/v2/leptonic/apparmor"
 	"github.com/containerd/nerdctl/v2/pkg/defaults"
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"

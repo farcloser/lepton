@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 
+	"go.farcloser.world/containers/reference"
 	"go.farcloser.world/containers/specs"
 
 	containerd "github.com/containerd/containerd/v2/client"
@@ -29,7 +30,6 @@ import (
 	"github.com/containerd/imgcrypt/v2/images/encryption"
 	"github.com/containerd/imgcrypt/v2/images/encryption/parsehelpers"
 
-	"github.com/containerd/nerdctl/v2/leptonic/reference"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/platformutil"
 )

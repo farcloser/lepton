@@ -20,7 +20,7 @@ import (
 	"context"
 	"strings"
 
-	"go.farcloser.world/containers/cgroups"
+	"go.farcloser.world/containers/security/cgroups"
 	"go.farcloser.world/containers/specs"
 
 	runcoptions "github.com/containerd/containerd/api/types/runc/options"

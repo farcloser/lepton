@@ -22,6 +22,8 @@ import (
 	"strings"
 	"sync"
 
+	"go.farcloser.world/containers/security/apparmor"
+	"go.farcloser.world/containers/security/seccomp"
 	"go.farcloser.world/containers/specs"
 
 	"github.com/containerd/containerd/v2/core/containers"
@@ -29,8 +31,6 @@ import (
 	"github.com/containerd/containerd/v2/pkg/oci"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/leptonic/apparmor"
-	"github.com/containerd/nerdctl/v2/leptonic/seccomp"
 	"github.com/containerd/nerdctl/v2/pkg/defaults"
 	"github.com/containerd/nerdctl/v2/pkg/maputil"
 	"github.com/containerd/nerdctl/v2/pkg/strutil"

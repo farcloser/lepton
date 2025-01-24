@@ -31,8 +31,8 @@ import (
 	"github.com/containerd/log"
 	"github.com/containerd/platforms"
 
+	"github.com/containerd/nerdctl/v2/leptonic/socket"
 	"github.com/containerd/nerdctl/v2/pkg/platformutil"
-	"github.com/containerd/nerdctl/v2/pkg/systemutil"
 )
 
 func NewClient(ctx context.Context, namespace, address string, opts ...containerd.Opt) (*containerd.Client, context.Context, context.CancelFunc, error) {
@@ -40,8 +40,8 @@ func NewClient(ctx context.Context, namespace, address string, opts ...container
 
 	address = strings.TrimPrefix(address, "unix://")
 	const dockerContainerdaddress = "/var/run/docker/containerd/containerd.sock"
-	if err := systemutil.IsSocketAccessible(address); err != nil {
-		if systemutil.IsSocketAccessible(dockerContainerdaddress) == nil {
+	if err := socket.IsSocketAccessible(address); err != nil {
+		if socket.IsSocketAccessible(dockerContainerdaddress) == nil {
 			err = fmt.Errorf("cannot access containerd socket %q (hint: try running with `--address %s` to connect to Docker-managed containerd): %w", address, dockerContainerdaddress, err)
 		} else {
 			err = fmt.Errorf("cannot access containerd socket %q: %w", address, err)

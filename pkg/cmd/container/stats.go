@@ -27,7 +27,7 @@ import (
 	"text/template"
 	"time"
 
-	"go.farcloser.world/containers/cgroups"
+	"go.farcloser.world/containers/security/cgroups"
 	stats2 "go.farcloser.world/containers/stats"
 
 	eventstypes "github.com/containerd/containerd/api/events"

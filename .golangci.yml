@@ -73,7 +73,8 @@ linters-settings:
       main:
         files:
           - "$all"
-        listMode: strict
+          - "!**/leptonic/**/*"
+        # list-mode: strict
         deny:
           - pkg: "github.com/hashicorp/golang-lru"
             desc: "Do not allow direct use of IBM patented NewARC"
@@ -86,6 +87,14 @@ linters-settings:
           - pkg: "github.com/opencontainers"
             desc: "use farcloser containers library instead"
           - pkg: "github.com/containerd/cgroups"
+            desc: "use farcloser containers library instead"
+          - pkg: "github.com/containerd/containerd/v2/contrib/apparmor"
+            desc: "use farcloser containers library instead"
+          - pkg: "github.com/containerd/containerd/v2/contrib/seccomp"
+            desc: "use farcloser containers library instead"
+          - pkg: "github.com/distribution"
+            desc: "use farcloser containers library instead"
+          - pkg: "github.com/fluent"
             desc: "use farcloser containers library instead"
           # - pkg: "github.com/vishvananda"
 

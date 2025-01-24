@@ -20,7 +20,7 @@ import (
 	"io"
 	"time"
 
-	"go.farcloser.world/containers/cgroups"
+	"go.farcloser.world/containers/security/cgroups"
 )
 
 // ContainerStartOptions specifies options for the `(container) start`.

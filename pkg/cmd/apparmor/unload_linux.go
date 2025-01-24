@@ -17,7 +17,7 @@
 package apparmor
 
 import (
-	"github.com/containerd/nerdctl/v2/leptonic/apparmor"
+	"go.farcloser.world/containers/security/apparmor"
 )
 
 func Unload(target string) error {

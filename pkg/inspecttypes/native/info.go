@@ -17,7 +17,7 @@
 package native
 
 import (
-	"go.farcloser.world/containers/cgroups"
+	"go.farcloser.world/containers/security/cgroups"
 
 	"github.com/containerd/containerd/api/services/introspection/v1"
 	"github.com/containerd/containerd/api/services/version/v1"

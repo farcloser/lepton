@@ -23,7 +23,8 @@ import (
 	"text/tabwriter"
 	"text/template"
 
-	"github.com/containerd/nerdctl/v2/leptonic/apparmor"
+	"go.farcloser.world/containers/security/apparmor"
+
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 )
