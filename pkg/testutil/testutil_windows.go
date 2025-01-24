@@ -16,18 +16,6 @@
 
 package testutil
 
-import (
-	"os"
-	"strconv"
-	"strings"
-	"sync"
-
-	"github.com/Microsoft/hcsshim"
-	"golang.org/x/sys/windows/svc/mgr"
-
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
-)
-
 const (
 	// CommonImage.
 	//
@@ -54,59 +42,3 @@ const (
 	// https://www.rfc-editor.org/rfc/rfc793
 	ExpectedConnectionRefusedError = "No connection could be made because the target machine actively refused it."
 )
-
-var (
-	hypervContainer     bool
-	hypervSupported     bool
-	hypervSupportedOnce sync.Once
-)
-
-// HyperVSupported is a test helper to check if hyperv is enabled on
-// the host. This can be used to skip tests that require virtualization.
-func HyperVSupported() bool {
-	if s := os.Getenv("NO_HYPERV"); s != "" {
-		if b, err := strconv.ParseBool(s); err == nil && b {
-			return false
-		}
-	}
-	hypervSupportedOnce.Do(func() {
-		// Hyper-V Virtual Machine Management service name
-		const hypervServiceName = "vmms"
-
-		m, err := mgr.Connect()
-		if err != nil {
-			return
-		}
-		defer m.Disconnect()
-
-		s, err := m.OpenService(hypervServiceName)
-		// hyperv service was present
-		if err == nil {
-			hypervSupported = true
-			s.Close()
-		}
-	})
-	return hypervSupported
-}
-
-// HyperVContainer is a test helper to check if the container is a
-// hyperv type container, lists only running containers
-func HyperVContainer(inspect dockercompat.Container) (bool, error) {
-	query := hcsshim.ComputeSystemQuery{}
-	containersList, err := hcsshim.GetContainers(query)
-	if err != nil {
-		hypervContainer = false
-		return hypervContainer, err
-	}
-
-	for _, container := range containersList {
-		// have to use IDs, not all containers have name set
-		if strings.Contains(container.ID, inspect.ID) {
-			if container.SystemType == "VirtualMachine" {
-				hypervContainer = true
-			}
-		}
-	}
-
-	return hypervContainer, nil
-}

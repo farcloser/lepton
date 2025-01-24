@@ -94,8 +94,9 @@ linters-settings:
             desc: "use farcloser containers library instead"
           - pkg: "github.com/distribution"
             desc: "use farcloser containers library instead"
+
           - pkg: "github.com/fluent"
-            desc: "use farcloser containers library instead"
+          - pkg: "github.com/Microsoft/hcsshim"
           # - pkg: "github.com/vishvananda"
 
       pkg:

@@ -18,13 +18,12 @@ package container
 
 import (
 	"fmt"
-	"regexp"
 	"strings"
 	"testing"
 
-	"github.com/Microsoft/hcsshim"
 	"gotest.tools/v3/assert"
 
+	"github.com/containerd/nerdctl/v2/leptonic/testtooling"
 	"github.com/containerd/nerdctl/v2/pkg/defaults"
 	"github.com/containerd/nerdctl/v2/pkg/netutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
@@ -65,26 +64,6 @@ func TestRunPort(t *testing.T) {
 	baseTestRunPort(t, testutil.NginxAlpineImage, testutil.NginxAlpineIndexHTMLSnippet, false)
 }
 
-// Checks whether an HNS endpoint with a name matching exists.
-func listHnsEndpointsRegex(hnsEndpointNameRegex string) ([]hcsshim.HNSEndpoint, error) {
-	r, err := regexp.Compile(hnsEndpointNameRegex)
-	if err != nil {
-		return nil, err
-	}
-	hnsEndpoints, err := hcsshim.HNSListEndpointRequest()
-	if err != nil {
-		return nil, fmt.Errorf("failed to list HNS endpoints for request: %w", err)
-	}
-
-	res := []hcsshim.HNSEndpoint{}
-	for _, endp := range hnsEndpoints {
-		if r.MatchString(endp.Name) {
-			res = append(res, endp)
-		}
-	}
-	return res, nil
-}
-
 // Asserts whether the container with the provided has any HNS endpoints with the expected
 // naming format (`${container_id}_${network_name}`) for all of the provided network names.
 // The container ID can be a regex.
@@ -94,7 +73,7 @@ func assertHnsEndpointsExistence(t *testing.T, shouldExist bool, containerIDRege
 
 		testName := fmt.Sprintf("hns_endpoint_%s_shouldExist_%t", endpointName, shouldExist)
 		t.Run(testName, func(t *testing.T) {
-			matchingEndpoints, err := listHnsEndpointsRegex(endpointName)
+			matchingEndpoints, err := testtooling.ListHnsEndpointsRegex(endpointName)
 			assert.NilError(t, err)
 			if shouldExist {
 				assert.Equal(t, len(matchingEndpoints), 1)
@@ -167,7 +146,7 @@ func TestHnsEndpointsRemovedAfterAttachedRun(t *testing.T) {
 	// NOTE: because we cannot set/obtain the ID of the container to check for the exact HNS
 	// endpoint name, we record the number of HNS endpoints on the testing network and
 	// ensure it remains constant until after the test.
-	existingEndpoints, err := listHnsEndpointsRegex(".*_" + testNet.Name)
+	existingEndpoints, err := testtooling.ListHnsEndpointsRegex(".*_" + testNet.Name)
 	assert.NilError(t, err)
 	originalEndpointsCount := len(existingEndpoints)
 
@@ -182,7 +161,7 @@ func TestHnsEndpointsRemovedAfterAttachedRun(t *testing.T) {
 		"ipconfig", "/all",
 	).AssertOK()
 
-	existingEndpoints, err = listHnsEndpointsRegex(".*_" + testNet.Name)
+	existingEndpoints, err = testtooling.ListHnsEndpointsRegex(".*_" + testNet.Name)
 	assert.NilError(t, err)
 	assert.Equal(t, originalEndpointsCount, len(existingEndpoints), "the number of HNS endpoints should equal pre-test amount")
 }

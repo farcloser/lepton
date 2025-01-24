@@ -14,15 +14,6 @@
    limitations under the License.
 */
 
-/*
-   Portions from:
-   - https://github.com/moby/moby/blob/v20.10.6/api/types/container/container_top.go
-   - https://github.com/moby/moby/blob/v20.10.6/daemon/top_unix.go
-   Copyright (C) The Moby authors.
-   Licensed under the Apache License, Version 2.0
-   NOTICE: https://github.com/moby/moby/blob/v20.10.6/NOTICE
-*/
-
 package container
 
 import (
@@ -32,25 +23,10 @@ import (
 
 	containerd "github.com/containerd/containerd/v2/client"
 
+	"github.com/containerd/nerdctl/v2/leptonic/container"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/idutil/containerwalker"
 )
-
-// ContainerTopOKBody is from https://github.com/moby/moby/blob/v20.10.6/api/types/container/container_top.go
-//
-// ContainerTopOKBody OK response to ContainerTop operation
-type ContainerTopOKBody struct { //nolint:revive
-
-	// Each process running in the container, where each is process
-	// is an array of values corresponding to the titles.
-	//
-	// Required: true
-	Processes [][]string `json:"Processes"`
-
-	// The ps column titles
-	// Required: true
-	Titles []string `json:"Titles"`
-}
 
 // Top performs the equivalent of running `top` inside of container(s)
 func Top(ctx context.Context, client *containerd.Client, containers []string, opt types.ContainerTopOptions) error {
@@ -60,7 +36,7 @@ func Top(ctx context.Context, client *containerd.Client, containers []string, op
 			if found.MatchCount > 1 {
 				return fmt.Errorf("multiple IDs found with provided prefix: %s", found.Req)
 			}
-			return containerTop(ctx, opt.Stdout, client, found.Container.ID(), strings.Join(containers[1:], " "))
+			return container.Top(ctx, opt.Stdout, client, found.Container.ID(), strings.Join(containers[1:], " "))
 		},
 	}
 

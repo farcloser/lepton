@@ -17,12 +17,12 @@
 package nerdtest
 
 import (
-	"github.com/containerd/nerdctl/v2/pkg/testutil"
+	"github.com/containerd/nerdctl/v2/leptonic/testtooling"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
 )
 
 var HyperV = &test.Requirement{
 	Check: func(data test.Data, helpers test.Helpers) (ret bool, mess string) {
-		return testutil.HyperVSupported(), "HyperV is not enabled, skipping test"
+		return testtooling.HyperVSupported(), "HyperV is not enabled, skipping test"
 	},
 }
