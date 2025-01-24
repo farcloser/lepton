@@ -16,4 +16,4 @@
 
 set -o errexit -o errtrace -o functrace -o nounset -o pipefail
 
-sudo apt-get install -qq --no-install-recommends golang make yamllint shellcheck
+sudo apt-get install -qq --no-install-recommends golang make yamllint shellcheck expect
