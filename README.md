@@ -27,7 +27,7 @@ Furthermore, lepton overarching priority is to provide a clean SDK for people wh
 own cli, specifically with more expressive and cleaner error management, better storage abstractions,
 better performance.
 
-## Detailed relationship with nerdctl
+## Detailed relationship with nerdctl, and current status
 
 Lepton started in 2024 as a private project, and was reset as a friendly fork of nerdctl, 14th of December 2024, from
 https://github.com/containerd/nerdctl/commit/7e97f0618ceb160b044e95810e17fccf21fea3df
@@ -51,6 +51,8 @@ Also, lepton does not explicitly support and does not test anymore (might still 
 - containerd pre v2 (v1.7, v1.6)
 - ubuntu 22.04 and earlier
 
+So far, besides removal of unsupported code, lepton has been focused on cleanup, reviewing and moving "library"
+packages up into https://github.com/farcloser/go-containers
 
 <!--
 [[⬇️ **Download]**](https://github.com/containerd/nerdctl/releases)

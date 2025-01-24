@@ -25,7 +25,7 @@ import (
 	"testing"
 
 	"github.com/moby/sys/userns"
-	"go.farcloser.world/containers/cgroups"
+	"go.farcloser.world/containers/security/cgroups"
 	"gotest.tools/v3/assert"
 
 	"github.com/containerd/continuity/testutil/loopback"

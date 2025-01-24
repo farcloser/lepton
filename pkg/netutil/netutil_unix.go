@@ -35,10 +35,10 @@ import (
 
 	"github.com/containerd/log"
 
+	"github.com/containerd/nerdctl/v2/leptonic/socket"
 	"github.com/containerd/nerdctl/v2/pkg/defaults"
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
 	"github.com/containerd/nerdctl/v2/pkg/strutil"
-	"github.com/containerd/nerdctl/v2/pkg/systemutil"
 	"github.com/containerd/nerdctl/v2/pkg/version"
 )
 
@@ -220,7 +220,7 @@ func (e *CNIEnv) generateIPAM(driver string, subnets []string, gatewayStr, ipRan
 	case "dhcp":
 		ipamConf := newDHCPIPAMConfig()
 		ipamConf.DaemonSocketPath = filepath.Join(defaults.CNIRuntimeDir(), "dhcp.sock")
-		if err := systemutil.IsSocketAccessible(ipamConf.DaemonSocketPath); err != nil {
+		if err := socket.IsSocketAccessible(ipamConf.DaemonSocketPath); err != nil {
 			log.L.Warnf("cannot access dhcp socket %q (hint: try running with `dhcp daemon --socketpath=%s &` in CNI_PATH to launch the dhcp daemon)", ipamConf.DaemonSocketPath, ipamConf.DaemonSocketPath)
 		}
 

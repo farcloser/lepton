@@ -24,7 +24,7 @@ import (
 	"strconv"
 	"strings"
 
-	"go.farcloser.world/containers/cgroups"
+	"go.farcloser.world/containers/security/cgroups"
 	"gotest.tools/v3/assert"
 
 	"github.com/containerd/nerdctl/v2/pkg/buildkitutil"

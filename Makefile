@@ -96,7 +96,7 @@ lint-go-all:
 lint-imports:
 	$(call title, $@)
 	@cd $(MAKEFILE_DIR) \
-		&& ./hack/lint-imports.sh
+		&& ./hack/make-lint-imports.sh
 	$(call footer, $@)
 
 lint-yaml:
@@ -116,7 +116,7 @@ lint-commits:
 
 lint-headers:
 	$(call title, $@)
-	@cd $(MAKEFILE_DIR) && ltag -t "./hack/headers" --check $(VERBOSE_FLAG)
+	@cd $(MAKEFILE_DIR) && ltag -t "./hack/headers" --check -v
 	$(call footer, $@)
 
 lint-mod:
@@ -127,7 +127,7 @@ lint-mod:
 lint-licenses:
 	$(call title, $@)
 	@cd $(MAKEFILE_DIR) \
-		&& ./make-lint-licenses.sh
+		&& ./hack/make-lint-licenses.sh
 	$(call footer, $@)
 
 #	&& GOOS=darwin make lint-licenses
@@ -169,19 +169,15 @@ up:
 		&& go get -u ./...
 	$(call footer, $@)
 
-install-golangci:
-	$(call title, $@)
-	@cd $(MAKEFILE_DIR) \
-		&& go install github.com/golangci/golangci-lint/cmd/golangci-lint@89476e7a1eaa0a8a06c17343af960a5fd9e7edb7 # v1.62.2
-	$(call footer, $@)
-
 install-linters:
 	$(call title, $@)
+	# golangci: v1.62.2
 	# git-validation: main from 2023/11
 	# ltag: v0.2.5
 	# go-licenses: v2.0.0-alpha.1
 	# goimports-reviser: v3.8.2
 	@cd $(MAKEFILE_DIR) \
+		&& go install github.com/golangci/golangci-lint/cmd/golangci-lint@89476e7a1eaa0a8a06c17343af960a5fd9e7edb7 \
 		&& go install github.com/vbatts/git-validation@679e5cad8c50f1605ab3d8a0a947aaf72fb24c07 \
 		&& go install github.com/kunalkushwaha/ltag@b0cfa33e4cc9383095dc584d3990b62c95096de0 \
 		&& go install github.com/google/go-licenses/v2@d01822334fba5896920a060f762ea7ecdbd086e8 \
@@ -199,7 +195,7 @@ bench-unit:
 	$(call footer, $@)
 
 race-unit:
-	$(call title, $@)
+	$(call title, $@)./make-lint-licenses.sh
 	@go test $(VERBOSE_FLAG) -count 1 $(MAKEFILE_DIR)/pkg/... -race
 	$(call footer, $@)
 
@@ -278,7 +274,7 @@ artifacts: clean
 	artifacts \
 	\
 	lint lint-commits lint-go lint-go-all lint-headers lint-imports lint-licenses lint-licenses-all lint-mod lint-shell lint-yaml \
-	install-golangci install-linters \
+	install-linters \
 	fix fix-go fix-go-all fix-imports fix-mod \
 	update \
 	test test-unit race-unit bench-unit \

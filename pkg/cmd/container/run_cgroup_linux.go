@@ -23,7 +23,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"go.farcloser.world/containers/cgroups"
+	"go.farcloser.world/containers/security/cgroups"
 	"go.farcloser.world/containers/specs"
 	"go.farcloser.world/core/units"
 

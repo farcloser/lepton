@@ -28,7 +28,7 @@ import (
 	"github.com/containerd/containerd/v2/core/runtime/v2/logging"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/leptonic/journald"
+	"github.com/containerd/nerdctl/v2/leptonic/loggers/journald"
 	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/containerutil"
 	"github.com/containerd/nerdctl/v2/pkg/strutil"

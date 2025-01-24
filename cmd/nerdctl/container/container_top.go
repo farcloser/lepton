@@ -20,7 +20,7 @@ import (
 	"errors"
 
 	"github.com/spf13/cobra"
-	"go.farcloser.world/containers/cgroups"
+	"go.farcloser.world/containers/security/cgroups"
 
 	containerd "github.com/containerd/containerd/v2/client"
 

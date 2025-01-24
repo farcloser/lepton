@@ -30,6 +30,7 @@ import (
 	"time"
 
 	"go.farcloser.world/containers/digest"
+	"go.farcloser.world/containers/reference"
 	"go.farcloser.world/containers/specs"
 	"go.farcloser.world/core/units"
 
@@ -40,7 +41,6 @@ import (
 	"github.com/containerd/log"
 	"github.com/containerd/platforms"
 
-	"github.com/containerd/nerdctl/v2/leptonic/reference"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/containerdutil"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"

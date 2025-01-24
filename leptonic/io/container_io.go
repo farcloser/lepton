@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package cioutil
+package io
 
 import (
 	"context"
@@ -36,6 +36,13 @@ import (
 
 const binaryIOProcTermTimeout = 12 * time.Second // Give logger process 10 seconds for cleanup
 
+var bufPool = sync.Pool{
+	New: func() interface{} {
+		buffer := make([]byte, 32<<10)
+		return &buffer
+	},
+}
+
 // ncio is a basic container IO implementation.
 type ncio struct {
 	cmd     *exec.Cmd
@@ -43,13 +50,6 @@ type ncio struct {
 	wg      *sync.WaitGroup
 	closers []io.Closer
 	cancel  context.CancelFunc
-}
-
-var bufPool = sync.Pool{
-	New: func() interface{} {
-		buffer := make([]byte, 32<<10)
-		return &buffer
-	},
 }
 
 func (c *ncio) Config() cio.Config {

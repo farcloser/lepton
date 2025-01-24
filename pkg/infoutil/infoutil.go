@@ -27,7 +27,7 @@ import (
 	"strings"
 	"time"
 
-	"go.farcloser.world/containers/cgroups"
+	"go.farcloser.world/containers/security/cgroups"
 	"go.farcloser.world/core/version/semver"
 
 	containerd "github.com/containerd/containerd/v2/client"
