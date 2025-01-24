@@ -43,22 +43,26 @@ type psTestContainer struct {
 func preparePsTestContainer(t *testing.T, identity string, keepAlive bool) (*testutil.Base, psTestContainer) {
 	base := testutil.NewBase(t)
 
-	base.Cmd("pull", testutil.CommonImage).AssertOK()
-
 	testContainerName := testutil.Identifier(t) + identity
 	rwVolName := testContainerName + "-rw"
+
 	// A container can mount named and anonymous volumes
 	rwDir, err := os.MkdirTemp(t.TempDir(), "rw")
 	if err != nil {
 		t.Fatal(err)
 	}
-	base.Cmd("network", "create", testContainerName).AssertOK()
-	t.Cleanup(func() {
+
+	tearDown := func() {
 		base.Cmd("rm", "-f", testContainerName).AssertOK()
 		base.Cmd("volume", "rm", "-f", rwVolName).Run()
 		base.Cmd("network", "rm", testContainerName).Run()
-		os.RemoveAll(rwDir)
-	})
+	}
+
+	tearDown()
+	t.Cleanup(tearDown)
+
+	base.Cmd("pull", testutil.CommonImage).AssertOK()
+	base.Cmd("network", "create", testContainerName).AssertOK()
 
 	// A container can have multiple labels.
 	// Therefore, this test container has multiple labels to check it.
