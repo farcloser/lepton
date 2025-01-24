@@ -1,3 +1,5 @@
+//go:build unix
+
 /*
    Copyright Farcloser.
 
@@ -14,4 +16,19 @@
    limitations under the License.
 */
 
-package apparmor
+package socket
+
+import (
+	"path/filepath"
+
+	"golang.org/x/sys/unix"
+)
+
+func IsSocketAccessible(s string) error {
+	abs, err := filepath.Abs(s)
+	if err != nil {
+		return err
+	}
+	// set AT_EACCESS to allow running ourselves as a setuid binary
+	return unix.Faccessat(-1, abs, unix.R_OK|unix.W_OK, unix.AT_EACCESS)
+}

@@ -1,5 +1,3 @@
-//go:build unix
-
 /*
    Copyright Farcloser.
 
@@ -16,19 +14,17 @@
    limitations under the License.
 */
 
-package systemutil
+package socket
 
 import (
-	"path/filepath"
+	"time"
 
-	"golang.org/x/sys/unix"
+	"github.com/Microsoft/go-winio"
 )
 
 func IsSocketAccessible(s string) error {
-	abs, err := filepath.Abs(s)
-	if err != nil {
-		return err
-	}
-	// set AT_EACCESS to allow running ourselves as a setuid binary
-	return unix.Faccessat(-1, abs, unix.R_OK|unix.W_OK, unix.AT_EACCESS)
+	// test if we can access the pipe
+	timeout := 2 * time.Second
+	_, err := winio.DialPipe(s, &timeout)
+	return err
 }

@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package cioutil
+package io
 
 import (
 	"fmt"
