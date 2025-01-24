@@ -42,6 +42,7 @@ import (
 	"go.farcloser.world/lepton/pkg/strutil"
 	"go.farcloser.world/lepton/pkg/testutil"
 	"go.farcloser.world/lepton/pkg/testutil/nerdtest"
+	"go.farcloser.world/lepton/pkg/testutil/nettestutil"
 	"go.farcloser.world/lepton/pkg/testutil/various"
 )
 
@@ -593,7 +594,7 @@ func TestPortBindingWithCustomHost(t *testing.T) {
 		{
 			Description: "Issue #3539 - Access to a container running when 127.0.0.2 is specified in -p in rootless mode.",
 			Setup: func(data test.Data, helpers test.Helpers) {
-				helpers.Ensure("run", "-d", "--name", data.Identifier(), "-p", fmt.Sprintf("%s:80", address), testutil.NginxAlpineImage)
+				helpers.Ensure("run", "-d", "--name", data.Identifier(), "-p", address+":80", testutil.NginxAlpineImage)
 				nerdtest.EnsureContainerStarted(helpers, data.Identifier())
 			},
 			Cleanup: func(data test.Data, helpers test.Helpers) {
@@ -603,12 +604,13 @@ func TestPortBindingWithCustomHost(t *testing.T) {
 				return &test.Expected{
 					ExitCode: 0,
 					Errors:   []error{},
-					Output: test.All(
+					Output: expect.All(
 						func(stdout string, info string, t *testing.T) {
 							resp, err := nettestutil.HTTPGet(address, 30, false)
 							assert.NilError(t, err)
 
 							respBody, err := io.ReadAll(resp.Body)
+							_ = resp.Body.Close()
 							assert.NilError(t, err)
 							assert.Assert(t, strings.Contains(string(respBody), testutil.NginxAlpineIndexHTMLSnippet))
 						},

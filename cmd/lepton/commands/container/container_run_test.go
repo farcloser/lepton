@@ -317,7 +317,7 @@ func TestRunWithJournaldLogDriver(t *testing.T) {
 	journalctl, _ := exec.LookPath("journalctl")
 	res := icmd.RunCmd(icmd.Command(journalctl, "-xe"))
 	if res.ExitCode != 0 {
-		t.Skip("current user is not allowed to access journal logs - presumably not a member of adm")
+		t.Skipf("current user is not allowed to access journal logs: %s", res.Combined())
 	}
 
 	if runtime.GOOS == "windows" {
@@ -375,7 +375,7 @@ func TestRunWithJournaldLogDriverAndLogOpt(t *testing.T) {
 	journalctl, _ := exec.LookPath("journalctl")
 	res := icmd.RunCmd(icmd.Command(journalctl, "-xe"))
 	if res.ExitCode != 0 {
-		t.Skip("current user is not allowed to access journal logs - presumably not a member of adm")
+		t.Skipf("current user is not allowed to access journal logs: %s", res.Combined())
 	}
 
 	if runtime.GOOS == "windows" {
