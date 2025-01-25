@@ -97,6 +97,7 @@ linters-settings:
 
           - pkg: "github.com/fluent"
           - pkg: "github.com/Microsoft/hcsshim"
+          - pkg: "github.com/Microsoft/go-winio"
           # - pkg: "github.com/vishvananda"
 
       pkg:

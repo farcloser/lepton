@@ -29,7 +29,7 @@ func TestFileStoreBasics(t *testing.T) {
 	tempDir := t.TempDir()
 
 	// Creation
-	tempStore, err := New(tempDir, 0, 0)
+	tempStore, err := New(tempDir, false, 0, 0)
 	assert.NilError(t, err, "temporary store creation should succeed")
 
 	// Lock acquisition
@@ -110,7 +110,7 @@ func TestFileStoreGroups(t *testing.T) {
 	tempDir := t.TempDir()
 
 	// Creation
-	tempStore, err := New(tempDir, 0, 0)
+	tempStore, err := New(tempDir, false, 0, 0)
 	assert.NilError(t, err, "temporary store creation should succeed")
 
 	_ = tempStore.Lock()
@@ -166,7 +166,7 @@ func TestFileStoreConcurrent(t *testing.T) {
 	tempDir := t.TempDir()
 
 	// Creation
-	tempStore, err := New(tempDir, 0, 0)
+	tempStore, err := New(tempDir, true, 0, 0)
 	assert.NilError(t, err, "temporary store creation should succeed")
 
 	go func() {

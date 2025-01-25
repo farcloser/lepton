@@ -196,7 +196,7 @@ bench-unit:
 	$(call footer, $@)
 
 race-unit:
-	$(call title, $@)./make-lint-licenses.sh
+	$(call title, $@)
 	@go test $(VERBOSE_FLAG) -count 1 $(MAKEFILE_DIR)/pkg/... -race
 	$(call footer, $@)
 

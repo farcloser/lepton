@@ -41,7 +41,7 @@ jobs:
           docker run --privileged --rm tonistiigi/binfmt --install linux/arm/v7
       - name: "Prepare integration test environment"
         run: |
-          sudo apt-get install -y expect
+          sudo apt-get install -qq --no-install-recommends expect
           go install -v gotest.tools/gotestsum@v1
       - name: "Ensure that the integration test suite is compatible with Docker"
         run: WITH_SUDO=true ./hack/test-integration.sh -test.target=docker
