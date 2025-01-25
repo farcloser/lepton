@@ -41,7 +41,7 @@ func New(stateDir, namespace string) (NameStore, error) {
 		return nil, errors.Join(ErrNameStore, errs.ErrInvalidArgument)
 	}
 
-	st, err := store.New(filepath.Join(stateDir, namespace), 0, 0)
+	st, err := store.New(filepath.Join(stateDir, namespace), false, 0, 0)
 	if err != nil {
 		return nil, errors.Join(ErrNameStore, err)
 	}

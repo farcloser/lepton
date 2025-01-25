@@ -17,6 +17,7 @@
 package store
 
 import (
+	"crypto/sha256"
 	"errors"
 	"fmt"
 	"os"
@@ -28,19 +29,34 @@ import (
 	"github.com/containerd/nerdctl/v2/leptonic/errs"
 )
 
-// This might improve performance in case of (mostly read) massively parallel concurrent scenarios
-
 const (
 	// Default filesystem permissions to use when creating dir or files
-	defaultFilePerm = 0o600
-	defaultDirPerm  = 0o700
+	defaultFilePerm    = 0o600
+	defaultDirPerm     = 0o700
+	transformBlockSize = 64 // grouping of chars per directory depth
 )
+
+func transform(keys ...string) []string {
+	key := fmt.Sprintf("%x", sha256.Sum256([]byte(filepath.Join(keys...))))
+
+	var (
+		sliceSize = len(key) / transformBlockSize
+		pathSlice = make([]string, sliceSize)
+	)
+
+	for i := range sliceSize {
+		from, to := i*transformBlockSize, (i+1)*transformBlockSize
+		pathSlice[i] = key[from:to]
+	}
+
+	return pathSlice
+}
 
 // New returns a filesystem based Store implementation that satisfies both Manager and Locker
 // Note that atomicity is "guaranteed" by `os.Rename`, which arguably is not *always* atomic.
 // In particular, operating-system crashes may break that promise, and windows behavior is probably questionable.
 // That being said, this is still a much better solution than writing directly to the destination file.
-func New(rootPath string, dirPerm os.FileMode, filePerm os.FileMode) (Store, error) {
+func New(rootPath string, hashPath bool, dirPerm os.FileMode, filePerm os.FileMode) (Store, error) {
 	if rootPath == "" {
 		return nil, errors.Join(errs.ErrInvalidArgument, errors.New("FileStore rootPath cannot be empty"))
 	}
@@ -57,25 +73,45 @@ func New(rootPath string, dirPerm os.FileMode, filePerm os.FileMode) (Store, err
 		return nil, errors.Join(errs.ErrSystemFailure, err)
 	}
 
-	return &fileStore{
+	fs := &fileStore{
 		dir:      rootPath,
 		dirPerm:  dirPerm,
 		filePerm: filePerm,
-	}, nil
+	}
+
+	if hashPath {
+		fs.transform = transform
+	}
+
+	return fs, nil
 }
 
 type fileStore struct {
-	mutex    sync.RWMutex
-	dir      string
-	locked   *os.File
-	dirPerm  os.FileMode
-	filePerm os.FileMode
+	mutex     sync.RWMutex
+	dir       string
+	locked    *os.File
+	dirPerm   os.FileMode
+	filePerm  os.FileMode
+	transform func(...string) []string
 }
 
 func (vs *fileStore) Lock() error {
 	vs.mutex.Lock()
 
 	dirFile, err := filesystem.Lock(vs.dir)
+	if err != nil {
+		return err
+	}
+
+	vs.locked = dirFile
+
+	return nil
+}
+
+func (vs *fileStore) ReadOnlyLock() error {
+	vs.mutex.Lock()
+
+	dirFile, err := filesystem.ReadOnlyLock(vs.dir)
 	if err != nil {
 		return err
 	}
@@ -103,6 +139,18 @@ func (vs *fileStore) Release() error {
 	return nil
 }
 
+func (vs *fileStore) WithReadOnlyLock(fun func() error) (err error) {
+	if err = vs.ReadOnlyLock(); err != nil {
+		return err
+	}
+
+	defer func() {
+		err = errors.Join(vs.Release(), err)
+	}()
+
+	return fun()
+}
+
 func (vs *fileStore) WithLock(fun func() error) (err error) {
 	if err = vs.Lock(); err != nil {
 		return err
@@ -120,11 +168,10 @@ func (vs *fileStore) Get(key ...string) ([]byte, error) {
 		return nil, errors.Join(errs.ErrFaultyImplementation, errors.New("operations on the store must use locking"))
 	}
 
-	if err := validateAllPathComponents(key...); err != nil {
+	path, err := vs.Location(key...)
+	if err != nil {
 		return nil, err
 	}
-
-	path := filepath.Join(append([]string{vs.dir}, key...)...)
 
 	st, err := os.Stat(path)
 	if err != nil {
@@ -139,7 +186,7 @@ func (vs *fileStore) Get(key ...string) ([]byte, error) {
 		return nil, errors.Join(errs.ErrFaultyImplementation, fmt.Errorf("%q is a directory and cannot be read as a file", path))
 	}
 
-	content, err := os.ReadFile(filepath.Join(append([]string{vs.dir}, key...)...))
+	content, err := os.ReadFile(path)
 	if err != nil {
 		return nil, errors.Join(errs.ErrSystemFailure, err)
 	}
@@ -148,13 +195,12 @@ func (vs *fileStore) Get(key ...string) ([]byte, error) {
 }
 
 func (vs *fileStore) Exists(key ...string) (bool, error) {
-	if err := validateAllPathComponents(key...); err != nil {
+	path, err := vs.Location(key...)
+	if err != nil {
 		return false, err
 	}
 
-	path := filepath.Join(append([]string{vs.dir}, key...)...)
-
-	_, err := os.Stat(path)
+	_, err = os.Stat(path)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			return false, nil
@@ -171,45 +217,46 @@ func (vs *fileStore) Set(data []byte, key ...string) error {
 		return errors.Join(errs.ErrFaultyImplementation, errors.New("operations on the store must use locking"))
 	}
 
-	if err := validateAllPathComponents(key...); err != nil {
+	path, err := vs.Location(key...)
+	if err != nil {
 		return err
 	}
 
-	fileName := key[len(key)-1]
-	parent := vs.dir
+	parent := filepath.Dir(path)
 
-	if len(key) > 1 {
-		parent = filepath.Join(append([]string{parent}, key[0:len(key)-1]...)...)
+	if parent != vs.dir {
 		err := os.MkdirAll(parent, vs.dirPerm)
 		if err != nil {
 			return errors.Join(errs.ErrSystemFailure, err)
 		}
 	}
 
-	dest := filepath.Join(parent, fileName)
-	st, err := os.Stat(dest)
+	st, err := os.Stat(path)
 	if err == nil {
 		if st.IsDir() {
-			return errors.Join(errs.ErrFaultyImplementation, fmt.Errorf("%q is a directory and cannot be written to", dest))
+			return errors.Join(errs.ErrFaultyImplementation, fmt.Errorf("%q is a directory and cannot be written to", path))
 		}
 	}
 
-	return filesystem.WriteFile(dest, data, vs.filePerm)
+	return filesystem.WriteFile(path, data, vs.filePerm)
 }
 
 func (vs *fileStore) List(key ...string) ([]string, error) {
+	// NOTE: list is problematic when hashing, as the returned keys may not make sense
 	if vs.locked == nil {
 		return nil, errors.Join(errs.ErrFaultyImplementation, errors.New("operations on the store must use locking"))
 	}
 
+	var err error
+	path := vs.dir
+
 	// Unlike Get, Set and Delete, List can have zero length key
-	for _, k := range key {
-		if err := filesystem.ValidatePathComponent(k); err != nil {
-			return nil, errors.Join(errs.ErrInvalidArgument, err)
+	if len(key) > 0 {
+		path, err = vs.Location(key...)
+		if err != nil {
+			return nil, err
 		}
 	}
-
-	path := filepath.Join(append([]string{vs.dir}, key...)...)
 
 	st, err := os.Stat(path)
 	if err != nil {
@@ -242,13 +289,12 @@ func (vs *fileStore) Delete(key ...string) error {
 		return errors.Join(errs.ErrFaultyImplementation, errors.New("operations on the store must use locking"))
 	}
 
-	if err := validateAllPathComponents(key...); err != nil {
+	path, err := vs.Location(key...)
+	if err != nil {
 		return err
 	}
 
-	path := filepath.Join(append([]string{vs.dir}, key...)...)
-
-	_, err := os.Stat(path)
+	_, err = os.Stat(path)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			return errors.Join(errs.ErrNotFound, err)
@@ -265,11 +311,15 @@ func (vs *fileStore) Delete(key ...string) error {
 }
 
 func (vs *fileStore) Location(key ...string) (string, error) {
+	if vs.transform != nil {
+		key = vs.transform(key...)
+	}
+
 	if err := validateAllPathComponents(key...); err != nil {
 		return "", err
 	}
 
-	return filepath.Join(append([]string{vs.dir}, key...)...), nil
+	return filepath.Join(vs.dir, filepath.Join(key...)), nil
 }
 
 func (vs *fileStore) GroupEnsure(key ...string) error {
@@ -277,11 +327,10 @@ func (vs *fileStore) GroupEnsure(key ...string) error {
 		return errors.Join(errs.ErrFaultyImplementation, errors.New("operations on the store must use locking"))
 	}
 
-	if err := validateAllPathComponents(key...); err != nil {
+	path, err := vs.Location(key...)
+	if err != nil {
 		return err
 	}
-
-	path := filepath.Join(append([]string{vs.dir}, key...)...)
 
 	if err := os.MkdirAll(path, vs.dirPerm); err != nil {
 		return errors.Join(errs.ErrSystemFailure, err)
@@ -295,11 +344,10 @@ func (vs *fileStore) GroupSize(key ...string) (int64, error) {
 		return 0, errors.Join(errs.ErrFaultyImplementation, errors.New("operations on the store must use locking"))
 	}
 
-	if err := validateAllPathComponents(key...); err != nil {
+	path, err := vs.Location(key...)
+	if err != nil {
 		return 0, err
 	}
-
-	path := filepath.Join(append([]string{vs.dir}, key...)...)
 
 	st, err := os.Stat(path)
 	if err != nil {

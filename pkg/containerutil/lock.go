@@ -23,7 +23,7 @@ import (
 )
 
 func Lock(stateDir string) (store.Store, error) {
-	stor, err := store.New(filepath.Join(stateDir, "oplock"), 0, 0)
+	stor, err := store.New(filepath.Join(stateDir, "oplock"), false, 0, 0)
 	if err != nil {
 		return nil, err
 	}

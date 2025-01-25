@@ -42,7 +42,7 @@ var ErrLifecycleStore = errors.New("lifecycle-store error")
 
 // New will return a lifecycle struct for the container which stateDir is passed as argument
 func New(stateDir string) (*Store, error) {
-	st, err := store.New(stateDir, 0, 0)
+	st, err := store.New(stateDir, false, 0, 0)
 	if err != nil {
 		return nil, errors.Join(ErrLifecycleStore, err)
 	}
