@@ -31,7 +31,7 @@ import (
 // skipAttachForDocker should be called by attach-related tests that assert 'read detach keys' in stdout.
 func skipAttachForDocker(t *testing.T) {
 	t.Helper()
-	if testutil.GetTarget() == testutil.Docker {
+	if nerdtest.IsDocker() {
 		t.Skip("When detaching from a container, for a session started with 'docker attach'" +
 			", it prints 'read escape sequence', but for one started with 'docker (run|start)', it prints nothing." +
 			" However, the flag is called '--detach-keys' in all cases" +

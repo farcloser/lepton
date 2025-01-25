@@ -26,6 +26,7 @@ import (
 	"gotest.tools/v3/assert"
 
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
+	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
 )
 
 func TestComposeExec(t *testing.T) {
@@ -164,9 +165,6 @@ services:
 func TestComposeExecTTY(t *testing.T) {
 	// `-i` in `compose run & exec` is only supported in compose v2.
 	base := testutil.NewBase(t)
-	if testutil.GetTarget() == testutil.Nerdctl {
-		testutil.RequireDaemonVersion(base, ">= 1.6.0-0")
-	}
 
 	var dockerComposeYAML = fmt.Sprintf(`
 version: '3.1'
@@ -234,7 +232,7 @@ services:
 			)
 			//  docker and nerdctl have different DNS resolution behaviors.
 			// it uses the ID in the /etc/hosts file, so we need to fetch the ID first.
-			if testutil.GetTarget() == testutil.Docker {
+			if nerdtest.IsDocker() {
 				base.Cmd("ps", "--filter", "name="+name, "--format", "{{.ID}}").AssertOutWithFunc(func(stdout string) error {
 					host = strings.TrimSpace(stdout)
 					return nil

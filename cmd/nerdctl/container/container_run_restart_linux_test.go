@@ -30,6 +30,7 @@ import (
 	"gotest.tools/v3/poll"
 
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
+	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nettestutil"
 )
 
@@ -95,7 +96,7 @@ func TestRunRestart(t *testing.T) {
 
 func TestRunRestartWithOnFailure(t *testing.T) {
 	base := testutil.NewBase(t)
-	if testutil.GetTarget() == testutil.Nerdctl {
+	if nerdtest.IsNotDocker() {
 		testutil.RequireContainerdPlugin(base, "io.containerd.internal.v1", "restart", []string{"on-failure"})
 	}
 	tID := testutil.Identifier(t)
@@ -116,7 +117,7 @@ func TestRunRestartWithOnFailure(t *testing.T) {
 
 func TestRunRestartWithUnlessStopped(t *testing.T) {
 	base := testutil.NewBase(t)
-	if testutil.GetTarget() == testutil.Nerdctl {
+	if nerdtest.IsNotDocker() {
 		testutil.RequireContainerdPlugin(base, "io.containerd.internal.v1", "restart", []string{"unless-stopped"})
 	}
 	tID := testutil.Identifier(t)
@@ -140,7 +141,7 @@ func TestRunRestartWithUnlessStopped(t *testing.T) {
 
 func TestUpdateRestartPolicy(t *testing.T) {
 	base := testutil.NewBase(t)
-	if testutil.GetTarget() == testutil.Nerdctl {
+	if nerdtest.IsNotDocker() {
 		testutil.RequireContainerdPlugin(base, "io.containerd.internal.v1", "restart", []string{"on-failure"})
 	}
 	tID := testutil.Identifier(t)
@@ -163,7 +164,7 @@ func TestUpdateRestartPolicy(t *testing.T) {
 // and check it can work correctly.
 func TestAddRestartPolicy(t *testing.T) {
 	base := testutil.NewBase(t)
-	if testutil.GetTarget() == testutil.Nerdctl {
+	if nerdtest.IsNotDocker() {
 		testutil.RequireContainerdPlugin(base, "io.containerd.internal.v1", "restart", []string{"on-failure"})
 	}
 	tID := testutil.Identifier(t)
