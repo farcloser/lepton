@@ -310,9 +310,6 @@ func TestRunWithInit(t *testing.T) {
 func TestRunTTY(t *testing.T) {
 	t.Parallel()
 	base := testutil.NewBase(t)
-	if testutil.GetTarget() == testutil.Nerdctl {
-		testutil.RequireDaemonVersion(base, ">= 1.6.0-0")
-	}
 
 	const sttyPartialOutput = "speed 38400 baud"
 	// unbuffer(1) emulates tty, which is required by `run -t`.
@@ -474,7 +471,7 @@ func TestRunWithOOMScoreAdj(t *testing.T) {
 func TestRunWithDetachKeys(t *testing.T) {
 	t.Parallel()
 
-	if testutil.GetTarget() == testutil.Docker {
+	if nerdtest.IsDocker() {
 		t.Skip("When detaching from a container, for a session started with 'docker attach'" +
 			", it prints 'read escape sequence', but for one started with 'docker (run|start)', it prints nothing." +
 			" However, the flag is called '--detach-keys' in all cases" +

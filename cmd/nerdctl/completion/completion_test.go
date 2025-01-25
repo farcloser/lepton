@@ -167,22 +167,22 @@ func TestCompletion(t *testing.T) {
 				Description: "no namespace --cgroup-manager",
 				Require:     test.Not(test.Windows),
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-					return helpers.Custom("nerdctl", "__complete", "--cgroup-manager", "")
+					return helpers.Custom(nerdtest.Binary(), "__complete", "--cgroup-manager", "")
 				},
 				Expected: test.Expects(0, nil, test.Contains("systemd\n")),
 			},
 			{
 				Description: "no namespace empty",
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-					return helpers.Custom("nerdctl", "__complete", "")
+					return helpers.Custom(nerdtest.Binary(), "__complete", "")
 				},
 				Expected: test.Expects(0, nil, test.Contains("run\t")),
 			},
 			{
 				Description: "namespace space empty",
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-					// mind {"--namespace=nerdctl-test"} vs {"--namespace", "nerdctl-test"}
-					return helpers.Custom("nerdctl", "__complete", "--namespace", string(helpers.Read(nerdtest.Namespace)), "")
+					// mind {"--namespace=test"} vs {"--namespace", "test"}
+					return helpers.Custom(nerdtest.Binary(), "__complete", "--namespace", string(helpers.Read(nerdtest.Namespace)), "")
 				},
 				Expected: test.Expects(0, nil, test.Contains("run\t")),
 			},
@@ -204,8 +204,8 @@ func TestCompletion(t *testing.T) {
 			{
 				Description: "namespace run -i",
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-					// mind {"--namespace=nerdctl-test"} vs {"--namespace", "nerdctl-test"}
-					return helpers.Custom("nerdctl", "__complete", "--namespace", string(helpers.Read(nerdtest.Namespace)), "run", "-i", "")
+					// mind {"--namespace=test"} vs {"--namespace", "test"}
+					return helpers.Custom(nerdtest.Binary(), "__complete", "--namespace", string(helpers.Read(nerdtest.Namespace)), "run", "-i", "")
 				},
 				Expected: test.Expects(0, nil, test.Contains(testutil.CommonImage+"\n")),
 			},

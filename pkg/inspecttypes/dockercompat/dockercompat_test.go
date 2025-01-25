@@ -31,7 +31,7 @@ import (
 	"github.com/containerd/containerd/v2/core/containers"
 
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/native"
-	"github.com/containerd/nerdctl/v2/pkg/version"
+	"github.com/containerd/nerdctl/v2/pkg/labels"
 )
 
 func TestContainerFromNative(t *testing.T) {
@@ -53,9 +53,9 @@ func TestContainerFromNative(t *testing.T) {
 			n: &native.Container{
 				Container: containers.Container{
 					Labels: map[string]string{
-						version.RootName + "/mounts":    "[{\"Type\":\"bind\",\"Source\":\"/mnt/foo\",\"Destination\":\"/mnt/foo\",\"Mode\":\"rshared,rw\",\"RW\":true,\"Propagation\":\"rshared\"}]",
-						version.RootName + "/state-dir": tempStateDir,
-						version.RootName + "/hostname":  "host1",
+						labels.Prefix + "mounts":    "[{\"Type\":\"bind\",\"Source\":\"/mnt/foo\",\"Destination\":\"/mnt/foo\",\"Mode\":\"rshared,rw\",\"RW\":true,\"Propagation\":\"rshared\"}]",
+						labels.Prefix + "state-dir": tempStateDir,
+						labels.Prefix + "hostname":  "host1",
 					},
 				},
 				Spec: &specs.Spec{},
@@ -88,9 +88,9 @@ func TestContainerFromNative(t *testing.T) {
 				},
 				Config: &Config{
 					Labels: map[string]string{
-						version.RootName + "/mounts":    "[{\"Type\":\"bind\",\"Source\":\"/mnt/foo\",\"Destination\":\"/mnt/foo\",\"Mode\":\"rshared,rw\",\"RW\":true,\"Propagation\":\"rshared\"}]",
-						version.RootName + "/state-dir": tempStateDir,
-						version.RootName + "/hostname":  "host1",
+						labels.Prefix + "mounts":    "[{\"Type\":\"bind\",\"Source\":\"/mnt/foo\",\"Destination\":\"/mnt/foo\",\"Mode\":\"rshared,rw\",\"RW\":true,\"Propagation\":\"rshared\"}]",
+						labels.Prefix + "state-dir": tempStateDir,
+						labels.Prefix + "hostname":  "host1",
 					},
 					Hostname: "host1",
 				},
@@ -299,7 +299,7 @@ func TestNetworkSettingsFromNative(t *testing.T) {
 			},
 			s: &specs.Spec{
 				Annotations: map[string]string{
-					version.RootName + "/ports": "[{\"HostPort\":8075,\"ContainerPort\":77,\"Protocol\":\"tcp\",\"HostIP\":\"127.0.0.1\"}]",
+					labels.Prefix + "ports": "[{\"HostPort\":8075,\"ContainerPort\":77,\"Protocol\":\"tcp\",\"HostIP\":\"127.0.0.1\"}]",
 				},
 			},
 			expected: &NetworkSettings{

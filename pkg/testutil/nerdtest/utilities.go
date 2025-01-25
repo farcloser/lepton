@@ -25,7 +25,6 @@ import (
 
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/native"
-	"github.com/containerd/nerdctl/v2/pkg/testutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
 )
 
@@ -37,8 +36,16 @@ const (
 	Infinity = "3600"
 )
 
+func Binary() string {
+	return getTarget()
+}
+
 func IsDocker() bool {
-	return testutil.GetTarget() == "docker"
+	return getTarget() == "docker"
+}
+
+func IsNotDocker() bool {
+	return getTarget() != "docker"
 }
 
 // InspectContainer is a helper that can be used inside custom commands or Setup

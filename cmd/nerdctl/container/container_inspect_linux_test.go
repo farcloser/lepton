@@ -27,6 +27,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
 	"github.com/containerd/nerdctl/v2/pkg/labels"
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
+	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
 )
 
 func TestContainerInspectContainsPortConfig(t *testing.T) {
@@ -189,7 +190,7 @@ func TestContainerInspectState(t *testing.T) {
 	// nerdish-cli: run error produces a nil Task, so the Status is empty because Status comes from Task.
 	// docker : run error gives => `Status=created` as  in docker there is no a separation between container and Task.
 	errStatus := ""
-	if base.Target == testutil.Docker {
+	if nerdtest.IsDocker() {
 		errStatus = "created"
 	}
 	testCases := []testCase{

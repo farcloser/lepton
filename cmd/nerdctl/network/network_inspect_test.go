@@ -244,7 +244,7 @@ func TestNetworkInspect(t *testing.T) {
 				return &test.Expected{
 					ExitCode: 0,
 					Output: func(stdout string, info string, t *testing.T) {
-						cmd := helpers.Custom("nerdctl", "--namespace", data.Identifier())
+						cmd := helpers.Custom(nerdtest.Binary(), "--namespace", data.Identifier())
 
 						com := cmd.Clone()
 						com.WithArgs("network", "inspect", data.Identifier())

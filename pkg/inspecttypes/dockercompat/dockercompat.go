@@ -400,6 +400,7 @@ func statusFromNative(x containerd.Status, labels map[string]string) string {
 	}
 }
 
+// FIXME: unexport and test ContainerFromNative instead
 func networkSettingsFromNative(n *native.NetNS, sp *specs.Spec) (*NetworkSettings, error) {
 	res := &NetworkSettings{
 		Networks: make(map[string]*NetworkEndpointSettings),
