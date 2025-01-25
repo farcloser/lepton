@@ -21,9 +21,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/containerd/errdefs"
-
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
+	"github.com/containerd/nerdctl/v2/leptonic/errs"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/volume"
 )
@@ -52,7 +51,7 @@ func processVolumeCreateOptions(cmd *cobra.Command) (types.VolumeCreateOptions, 
 	}
 	for _, label := range labels {
 		if label == "" {
-			return types.VolumeCreateOptions{}, fmt.Errorf("labels cannot be empty (%w)", errdefs.ErrInvalidArgument)
+			return types.VolumeCreateOptions{}, fmt.Errorf("labels cannot be empty (%w)", errs.ErrInvalidArgument)
 		}
 	}
 

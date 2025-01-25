@@ -32,12 +32,12 @@ import (
 	"github.com/containerd/containerd/v2/core/images"
 	"github.com/containerd/containerd/v2/core/remotes"
 	"github.com/containerd/containerd/v2/core/snapshots"
-	"github.com/containerd/errdefs"
 	"github.com/containerd/imgcrypt/v2"
 	"github.com/containerd/imgcrypt/v2/images/encryption"
 	"github.com/containerd/log"
 	"github.com/containerd/platforms"
 
+	"github.com/containerd/nerdctl/v2/leptonic/errs"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/errutil"
 	"github.com/containerd/nerdctl/v2/pkg/idutil/imagewalker"
@@ -93,10 +93,10 @@ func GetExistingImage(ctx context.Context, client *containerd.Client, snapshotte
 		return nil, err
 	}
 	if count == 0 {
-		return nil, errors.Join(errdefs.ErrNotFound, errors.New("got count 0 after walking"))
+		return nil, errors.Join(errs.ErrNotFound, errors.New("got count 0 after walking"))
 	}
 	if res == nil {
-		return nil, errors.Join(errdefs.ErrNotFound, errors.New("got nil res after walking"))
+		return nil, errors.Join(errs.ErrNotFound, errors.New("got nil res after walking"))
 	}
 	return res, nil
 }
@@ -116,7 +116,7 @@ func EnsureImage(ctx context.Context, client *containerd.Client, rawRef string, 
 	if options.Mode != "always" && len(options.OCISpecPlatform) == 1 {
 		if res, err := GetExistingImage(ctx, client, options.GOptions.Snapshotter, rawRef, options.OCISpecPlatform[0]); err == nil {
 			return res, nil
-		} else if !errdefs.IsNotFound(err) {
+		} else if !errors.Is(err, errs.ErrNotFound) {
 			return nil, err
 		}
 	}

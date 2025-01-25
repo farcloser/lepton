@@ -34,9 +34,9 @@ import (
 	"github.com/muesli/cancelreader"
 
 	"github.com/containerd/containerd/v2/core/runtime/v2/logging"
-	"github.com/containerd/errdefs"
 	"github.com/containerd/log"
 
+	"github.com/containerd/nerdctl/v2/leptonic/errs"
 	"github.com/containerd/nerdctl/v2/pkg/version"
 )
 
@@ -89,7 +89,7 @@ func Drivers() []string {
 func GetDriver(name string, opts map[string]string, address string) (Driver, error) {
 	driverFactory, ok := drivers[name]
 	if !ok {
-		return nil, fmt.Errorf("unknown logging driver %q: %w", name, errdefs.ErrNotFound)
+		return nil, fmt.Errorf("unknown logging driver %q: %w", name, errs.ErrNotFound)
 	}
 	return driverFactory(opts, address)
 }

@@ -19,8 +19,7 @@ package volume
 import (
 	"testing"
 
-	"github.com/containerd/errdefs"
-
+	"github.com/containerd/nerdctl/v2/leptonic/errs"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
 )
@@ -53,7 +52,7 @@ func TestVolumeNamespace(t *testing.T) {
 				return helpers.Command("volume", "inspect", data.Get("root_volume"))
 			},
 			Expected: test.Expects(1, []error{
-				errdefs.ErrNotFound,
+				errs.ErrNotFound,
 			}, nil),
 		},
 		{
@@ -62,7 +61,7 @@ func TestVolumeNamespace(t *testing.T) {
 				return helpers.Command("volume", "remove", data.Get("root_volume"))
 			},
 			Expected: test.Expects(1, []error{
-				errdefs.ErrNotFound,
+				errs.ErrNotFound,
 			}, nil),
 		},
 		{

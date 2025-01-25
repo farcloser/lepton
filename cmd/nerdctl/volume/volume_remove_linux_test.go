@@ -24,6 +24,7 @@ import (
 
 	"github.com/containerd/errdefs"
 
+	"github.com/containerd/nerdctl/v2/leptonic/errs"
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
@@ -45,12 +46,12 @@ func TestVolumeRemove(t *testing.T) {
 		{
 			Description: "invalid identifier should fail",
 			Command:     test.Command("volume", "rm", "∞"),
-			Expected:    test.Expects(1, []error{errdefs.ErrInvalidArgument}, nil),
+			Expected:    test.Expects(1, []error{errs.ErrInvalidArgument}, nil),
 		},
 		{
 			Description: "non existent volume should fail",
 			Command:     test.Command("volume", "rm", "doesnotexist"),
-			Expected:    test.Expects(1, []error{errdefs.ErrNotFound}, nil),
+			Expected:    test.Expects(1, []error{errs.ErrNotFound}, nil),
 		},
 		{
 			Description: "busy volume should fail",
@@ -170,9 +171,9 @@ func TestVolumeRemove(t *testing.T) {
 				return &test.Expected{
 					ExitCode: 1,
 					Errors: []error{
-						errdefs.ErrNotFound,
+						errs.ErrNotFound,
 						errdefs.ErrFailedPrecondition,
-						errdefs.ErrInvalidArgument,
+						errs.ErrInvalidArgument,
 					},
 					Output: test.Equals(data.Identifier() + "\n"),
 				}
@@ -218,9 +219,9 @@ func TestVolumeRemove(t *testing.T) {
 			},
 
 			Expected: test.Expects(1, []error{
-				errdefs.ErrNotFound,
+				errs.ErrNotFound,
 				errdefs.ErrFailedPrecondition,
-				errdefs.ErrInvalidArgument,
+				errs.ErrInvalidArgument,
 			}, nil),
 		},
 	}

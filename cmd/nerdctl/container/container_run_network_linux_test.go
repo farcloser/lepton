@@ -37,9 +37,9 @@ import (
 
 	"github.com/containerd/containerd/v2/defaults"
 	"github.com/containerd/containerd/v2/pkg/netns"
-	"github.com/containerd/errdefs"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
+	"github.com/containerd/nerdctl/v2/leptonic/errs"
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
@@ -371,7 +371,7 @@ func TestRunWithInvalidPortThenCleanUp(t *testing.T) {
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 				return &test.Expected{
 					ExitCode: 1,
-					Errors:   []error{errdefs.ErrInvalidArgument},
+					Errors:   []error{errs.ErrInvalidArgument},
 					Output: func(stdout string, info string, t *testing.T) {
 						getAddrHash := func(addr string) string {
 							const addrHashLen = 8
