@@ -21,8 +21,7 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/containerd/errdefs"
-
+	"github.com/containerd/nerdctl/v2/leptonic/errs"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
 )
@@ -39,7 +38,7 @@ func TestVolumeCreate(t *testing.T) {
 		{
 			Description: "invalid identifier should fail",
 			Command:     test.Command("volume", "create", "∞"),
-			Expected:    test.Expects(1, []error{errdefs.ErrInvalidArgument}, nil),
+			Expected:    test.Expects(1, []error{errs.ErrInvalidArgument}, nil),
 		},
 		{
 			Description: "too many args should fail",
@@ -84,7 +83,7 @@ func TestVolumeCreate(t *testing.T) {
 				helpers.Anyhow("volume", "rm", "-f", data.Identifier())
 			},
 			// NOTE: docker returns 125 on this
-			Expected: test.Expects(-1, []error{errdefs.ErrInvalidArgument}, nil),
+			Expected: test.Expects(-1, []error{errs.ErrInvalidArgument}, nil),
 		},
 		{
 			Description: "creating already existing volume should succeed",

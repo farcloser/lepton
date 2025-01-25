@@ -27,8 +27,7 @@ import (
 
 	"gotest.tools/v3/assert"
 
-	"github.com/containerd/errdefs"
-
+	"github.com/containerd/nerdctl/v2/leptonic/errs"
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/native"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
@@ -84,12 +83,12 @@ func TestVolumeInspect(t *testing.T) {
 		{
 			Description: "invalid identifier should fail",
 			Command:     test.Command("volume", "inspect", "∞"),
-			Expected:    test.Expects(1, []error{errdefs.ErrInvalidArgument}, nil),
+			Expected:    test.Expects(1, []error{errs.ErrInvalidArgument}, nil),
 		},
 		{
 			Description: "non existent volume should fail",
 			Command:     test.Command("volume", "inspect", "doesnotexist"),
-			Expected:    test.Expects(1, []error{errdefs.ErrNotFound}, nil),
+			Expected:    test.Expects(1, []error{errs.ErrNotFound}, nil),
 		},
 		{
 			Description: "success",
@@ -188,7 +187,7 @@ func TestVolumeInspect(t *testing.T) {
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 				return &test.Expected{
 					ExitCode: 1,
-					Errors:   []error{errdefs.ErrNotFound, errdefs.ErrInvalidArgument},
+					Errors:   []error{errs.ErrNotFound, errs.ErrInvalidArgument},
 					Output: test.All(
 						test.Contains(data.Get("vol1")),
 						func(stdout string, info string, t *testing.T) {
@@ -206,7 +205,7 @@ func TestVolumeInspect(t *testing.T) {
 		{
 			Description: "multi failure",
 			Command:     test.Command("volume", "inspect", "invalid∞", "nonexistent"),
-			Expected:    test.Expects(1, []error{errdefs.ErrNotFound, errdefs.ErrInvalidArgument}, nil),
+			Expected:    test.Expects(1, []error{errs.ErrNotFound, errs.ErrInvalidArgument}, nil),
 		},
 	}
 

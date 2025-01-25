@@ -17,3 +17,4 @@
 set -o errexit -o errtrace -o functrace -o nounset -o pipefail
 
 brew install golang make yamllint shellcheck expect
+make install-dev-tools

@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/containerd/errdefs"
+	"github.com/containerd/nerdctl/v2/leptonic/errs"
 )
 
 const AllowedIdentfierChars = `[a-zA-Z0-9][a-zA-Z0-9_.-]`
@@ -35,11 +35,11 @@ var AllowedIdentifierPattern = regexp.MustCompile(`^` + AllowedIdentfierChars + 
 // while the Docker compatible implementation omits the length check entirely.
 func ValidateDockerCompat(s string) error {
 	if len(s) == 0 {
-		return fmt.Errorf("identifier must not be empty %w", errdefs.ErrInvalidArgument)
+		return fmt.Errorf("identifier must not be empty %w", errs.ErrInvalidArgument)
 	}
 
 	if !AllowedIdentifierPattern.MatchString(s) {
-		return fmt.Errorf("identifier %q must match pattern %q: %w", s, AllowedIdentfierChars, errdefs.ErrInvalidArgument)
+		return fmt.Errorf("identifier %q must match pattern %q: %w", s, AllowedIdentfierChars, errs.ErrInvalidArgument)
 	}
 
 	return nil
