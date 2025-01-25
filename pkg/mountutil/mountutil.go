@@ -258,8 +258,6 @@ func createDirOnHost(src string, createDir bool) error {
 }
 
 func isNamedVolume(s string) bool {
-	err := identifiers.ValidateDockerCompat(s)
-
 	// If the volume name is invalid, we assume it is a path
-	return err == nil
+	return identifiers.ValidateDockerCompat(s) == nil
 }
