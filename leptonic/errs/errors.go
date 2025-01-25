@@ -37,4 +37,16 @@ var (
 	// used is wrong.
 	// For example, if a certain abstraction expects to be first initialized before being used
 	ErrFaultyImplementation = errors.New("code needs to be fixed")
+
+	// ErrNetworkCondition is meant to wrap network level errors - DNS, TCP, TLS errors
+	// but NOT http server level errors
+	ErrNetworkCondition = errors.New("network communication failed")
+
+	// ErrServerIsMisbehaving should wrap all server errors (eg: status code 50x)
+	// but NOT dns, tcp, or tls errors
+	ErrServerIsMisbehaving = errors.New("server error")
+
+	// ErrFailedPrecondition should wrap errors encountered when a certain operation cannot be performed because
+	// a precondition prevents it from completing. For example, removing a volume that is in use.
+	ErrFailedPrecondition = errors.New("unable to perform the requested operation")
 )
