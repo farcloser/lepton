@@ -19,6 +19,7 @@ package version
 import (
 	"runtime/debug"
 	"strconv"
+	"strings"
 )
 
 var (
@@ -30,7 +31,7 @@ var (
 	// Changing this can be done at build time with -X (from Makefile), and is mostly of interest for people looking
 	// to build their own cli, leveraging the codebase as a library.
 	RootName  = "nerdctl"
-	EnvPrefix = "NERDCTL"
+	EnvPrefix = strings.ToUpper(RootName)
 )
 
 const unknown = "<unknown>"
