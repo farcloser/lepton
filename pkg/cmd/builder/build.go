@@ -152,7 +152,7 @@ type readCounter struct {
 func loadImage(ctx context.Context, in io.Reader, namespace, address, snapshotter string, output io.Writer, platMC platforms.MatchComparer, quiet bool) error {
 	// In addition to passing WithImagePlatform() to client.Import(), we also need to pass WithDefaultPlatform() to NewClient().
 	// Otherwise unpacking may fail.
-	client, ctx, cancel, err := clientutil.NewClient(ctx, namespace, address, containerd.WithDefaultPlatform(platMC))
+	client, ctx, cancel, err := clientutil.NewClientWithOpt(ctx, namespace, address, containerd.WithDefaultPlatform(platMC))
 	if err != nil {
 		return err
 	}

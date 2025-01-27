@@ -14,28 +14,12 @@
    limitations under the License.
 */
 
-package buildkitutil
+package rootlesskit
 
-import (
-	"fmt"
-	"os"
+import "errors"
 
-	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
+var (
+	ErrEnvXDGRuntimeDirNotSet = errors.New("environment variable XDG_RUNTIME_DIR is not set, see https://rootlesscontaine.rs/getting-started/common/login/")
+	ErrEnvHomeNotSet          = errors.New("environment variable HOME is not set")
+	ErrXDGNotAvailable        = errors.New("can only query XDG env vars on Linux")
 )
-
-func getRuntimeVariableDataDir() (string, error) {
-	// Per Linux Foundation "Filesystem Hierarchy Standard" version 3.0 section 3.15.
-	// Under version 2.3, this was "/var/run".
-	run := "/run"
-	if rootlessutil.IsRootless() {
-		var err error
-		run, err = rootlessutil.XDGRuntimeDir()
-		if err != nil {
-			if rootlessutil.IsRootlessChild() {
-				return "", err
-			}
-			run = fmt.Sprintf("/run/user/%d", os.Geteuid())
-		}
-	}
-	return run, nil
-}

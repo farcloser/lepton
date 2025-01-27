@@ -1,3 +1,5 @@
+//go:build !linux
+
 /*
    Copyright Farcloser.
 
@@ -14,28 +16,16 @@
    limitations under the License.
 */
 
-package buildkitutil
+package rootlesskit
 
-import (
-	"fmt"
-	"os"
+func XDGRuntimeDir() (string, error) {
+	return "", ErrXDGNotAvailable
+}
 
-	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
-)
+func XDGConfigHome() (string, error) {
+	return "", ErrXDGNotAvailable
+}
 
-func getRuntimeVariableDataDir() (string, error) {
-	// Per Linux Foundation "Filesystem Hierarchy Standard" version 3.0 section 3.15.
-	// Under version 2.3, this was "/var/run".
-	run := "/run"
-	if rootlessutil.IsRootless() {
-		var err error
-		run, err = rootlessutil.XDGRuntimeDir()
-		if err != nil {
-			if rootlessutil.IsRootlessChild() {
-				return "", err
-			}
-			run = fmt.Sprintf("/run/user/%d", os.Geteuid())
-		}
-	}
-	return run, nil
+func XDGDataHome() (string, error) {
+	return "", ErrXDGNotAvailable
 }

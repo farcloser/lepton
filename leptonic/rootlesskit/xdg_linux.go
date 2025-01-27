@@ -14,10 +14,9 @@
    limitations under the License.
 */
 
-package rootlessutil
+package rootlesskit
 
 import (
-	"errors"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -27,12 +26,14 @@ func XDGRuntimeDir() (string, error) {
 	if xrd := os.Getenv("XDG_RUNTIME_DIR"); xrd != "" {
 		return xrd, nil
 	}
+
 	// Fall back to "/run/user/<euid>".
 	// Note that We cannot rely on os.Geteuid() because we might be inside UserNS.
 	euid, err := strconv.Atoi(os.Getenv("ROOTLESSKIT_PARENT_EUID"))
 	if err != nil {
-		return "", errors.New("environment variable XDG_RUNTIME_DIR is not set, see https://rootlesscontaine.rs/getting-started/common/login/")
+		return "", ErrEnvXDGRuntimeDirNotSet
 	}
+
 	return "/run/user/" + strconv.Itoa(euid), nil
 }
 
@@ -40,12 +41,14 @@ func XDGConfigHome() (string, error) {
 	if xch := os.Getenv("XDG_CONFIG_HOME"); xch != "" {
 		return xch, nil
 	}
+
 	// Fall back to "~/.config"
-	// Note that We cannot rely on user.Current().HomeDir because we might be inside UserNS.
+	// Note that we cannot rely on user.Current().HomeDir because we might be inside UserNS.
 	home := os.Getenv("HOME")
 	if home == "" {
-		return "", errors.New("environment variable HOME is not set")
+		return "", ErrEnvHomeNotSet
 	}
+
 	return filepath.Join(home, ".config"), nil
 }
 
@@ -53,11 +56,13 @@ func XDGDataHome() (string, error) {
 	if xdh := os.Getenv("XDG_DATA_HOME"); xdh != "" {
 		return xdh, nil
 	}
+
 	// Fall back to "~/.local/share"
-	// Note that We cannot rely on user.Current().HomeDir because we might be inside UserNS.
+	// Note that we cannot rely on user.Current().HomeDir because we might be inside UserNS.
 	home := os.Getenv("HOME")
 	if home == "" {
-		return "", errors.New("environment variable HOME is not set")
+		return "", ErrEnvHomeNotSet
 	}
-	return filepath.Join(home, ".local/share"), nil
+
+	return filepath.Join(home, ".local", "share"), nil
 }

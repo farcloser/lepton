@@ -14,28 +14,17 @@
    limitations under the License.
 */
 
-package buildkitutil
+package namespace
 
 import (
-	"fmt"
-	"os"
-
-	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
+	"github.com/containerd/containerd/v2/core/runtime/opts"
+	"github.com/containerd/containerd/v2/pkg/namespaces"
 )
 
-func getRuntimeVariableDataDir() (string, error) {
-	// Per Linux Foundation "Filesystem Hierarchy Standard" version 3.0 section 3.15.
-	// Under version 2.3, this was "/var/run".
-	run := "/run"
-	if rootlessutil.IsRootless() {
-		var err error
-		run, err = rootlessutil.XDGRuntimeDir()
-		if err != nil {
-			if rootlessutil.IsRootlessChild() {
-				return "", err
-			}
-			run = fmt.Sprintf("/run/user/%d", os.Geteuid())
-		}
+func getDeleteOptions(cgroup bool) namespaces.DeleteOpts {
+	if cgroup {
+		return opts.WithNamespaceCgroupDeletion
 	}
-	return run, nil
+
+	return nil
 }

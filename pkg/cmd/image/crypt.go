@@ -26,13 +26,26 @@ import (
 
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/content"
+	"github.com/containerd/containerd/v2/core/images"
 	"github.com/containerd/containerd/v2/core/images/converter"
 	"github.com/containerd/imgcrypt/v2/images/encryption"
 	"github.com/containerd/imgcrypt/v2/images/encryption/parsehelpers"
+	"github.com/containerd/platforms"
 
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/platformutil"
 )
+
+func layerDescs(ctx context.Context, provider content.Provider, imageTarget specs.Descriptor, platform platforms.MatchComparer) ([]specs.Descriptor, error) {
+	var descs []specs.Descriptor
+	err := images.Walk(ctx, images.Handlers(images.HandlerFunc(func(ctx context.Context, desc specs.Descriptor) ([]specs.Descriptor, error) {
+		if images.IsLayerType(desc.MediaType) {
+			descs = append(descs, desc)
+		}
+		return nil, nil
+	}), images.FilterPlatforms(images.ChildrenHandler(provider), platform)), imageTarget)
+	return descs, err
+}
 
 func Crypt(ctx context.Context, client *containerd.Client, srcRawRef, targetRawRef string, encrypt bool, options types.ImageCryptOptions) error {
 	var convertOpts = []converter.Opt{}
@@ -67,7 +80,7 @@ func Crypt(ctx context.Context, client *containerd.Client, srcRawRef, targetRawR
 	if err != nil {
 		return err
 	}
-	layerDescs, err := platformutil.LayerDescs(ctx, client.ContentStore(), srcImg.Target, platMC)
+	layerDescs, err := layerDescs(ctx, client.ContentStore(), srcImg.Target, platMC)
 	if err != nil {
 		return err
 	}

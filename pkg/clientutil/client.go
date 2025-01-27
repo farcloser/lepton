@@ -26,40 +26,31 @@ import (
 
 	"go.farcloser.world/containers/digest"
 
-	containerd "github.com/containerd/containerd/v2/client"
-	"github.com/containerd/containerd/v2/pkg/namespaces"
+	ctdcli "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/log"
 	"github.com/containerd/platforms"
 
-	"github.com/containerd/nerdctl/v2/leptonic/socket"
-	"github.com/containerd/nerdctl/v2/pkg/platformutil"
+	"github.com/containerd/nerdctl/v2/leptonic/emulation"
+	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 )
 
-func NewClient(ctx context.Context, namespace, address string, opts ...containerd.Opt) (*containerd.Client, context.Context, context.CancelFunc, error) {
-	ctx = namespaces.WithNamespace(ctx, namespace)
-
-	address = strings.TrimPrefix(address, "unix://")
-	const dockerContainerdaddress = "/var/run/docker/containerd/containerd.sock"
-	if err := socket.IsSocketAccessible(address); err != nil {
-		if socket.IsSocketAccessible(dockerContainerdaddress) == nil {
-			err = fmt.Errorf("cannot access containerd socket %q (hint: try running with `--address %s` to connect to Docker-managed containerd): %w", address, dockerContainerdaddress, err)
-		} else {
-			err = fmt.Errorf("cannot access containerd socket %q: %w", address, err)
-		}
-		return nil, nil, nil, err
-	}
-	client, err := containerd.New(address, opts...)
-	if err != nil {
-		return nil, nil, nil, err
-	}
-	var cancel context.CancelFunc
-	ctx, cancel = context.WithCancel(ctx)
-	return client, ctx, cancel, nil
+func NewClient(ctx context.Context, namespace string, address string) (*ctdcli.Client, context.Context, context.CancelFunc, error) {
+	return containerd.NewClient(ctx, namespace, address)
 }
 
-func NewClientWithPlatform(ctx context.Context, namespace, address, platform string, clientOpts ...containerd.Opt) (*containerd.Client, context.Context, context.CancelFunc, error) {
+func NewClientWithOpt(ctx context.Context, namespace string, address string, clientOpt ctdcli.Opt) (*ctdcli.Client, context.Context, context.CancelFunc, error) {
+	return containerd.NewClient(ctx, namespace, address, clientOpt)
+}
+
+func NewClientWithPlatform(ctx context.Context, namespace, address, platform string) (*ctdcli.Client, context.Context, context.CancelFunc, error) {
+	clientOpts := []ctdcli.Opt{}
 	if platform != "" {
-		if canExec, canExecErr := platformutil.CanExecProbably(platform); !canExec {
+		platformParsed, err := platforms.Parse(platform)
+		if err != nil {
+			return nil, nil, nil, err
+		}
+
+		if canExec, canExecErr := emulation.CanExecProbably(platformParsed); !canExec {
 			warn := fmt.Sprintf("Platform %q seems incompatible with the host platform %q. If you see \"exec format error\", see https://github.com/containerd/nerdctl/blob/main/docs/multi-platform.md",
 				platform, platforms.DefaultString())
 			if canExecErr != nil {
@@ -68,14 +59,11 @@ func NewClientWithPlatform(ctx context.Context, namespace, address, platform str
 				log.L.Warn(warn)
 			}
 		}
-		platformParsed, err := platforms.Parse(platform)
-		if err != nil {
-			return nil, nil, nil, err
-		}
-		platformM := platforms.Only(platformParsed)
-		clientOpts = append(clientOpts, containerd.WithDefaultPlatform(platformM))
+
+		clientOpts = append(clientOpts, ctdcli.WithDefaultPlatform(platforms.Only(platformParsed)))
 	}
-	return NewClient(ctx, namespace, address, clientOpts...)
+
+	return containerd.NewClient(ctx, namespace, address, clientOpts...)
 }
 
 // DataStore returns a string like "/var/lib/nerdctl/1935db59".
