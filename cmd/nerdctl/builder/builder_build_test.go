@@ -27,7 +27,9 @@ import (
 
 	"gotest.tools/v3/assert"
 
-	"github.com/containerd/nerdctl/v2/pkg/platformutil"
+	"github.com/containerd/platforms"
+
+	"github.com/containerd/nerdctl/v2/leptonic/emulation"
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
@@ -116,7 +118,8 @@ func TestCanBuildOnOtherPlatform(t *testing.T) {
 			if runtime.GOARCH == "arm64" {
 				candidateArch = "amd64"
 			}
-			can, err := platformutil.CanExecProbably("linux/" + candidateArch)
+			platform, _ := platforms.Parse("linux/" + candidateArch)
+			can, err := emulation.CanExecProbably(platform)
 			assert.NilError(helpers.T(), err)
 
 			data.Set("OS", "linux")
