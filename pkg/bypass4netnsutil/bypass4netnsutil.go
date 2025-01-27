@@ -18,34 +18,43 @@ package bypass4netnsutil
 
 import (
 	"context"
+	"errors"
 	"os"
 	"path/filepath"
 	"strconv"
 
 	b4nnoci "github.com/rootless-containers/bypass4netns/pkg/oci"
 	"go.farcloser.world/containers/specs"
+	"go.farcloser.world/core/filesystem"
 
 	"github.com/containerd/containerd/v2/core/containers"
 	"github.com/containerd/containerd/v2/pkg/oci"
 
+	"github.com/containerd/nerdctl/v2/leptonic/errs"
+	"github.com/containerd/nerdctl/v2/leptonic/rootlesskit"
 	"github.com/containerd/nerdctl/v2/pkg/annotations"
-	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
+)
+
+const (
+	b4nnRuntimeDir = "bypass4netns"
+	b4nnSocketPath = "bypass4netnsd.sock"
 )
 
 func generateSecurityOpt(listenerPath string) oci.SpecOpts {
-	opt := func(_ context.Context, _ oci.Client, _ *containers.Container, s *specs.Spec) error {
+	return func(_ context.Context, _ oci.Client, _ *containers.Container, s *specs.Spec) error {
 		if s.Linux.Seccomp == nil {
 			s.Linux.Seccomp = b4nnoci.GetDefaultSeccompProfile(listenerPath)
 		} else {
 			sc, err := b4nnoci.TranslateSeccompProfile(*s.Linux.Seccomp, listenerPath)
 			if err != nil {
-				return err
+				return errors.Join(errs.ErrInvalidArgument, err)
 			}
+
 			s.Linux.Seccomp = sc
 		}
+
 		return nil
 	}
-	return opt
 }
 
 func GenerateBypass4netnsOpts(securityOptsMaps map[string]string, annotationsMap map[string]string, id string) ([]oci.SpecOpts, error) {
@@ -56,19 +65,19 @@ func GenerateBypass4netnsOpts(securityOptsMaps map[string]string, annotationsMap
 
 	b4nnEnable, err := strconv.ParseBool(b4nn)
 	if err != nil {
-		return nil, err
+		return nil, errors.Join(errs.ErrInvalidArgument, err)
 	}
 
 	if !b4nnEnable {
 		return nil, nil
 	}
 
-	socketPath, err := GetSocketPathByID(id)
+	socketPath, err := getSocketPathByID(id)
 	if err != nil {
 		return nil, err
 	}
 
-	err = CreateSocketDir()
+	err = ensureRuntimeDir()
 	if err != nil {
 		return nil, err
 	}
@@ -78,72 +87,85 @@ func GenerateBypass4netnsOpts(securityOptsMaps map[string]string, annotationsMap
 	}, nil
 }
 
-func CreateSocketDir() error {
-	xdgRuntimeDir, err := rootlessutil.XDGRuntimeDir()
+func GetBypass4NetnsdDefaultSocketPath() (string, error) {
+	xdgRuntimeDir, err := rootlesskit.XDGRuntimeDir()
+	if err != nil {
+		return "", errors.Join(errs.ErrSystemFailure, err)
+	}
+
+	return filepath.Join(xdgRuntimeDir, b4nnSocketPath), nil
+}
+
+func ensureRuntimeDir() error {
+	runtimeDir, err := getRuntimeDir()
 	if err != nil {
 		return err
 	}
-	dirPath := filepath.Join(xdgRuntimeDir, "bypass4netns")
-	if _, err := os.Stat(dirPath); os.IsNotExist(err) {
-		err = os.MkdirAll(dirPath, 0o775)
-		if err != nil {
-			return err
+
+	stat, err := os.Stat(runtimeDir)
+	if err != nil {
+		if !errors.Is(err, os.ErrNotExist) {
+			return errors.Join(errs.ErrSystemFailure, err)
 		}
+
+		if err = os.MkdirAll(runtimeDir, filesystem.DirPermissionsPrivate); err != nil {
+			return errors.Join(errs.ErrSystemFailure, err)
+		}
+	} else if !stat.IsDir() {
+		return errs.ErrSystemFailure
 	}
 
 	return nil
 }
 
-func GetBypass4NetnsdDefaultSocketPath() (string, error) {
-	xdgRuntimeDir, err := rootlessutil.XDGRuntimeDir()
+func getRuntimeDir() (string, error) {
+	xdgRuntimeDir, err := rootlesskit.XDGRuntimeDir()
 	if err != nil {
-		return "", err
+		return "", errors.Join(errs.ErrSystemFailure, err)
 	}
 
-	return filepath.Join(xdgRuntimeDir, "bypass4netnsd.sock"), nil
+	return filepath.Join(xdgRuntimeDir, b4nnRuntimeDir), nil
 }
 
-func GetSocketPathByID(id string) (string, error) {
-	xdgRuntimeDir, err := rootlessutil.XDGRuntimeDir()
+func getSocketPathByID(id string) (string, error) {
+	runtimeDir, err := getRuntimeDir()
 	if err != nil {
 		return "", err
 	}
 
-	socketPath := filepath.Join(xdgRuntimeDir, "bypass4netns", id[0:15]+".sock")
-	return socketPath, nil
+	return filepath.Join(runtimeDir, id[0:15]+".sock"), nil
 }
 
-func GetPidFilePathByID(id string) (string, error) {
-	xdgRuntimeDir, err := rootlessutil.XDGRuntimeDir()
+func getPidFilePathByID(id string) (string, error) {
+	runtimeDir, err := getRuntimeDir()
 	if err != nil {
 		return "", err
 	}
 
-	pidPath := filepath.Join(xdgRuntimeDir, "bypass4netns", id[0:15]+".pid")
-
-	err = os.MkdirAll(filepath.Join(xdgRuntimeDir, "bypass4netns"), 0o700)
-	if err != nil {
-		return "", err
-	}
-
-	return pidPath, nil
+	return filepath.Join(runtimeDir, id[0:15]+".pid"), nil
 }
 
-func IsBypass4netnsEnabled(annotationsMap map[string]string) (enabled, bindEnabled bool, err error) {
-	if b4nn, ok := annotationsMap[annotations.Bypass4netns]; ok {
-		enabled, err = strconv.ParseBool(b4nn)
+func IsBypass4netnsEnabled(annotationsMap map[string]string) (bool, bool, error) {
+	b4nn, ok := annotationsMap[annotations.Bypass4netns]
+	if !ok {
+		return false, false, nil
+	}
+
+	enabled, err := strconv.ParseBool(b4nn)
+	if err != nil {
+		return false, false, errors.Join(errs.ErrInvalidArgument, err)
+	}
+
+	bindEnabled := enabled
+	if s, ok := annotationsMap[annotations.Bypass4netnsIgnoreBind]; ok {
+		var bindDisabled bool
+		bindDisabled, err = strconv.ParseBool(s)
 		if err != nil {
-			return
+			return enabled, bindEnabled, errors.Join(errs.ErrInvalidArgument, err)
 		}
-		bindEnabled = enabled
-		if s, ok := annotationsMap[annotations.Bypass4netnsIgnoreBind]; ok {
-			var bindDisabled bool
-			bindDisabled, err = strconv.ParseBool(s)
-			if err != nil {
-				return
-			}
-			bindEnabled = !bindDisabled
-		}
+
+		bindEnabled = !bindDisabled
 	}
-	return
+
+	return enabled, bindEnabled, nil
 }

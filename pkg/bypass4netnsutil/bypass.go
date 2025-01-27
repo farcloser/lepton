@@ -67,11 +67,11 @@ type Bypass4netnsCNIBypassManager struct {
 }
 
 func (b4nnm *Bypass4netnsCNIBypassManager) StartBypass(ctx context.Context, ports []cni.PortMapping, id, stateDir string) error {
-	socketPath, err := GetSocketPathByID(id)
+	socketPath, err := getSocketPathByID(id)
 	if err != nil {
 		return err
 	}
-	pidFilePath, err := GetPidFilePathByID(id)
+	pidFilePath, err := getPidFilePathByID(id)
 	if err != nil {
 		return err
 	}

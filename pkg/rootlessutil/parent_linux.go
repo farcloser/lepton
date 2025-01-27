@@ -21,13 +21,12 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"strconv"
-	"strings"
 	"syscall"
 
 	"github.com/containerd/log"
 
+	"github.com/containerd/nerdctl/v2/leptonic/rootlesskit"
 	"github.com/containerd/nerdctl/v2/pkg/version"
 )
 
@@ -35,46 +34,16 @@ func IsRootlessParent() bool {
 	return os.Geteuid() != 0
 }
 
-func RootlessKitStateDir() (string, error) {
-	if v := os.Getenv("ROOTLESSKIT_STATE_DIR"); v != "" {
-		return v, nil
-	}
-	xdr, err := XDGRuntimeDir()
-	if err != nil {
-		return "", err
-	}
-	// "${XDG_RUNTIME_DIR}/containerd-rootless" is hardcoded in containerd-rootless.sh
-	stateDir := filepath.Join(xdr, "containerd-rootless")
-	if _, err := os.Stat(stateDir); err != nil {
-		return "", err
-	}
-	return stateDir, nil
-}
-
-func RootlessKitChildPid(stateDir string) (int, error) {
-	pidFilePath := filepath.Join(stateDir, "child_pid")
-	if _, err := os.Stat(pidFilePath); err != nil {
-		return 0, err
-	}
-
-	pidFileBytes, err := os.ReadFile(pidFilePath)
-	if err != nil {
-		return 0, err
-	}
-	pidStr := strings.TrimSpace(string(pidFileBytes))
-	return strconv.Atoi(pidStr)
-}
-
 func ParentMain(hostGatewayIP string) error {
 	if !IsRootlessParent() {
 		return errors.New("should not be called when !IsRootlessParent()")
 	}
-	stateDir, err := RootlessKitStateDir()
+	stateDir, err := rootlesskit.StateDir()
 	log.L.Debugf("stateDir: %s", stateDir)
 	if err != nil {
 		return fmt.Errorf("rootless containerd not running? (hint: use `containerd-rootless-setuptool.sh install` to start rootless containerd): %w", err)
 	}
-	childPid, err := RootlessKitChildPid(stateDir)
+	childPid, err := rootlesskit.ChildPid(stateDir)
 	if err != nil {
 		return err
 	}

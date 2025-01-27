@@ -25,6 +25,8 @@ import (
 
 	"github.com/containernetworking/plugins/pkg/ns"
 	"github.com/rootless-containers/rootlesskit/v2/pkg/api/client"
+
+	"github.com/containerd/nerdctl/v2/leptonic/rootlesskit"
 )
 
 func IsRootless() bool {
@@ -35,51 +37,37 @@ func ParentEUID() int {
 	if !IsRootlessChild() {
 		return os.Geteuid()
 	}
-	env := os.Getenv("ROOTLESSKIT_PARENT_EUID")
-	if env == "" {
-		panic("environment variable ROOTLESSKIT_PARENT_EUID is not set")
-	}
-	i, err := strconv.Atoi(env)
-	if err != nil {
-		panic(fmt.Errorf("failed to parse ROOTLESSKIT_PARENT_EUID=%q: %w", env, err))
-	}
-	return i
-}
 
-func ParentEGID() int {
-	if !IsRootlessChild() {
-		return os.Getegid()
-	}
-	env := os.Getenv("ROOTLESSKIT_PARENT_EGID")
-	if env == "" {
-		panic("environment variable ROOTLESSKIT_PARENT_EGID is not set")
-	}
-	i, err := strconv.Atoi(env)
+	i, err := strconv.Atoi(os.Getenv("ROOTLESSKIT_PARENT_EUID"))
 	if err != nil {
-		panic(fmt.Errorf("failed to parse ROOTLESSKIT_PARENT_EGID=%q: %w", env, err))
+		panic(fmt.Errorf("failed to parse ROOTLESSKIT_PARENT_EUID: %w", err))
 	}
+
 	return i
 }
 
 func NewRootlessKitClient() (client.Client, error) {
-	stateDir, err := RootlessKitStateDir()
+	stateDir, err := rootlesskit.StateDir()
 	if err != nil {
 		return nil, err
 	}
 	apiSock := filepath.Join(stateDir, "api.sock")
+
 	return client.New(apiSock)
 }
 
 // RootlessContainredSockAddress returns sock address of rootless containerd based on https://github.com/containerd/nerdctl/blob/main/docs/faq.md#containerd-socket-address
 func RootlessContainredSockAddress() (string, error) {
-	stateDir, err := RootlessKitStateDir()
+	stateDir, err := rootlesskit.StateDir()
 	if err != nil {
 		return "", err
 	}
-	childPid, err := RootlessKitChildPid(stateDir)
+	childPid, err := rootlesskit.ChildPid(stateDir)
+
 	if err != nil {
 		return "", err
 	}
+
 	return fmt.Sprintf("/proc/%d/root/run/containerd/containerd.sock", childPid), nil
 }
 
@@ -89,11 +77,28 @@ func DetachedNetNS() (string, error) {
 	if !IsRootless() {
 		return "", nil
 	}
-	stateDir, err := RootlessKitStateDir()
+
+	stateDir, err := rootlesskit.StateDir()
 	if err != nil {
 		return "", err
 	}
+
 	return detachedNetNS(stateDir)
+}
+
+// WithDetachedNetNSIfAny executes fn in [DetachedNetNS] if RootlessKit is running with --detach-netns mode.
+// Otherwise, it just executes fn in the current netns.
+func WithDetachedNetNSIfAny(fn func() error) error {
+	netns, err := DetachedNetNS()
+	if err != nil {
+		return err
+	}
+
+	if netns == "" {
+		return fn()
+	}
+
+	return ns.WithNetNSPath(netns, func(_ ns.NetNS) error { return fn() })
 }
 
 func detachedNetNS(stateDir string) (string, error) {
@@ -104,18 +109,6 @@ func detachedNetNS(stateDir string) (string, error) {
 		}
 		return "", err
 	}
-	return p, nil
-}
 
-// WithDetachedNetNSIfAny executes fn in [DetachedNetNS] if RootlessKit is running with --detach-netns mode.
-// Otherwise it just executes fn in the current netns.
-func WithDetachedNetNSIfAny(fn func() error) error {
-	netns, err := DetachedNetNS()
-	if err != nil {
-		return err
-	}
-	if netns == "" {
-		return fn()
-	}
-	return ns.WithNetNSPath(netns, func(_ ns.NetNS) error { return fn() })
+	return p, nil
 }

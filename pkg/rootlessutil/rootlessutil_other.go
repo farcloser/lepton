@@ -43,11 +43,6 @@ func IsRootlessParent() bool {
 	return false
 }
 
-// Always errors out on non-Linux platforms.
-func XDGRuntimeDir() (string, error) {
-	return "", errors.New("can only query XDG env vars on Linux")
-}
-
 // Always returns -1 on non-Linux platforms.
 func ParentEUID() int {
 	return -1

@@ -66,7 +66,7 @@ func List(ctx context.Context, cli *client.Client) ([]string, error) {
 
 	list, err := service.List(ctx)
 	if err != nil {
-		return nil, errWrap(err)
+		return nil, errWrap(errConvert(err))
 	}
 
 	return list, nil
