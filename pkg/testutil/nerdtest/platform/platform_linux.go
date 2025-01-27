@@ -17,13 +17,8 @@
 package platform
 
 import (
-	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 )
-
-func DataHome() (string, error) {
-	return rootlessutil.XDGDataHome()
-}
 
 var (
 	RegistryImageStable = testutil.RegistryImageStable
