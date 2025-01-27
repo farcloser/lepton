@@ -14,23 +14,17 @@
    limitations under the License.
 */
 
-package namespace
+package utils
 
 import "strings"
 
-func objectWithLabelArgs(args []string) map[string]string {
-	if len(args) >= 1 {
-		return labelArgs(args)
+func StringSlice2KVMap(slice []string, separator string) map[string]string {
+	if len(slice) == 0 {
+		return nil
 	}
-	return nil
-}
-
-// labelArgs returns a map of label key,value pairs.
-// From https://github.com/containerd/containerd/blob/v1.7.0-rc.2/cmd/ctr/commands/commands.go#L229-L241
-func labelArgs(labelStrings []string) map[string]string {
-	labels := make(map[string]string, len(labelStrings))
-	for _, label := range labelStrings {
-		key, value, ok := strings.Cut(label, "=")
+	labels := make(map[string]string, len(slice))
+	for _, label := range slice {
+		key, value, ok := strings.Cut(label, separator)
 		if !ok {
 			value = "true"
 		}

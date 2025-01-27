@@ -17,13 +17,20 @@
 package namespace
 
 import (
+	"errors"
+
 	"github.com/spf13/cobra"
 
+	"github.com/containerd/log"
+
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
+	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
+	"github.com/containerd/nerdctl/v2/leptonic/services/namespace"
+	"github.com/containerd/nerdctl/v2/leptonic/utils"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
-	"github.com/containerd/nerdctl/v2/pkg/cmd/namespace"
 )
+
+type namespaceUpdateOptions namespaceCreateOptions
 
 func newNamespacelabelUpdateCommand() *cobra.Command {
 	namespaceLableCommand := &cobra.Command{
@@ -34,36 +41,47 @@ func newNamespacelabelUpdateCommand() *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
+
 	namespaceLableCommand.Flags().StringArrayP("label", "l", nil, "Set labels for a namespace")
+
 	return namespaceLableCommand
 }
 
-func processNamespaceUpdateCommandOption(cmd *cobra.Command) (types.NamespaceUpdateOptions, error) {
+func processNamespaceUpdateCommandOption(cmd *cobra.Command) (*types.GlobalCommandOptions, *namespaceUpdateOptions, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return types.NamespaceUpdateOptions{}, err
+		return nil, nil, err
 	}
+
 	labels, err := cmd.Flags().GetStringArray("label")
 	if err != nil {
-		return types.NamespaceUpdateOptions{}, err
+		return &globalOptions, nil, err
 	}
-	return types.NamespaceUpdateOptions{
-		GOptions: globalOptions,
-		Labels:   labels,
-	}, nil
+
+	return &globalOptions, &namespaceUpdateOptions{Labels: utils.StringSlice2KVMap(labels, "=")}, nil
 }
 
 func labelUpdateAction(cmd *cobra.Command, args []string) error {
-	options, err := processNamespaceUpdateCommandOption(cmd)
+	globalOptions, options, err := processNamespaceUpdateCommandOption(cmd)
 	if err != nil {
 		return err
 	}
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	client, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
 	if err != nil {
 		return err
 	}
+
 	defer cancel()
 
-	return namespace.Update(ctx, client, args[0], options)
+	errs := namespace.Update(ctx, client, args[0], options.Labels)
+	if len(errs) > 0 {
+		for _, err = range errs {
+			log.G(ctx).WithError(err).Error()
+		}
+
+		return errors.New("an error occurred")
+	}
+
+	return nil
 }

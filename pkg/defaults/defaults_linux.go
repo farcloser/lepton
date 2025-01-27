@@ -25,6 +25,7 @@ import (
 	"github.com/containerd/containerd/v2/plugins"
 	"github.com/containerd/go-cni"
 
+	"github.com/containerd/nerdctl/v2/leptonic/rootlesskit"
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
 	"github.com/containerd/nerdctl/v2/pkg/version"
 )
@@ -42,7 +43,7 @@ func DataRoot() string {
 	if !rootlessutil.IsRootless() {
 		return "/var/lib/" + version.RootName
 	}
-	xdh, err := rootlessutil.XDGDataHome()
+	xdh, err := rootlesskit.XDGDataHome()
 	if err != nil {
 		panic(err)
 	}
@@ -84,7 +85,7 @@ func CNINetConfPath() string {
 	if !rootlessutil.IsRootless() {
 		return cni.DefaultNetDir
 	}
-	xch, err := rootlessutil.XDGConfigHome()
+	xch, err := rootlesskit.XDGConfigHome()
 	if err != nil {
 		panic(err)
 	}
@@ -95,7 +96,7 @@ func CNIRuntimeDir() (string, error) {
 	if !rootlessutil.IsRootless() {
 		return "/run/cni", nil
 	}
-	xdr, err := rootlessutil.XDGRuntimeDir()
+	xdr, err := rootlesskit.XDGRuntimeDir()
 	if err != nil {
 		if rootlessutil.IsRootlessChild() {
 			return "", err
@@ -109,7 +110,7 @@ func CliTOML() string {
 	if !rootlessutil.IsRootless() {
 		return fmt.Sprintf("/etc/%s/%s.toml", version.RootName, version.RootName)
 	}
-	xch, err := rootlessutil.XDGConfigHome()
+	xch, err := rootlesskit.XDGConfigHome()
 	if err != nil {
 		panic(err)
 	}
@@ -120,7 +121,7 @@ func HostsDirs() []string {
 	if !rootlessutil.IsRootless() {
 		return []string{"/etc/containerd/certs.d", "/etc/docker/certs.d"}
 	}
-	xch, err := rootlessutil.XDGConfigHome()
+	xch, err := rootlesskit.XDGConfigHome()
 	if err != nil {
 		panic(err)
 	}

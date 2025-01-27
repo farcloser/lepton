@@ -32,6 +32,7 @@ import (
 	"time"
 
 	"go.farcloser.world/containers/digest"
+	"go.farcloser.world/containers/specs"
 	"go.farcloser.world/core/filesystem"
 	"go.farcloser.world/core/version/semver"
 	"gotest.tools/v3/assert"
@@ -40,12 +41,14 @@ import (
 	"github.com/containerd/containerd/v2/defaults"
 	"github.com/containerd/log"
 
+	"github.com/containerd/nerdctl/v2/leptonic/emulation"
+	"github.com/containerd/nerdctl/v2/leptonic/platforms"
+	"github.com/containerd/nerdctl/v2/leptonic/rootlesskit"
 	"github.com/containerd/nerdctl/v2/pkg/buildkitutil"
 	"github.com/containerd/nerdctl/v2/pkg/imgutil"
 	"github.com/containerd/nerdctl/v2/pkg/infoutil"
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/native"
-	"github.com/containerd/nerdctl/v2/pkg/platformutil"
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
 	"github.com/containerd/nerdctl/v2/pkg/version"
 )
@@ -291,7 +294,7 @@ func (b *Base) ContainerdAddress() string {
 	if os.Geteuid() == 0 {
 		return defaults.DefaultAddress
 	}
-	xdr, err := rootlessutil.XDGRuntimeDir()
+	xdr, err := rootlesskit.XDGRuntimeDir()
 	if err != nil {
 		b.T.Log(err)
 		xdr = fmt.Sprintf("/run/user/%d", os.Geteuid())
@@ -302,6 +305,7 @@ func (b *Base) ContainerdAddress() string {
 		b.T.Fatal(err)
 	}
 	pidS := strings.TrimSpace(string(pidB))
+
 	return filepath.Join("/proc", pidS, "root", defaults.DefaultAddress)
 }
 
@@ -658,9 +662,15 @@ func RequiresBuild(t testing.TB) {
 }
 
 func RequireExecPlatform(t testing.TB, ss ...string) {
-	ok, err := platformutil.CanExecProbably(ss...)
+	pp := []specs.Platform{}
+	for _, s := range ss {
+		p, _ := platforms.Parse(s)
+		pp = append(pp, p)
+	}
+
+	ok, err := emulation.CanExecProbably(pp...)
 	if !ok {
-		msg := fmt.Sprintf("test requires platform %v", ss)
+		msg := fmt.Sprintf("test requires platforms: %v", ss)
 		if err != nil {
 			msg += fmt.Sprintf(": %v", err)
 		}

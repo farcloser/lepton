@@ -14,23 +14,18 @@
    limitations under the License.
 */
 
-package namespace
+package platforms
 
 import (
-	"context"
+	specs "github.com/opencontainers/image-spec/specs-go/v1"
 
-	containerd "github.com/containerd/containerd/v2/client"
-
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	ctdplatforms "github.com/containerd/platforms"
 )
 
-func Update(ctx context.Context, client *containerd.Client, namespace string, options types.NamespaceUpdateOptions) error {
-	labelsArg := objectWithLabelArgs(options.Labels)
-	namespaces := client.NamespaceService()
-	for k, v := range labelsArg {
-		if err := namespaces.SetLabel(ctx, namespace, k, v); err != nil {
-			return err
-		}
-	}
-	return nil
+func Parse(specifier string) (specs.Platform, error) {
+	return ctdplatforms.Parse(specifier)
+}
+
+func Default() ctdplatforms.MatchComparer {
+	return ctdplatforms.Default()
 }
