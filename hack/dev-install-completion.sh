@@ -16,5 +16,4 @@
 
 set -o errexit -o errtrace -o functrace -o nounset -o pipefail
 
-brew install golang make yamllint shellcheck expect gcc
-make install-dev-tools
+nerdctl completion bash | sudo tee /usr/share/bash-completion/completions/nerdctl
