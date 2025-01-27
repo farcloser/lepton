@@ -46,6 +46,26 @@ func TestCompletion(t *testing.T) {
 			helpers.Anyhow("volume", "rm", identifier)
 		},
 		SubTests: []*test.Case{
+			// Namespace commands
+			{
+				Description: "namespace",
+				Require:     test.Not(test.Windows),
+				Command:     test.Command("__complete", "namespace", ""),
+				Expected:    test.Expects(0, nil, test.Contains("inspect")),
+			},
+			{
+				Description: "namespace",
+				Require:     test.Not(test.Windows),
+				Command:     test.Command("__complete", "namespace", "inspect", "--format"),
+				Expected:    test.Expects(0, nil, test.Contains("json")),
+			},
+			{
+				Description: "namespace",
+				Require:     test.Not(test.Windows),
+				Command:     test.Command("__complete", "namespace", "inspect", ""),
+				Expected:    test.Expects(0, nil, test.Contains("default")),
+			},
+			// Others
 			{
 				Description: "--cgroup-manager",
 				Require:     test.Not(test.Windows),
