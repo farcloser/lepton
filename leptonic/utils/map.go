@@ -14,23 +14,22 @@
    limitations under the License.
 */
 
-package namespace
+package utils
 
-import (
-	"context"
+import "strings"
 
-	containerd "github.com/containerd/containerd/v2/client"
-
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
-)
-
-func Update(ctx context.Context, client *containerd.Client, namespace string, options types.NamespaceUpdateOptions) error {
-	labelsArg := objectWithLabelArgs(options.Labels)
-	namespaces := client.NamespaceService()
-	for k, v := range labelsArg {
-		if err := namespaces.SetLabel(ctx, namespace, k, v); err != nil {
-			return err
-		}
+func StringSlice2KVMap(slice []string, separator string) map[string]string {
+	if len(slice) == 0 {
+		return nil
 	}
-	return nil
+	labels := make(map[string]string, len(slice))
+	for _, label := range slice {
+		key, value, ok := strings.Cut(label, separator)
+		if !ok {
+			value = "true"
+		}
+		labels[key] = value
+	}
+
+	return labels
 }

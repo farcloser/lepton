@@ -17,55 +17,78 @@
 package namespace
 
 import (
+	"errors"
+
 	"github.com/spf13/cobra"
 
+	"github.com/containerd/log"
+
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
+	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
+	"github.com/containerd/nerdctl/v2/leptonic/services/namespace"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
-	"github.com/containerd/nerdctl/v2/pkg/cmd/namespace"
 )
+
+type namespaceRemoveOptions struct {
+	// CGroup delete the namespace's cgroup
+	CGroup bool
+}
 
 func newNamespaceRmCommand() *cobra.Command {
 	namespaceRmCommand := &cobra.Command{
-		Use:           "remove [flags] NAMESPACE [NAMESPACE...]",
-		Aliases:       []string{"rm"},
-		Args:          cobra.MinimumNArgs(1),
-		Short:         "Remove one or more namespaces",
-		RunE:          namespaceRmAction,
-		SilenceUsage:  true,
-		SilenceErrors: true,
+		Use:               "remove [flags] NAMESPACE [NAMESPACE...]",
+		Aliases:           []string{"rm"},
+		Args:              cobra.MinimumNArgs(1),
+		ValidArgsFunction: ShellComplete,
+		Short:             "Remove one or more namespaces",
+		RunE:              namespaceRmAction,
+		SilenceUsage:      true,
+		SilenceErrors:     true,
 	}
+
 	namespaceRmCommand.Flags().BoolP("cgroup", "c", false, "delete the namespace's cgroup")
+
 	return namespaceRmCommand
 }
 
-func processNamespaceRemoveOptions(cmd *cobra.Command) (types.NamespaceRemoveOptions, error) {
+func processNamespaceRemoveOptions(cmd *cobra.Command) (*types.GlobalCommandOptions, *namespaceRemoveOptions, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return types.NamespaceRemoveOptions{}, err
+		return nil, nil, err
 	}
+
 	cgroup, err := cmd.Flags().GetBool("cgroup")
 	if err != nil {
-		return types.NamespaceRemoveOptions{}, err
+		return &globalOptions, nil, err
 	}
-	return types.NamespaceRemoveOptions{
-		GOptions: globalOptions,
-		CGroup:   cgroup,
-		Stdout:   cmd.OutOrStdout(),
+
+	return &globalOptions, &namespaceRemoveOptions{
+		CGroup: cgroup,
 	}, nil
 }
 
 func namespaceRmAction(cmd *cobra.Command, args []string) error {
-	options, err := processNamespaceRemoveOptions(cmd)
+	globalOptions, options, err := processNamespaceRemoveOptions(cmd)
 	if err != nil {
 		return err
 	}
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	client, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
 	if err != nil {
 		return err
 	}
+
 	defer cancel()
 
-	return namespace.Remove(ctx, client, args, options)
+	errs := namespace.Remove(ctx, client, args, options.CGroup)
+
+	if len(errs) > 0 {
+		for _, err = range errs {
+			log.G(ctx).WithError(err).Error()
+		}
+
+		return errors.New("failed to remove namespaces")
+	}
+
+	return nil
 }

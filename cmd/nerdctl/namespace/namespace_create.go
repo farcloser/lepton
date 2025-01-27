@@ -20,10 +20,16 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
+	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
+	"github.com/containerd/nerdctl/v2/leptonic/services/namespace"
+	"github.com/containerd/nerdctl/v2/leptonic/utils"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
-	"github.com/containerd/nerdctl/v2/pkg/cmd/namespace"
 )
+
+type namespaceCreateOptions struct {
+	// Labels are the namespace labels
+	Labels map[string]string
+}
 
 func newNamespaceCreateCommand() *cobra.Command {
 	namespaceCreateCommand := &cobra.Command{
@@ -39,32 +45,33 @@ func newNamespaceCreateCommand() *cobra.Command {
 	return namespaceCreateCommand
 }
 
-func processNamespaceCreateCommandOption(cmd *cobra.Command) (types.NamespaceCreateOptions, error) {
+func processNamespaceCreateCommandOption(cmd *cobra.Command) (*types.GlobalCommandOptions, *namespaceUpdateOptions, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return types.NamespaceCreateOptions{}, err
+		return nil, nil, err
 	}
 	labels, err := cmd.Flags().GetStringArray("label")
 	if err != nil {
-		return types.NamespaceCreateOptions{}, err
+		return &globalOptions, nil, err
 	}
-	return types.NamespaceCreateOptions{
-		GOptions: globalOptions,
-		Labels:   labels,
-	}, nil
+	return &globalOptions, &namespaceUpdateOptions{Labels: utils.StringSlice2KVMap(labels, "=")}, nil
 }
 
 func namespaceCreateAction(cmd *cobra.Command, args []string) error {
-	options, err := processNamespaceCreateCommandOption(cmd)
+	globalOptions, options, err := processNamespaceCreateCommandOption(cmd)
 	if err != nil {
 		return err
 	}
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
 	if err != nil {
 		return err
 	}
+
 	defer cancel()
 
-	return namespace.Create(ctx, client, args[0], options)
+	name := args[0]
+
+	return namespace.Create(ctx, cli, name, options.Labels)
+
 }
