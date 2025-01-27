@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/containerd/nerdctl/v2/leptonic/rootlesskit"
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
 )
 
@@ -29,7 +30,7 @@ func getRuntimeVariableDataDir() (string, error) {
 	run := "/run"
 	if rootlessutil.IsRootless() {
 		var err error
-		run, err = rootlessutil.XDGRuntimeDir()
+		run, err = rootlesskit.XDGRuntimeDir()
 		if err != nil {
 			if rootlessutil.IsRootlessChild() {
 				return "", err
