@@ -63,7 +63,7 @@ func TestCompletion(t *testing.T) {
 				Description: "namespace",
 				Require:     test.Not(test.Windows),
 				Command:     test.Command("__complete", "namespace", "inspect", ""),
-				Expected:    test.Expects(0, nil, test.Contains("default")),
+				Expected:    test.Expects(0, nil, test.Contains("nerdctl-test")),
 			},
 			// Others
 			{

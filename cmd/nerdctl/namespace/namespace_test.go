@@ -110,13 +110,14 @@ func TestInspectFail(t *testing.T) {
 		},
 		{
 			Description: "mixing errors and one good known namespace",
-			Command:     test.Command("namespace", "inspect", "--format", "json", "doesnotexistandneverwill", "_", "∞", "default"),
+			// FIXME unhardcode namespace name
+			Command: test.Command("namespace", "inspect", "--format", "json", "doesnotexistandneverwill", "_", "∞", "nerdctl-test"),
 			Expected: test.Expects(1, []error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument, errs.ErrNotFound}, func(stdout string, info string, t *testing.T) {
 				var expect []api.Namespace
 				err := json.Unmarshal([]byte(stdout), &expect)
 				assert.NilError(t, err, info)
 				assert.Assert(t, len(expect) != 0, info)
-				assert.Equal(t, expect[0].Name, "default", info)
+				assert.Equal(t, expect[0].Name, "nerdctl-test", info)
 			}),
 		},
 	}
@@ -160,12 +161,12 @@ func TestUpdateFail(t *testing.T) {
 		},
 		{
 			Description: "exiting namespace with no label",
-			Command:     test.Command("namespace", "update", "default"),
+			Command:     test.Command("namespace", "update", "nerdctl-test"),
 			Expected:    test.Expects(1, []error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument}, test.Equals("")),
 		},
 		{
 			Description: "exiting namespace with empty label key",
-			Command:     test.Command("namespace", "update", "default", "--label"),
+			Command:     test.Command("namespace", "update", "nerdctl-test", "--label"),
 			Expected:    test.Expects(1, []error{errors.New("flag needs an argument")}, test.Equals("")),
 		},
 	}
