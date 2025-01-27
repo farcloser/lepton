@@ -38,7 +38,7 @@ func NewMatchComparerFromOCISpecPlatformSlice(platformz []specs.Platform) platfo
 // NewMatchComparer returns MatchComparer.
 // If all is true, NewMatchComparer always returns All, regardless to the value of ss.
 // If all is false and ss is empty, NewMatchComparer returns DefaultStrict (not Default).
-// Otherwise NewMatchComparer returns Ordered MatchComparer.
+// Otherwise, NewMatchComparer returns Ordered MatchComparer.
 func NewMatchComparer(all bool, ss []string) (platforms.MatchComparer, error) {
 	if all {
 		return platforms.All, nil
