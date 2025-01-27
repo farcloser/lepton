@@ -18,7 +18,6 @@ package bypass4netnsutil
 
 import (
 	"context"
-
 	"os"
 	"path/filepath"
 	"strconv"
