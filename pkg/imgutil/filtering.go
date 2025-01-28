@@ -325,6 +325,11 @@ func matchesAllLabels(imageCfgLabels map[string]string, filterLabels map[string]
 func matchesReferences(image images.Image, referencePatterns []string) (bool, error) {
 	var matches int
 
+	// Containerd returns ":" for dangling untagged images
+	if image.Name == ":" {
+		return false, nil
+	}
+
 	parsedReference, err := reference.Parse(image.Name)
 	if err != nil {
 		return false, err
