@@ -578,3 +578,45 @@ func TestIssue3568(t *testing.T) {
 
 	testCase.Run(t)
 }
+
+// TestPortBindingWithCustomHost tests https://github.com/containerd/nerdctl/issues/3539
+func TestPortBindingWithCustomHost(t *testing.T) {
+	testCase := nerdtest.Setup()
+
+	const (
+		host     = "127.0.0.2"
+		hostPort = 8080
+	)
+	address := fmt.Sprintf("%s:%d", host, hostPort)
+
+	testCase.SubTests = []*test.Case{
+		{
+			Description: "Issue #3539 - Access to a container running when 127.0.0.2 is specified in -p in rootless mode.",
+			Setup: func(data test.Data, helpers test.Helpers) {
+				helpers.Ensure("run", "-d", "--name", data.Identifier(), "-p", fmt.Sprintf("%s:80", address), testutil.NginxAlpineImage)
+				nerdtest.EnsureContainerStarted(helpers, data.Identifier())
+			},
+			Cleanup: func(data test.Data, helpers test.Helpers) {
+				helpers.Anyhow("rm", "-f", data.Identifier())
+			},
+			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
+				return &test.Expected{
+					ExitCode: 0,
+					Errors:   []error{},
+					Output: test.All(
+						func(stdout string, info string, t *testing.T) {
+							resp, err := nettestutil.HTTPGet(address, 30, false)
+							assert.NilError(t, err)
+
+							respBody, err := io.ReadAll(resp.Body)
+							assert.NilError(t, err)
+							assert.Assert(t, strings.Contains(string(respBody), testutil.NginxAlpineIndexHTMLSnippet))
+						},
+					),
+				}
+			},
+		},
+	}
+
+	testCase.Run(t)
+}
