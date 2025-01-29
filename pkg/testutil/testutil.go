@@ -540,13 +540,12 @@ func (c *Cmd) OutLines() []string {
 type Target = string
 
 const (
-	Nerdctl = Target("nerdctl")
-	Docker  = Target("docker")
+	Nerdishctl = Target(version.RootName)
+	Nerdctl    = Target("nerdctl")
+	Docker     = Target("docker")
 )
 
 var (
-	Nerdishctl = version.RootName
-
 	flagTestTarget     Target
 	flagTestKillDaemon bool
 	flagTestIPv6       bool

@@ -24,7 +24,7 @@ readonly retries="2"
 readonly needsudo="${WITH_SUDO:-}"
 
 # See https://github.com/containerd/nerdctl/blob/main/docs/testing/README.md#about-parallelization
-args=(--format=testname --jsonfile /tmp/test-integration.log --packages="$root"/../cmd/nerdctl/...)
+args=(--format=testname --jsonfile /tmp/test-integration.log --packages="$root"/../cmd/lepton/...)
 
 if [ "$#" == 0 ]; then
   "$root"/test-integration.sh -test.only-flaky=false

@@ -24,4 +24,5 @@ jobs:
         # See https://github.com/containerd/nerdctl/blob/main/docs/testing/README.md#about-parallelization
         run: |
           ./hack/build-integration-kubernetes.sh
-          sudo ./_output/nerdctl exec nerdctl-test-control-plane bash -c -- 'export TMPDIR="$HOME"/tmp; mkdir -p "$TMPDIR"; cd /nerdctl-source; /usr/local/go/bin/go test -p 1 ./cmd/nerdctl/... -test.only-kubernetes'
+          sudo ./_output/nerdctl ps -a
+          sudo ./_output/nerdctl exec nerdctl-test-control-plane bash -c -- 'export TMPDIR="$HOME"/tmp; mkdir -p "$TMPDIR"; cd /source; /usr/local/go/bin/go test -p 1 ./cmd/"$KIND_EXPERIMENTAL_PROVIDER"/... -test.only-kubernetes'

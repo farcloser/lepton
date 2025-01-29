@@ -315,7 +315,7 @@ func (x *hostsStore) updateAllHosts() (err error) {
 		}
 
 		// parse the hosts file, keep the original host record
-		// retain custom /etc/hosts entries outside <nerdctl> </nerdctl> region
+		// retain custom /etc/hosts entries outside <version.RootName> </version.RootName> region
 		var buf bytes.Buffer
 		if content != nil {
 			if err = parseHostsButSkipMarkedRegion(&buf, bytes.NewReader(content)); err != nil {

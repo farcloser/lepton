@@ -215,9 +215,9 @@ func Create(ctx context.Context, client *containerd.Client, args []string, netMa
 	// Always set internalLabels.logURI
 	// to support restart the container that run with "-it", like
 	//
-	// 1, nerdctl run --name demo -it imagename
+	// 1, run --name demo -it imagename
 	// 2, ctrl + c to stop demo container
-	// 3, nerdctl start/restart demo
+	// 3, start/restart demo
 	logConfig, err := generateLogConfig(dataStore, id, options.LogDriver, options.LogOpt, options.GOptions.Namespace, options.GOptions.Address)
 	if err != nil {
 		return nil, generateRemoveStateDirFunc(ctx, id, internalLabels), err
@@ -254,7 +254,7 @@ func Create(ctx context.Context, client *containerd.Client, args []string, netMa
 	// NOTE: OCI hooks are currently not supported on Windows so we skip setting them altogether.
 	// The OCI hooks we define (whose logic can be found in pkg/ocihook) primarily
 	// perform network setup and teardown when using CNI networking.
-	// On Windows, we are forced to set up and tear down the networking from within nerdctl.
+	// On Windows, we are forced to set up and tear down the networking from within the cli.
 	if runtime.GOOS != "windows" {
 		hookOpt, err := withOCIHook(options.CliCmd, options.CliArgs)
 		if err != nil {

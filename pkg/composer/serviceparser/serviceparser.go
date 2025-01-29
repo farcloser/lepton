@@ -35,18 +35,19 @@ import (
 
 	"github.com/containerd/nerdctl/v2/pkg/identifiers"
 	"github.com/containerd/nerdctl/v2/pkg/reflectutil"
+	"github.com/containerd/nerdctl/v2/pkg/version"
 )
 
 // ComposeExtensionKey defines fields used to implement extension features.
 const (
-	ComposeVerify                            = "x-nerdctl-verify"
-	ComposeCosignPublicKey                   = "x-nerdctl-cosign-public-key"
-	ComposeSign                              = "x-nerdctl-sign"
-	ComposeCosignPrivateKey                  = "x-nerdctl-cosign-private-key"
-	ComposeCosignCertificateIdentity         = "x-nerdctl-cosign-certificate-identity"
-	ComposeCosignCertificateIdentityRegexp   = "x-nerdctl-cosign-certificate-identity-regexp"
-	ComposeCosignCertificateOidcIssuer       = "x-nerdctl-cosign-certificate-oidc-issuer"
-	ComposeCosignCertificateOidcIssuerRegexp = "x-nerdctl-cosign-certificate-oidc-issuer-regexp"
+	ComposeVerify                            = "x-" + version.RootName + "-verify"
+	ComposeCosignPublicKey                   = "x-" + version.RootName + "-cosign-public-key"
+	ComposeSign                              = "x-" + version.RootName + "-sign"
+	ComposeCosignPrivateKey                  = "x-" + version.RootName + "-cosign-private-key"
+	ComposeCosignCertificateIdentity         = "x-" + version.RootName + "-cosign-certificate-identity"
+	ComposeCosignCertificateIdentityRegexp   = "x-" + version.RootName + "-cosign-certificate-identity-regexp"
+	ComposeCosignCertificateOidcIssuer       = "x-" + version.RootName + "-cosign-certificate-oidc-issuer"
+	ComposeCosignCertificateOidcIssuerRegexp = "x-" + version.RootName + "-cosign-certificate-oidc-issuer-regexp"
 )
 
 // Separator is used for naming components (e.g., service image or container)

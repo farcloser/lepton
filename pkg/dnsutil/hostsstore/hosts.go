@@ -36,14 +36,16 @@ import (
 	"fmt"
 	"io"
 	"strings"
+
+	"github.com/containerd/nerdctl/v2/pkg/version"
 )
 
 const (
-	MarkerBegin = "<nerdctl>"
-	MarkerEnd   = "</nerdctl>"
+	MarkerBegin = "<" + version.RootName + ">"
+	MarkerEnd   = "</" + version.RootName + ">"
 )
 
-// parseHostsButSkipMarkedRegion parses hosts file content but skips the <nerdctl> </nerdctl> region
+// parseHostsButSkipMarkedRegion parses hosts file content but skips the <version.RootName> </version.RootName> region
 // mimics  https://github.com/jaytaylor/go-hostsfile/blob/59e7508e09b9e08c57183ae15eabf1b757328ebf/hosts.go#L18
 // mimics  https://github.com/norouter/norouter/blob/v0.6.2/pkg/agent/etchosts/etchosts.go#L128-L152
 func parseHostsButSkipMarkedRegion(w io.Writer, r io.Reader) error {
