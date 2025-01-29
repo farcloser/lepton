@@ -17,9 +17,14 @@
 package apparmor
 
 import (
-	"go.farcloser.world/containers/security/apparmor"
+	"github.com/containerd/nerdctl/v2/leptonic/services/apparmor"
+	"github.com/containerd/nerdctl/v2/pkg/defaults"
 )
 
 func Unload(target string) error {
+	if target == "" {
+		target = defaults.AppArmorProfileName
+	}
+
 	return apparmor.Unload(target)
 }

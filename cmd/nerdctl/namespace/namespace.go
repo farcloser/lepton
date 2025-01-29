@@ -20,8 +20,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
-	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
-	"github.com/containerd/nerdctl/v2/leptonic/services/namespace"
 )
 
 func NewNamespaceCommand() *cobra.Command {
@@ -43,25 +41,4 @@ func NewNamespaceCommand() *cobra.Command {
 	namespaceCommand.AddCommand(newNamespaceInspectCommand())
 
 	return namespaceCommand
-}
-
-func ShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
-	if err != nil {
-		return nil, cobra.ShellCompDirectiveError
-	}
-
-	client, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
-	if err != nil {
-		return nil, cobra.ShellCompDirectiveError
-	}
-
-	defer cancel()
-
-	nsList, err := namespace.List(ctx, client)
-	if err != nil {
-		return nil, cobra.ShellCompDirectiveError
-	}
-
-	return nsList, cobra.ShellCompDirectiveNoFileComp
 }

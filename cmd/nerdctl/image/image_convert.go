@@ -183,5 +183,5 @@ func imageConvertAction(cmd *cobra.Command, args []string) error {
 
 func imageConvertShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 	// show image names
-	return completion.ImageNames(cmd)
+	return completion.ImageNames(cmd, args, toComplete)
 }

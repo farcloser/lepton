@@ -23,6 +23,7 @@ import (
 
 	"gotest.tools/v3/assert"
 
+	"github.com/containerd/nerdctl/v2/pkg/formatter"
 	"github.com/containerd/nerdctl/v2/pkg/infoutil"
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
@@ -48,7 +49,7 @@ func TestInfo(t *testing.T) {
 		},
 		{
 			Description: "info convenience form",
-			Command:     test.Command("info", "--format", "json"),
+			Command:     test.Command("info", "--format", formatter.FormatJSON),
 			Expected:    test.Expects(0, nil, testInfoComparator),
 		},
 		{

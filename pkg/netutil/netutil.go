@@ -39,6 +39,7 @@ import (
 	"github.com/containerd/log"
 
 	"github.com/containerd/nerdctl/v2/leptonic/errs"
+	"github.com/containerd/nerdctl/v2/leptonic/services/namespace"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/labels"
 	"github.com/containerd/nerdctl/v2/pkg/netutil/nettype"
@@ -97,11 +98,11 @@ func (e *CNIEnv) ListNetworksMatch(reqs []string, allowPseudoNetwork bool) (list
 }
 
 func UsedNetworks(ctx context.Context, client *containerd.Client) (map[string][]string, error) {
-	nsService := client.NamespaceService()
-	nsList, err := nsService.List(ctx)
+	nsList, err := namespace.ListNames(ctx, client)
 	if err != nil {
 		return nil, err
 	}
+
 	used := make(map[string][]string)
 	for _, ns := range nsList {
 		nsCtx := namespaces.WithNamespace(ctx, ns)
@@ -109,6 +110,7 @@ func UsedNetworks(ctx context.Context, client *containerd.Client) (map[string][]
 		if err != nil {
 			return nil, err
 		}
+
 		nsUsedN, err := namespaceUsedNetworks(nsCtx, containers)
 		if err != nil {
 			return nil, err

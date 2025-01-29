@@ -18,63 +18,71 @@ package apparmor
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
+	"io"
 	"text/tabwriter"
-	"text/template"
 
-	"go.farcloser.world/containers/security/apparmor"
-
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/leptonic/services/apparmor"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 )
 
-func List(options types.ApparmorListOptions) error {
-	quiet := options.Quiet
-	w := options.Stdout
-	var tmpl *template.Template
-	format := options.Format
-	switch format {
-	case "", "table", "wide":
-		w = tabwriter.NewWriter(w, 4, 8, 4, ' ', 0)
-		if !quiet {
-			fmt.Fprintln(w, "NAME\tMODE")
-		}
-	case "raw":
-		return errors.New("unsupported format: \"raw\"")
-	default:
-		if quiet {
-			return errors.New("format and quiet must not be specified together")
-		}
-		var err error
-		tmpl, err = formatter.ParseTemplate(format)
-		if err != nil {
-			return err
-		}
-	}
-
-	profiles, err := apparmor.Profiles()
+func List(out io.Writer, options *ListOptions) error {
+	profiles, err := apparmor.List()
 	if err != nil {
 		return err
 	}
 
-	for _, f := range profiles {
-		if tmpl != nil {
+	quiet := options.Quiet
+	format := options.Format
+
+	switch format {
+	case formatter.FormatNone, formatter.FormatTable, formatter.FormatWide:
+		out = tabwriter.NewWriter(out, 4, 8, 4, ' ', 0)
+		if !quiet {
+			if _, err = fmt.Fprintln(out, "NAME\tMODE"); err != nil {
+				return err
+			}
+		}
+
+		for _, f := range profiles {
+			if quiet {
+				_, _ = fmt.Fprintln(out, f.Name)
+			} else {
+				_, _ = fmt.Fprintf(out, "%s\t%s\n", f.Name, f.Mode)
+			}
+		}
+
+		if f, ok := out.(formatter.Flusher); ok {
+			return f.Flush()
+		}
+
+	case formatter.FormatJSON:
+		toPrint, err := formatter.ToJSON(profiles, "", "   ")
+		if err != nil {
+			return err
+		}
+
+		if _, err = fmt.Fprint(out, toPrint); err != nil {
+			return err
+		}
+
+	default:
+		tmpl, err := formatter.ParseTemplate(format)
+		if err != nil {
+			return err
+		}
+
+		for _, f := range profiles {
 			var b bytes.Buffer
 			if err := tmpl.Execute(&b, f); err != nil {
 				return err
 			}
-			if _, err = fmt.Fprintln(w, b.String()); err != nil {
+
+			if _, err = fmt.Fprintln(out, b.String()); err != nil {
 				return err
 			}
-		} else if quiet {
-			fmt.Fprintln(w, f.Name)
-		} else {
-			fmt.Fprintf(w, "%s\t%s\n", f.Name, f.Mode)
 		}
 	}
-	if f, ok := w.(formatter.Flusher); ok {
-		return f.Flush()
-	}
+
 	return nil
 }

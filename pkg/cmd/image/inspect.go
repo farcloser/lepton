@@ -20,8 +20,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"regexp"
-	"strings"
 	"time"
 
 	"go.farcloser.world/containers/reference"
@@ -30,6 +28,8 @@ import (
 	"github.com/containerd/containerd/v2/core/images"
 	"github.com/containerd/log"
 
+	"github.com/containerd/nerdctl/v2/leptonic/api"
+	"github.com/containerd/nerdctl/v2/leptonic/services/image"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/containerdutil"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
@@ -37,54 +37,8 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
 )
 
-func inspectIdentifier(ctx context.Context, client *containerd.Client, identifier string) ([]images.Image, string, string, error) {
-	// Figure out what we have here - digest, tag, name
-	parsedReference, err := reference.Parse(identifier)
-	if err != nil {
-		return nil, "", "", err
-	}
-	digest := ""
-	if parsedReference.Digest != "" {
-		digest = parsedReference.Digest.String()
-	}
-	name := parsedReference.Name()
-	tag := parsedReference.Tag
-
-	// Initialize filters
-	var filters []string
-	// This will hold the final image list, if any
-	var imageList []images.Image
-
-	// No digest in the request? Then assume it is a name
-	if digest == "" {
-		filters = []string{fmt.Sprintf("name==%s:%s", name, tag)}
-		// Query it
-		imageList, err = client.ImageService().List(ctx, filters...)
-		if err != nil {
-			return nil, "", "", fmt.Errorf("containerd image service failed: %w", err)
-		}
-		// Nothing? Then it could be a short id (aka truncated digest) - we are going to use this
-		if len(imageList) == 0 {
-			digest = fmt.Sprintf("sha256:%s.*", regexp.QuoteMeta(strings.TrimPrefix(identifier, "sha256:")))
-			name = ""
-			tag = ""
-		} else {
-			// Otherwise, we found one by name. Get the digest from it.
-			digest = imageList[0].Target.Digest.String()
-		}
-	}
-
-	// At this point, we DO have a digest (or short id), so, that is what we are retrieving
-	filters = []string{fmt.Sprintf("target.digest~=^%s$", digest)}
-	imageList, err = client.ImageService().List(ctx, filters...)
-	if err != nil {
-		return nil, "", "", fmt.Errorf("containerd image service failed: %w", err)
-	}
-
-	// TODO: docker does allow retrieving images by Id, so implement as a last ditch effort (probably look-up the store)
-
-	// Return the list we found, along with normalized name and tag
-	return imageList, name, tag, nil
+func inspectIdentifier(ctx context.Context, client *containerd.Client, identifier string) ([]*api.Image, string, string, error) {
+	return image.Inspect(ctx, client, identifier)
 }
 
 // Inspect prints detailed information of each image in `images`.
@@ -118,7 +72,14 @@ func Inspect(ctx context.Context, client *containerd.Client, identifiers []strin
 		// Go through the candidates
 		for _, candidateImage := range candidateImageList {
 			// Inspect the image
-			candidateNativeImage, err := imageinspector.Inspect(ctx, client, candidateImage, snapshotter)
+			candidateNativeImage, err := imageinspector.Inspect(ctx, client,
+				images.Image{
+					Name:      candidateImage.Name,
+					Labels:    candidateImage.Labels,
+					Target:    candidateImage.Target,
+					CreatedAt: candidateImage.CreatedAt,
+					UpdatedAt: candidateImage.UpdatedAt,
+				}, snapshotter)
 			if err != nil {
 				log.G(ctx).WithError(err).WithField("name", candidateImage.Name).Error("failure inspecting image")
 				continue

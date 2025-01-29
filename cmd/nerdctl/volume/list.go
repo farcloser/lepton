@@ -22,6 +22,7 @@ import (
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/volume"
+	"github.com/containerd/nerdctl/v2/pkg/formatter"
 )
 
 func newVolumeLsCommand() *cobra.Command {
@@ -39,7 +40,7 @@ func newVolumeLsCommand() *cobra.Command {
 	volumeLsCommand.Flags().String("format", "", "Format the output using the given go template")
 	volumeLsCommand.Flags().BoolP("size", "s", false, "Display the disk usage of volumes. Can be slow with volumes having loads of directories.")
 	volumeLsCommand.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{"json", "table", "wide"}, cobra.ShellCompDirectiveNoFileComp
+		return []string{formatter.FormatJSON, formatter.FormatTable, formatter.FormatWide}, cobra.ShellCompDirectiveNoFileComp
 	})
 	volumeLsCommand.Flags().StringSliceP("filter", "f", []string{}, "Filter matches volumes based on given conditions")
 	return volumeLsCommand

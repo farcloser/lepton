@@ -22,39 +22,35 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
+	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/pkg/infoutil"
-	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
 )
 
-func NetworkDrivers(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-	candidates := []string{"bridge", "macvlan", "ipvlan"}
-	return candidates, cobra.ShellCompDirectiveNoFileComp
+func NetworkDrivers(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
+	return []string{"bridge", "macvlan", "ipvlan"}, cobra.ShellCompDirectiveNoFileComp
 }
 
-func IPAMDrivers(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+func IPAMDrivers(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
 	return []string{"default", "host-local", "dhcp"}, cobra.ShellCompDirectiveNoFileComp
 }
 
-func SnapshotterNames(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+func SnapshotterNames(cmd *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return nil, cobra.ShellCompDirectiveError
 	}
-	if rootlessutil.IsRootlessParent() {
-		_ = rootlessutil.ParentMain(globalOptions.HostGatewayIP)
-		return nil, cobra.ShellCompDirectiveNoFileComp
-	}
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
+
+	client, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
 	if err != nil {
 		return nil, cobra.ShellCompDirectiveError
 	}
+
 	defer cancel()
+
 	snapshotterPlugins, err := infoutil.GetSnapshotterNames(ctx, client)
 	if err != nil {
 		return nil, cobra.ShellCompDirectiveError
 	}
-	var candidates []string
-	candidates = append(candidates, snapshotterPlugins...)
-	return candidates, cobra.ShellCompDirectiveNoFileComp
+
+	return snapshotterPlugins, cobra.ShellCompDirectiveNoFileComp
 }

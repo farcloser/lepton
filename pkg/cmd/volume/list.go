@@ -94,7 +94,7 @@ func lsPrintOutput(vols map[string]native.Volume, options types.VolumeListOption
 	w := options.Stdout
 	var tmpl *template.Template
 	switch options.Format {
-	case "", "table", "wide":
+	case formatter.FormatNone, formatter.FormatTable, formatter.FormatWide:
 		w = tabwriter.NewWriter(w, 4, 8, 4, ' ', 0)
 		if !options.Quiet {
 			if options.Size {
@@ -103,8 +103,6 @@ func lsPrintOutput(vols map[string]native.Volume, options types.VolumeListOption
 				fmt.Fprintln(w, "VOLUME NAME\tDIRECTORY")
 			}
 		}
-	case "raw":
-		return errors.New("unsupported format: \"raw\"")
 	default:
 		if options.Quiet {
 			return errors.New("format and quiet must not be specified together")

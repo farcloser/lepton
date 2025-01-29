@@ -23,6 +23,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/system"
+	"github.com/containerd/nerdctl/v2/pkg/formatter"
 )
 
 func NewInfoCommand() *cobra.Command {
@@ -42,7 +43,7 @@ func NewInfoCommand() *cobra.Command {
 
 	infoCommand.Flags().StringP("format", "f", "", "Format the output using the given Go template, e.g, '{{json .}}'")
 	_ = infoCommand.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{"json"}, cobra.ShellCompDirectiveNoFileComp
+		return []string{formatter.FormatJSON}, cobra.ShellCompDirectiveNoFileComp
 	})
 
 	return infoCommand

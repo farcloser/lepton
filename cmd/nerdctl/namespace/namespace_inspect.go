@@ -28,6 +28,7 @@ import (
 	"github.com/containerd/containerd/v2/core/images"
 	"github.com/containerd/log"
 
+	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/leptonic/services/namespace"
@@ -49,14 +50,14 @@ func newNamespaceInspectCommand() *cobra.Command {
 		Short:             "Display detailed information on one or more namespaces.",
 		RunE:              inspectAction,
 		Args:              cobra.MinimumNArgs(1),
-		ValidArgsFunction: ShellComplete,
+		ValidArgsFunction: completion.NamespaceNames,
 		SilenceUsage:      true,
 		SilenceErrors:     true,
 	}
 
 	namespaceInspectCommand.Flags().StringP("format", "f", "", "Format the output using the given Go template, e.g, '{{json .}}'")
 	namespaceInspectCommand.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{"json"}, cobra.ShellCompDirectiveNoFileComp
+		return []string{formatter.FormatJSON}, cobra.ShellCompDirectiveNoFileComp
 	})
 
 	return namespaceInspectCommand
@@ -148,9 +149,7 @@ func inspectAction(cmd *cobra.Command, args []string) error {
 	}
 
 	switch options.Format {
-	case "", "table", "wide":
-	case "raw":
-		return errors.New("unsupported format: \"raw\"")
+	case formatter.FormatNone, formatter.FormatTable, formatter.FormatWide:
 	default:
 		tmpl, err := formatter.ParseTemplate(options.Format)
 		if err != nil {

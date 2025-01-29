@@ -34,6 +34,7 @@ import (
 const UnameO = "GNU/Linux"
 
 func fulfillSecurityOptions(info *dockercompat.Info) {
+	// FIXME: what is this even reporting?
 	if apparmor.CanApplyExistingProfile() {
 		info.SecurityOptions = append(info.SecurityOptions, "name=apparmor")
 		if rootlessutil.IsRootless() && !apparmor.CanApplySpecificExistingProfile(defaults.AppArmorProfileName) {

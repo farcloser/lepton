@@ -170,12 +170,12 @@ func printImages(ctx context.Context, client *containerd.Client, imageList []ima
 		finalImageList = imageList
 	}
 	digestsFlag := options.Digests
-	if options.Format == "wide" {
+	if options.Format == formatter.FormatWide {
 		digestsFlag = true
 	}
 	var tmpl *template.Template
 	switch options.Format {
-	case "", "table", "wide":
+	case formatter.FormatNone, formatter.FormatTable, formatter.FormatWide:
 		w = tabwriter.NewWriter(w, 4, 8, 4, ' ', 0)
 		if !options.Quiet {
 			printHeader := ""
@@ -190,8 +190,6 @@ func printImages(ctx context.Context, client *containerd.Client, imageList []ima
 			printHeader += "IMAGE ID\tCREATED\tPLATFORM\tSIZE\tBLOB SIZE"
 			fmt.Fprintln(w, printHeader)
 		}
-	case "raw":
-		return errors.New("unsupported format: \"raw\"")
 	default:
 		if options.Quiet {
 			return errors.New("format and quiet must not be specified together")
@@ -235,14 +233,14 @@ type imagePrinter struct {
 	snapshotter                            snapshots.Snapshotter
 }
 
-type image struct {
+type imageStruct struct {
 	blobSize int64
 	size     int64
 	platform platforms.Platform
 	config   *specs.Descriptor
 }
 
-func readManifest(ctx context.Context, provider content.Provider, snapshotter snapshots.Snapshotter, desc specs.Descriptor) (*image, error) {
+func readManifest(ctx context.Context, provider content.Provider, snapshotter snapshots.Snapshotter, desc specs.Descriptor) (*imageStruct, error) {
 	// Read the manifest blob from the descriptor
 	manifestData, err := containerdutil.ReadBlob(ctx, provider, desc)
 	if err != nil {
@@ -286,7 +284,7 @@ func readManifest(ctx context.Context, provider content.Provider, snapshotter sn
 		size = actualSize.Size
 	}
 
-	return &image{
+	return &imageStruct{
 		blobSize: blobSize,
 		size:     size,
 		platform: plt,
@@ -294,8 +292,8 @@ func readManifest(ctx context.Context, provider content.Provider, snapshotter sn
 	}, nil
 }
 
-func readIndex(ctx context.Context, provider content.Provider, snapshotter snapshots.Snapshotter, desc specs.Descriptor) (map[string]*image, error) {
-	descs := map[string]*image{}
+func readIndex(ctx context.Context, provider content.Provider, snapshotter snapshots.Snapshotter, desc specs.Descriptor) (map[string]*imageStruct, error) {
+	descs := map[string]*imageStruct{}
 
 	// Read the index
 	indexData, err := containerdutil.ReadBlob(ctx, provider, desc)
@@ -320,13 +318,13 @@ func readIndex(ctx context.Context, provider content.Provider, snapshotter snaps
 	return descs, err
 }
 
-func read(ctx context.Context, provider content.Provider, snapshotter snapshots.Snapshotter, desc specs.Descriptor) (map[string]*image, error) {
+func read(ctx context.Context, provider content.Provider, snapshotter snapshots.Snapshotter, desc specs.Descriptor) (map[string]*imageStruct, error) {
 	if images.IsManifestType(desc.MediaType) {
 		manifest, err := readManifest(ctx, provider, snapshotter, desc)
 		if err != nil {
 			return nil, err
 		}
-		descs := map[string]*image{}
+		descs := map[string]*imageStruct{}
 		descs[platforms.FormatAll(manifest.platform)] = manifest
 		return descs, nil
 	}

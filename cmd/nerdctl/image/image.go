@@ -32,6 +32,7 @@ func NewImageCommand() *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
+
 	cmd.AddCommand(
 		builder.NewBuildCommand(),
 		// commitCommand is in "container", not in "image"
@@ -49,19 +50,22 @@ func NewImageCommand() *cobra.Command {
 		newImageDecryptCommand(),
 		newImagePruneCommand(),
 	)
+
 	return cmd
 }
 
 func imageLsCommand() *cobra.Command {
-	x := NewImagesCommand()
-	x.Use = "ls"
-	x.Aliases = []string{"list"}
-	return x
+	cmd := NewImagesCommand()
+	cmd.Use = "ls"
+	cmd.Aliases = []string{"list"}
+
+	return cmd
 }
 
 func imageRmCommand() *cobra.Command {
-	x := NewRmiCommand()
-	x.Use = "rm"
-	x.Aliases = []string{"remove"}
-	return x
+	cmd := NewRmiCommand()
+	cmd.Use = "rm"
+	cmd.Aliases = []string{"remove"}
+
+	return cmd
 }

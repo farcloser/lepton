@@ -41,7 +41,7 @@ type Flusher interface {
 func FormatSlice(format string, writer io.Writer, x []interface{}) error {
 	var tmpl *template.Template
 	switch format {
-	case "":
+	case FormatNone:
 		// Avoid escaping "<", ">", "&"
 		// https://pkg.go.dev/encoding/json
 		encoder := json.NewEncoder(writer)
@@ -52,8 +52,8 @@ func FormatSlice(format string, writer io.Writer, x []interface{}) error {
 			return err
 		}
 		fmt.Fprint(writer, "\n")
-	case "raw", "table", "wide":
-		return errors.New("unsupported format: \"raw\", \"table\", and \"wide\"")
+	case FormatTable, FormatWide:
+		return errors.New("unsupported format: \"table\", and \"wide\"")
 	default:
 		var err error
 		tmpl, err = ParseTemplate(format)
@@ -78,6 +78,7 @@ func FormatSlice(format string, writer io.Writer, x []interface{}) error {
 	return nil
 }
 
+// FIXME: is this really serving a purpose?
 func tryRawFormat(b *bytes.Buffer, f interface{}, tmpl *template.Template) error {
 	m, err := json.MarshalIndent(f, "", "    ")
 	if err != nil {
@@ -103,12 +104,15 @@ func tryRawFormat(b *bytes.Buffer, f interface{}, tmpl *template.Template) error
 
 // ParseTemplate wraps github.com/docker/cli/templates.Parse() to allow `json` as an alias of `{{json .}}`.
 // ParseTemplate can be removed when https://github.com/docker/cli/pull/3355 gets merged and tagged (Docker 22.XX).
+// FIXME: remove this entirely - json should output valid json - {{ json . }} may output a stream
 func ParseTemplate(format string) (*template.Template, error) {
 	aliases := map[string]string{
-		"json": "{{json .}}",
+		FormatJSON: "{{json .}}",
 	}
+
 	if alias, ok := aliases[format]; ok {
 		format = alias
 	}
+
 	return templates.Parse(format)
 }

@@ -20,8 +20,8 @@ import (
 	"go.farcloser.world/containers/security/cgroups"
 
 	"github.com/containerd/containerd/v2/defaults"
-	"github.com/containerd/containerd/v2/pkg/namespaces"
 
+	"github.com/containerd/nerdctl/v2/leptonic/services/namespace"
 	ncdefaults "github.com/containerd/nerdctl/v2/pkg/defaults"
 )
 
@@ -52,7 +52,7 @@ func New() *Config {
 		Debug:            false,
 		DebugFull:        false,
 		Address:          defaults.DefaultAddress,
-		Namespace:        namespaces.Default,
+		Namespace:        namespace.Default,
 		Snapshotter:      defaults.DefaultSnapshotter,
 		CNIPath:          ncdefaults.CNIPath(),
 		CNINetConfPath:   ncdefaults.CNINetConfPath(),

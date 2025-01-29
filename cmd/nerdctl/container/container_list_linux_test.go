@@ -168,7 +168,7 @@ func TestContainerListWideMode(t *testing.T) {
 	base, testContainer := preparePsTestContainer(t, "listWithMode", true)
 
 	// hope there are no tests running parallel
-	base.Cmd("ps", "-n", "1", "--format", "wide").AssertOutWithFunc(func(stdout string) error {
+	base.Cmd("ps", "-n", "1", "--format", formatter.FormatWide).AssertOutWithFunc(func(stdout string) error {
 
 		// An example of nerdctl ps --format wide
 		// CONTAINER ID    IMAGE                               PLATFORM       COMMAND    CREATED              STATUS    PORTS    NAMES            RUNTIME                  SIZE

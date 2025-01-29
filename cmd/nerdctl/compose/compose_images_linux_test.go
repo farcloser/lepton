@@ -22,6 +22,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/containerd/nerdctl/v2/pkg/formatter"
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 )
 
@@ -143,9 +144,9 @@ volumes:
 	// check other formats are not supported
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "images", "--format", "yaml").AssertFail()
 	// check all services are up (can be marshalled and unmarshalled)
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "images", "--format", "json").
+	base.ComposeCmd("-f", comp.YAMLFullPath(), "images", "--format", formatter.FormatJSON).
 		AssertOutWithFunc(assertHandler("all", 2, `"ContainerName":"wordpress"`, `"ContainerName":"db"`))
 
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "images", "--format", "json", "wordpress").
+	base.ComposeCmd("-f", comp.YAMLFullPath(), "images", "--format", formatter.FormatJSON, "wordpress").
 		AssertOutWithFunc(assertHandler("wordpress", 1, `"ContainerName":"wordpress"`))
 }

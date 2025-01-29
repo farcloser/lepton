@@ -49,7 +49,7 @@ func newComposePsCommand() *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
-	composePsCommand.Flags().String("format", "table", "Format the output. Supported values: [table|json]")
+	composePsCommand.Flags().String("format", formatter.FormatTable, "Format the output. Supported values: [table|json]")
 	composePsCommand.Flags().String("filter", "", "Filter matches containers based on given conditions")
 	composePsCommand.Flags().StringArray("status", []string{}, "Filter services by status. Values: [paused | restarting | removing | running | dead | created | exited]")
 	composePsCommand.Flags().BoolP("quiet", "q", false, "Only display container IDs")
@@ -83,7 +83,7 @@ func composePsAction(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	if format != "json" && format != "table" {
+	if format != formatter.FormatJSON && format != formatter.FormatTable {
 		return fmt.Errorf("unsupported format %s, supported formats are: [table|json]", format)
 	}
 	status, err := cmd.Flags().GetStringArray("status")
@@ -183,7 +183,7 @@ func composePsAction(cmd *cobra.Command, args []string) error {
 		eg.Go(func() error {
 			var p composeContainerPrintable
 			var err error
-			if format == "json" {
+			if format == formatter.FormatJSON {
 				p, err = composeContainerPrintableJSON(ctx, container)
 			} else {
 				p, err = composeContainerPrintableTab(ctx, container)
@@ -206,7 +206,7 @@ func composePsAction(cmd *cobra.Command, args []string) error {
 		}
 		return nil
 	}
-	if format == "json" {
+	if format == formatter.FormatJSON {
 		outJSON, err := formatter.ToJSON(containersPrintable, "", "")
 		if err != nil {
 			return err

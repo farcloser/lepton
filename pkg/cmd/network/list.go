@@ -47,13 +47,11 @@ func List(ctx context.Context, options types.NetworkListOptions) error {
 	var tmpl *template.Template
 
 	switch format {
-	case "", "table", "wide":
+	case formatter.FormatNone, formatter.FormatTable, formatter.FormatWide:
 		w = tabwriter.NewWriter(w, 4, 8, 4, ' ', 0)
 		if !quiet {
 			fmt.Fprintln(w, "NETWORK ID\tNAME\tFILE")
 		}
-	case "raw":
-		return errors.New("unsupported format: \"raw\"")
 	default:
 		if quiet {
 			return errors.New("format and quiet must not be specified together")

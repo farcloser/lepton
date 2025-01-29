@@ -52,7 +52,7 @@ func NewPsCommand() *cobra.Command {
 	// Alias "-f" is reserved for "--filter"
 	psCommand.Flags().String("format", "", "Format the output using the given Go template, e.g, '{{json .}}', 'wide'")
 	psCommand.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{"json", "table", "wide"}, cobra.ShellCompDirectiveNoFileComp
+		return []string{formatter.FormatJSON, formatter.FormatTable, formatter.FormatWide}, cobra.ShellCompDirectiveNoFileComp
 	})
 	psCommand.Flags().StringSliceP("filter", "f", nil, "Filter matches containers based on given conditions. When specifying the condition 'status', it filters all containers")
 	return psCommand
@@ -113,7 +113,7 @@ func processOptions(cmd *cobra.Command) (types.ContainerListOptions, FormattingA
 			All:      all,
 			LastN:    lastN,
 			Truncate: trunc,
-			Size:     size || (format == "wide" && !quiet),
+			Size:     size || (format == formatter.FormatWide && !quiet),
 			Filters:  filters,
 		}, FormattingAndPrintingOptions{
 			Stdout: cmd.OutOrStdout(),
@@ -161,7 +161,7 @@ func formatAndPrintContainerInfo(containers []container.ListItem, options Format
 		tmpl *template.Template
 	)
 	switch options.Format {
-	case "", "table":
+	case formatter.FormatNone, formatter.FormatTable:
 		w = tabwriter.NewWriter(w, 4, 8, 4, ' ', 0)
 		if !options.Quiet {
 			printHeader := "CONTAINER ID\tIMAGE\tCOMMAND\tCREATED\tSTATUS\tPORTS\tNAMES"
@@ -170,9 +170,7 @@ func formatAndPrintContainerInfo(containers []container.ListItem, options Format
 			}
 			fmt.Fprintln(w, printHeader)
 		}
-	case "raw":
-		return errors.New("unsupported format: \"raw\"")
-	case "wide":
+	case formatter.FormatWide:
 		w = tabwriter.NewWriter(w, 4, 8, 4, ' ', 0)
 		if !options.Quiet {
 			fmt.Fprintln(w, "CONTAINER ID\tIMAGE\tCOMMAND\tCREATED\tSTATUS\tPORTS\tNAMES\tRUNTIME\tPLATFORM\tSIZE")

@@ -26,6 +26,7 @@ import (
 	"github.com/containerd/nerdctl/v2/leptonic/api"
 	"github.com/containerd/nerdctl/v2/leptonic/errs"
 	"github.com/containerd/nerdctl/v2/leptonic/services/namespace"
+	"github.com/containerd/nerdctl/v2/pkg/formatter"
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
@@ -111,7 +112,7 @@ func TestInspectFail(t *testing.T) {
 		{
 			Description: "mixing errors and one good known namespace",
 			// FIXME unhardcode namespace name
-			Command: test.Command("namespace", "inspect", "--format", "json", "doesnotexistandneverwill", "_", "∞", "nerdctl-test"),
+			Command: test.Command("namespace", "inspect", "--format", formatter.FormatJSON, "doesnotexistandneverwill", "_", "∞", "nerdctl-test"),
 			Expected: test.Expects(1, []error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument, errs.ErrNotFound}, func(stdout string, info string, t *testing.T) {
 				var expect []api.Namespace
 				err := json.Unmarshal([]byte(stdout), &expect)
@@ -196,7 +197,7 @@ func TestCreateSuccess(t *testing.T) {
 			Description: "inspect works",
 			NoParallel:  true,
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-				return helpers.Command("namespace", "inspect", "--format", "json", data.Get("namespace"))
+				return helpers.Command("namespace", "inspect", "--format", formatter.FormatJSON, data.Get("namespace"))
 			},
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 				return &test.Expected{
@@ -217,7 +218,7 @@ func TestCreateSuccess(t *testing.T) {
 			{
 				Description: "visible in list",
 				NoParallel:  true,
-				Command:     test.Command("namespace", "list", "--format", "json"),
+				Command:     test.Command("namespace", "list", "--format", output.FormatJSON),
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
 						ExitCode: 0,
@@ -250,7 +251,7 @@ func TestCreateSuccess(t *testing.T) {
 		{
 			Description: "not visible in list anymore",
 			NoParallel:  true,
-			Command:     test.Command("namespace", "list", "--format", "json"),
+			Command:     test.Command("namespace", "list", "--format", formatter.FormatJSON),
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 				return &test.Expected{
 					ExitCode: 0,

@@ -19,6 +19,7 @@ package completion
 import (
 	"testing"
 
+	"github.com/containerd/nerdctl/v2/pkg/formatter"
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
@@ -57,7 +58,7 @@ func TestCompletion(t *testing.T) {
 				Description: "namespace",
 				Require:     test.Not(test.Windows),
 				Command:     test.Command("__complete", "namespace", "inspect", "--format"),
-				Expected:    test.Expects(0, nil, test.Contains("json")),
+				Expected:    test.Expects(0, nil, test.Contains(formatter.FormatJSON)),
 			},
 			{
 				Description: "namespace",

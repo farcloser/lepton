@@ -14,20 +14,12 @@
    limitations under the License.
 */
 
-package types
+package apparmor
 
-import "io"
-
-// ApparmorListOptions specifies options for `apparmor ls`.
-type ApparmorListOptions struct {
-	Stdout io.Writer
+// ListOptions specifies options for `apparmor ls`.
+type ListOptions struct {
 	// Only display profile names
 	Quiet bool
 	// Format the output using the given go template
 	Format string
-}
-
-// ApparmorInspectOptions specifies options for `apparmor inspect`
-type ApparmorInspectOptions struct {
-	Stdout io.Writer
 }

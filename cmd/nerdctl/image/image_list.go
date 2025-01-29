@@ -25,6 +25,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/image"
+	"github.com/containerd/nerdctl/v2/pkg/formatter"
 )
 
 func NewImagesCommand() *cobra.Command {
@@ -59,7 +60,7 @@ Properties:
 	imagesCommand.Flags().String("format", "", "Format the output using the given Go template, e.g, '{{json .}}', 'wide'")
 	imagesCommand.Flags().StringSliceP("filter", "f", []string{}, "Filter output based on conditions provided")
 	imagesCommand.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{"json", "table", "wide"}, cobra.ShellCompDirectiveNoFileComp
+		return []string{formatter.FormatJSON, formatter.FormatTable, formatter.FormatWide}, cobra.ShellCompDirectiveNoFileComp
 	})
 	imagesCommand.Flags().Bool("digests", false, "Show digests (compatible with Docker, unlike ID)")
 	imagesCommand.Flags().Bool("names", false, "Show image names")
@@ -144,7 +145,7 @@ func imagesAction(cmd *cobra.Command, args []string) error {
 func imagesShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 	if len(args) == 0 {
 		// show image names
-		return completion.ImageNames(cmd)
+		return completion.ImageNames(cmd, args, toComplete)
 	}
 	return nil, cobra.ShellCompDirectiveNoFileComp
 }

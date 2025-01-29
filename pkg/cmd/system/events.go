@@ -150,10 +150,10 @@ func Events(ctx context.Context, client *containerd.Client, options types.System
 	eventsCh, errCh := eventsClient.Subscribe(ctx)
 	var tmpl *template.Template
 	switch options.Format {
-	case "":
+	case formatter.FormatNone:
 		tmpl = nil
-	case "raw", "table", "wide":
-		return errors.New("unsupported format: \"raw\", \"table\", and \"wide\"")
+	case formatter.FormatTable, formatter.FormatWide:
+		return errors.New("unsupported format: \"table\", and \"wide\"")
 	default:
 		var err error
 		tmpl, err = formatter.ParseTemplate(options.Format)

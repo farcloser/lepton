@@ -26,7 +26,7 @@ import (
 )
 
 func newApparmorLoadCommand() *cobra.Command {
-	cmd := &cobra.Command{
+	return &cobra.Command{
 		Use:           "load",
 		Short:         fmt.Sprintf("Load the default AppArmor profile %q. Requires root.", defaults.AppArmorProfileName),
 		Args:          cobra.NoArgs,
@@ -34,9 +34,8 @@ func newApparmorLoadCommand() *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
-	return cmd
 }
 
-func apparmorLoadAction(cmd *cobra.Command, args []string) error {
+func apparmorLoadAction(_ *cobra.Command, _ []string) error {
 	return apparmor.Load()
 }

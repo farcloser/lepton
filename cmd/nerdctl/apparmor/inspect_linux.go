@@ -21,13 +21,12 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/apparmor"
 	"github.com/containerd/nerdctl/v2/pkg/defaults"
 )
 
 func newApparmorInspectCommand() *cobra.Command {
-	cmd := &cobra.Command{
+	return &cobra.Command{
 		Use:           "inspect",
 		Short:         fmt.Sprintf("Display the default AppArmor profile %q. Other profiles cannot be displayed with this command.", defaults.AppArmorProfileName),
 		Args:          cobra.NoArgs,
@@ -35,11 +34,8 @@ func newApparmorInspectCommand() *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
-	return cmd
 }
 
-func apparmorInspectAction(cmd *cobra.Command, args []string) error {
-	return apparmor.Inspect(types.ApparmorInspectOptions{
-		Stdout: cmd.OutOrStdout(),
-	})
+func apparmorInspectAction(cmd *cobra.Command, _ []string) error {
+	return apparmor.Inspect(cmd.OutOrStdout())
 }

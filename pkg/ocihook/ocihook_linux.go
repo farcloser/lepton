@@ -17,19 +17,14 @@
 package ocihook
 
 import (
-	"go.farcloser.world/containers/security/apparmor"
-
 	"github.com/containerd/log"
 
+	"github.com/containerd/nerdctl/v2/leptonic/services/apparmor"
 	"github.com/containerd/nerdctl/v2/pkg/defaults"
 )
 
 func loadAppArmor() {
-	if !apparmor.CanLoadNewProfile() {
-		return
-	}
-	// ensure that the default profile is loaded to the host
-	if err := apparmor.LoadDefaultProfile(defaults.AppArmorProfileName); err != nil {
+	if err := apparmor.Load(defaults.AppArmorProfileName); err != nil {
 		log.L.WithError(err).Errorf("failed to load AppArmor profile %q", defaults.AppArmorProfileName)
 		// We do not abort here. This is by design, and not a security issue.
 		//
