@@ -20,13 +20,14 @@ import (
 	"testing"
 	"time"
 
+	"github.com/containerd/nerdctl/v2/pkg/formatter"
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
 )
 
 func testEventFilterExecutor(data test.Data, helpers test.Helpers) test.TestableCommand {
-	cmd := helpers.Command("events", "--filter", data.Get("filter"), "--format", "json")
+	cmd := helpers.Command("events", "--filter", data.Get("filter"), "--format", formatter.FormatJSON)
 	cmd.Background(1 * time.Second)
 	helpers.Ensure("run", "--rm", testutil.CommonImage)
 	return cmd

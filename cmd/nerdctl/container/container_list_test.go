@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/containerd/nerdctl/v2/pkg/formatter"
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
 )
@@ -58,5 +59,5 @@ func TestContainerListWithJsonFormatLabel(t *testing.T) {
 	defer base.Cmd("rm", "-f", cID).AssertOK()
 	base.Cmd("ps", "-a",
 		"--filter", "label="+labelK,
-		"--format", "json").AssertOutContains(fmt.Sprintf("%s=%s", labelK, labelV))
+		"--format", formatter.FormatJSON).AssertOutContains(fmt.Sprintf("%s=%s", labelK, labelV))
 }

@@ -111,5 +111,5 @@ func saveAction(cmd *cobra.Command, args []string) error {
 
 func saveShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 	// show image names
-	return completion.ImageNames(cmd)
+	return completion.ImageNames(cmd, args, toComplete)
 }

@@ -125,5 +125,5 @@ func getImgcryptAction(encrypt bool) func(cmd *cobra.Command, args []string) err
 
 func imgcryptShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 	// show image names
-	return completion.ImageNames(cmd)
+	return completion.ImageNames(cmd, args, toComplete)
 }

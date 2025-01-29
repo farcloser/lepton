@@ -60,7 +60,7 @@ func NewHistoryCommand() *cobra.Command {
 func addHistoryFlags(cmd *cobra.Command) {
 	cmd.Flags().StringP("format", "f", "", "Format the output using the given Go template, e.g, '{{json .}}'")
 	cmd.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{"json"}, cobra.ShellCompDirectiveNoFileComp
+		return []string{formatter.FormatJSON}, cobra.ShellCompDirectiveNoFileComp
 	})
 	cmd.Flags().BoolP("quiet", "q", false, "Only show numeric IDs")
 	cmd.Flags().BoolP("human", "H", true, "Print sizes and dates in human readable format (default true)")
@@ -186,13 +186,11 @@ func printHistory(cmd *cobra.Command, historys []historyPrintable) error {
 
 	var tmpl *template.Template
 	switch format {
-	case "", "table":
+	case formatter.FormatNone, formatter.FormatTable:
 		w = tabwriter.NewWriter(w, 4, 8, 4, ' ', 0)
 		if !quiet {
 			fmt.Fprintln(w, "SNAPSHOT\tCREATED\tCREATED BY\tSIZE\tCOMMENT") //nolint:dupword
 		}
-	case "raw":
-		return errors.New("unsupported format: \"raw\"")
 	default:
 		quiet = false
 		var err error
@@ -272,5 +270,5 @@ func (x *historyPrinter) printHistory(printable historyPrintable) error {
 
 func historyShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 	// show image names
-	return completion.ImageNames(cmd)
+	return completion.ImageNames(cmd, args, toComplete)
 }

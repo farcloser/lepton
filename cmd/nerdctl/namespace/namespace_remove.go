@@ -23,6 +23,7 @@ import (
 
 	"github.com/containerd/log"
 
+	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/leptonic/services/namespace"
@@ -39,7 +40,7 @@ func newNamespaceRmCommand() *cobra.Command {
 		Use:               "remove [flags] NAMESPACE [NAMESPACE...]",
 		Aliases:           []string{"rm"},
 		Args:              cobra.MinimumNArgs(1),
-		ValidArgsFunction: ShellComplete,
+		ValidArgsFunction: completion.NamespaceNames,
 		Short:             "Remove one or more namespaces",
 		RunE:              namespaceRmAction,
 		SilenceUsage:      true,

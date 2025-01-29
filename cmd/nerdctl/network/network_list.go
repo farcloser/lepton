@@ -22,6 +22,7 @@ import (
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/network"
+	"github.com/containerd/nerdctl/v2/pkg/formatter"
 )
 
 func newNetworkLsCommand() *cobra.Command {
@@ -38,7 +39,7 @@ func newNetworkLsCommand() *cobra.Command {
 	cmd.Flags().StringSliceP("filter", "f", []string{}, "Provide filter values (e.g. \"name=default\")")
 	cmd.Flags().String("format", "", "Format the output using the given Go template, e.g, '{{json .}}'")
 	cmd.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{"json", "table", "wide"}, cobra.ShellCompDirectiveNoFileComp
+		return []string{formatter.FormatJSON, formatter.FormatTable, formatter.FormatWide}, cobra.ShellCompDirectiveNoFileComp
 	})
 	return cmd
 }

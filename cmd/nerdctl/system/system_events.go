@@ -23,6 +23,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/system"
+	"github.com/containerd/nerdctl/v2/pkg/formatter"
 )
 
 func NewEventsCommand() *cobra.Command {
@@ -39,7 +40,7 @@ func NewEventsCommand() *cobra.Command {
 	}
 	eventsCommand.Flags().String("format", "", "Format the output using the given Go template, e.g, '{{json .}}'")
 	eventsCommand.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{"json"}, cobra.ShellCompDirectiveNoFileComp
+		return []string{formatter.FormatJSON}, cobra.ShellCompDirectiveNoFileComp
 	})
 	eventsCommand.Flags().StringSliceP("filter", "f", []string{}, "Filter matches containers based on given conditions")
 	return eventsCommand

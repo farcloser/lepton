@@ -24,6 +24,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/image"
+	"github.com/containerd/nerdctl/v2/pkg/formatter"
 )
 
 func newImageInspectCommand() *cobra.Command {
@@ -33,17 +34,18 @@ func newImageInspectCommand() *cobra.Command {
 		Short:             "Display detailed information on one or more images.",
 		Long:              "Hint: set `--mode=native` for showing the full output",
 		RunE:              imageInspectAction,
-		ValidArgsFunction: imageInspectShellComplete,
+		ValidArgsFunction: completion.ImageNames,
 		SilenceUsage:      true,
 		SilenceErrors:     true,
 	}
+
 	imageInspectCommand.Flags().String("mode", "dockercompat", `Inspect mode, "dockercompat" for Docker-compatible output, "native" for containerd-native output`)
 	imageInspectCommand.RegisterFlagCompletionFunc("mode", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return []string{"dockercompat", "native"}, cobra.ShellCompDirectiveNoFileComp
 	})
 	imageInspectCommand.Flags().StringP("format", "f", "", "Format the output using the given Go template, e.g, '{{json .}}'")
 	imageInspectCommand.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{"json"}, cobra.ShellCompDirectiveNoFileComp
+		return []string{formatter.FormatJSON}, cobra.ShellCompDirectiveNoFileComp
 	})
 
 	// #region platform flags
@@ -59,14 +61,17 @@ func ProcessImageInspectOptions(cmd *cobra.Command, platform *string) (types.Ima
 	if err != nil {
 		return types.ImageInspectOptions{}, err
 	}
+
 	mode, err := cmd.Flags().GetString("mode")
 	if err != nil {
 		return types.ImageInspectOptions{}, err
 	}
+
 	format, err := cmd.Flags().GetString("format")
 	if err != nil {
 		return types.ImageInspectOptions{}, err
 	}
+
 	if platform == nil {
 		tempPlatform, err := cmd.Flags().GetString("platform")
 		if err != nil {
@@ -74,6 +79,7 @@ func ProcessImageInspectOptions(cmd *cobra.Command, platform *string) (types.Ima
 		}
 		platform = &tempPlatform
 	}
+
 	return types.ImageInspectOptions{
 		GOptions: globalOptions,
 		Mode:     mode,
@@ -96,9 +102,4 @@ func imageInspectAction(cmd *cobra.Command, args []string) error {
 	defer cancel()
 
 	return image.Inspect(ctx, client, args, options)
-}
-
-func imageInspectShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-	// show image names
-	return completion.ImageNames(cmd)
 }

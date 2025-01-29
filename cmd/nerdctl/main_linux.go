@@ -29,35 +29,29 @@ func appNeedsRootlessParentMain(cmd *cobra.Command, args []string) bool {
 	for tcmd := cmd; tcmd != nil; tcmd = tcmd.Parent() {
 		commands = append(commands, tcmd.Name())
 	}
+
 	commands = strutil.ReverseStrSlice(commands)
 
 	if !rootlessutil.IsRootlessParent() {
 		return false
 	}
+
 	if len(commands) < 2 {
 		return true
 	}
+
 	switch commands[1] {
 	// completion, login, logout, version: false, because it shouldn't require the daemon to be running
 	// apparmor: false, because it requires the initial mount namespace to access /sys/kernel/security
 	// cp, compose cp: false, because it requires the initial mount namespace to inspect file owners
 	case "", "completion", "login", "logout", "apparmor", "cp", "version":
 		return false
-	case "container":
-		if len(commands) < 3 {
-			return true
-		}
-		if commands[2] == "cp" {
-			return false
-		}
-	case "compose":
-		if len(commands) < 3 {
-			return true
-		}
-		if commands[2] == "cp" {
+	case "container", "compose":
+		if len(commands) >= 3 && commands[2] == "cp" {
 			return false
 		}
 	}
+
 	return true
 }
 

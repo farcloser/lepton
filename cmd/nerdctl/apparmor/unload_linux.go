@@ -21,35 +21,28 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/containerd/log"
-
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/apparmor"
 	"github.com/containerd/nerdctl/v2/pkg/defaults"
 )
 
 func newApparmorUnloadCommand() *cobra.Command {
-	cmd := &cobra.Command{
+	return &cobra.Command{
 		Use:               "unload [PROFILE]",
 		Short:             fmt.Sprintf("Unload an AppArmor profile. The target profile name defaults to %q. Requires root.", defaults.AppArmorProfileName),
 		Args:              cobra.MaximumNArgs(1),
 		RunE:              apparmorUnloadAction,
-		ValidArgsFunction: apparmorUnloadShellComplete,
+		ValidArgsFunction: completion.ApparmorProfiles,
 		SilenceUsage:      true,
 		SilenceErrors:     true,
 	}
-	return cmd
 }
 
-func apparmorUnloadAction(cmd *cobra.Command, args []string) error {
-	target := defaults.AppArmorProfileName
+func apparmorUnloadAction(_ *cobra.Command, args []string) error {
+	target := ""
 	if len(args) > 0 {
 		target = args[0]
 	}
-	log.L.Infof("Unloading profile %q", target)
-	return apparmor.Unload(target)
-}
 
-func apparmorUnloadShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-	return completion.ApparmorProfiles(cmd)
+	return apparmor.Unload(target)
 }

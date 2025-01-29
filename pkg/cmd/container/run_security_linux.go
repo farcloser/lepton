@@ -86,6 +86,7 @@ func generateSecurityOpts(privileged bool, securityOptsMap map[string]string) ([
 		opts = append(opts, seccompWithDefaultProfile())
 	}
 
+	// FIXME: remove this tagliatelle
 	canLoadNewAppArmor := apparmor.CanLoadNewProfile()
 	canApplyExistingProfile := apparmor.CanApplyExistingProfile()
 	if aaProfile, ok := securityOptsMap["apparmor"]; ok {

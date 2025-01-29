@@ -18,19 +18,17 @@ package completion
 
 import (
 	"github.com/spf13/cobra"
-	"go.farcloser.world/containers/security/apparmor"
 	"go.farcloser.world/containers/security/cgroups"
+
+	"github.com/containerd/nerdctl/v2/leptonic/services/apparmor"
 )
 
-func ApparmorProfiles(cmd *cobra.Command) ([]string, cobra.ShellCompDirective) {
-	profiles, err := apparmor.Profiles()
+func ApparmorProfiles(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
+	names, err := apparmor.ListNames()
 	if err != nil {
 		return nil, cobra.ShellCompDirectiveError
 	}
-	var names []string //nolint:prealloc
-	for _, f := range profiles {
-		names = append(names, f.Name)
-	}
+
 	return names, cobra.ShellCompDirectiveNoFileComp
 }
 
@@ -40,5 +38,6 @@ func CgroupManagerNames(cmd *cobra.Command, args []string, toComplete string) ([
 	for i, manager := range availableManagers {
 		candidates[i] = string(manager)
 	}
+
 	return candidates, cobra.ShellCompDirectiveNoFileComp
 }

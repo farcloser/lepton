@@ -25,6 +25,7 @@ import (
 
 	"gotest.tools/v3/assert"
 
+	"github.com/containerd/nerdctl/v2/pkg/formatter"
 	"github.com/containerd/nerdctl/v2/pkg/tabutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 )
@@ -173,18 +174,18 @@ volumes:
 	// check other formats are not supported
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "--format", "yaml").AssertFail()
 	// check all services are up (can be marshalled and unmarshalled) and check Image field exists
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "--format", "json").
+	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "--format", formatter.FormatJSON).
 		AssertOutWithFunc(assertHandler("all", 2, `"Service":"wordpress"`, `"Service":"db"`,
 			fmt.Sprintf(`"Image":"%s"`, testutil.WordpressImage), fmt.Sprintf(`"Image":"%s"`, testutil.MariaDBImage)))
 	// check wordpress is running
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "--format", "json", "wordpress").
+	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "--format", formatter.FormatJSON, "wordpress").
 		AssertOutWithFunc(assertHandler("wordpress", 1, `"Service":"wordpress"`, `"State":"running"`, `"TargetPort":80`, `"PublishedPort":8080`))
 	// check wordpress is stopped
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "stop", "wordpress").AssertOK()
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "--format", "json", "wordpress", "-a").
+	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "--format", formatter.FormatJSON, "wordpress", "-a").
 		AssertOutWithFunc(assertHandler("wordpress", 1, `"Service":"wordpress"`, `"State":"exited"`))
 	// check wordpress is removed
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "rm", "-f", "wordpress").AssertOK()
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "--format", "json", "wordpress").
+	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "--format", formatter.FormatJSON, "wordpress").
 		AssertOutWithFunc(assertHandler("wordpress", 0))
 }

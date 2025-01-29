@@ -19,6 +19,7 @@ package compose
 import (
 	"testing"
 
+	"github.com/containerd/nerdctl/v2/pkg/formatter"
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 )
 
@@ -34,5 +35,5 @@ func TestComposeVersionShort(t *testing.T) {
 
 func TestComposeVersionJson(t *testing.T) {
 	base := testutil.NewBase(t)
-	base.ComposeCmd("version", "--format", "json").AssertOutContains("{\"version\":\"")
+	base.ComposeCmd("version", "--format", formatter.FormatJSON).AssertOutContains("{\"version\":\"")
 }

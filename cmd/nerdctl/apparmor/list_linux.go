@@ -17,44 +17,53 @@
 package apparmor
 
 import (
+	"errors"
+
 	"github.com/spf13/cobra"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/apparmor"
+	"github.com/containerd/nerdctl/v2/pkg/formatter"
 )
 
-func newApparmorLsCommand() *cobra.Command {
+func newApparmorListCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:           "ls",
-		Aliases:       []string{"list"},
+		Use:           "list",
+		Aliases:       []string{"ls"},
 		Short:         "List the loaded AppArmor profiles",
 		Args:          cobra.NoArgs,
 		RunE:          apparmorLsAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
+
 	cmd.Flags().BoolP("quiet", "q", false, "Only display profile names")
-	// Alias "-f" is reserved for "--filter"
 	cmd.Flags().String("format", "", "Format the output using the given go template")
-	cmd.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{"json", "table", "wide"}, cobra.ShellCompDirectiveNoFileComp
+
+	_ = cmd.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return []string{formatter.FormatJSON, formatter.FormatTable, formatter.FormatWide}, cobra.ShellCompDirectiveNoFileComp
 	})
+
 	return cmd
 }
 
-func processApparmorListOptions(cmd *cobra.Command) (types.ApparmorListOptions, error) {
+func processApparmorListOptions(cmd *cobra.Command) (*apparmor.ListOptions, error) {
 	quiet, err := cmd.Flags().GetBool("quiet")
 	if err != nil {
-		return types.ApparmorListOptions{}, err
+		return nil, err
 	}
+
 	format, err := cmd.Flags().GetString("format")
 	if err != nil {
-		return types.ApparmorListOptions{}, err
+		return nil, err
 	}
-	return types.ApparmorListOptions{
+
+	if format != formatter.FormatNone && format != formatter.FormatWide && format != formatter.FormatTable && quiet {
+		return nil, errors.New("custom or json format, and 'quiet', cannot be specified together")
+	}
+
+	return &apparmor.ListOptions{
 		Quiet:  quiet,
 		Format: format,
-		Stdout: cmd.OutOrStdout(),
 	}, nil
 }
 
@@ -63,5 +72,6 @@ func apparmorLsAction(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	return apparmor.List(options)
+
+	return apparmor.List(cmd.OutOrStdout(), options)
 }

@@ -22,6 +22,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/containerd/nerdctl/v2/pkg/formatter"
 	"github.com/containerd/nerdctl/v2/pkg/version"
 )
 
@@ -34,9 +35,9 @@ func newComposeVersionCommand() *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
-	composeVersionCommand.Flags().StringP("format", "f", "pretty", "Format the output. Values: [pretty | json]")
+	composeVersionCommand.Flags().StringP("format", "f", formatter.FormatPretty, "Format the output. Values: [pretty | json]")
 	composeVersionCommand.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{"json", "pretty"}, cobra.ShellCompDirectiveNoFileComp
+		return []string{formatter.FormatJSON, formatter.FormatPretty}, cobra.ShellCompDirectiveNoFileComp
 	})
 	composeVersionCommand.Flags().Bool("short", false, "Shows only Compose's version number")
 	return composeVersionCommand
@@ -57,9 +58,9 @@ func composeVersionAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	switch format {
-	case "pretty":
+	case formatter.FormatPretty:
 		fmt.Fprintln(cmd.OutOrStdout(), "Compose version "+version.GetVersion())
-	case "json":
+	case formatter.FormatJSON:
 		fmt.Fprintf(cmd.OutOrStdout(), "{\"version\":\"%v\"}\n", version.Version)
 	default:
 		return fmt.Errorf("format can be either pretty or json, not %v", format)

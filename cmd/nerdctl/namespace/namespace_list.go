@@ -17,7 +17,6 @@
 package namespace
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 	"text/tabwriter"
@@ -44,7 +43,7 @@ func newNamespaceLsCommand() *cobra.Command {
 	namespaceLsCommand := &cobra.Command{
 		Use:           "ls",
 		Aliases:       []string{"list"},
-		Short:         "List containerd namespaces",
+		Short:         "ListNames containerd namespaces",
 		RunE:          namespaceLsAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
@@ -99,7 +98,7 @@ func namespaceLsAction(cmd *cobra.Command, args []string) error {
 
 	defer cancel()
 
-	namespaces, err := namespace.List(ctx, client)
+	namespaces, err := namespace.ListNames(ctx, client)
 	if err != nil {
 		return err
 	}
@@ -159,9 +158,7 @@ func namespaceLsAction(cmd *cobra.Command, args []string) error {
 	}
 
 	switch options.Format {
-	case "", "table", "wide":
-	case "raw":
-		return errors.New("unsupported format: \"raw\"")
+	case formatter.FormatNone, formatter.FormatTable, formatter.FormatWide:
 	default:
 		tmpl, err := formatter.ParseTemplate(options.Format)
 		if err != nil {

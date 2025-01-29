@@ -22,67 +22,93 @@ import (
 
 	"github.com/spf13/cobra"
 
-	containerd "github.com/containerd/containerd/v2/client"
+	"github.com/containerd/containerd/v2/client"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
+	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
+	"github.com/containerd/nerdctl/v2/leptonic/services/image"
+	"github.com/containerd/nerdctl/v2/leptonic/services/namespace"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/volume"
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/native"
 	"github.com/containerd/nerdctl/v2/pkg/labels"
 	"github.com/containerd/nerdctl/v2/pkg/netutil"
 )
 
-func ImageNames(cmd *cobra.Command) ([]string, cobra.ShellCompDirective) {
+func ImageNames(cmd *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return nil, cobra.ShellCompDirectiveError
 	}
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
+
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
 	if err != nil {
 		return nil, cobra.ShellCompDirectiveError
 	}
+
 	defer cancel()
 
-	imageList, err := client.ImageService().List(ctx, "")
-
+	candidates, err := image.ListNames(ctx, cli)
 	if err != nil {
 		return nil, cobra.ShellCompDirectiveError
 	}
-	candidates := []string{}
-	for _, img := range imageList {
-		candidates = append(candidates, img.Name)
-	}
+
 	return candidates, cobra.ShellCompDirectiveNoFileComp
 }
 
-func ContainerNames(cmd *cobra.Command, filterFunc func(containerd.ProcessStatus) bool) ([]string, cobra.ShellCompDirective) {
+func NamespaceNames(cmd *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return nil, cobra.ShellCompDirectiveError
 	}
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
+
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
 	if err != nil {
 		return nil, cobra.ShellCompDirectiveError
 	}
+
 	defer cancel()
-	containers, err := client.Containers(ctx)
+
+	nsList, err := namespace.ListNames(ctx, cli)
 	if err != nil {
 		return nil, cobra.ShellCompDirectiveError
 	}
-	getStatus := func(c containerd.Container) containerd.ProcessStatus {
+
+	return nsList, cobra.ShellCompDirectiveNoFileComp
+}
+
+func ContainerNames(cmd *cobra.Command, filterFunc func(status client.ProcessStatus) bool) ([]string, cobra.ShellCompDirective) {
+	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
+	if err != nil {
+		return nil, cobra.ShellCompDirectiveError
+	}
+
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
+	if err != nil {
+		return nil, cobra.ShellCompDirectiveError
+	}
+
+	defer cancel()
+
+	containers, err := cli.Containers(ctx)
+	if err != nil {
+		return nil, cobra.ShellCompDirectiveError
+	}
+
+	getStatus := func(c client.Container) client.ProcessStatus {
 		ctx2, cancel2 := context.WithTimeout(ctx, 100*time.Millisecond)
 		defer cancel2()
 		task, err := c.Task(ctx2, nil)
 		if err != nil {
-			return containerd.Unknown
+			return client.Unknown
 		}
 		st, err := task.Status(ctx2)
 		if err != nil {
-			return containerd.Unknown
+			return client.Unknown
 		}
 		return st.Status
 	}
+
 	candidates := []string{}
 	for _, c := range containers {
 		if filterFunc != nil {
@@ -101,6 +127,7 @@ func ContainerNames(cmd *cobra.Command, filterFunc func(containerd.ProcessStatus
 		}
 		candidates = append(candidates, c.ID())
 	}
+
 	return candidates, cobra.ShellCompDirectiveNoFileComp
 }
 

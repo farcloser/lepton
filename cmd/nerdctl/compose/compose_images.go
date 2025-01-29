@@ -66,7 +66,7 @@ func composeImagesAction(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	if format != "json" && format != "" {
+	if format != formatter.FormatJSON && format != "" {
 		return fmt.Errorf("unsupported format %s, supported formats are: [json]", format)
 	}
 
@@ -164,7 +164,7 @@ func printComposeImages(ctx context.Context, cmd *cobra.Command, containers []co
 			if tag == "" {
 				tag = "<none>"
 			}
-			if format != "json" {
+			if format != formatter.FormatJSON {
 				imageID = strings.Split(imageID, ":")[1][:12]
 			}
 
@@ -185,7 +185,7 @@ func printComposeImages(ctx context.Context, cmd *cobra.Command, containers []co
 		return err
 	}
 
-	if format == "json" {
+	if format == formatter.FormatJSON {
 		outJSON, err := formatter.ToJSON(imagePrintables, "", "")
 		if err != nil {
 			return err

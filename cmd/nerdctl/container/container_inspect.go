@@ -26,6 +26,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
+	"github.com/containerd/nerdctl/v2/pkg/formatter"
 )
 
 func newContainerInspectCommand() *cobra.Command {
@@ -47,7 +48,7 @@ func newContainerInspectCommand() *cobra.Command {
 	})
 	containerInspectCommand.Flags().StringP("format", "f", "", "Format the output using the given Go template, e.g, '{{json .}}'")
 	containerInspectCommand.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{"json"}, cobra.ShellCompDirectiveNoFileComp
+		return []string{formatter.FormatJSON}, cobra.ShellCompDirectiveNoFileComp
 	})
 	return containerInspectCommand
 }

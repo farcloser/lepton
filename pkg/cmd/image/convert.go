@@ -37,6 +37,7 @@ import (
 	"github.com/containerd/stargz-snapshotter/recorder"
 
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/formatter"
 	converterutil "github.com/containerd/nerdctl/v2/pkg/imgutil/converter"
 	"github.com/containerd/nerdctl/v2/pkg/platformutil"
 )
@@ -185,7 +186,7 @@ func readPathsFromRecordFile(filename string) ([]string, error) {
 
 func printConvertedImage(stdout io.Writer, options types.ImageConvertOptions, img converterutil.ConvertedImageInfo) error {
 	switch options.Format {
-	case "json":
+	case formatter.FormatJSON:
 		b, err := json.MarshalIndent(img, "", "    ")
 		if err != nil {
 			return err

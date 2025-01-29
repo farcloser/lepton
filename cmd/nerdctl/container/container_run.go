@@ -469,7 +469,7 @@ func runAction(cmd *cobra.Command, args []string) error {
 
 func runShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 	if len(args) == 0 {
-		return completion.ImageNames(cmd)
+		return completion.ImageNames(cmd, args, toComplete)
 	}
 	return nil, cobra.ShellCompDirectiveNoFileComp
 }

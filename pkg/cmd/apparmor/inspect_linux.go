@@ -18,18 +18,19 @@ package apparmor
 
 import (
 	"fmt"
+	"io"
 
-	"go.farcloser.world/containers/security/apparmor"
-
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/leptonic/services/apparmor"
 	"github.com/containerd/nerdctl/v2/pkg/defaults"
 )
 
-func Inspect(options types.ApparmorInspectOptions) error {
-	b, err := apparmor.DumpDefaultProfile(defaults.AppArmorProfileName)
+func Inspect(out io.Writer) error {
+	b, err := apparmor.Inspect(defaults.AppArmorProfileName)
 	if err != nil {
 		return err
 	}
-	_, err = fmt.Fprint(options.Stdout, b)
+
+	_, err = fmt.Fprint(out, b)
+
 	return err
 }

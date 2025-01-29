@@ -30,6 +30,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/image"
+	"github.com/containerd/nerdctl/v2/pkg/formatter"
 	"github.com/containerd/nerdctl/v2/pkg/idutil/containerwalker"
 	"github.com/containerd/nerdctl/v2/pkg/idutil/imagewalker"
 )
@@ -60,7 +61,7 @@ func addInspectFlags(cmd *cobra.Command) {
 
 	cmd.Flags().StringP("format", "f", "", "Format the output using the given Go template, e.g, '{{json .}}'")
 	cmd.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{"json"}, cobra.ShellCompDirectiveNoFileComp
+		return []string{formatter.FormatJSON}, cobra.ShellCompDirectiveNoFileComp
 	})
 	cmd.Flags().String("type", "", "Return JSON for specified type")
 	cmd.RegisterFlagCompletionFunc("type", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
@@ -171,6 +172,6 @@ func inspectShellComplete(cmd *cobra.Command, args []string, toComplete string) 
 	// show container names
 	containers, _ := completion.ContainerNames(cmd, nil)
 	// show image names
-	images, _ := completion.ImageNames(cmd)
+	images, _ := completion.ImageNames(cmd, args, toComplete)
 	return append(containers, images...), cobra.ShellCompDirectiveNoFileComp
 }

@@ -95,10 +95,8 @@ func Stats(ctx context.Context, client *containerd.Client, containerIDs []string
 	var w = options.Stdout
 	var tmpl *template.Template
 	switch options.Format {
-	case "", "table":
+	case formatter.FormatNone, formatter.FormatTable:
 		w = tabwriter.NewWriter(options.Stdout, 10, 1, 3, ' ', 0)
-	case "raw":
-		return errors.New("unsupported format: \"raw\"")
 	default:
 		tmpl, err = formatter.ParseTemplate(options.Format)
 		if err != nil {
@@ -263,7 +261,7 @@ func Stats(ctx context.Context, client *containerd.Client, containerIDs []string
 
 		if !firstTick {
 			// print header for every tick
-			if options.Format == "" || options.Format == "table" {
+			if options.Format == formatter.FormatNone || options.Format == formatter.FormatTable {
 				fmt.Fprintln(w, "CONTAINER ID\tNAME\tCPU %\tMEM USAGE / LIMIT\tMEM %\tNET I/O\tBLOCK I/O\tPIDS")
 			}
 		}

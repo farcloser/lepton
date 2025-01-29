@@ -172,7 +172,7 @@ func initRootCmdFlags(rootCmd *cobra.Command, tomlPath string) (*pflag.FlagSet, 
 	helpers.AddPersistentStringFlag(rootCmd, "address", []string{"a", "H"}, nil, []string{"host"}, aliasToBeInherited, cfg.Address, "CONTAINERD_ADDRESS", `containerd address, optionally with "unix://" prefix`)
 	// -n is aliases (conflicts with nerdctl logs -n)
 	helpers.AddPersistentStringFlag(rootCmd, "namespace", []string{"n"}, nil, nil, aliasToBeInherited, cfg.Namespace, "CONTAINERD_NAMESPACE", `containerd namespace, such as "moby" for Docker, "k8s.io" for Kubernetes`)
-	rootCmd.RegisterFlagCompletionFunc("namespace", namespace.ShellComplete)
+	rootCmd.RegisterFlagCompletionFunc("namespace", completion.NamespaceNames)
 	helpers.AddPersistentStringFlag(rootCmd, "snapshotter", nil, nil, []string{"storage-driver"}, aliasToBeInherited, cfg.Snapshotter, "CONTAINERD_SNAPSHOTTER", "containerd snapshotter")
 	rootCmd.RegisterFlagCompletionFunc("snapshotter", completion.SnapshotterNames)
 	rootCmd.RegisterFlagCompletionFunc("storage-driver", completion.SnapshotterNames)

@@ -20,15 +20,14 @@ import (
 	"context"
 	"errors"
 	"slices"
-	"strings"
 
 	"github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/pkg/identifiers"
 	"github.com/containerd/containerd/v2/pkg/namespaces"
-	"github.com/containerd/errdefs"
 
 	"github.com/containerd/nerdctl/v2/leptonic/api"
 	"github.com/containerd/nerdctl/v2/leptonic/errs"
+	"github.com/containerd/nerdctl/v2/leptonic/services/helpers"
 )
 
 /*
@@ -42,6 +41,10 @@ Hence:
 - we validate names first
 - inspect compares to the full list
 */
+
+const (
+	Default = namespaces.Default
+)
 
 var (
 	ErrServiceNamespace = errors.New("namespace error")
@@ -61,12 +64,12 @@ func NamespacedContext(ctx context.Context, name string) context.Context {
 	return namespaces.WithNamespace(ctx, name)
 }
 
-func List(ctx context.Context, cli *client.Client) ([]string, error) {
+func ListNames(ctx context.Context, cli *client.Client) ([]string, error) {
 	service := cli.NamespaceService()
 
 	list, err := service.List(ctx)
 	if err != nil {
-		return nil, errWrap(errConvert(err))
+		return nil, errWrap(helpers.ErrConvert(err))
 	}
 
 	return list, nil
@@ -100,7 +103,7 @@ func Update(ctx context.Context, cli *client.Client, name string, labels map[str
 
 	list, err := service.List(ctx)
 	if err != nil {
-		return []error{errWrap(errConvert(err))}
+		return []error{errWrap(helpers.ErrConvert(err))}
 	}
 
 	if !slices.Contains(list, name) {
@@ -125,7 +128,7 @@ func Inspect(ctx context.Context, cli *client.Client, names []string) ([]*api.Na
 
 	list, err := service.List(ctx)
 	if err != nil {
-		return nil, []error{errWrap(errConvert(err))}
+		return nil, []error{errWrap(helpers.ErrConvert(err))}
 	}
 
 	for _, name := range names {
@@ -179,7 +182,7 @@ func remove(ctx context.Context, service namespaces.Store, name string, removeCG
 	}
 
 	if err := service.Delete(NamespacedContext(ctx, name), name, deleteOptions...); err != nil {
-		return errConvert(err)
+		return helpers.ErrConvert(err)
 	}
 
 	return nil
@@ -188,7 +191,7 @@ func remove(ctx context.Context, service namespaces.Store, name string, removeCG
 func inspect(ctx context.Context, service namespaces.Store, name string) (*api.Namespace, error) {
 	labels, err := service.Labels(NamespacedContext(ctx, name), name)
 	if err != nil {
-		return nil, errConvert(err)
+		return nil, helpers.ErrConvert(err)
 	}
 
 	return &api.Namespace{
@@ -200,7 +203,7 @@ func inspect(ctx context.Context, service namespaces.Store, name string) (*api.N
 func update(ctx context.Context, service namespaces.Store, name string, key string, value string) error {
 	err := service.SetLabel(NamespacedContext(ctx, name), name, key, value)
 	if err != nil {
-		return errConvert(err)
+		return helpers.ErrConvert(err)
 	}
 
 	return nil
@@ -208,20 +211,4 @@ func update(ctx context.Context, service namespaces.Store, name string, key stri
 
 func errWrap(err error) error {
 	return errors.Join(ErrServiceNamespace, err)
-}
-
-func errConvert(err error) error {
-	if errdefs.IsNotFound(err) {
-		return errors.Join(errs.ErrNotFound, err)
-	}
-
-	if errdefs.IsInvalidArgument(err) {
-		return errors.Join(errs.ErrInvalidArgument, err)
-	}
-
-	if strings.Contains(err.Error(), "contains value with non-printable ASCII characters") {
-		return errors.Join(errs.ErrInvalidArgument, err)
-	}
-
-	return errors.Join(errs.ErrSystemFailure, err)
 }

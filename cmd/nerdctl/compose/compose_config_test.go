@@ -25,6 +25,7 @@ import (
 	"gotest.tools/v3/assert"
 
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
+	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
 )
 
 func TestComposeConfig(t *testing.T) {
@@ -70,7 +71,7 @@ services:
 	defer comp.CleanUp()
 
 	// `--hash=*` is broken in Docker Compose v2.23.0: https://github.com/docker/compose/issues/11145
-	if base.Target == testutil.Nerdctl {
+	if nerdtest.IsNotDocker() {
 		base.ComposeCmd("-f", comp.YAMLFullPath(), "config", "--hash=*").AssertOutContains("hello1")
 	}
 
