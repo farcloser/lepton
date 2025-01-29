@@ -21,8 +21,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
+	"github.com/containerd/nerdctl/v2/pkg/testutil/helpers"
 )
 
 func TestRunSoci(t *testing.T) {

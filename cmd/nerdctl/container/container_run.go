@@ -102,40 +102,27 @@ func setCreateFlags(cmd *cobra.Command) {
 	cmd.Flags().String("init-binary", tiniInitBinary, "The custom binary to use as the init process")
 	// #endregion
 
-	// #region platform flags
 	cmd.Flags().String("platform", "", "Set platform (e.g. \"amd64\", \"arm64\")") // not a slice, and there is no --all-platforms
-	cmd.RegisterFlagCompletionFunc("platform", completion.Platforms)
-	// #endregion
-
-	// #region network flags
-	// network (net) is defined as StringSlice, not StringArray, to allow specifying "--network=cni1,cni2"
 	cmd.Flags().StringSlice("network", []string{netutil.DefaultNetworkName}, `Connect a container to a network ("bridge"|"host"|"none"|"container:<container>"|"ns:<path>"|<CNI>)`)
-	cmd.RegisterFlagCompletionFunc("network", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return completion.NetworkNames(cmd, []string{})
-	})
 	cmd.Flags().StringSlice("net", []string{netutil.DefaultNetworkName}, `Connect a container to a network ("bridge"|"host"|"none"|"container:<container>"|"ns:<path>"|<CNI>)`)
-	cmd.RegisterFlagCompletionFunc("net", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return completion.NetworkNames(cmd, []string{})
-	})
-	// dns is defined as StringSlice, not StringArray, to allow specifying "--dns=1.1.1.1,8.8.8.8" (compatible with Podman)
 	cmd.Flags().StringSlice("dns", nil, "Set custom DNS servers")
 	cmd.Flags().StringSlice("dns-search", nil, "Set custom DNS search domains")
-	// We allow for both "--dns-opt" and "--dns-option", although the latter is the recommended way.
 	cmd.Flags().StringSlice("dns-opt", nil, "Set DNS options")
 	cmd.Flags().StringSlice("dns-option", nil, "Set DNS options")
-	// publish is defined as StringSlice, not StringArray, to allow specifying "--publish=80:80,443:443" (compatible with Podman)
 	cmd.Flags().StringSliceP("publish", "p", nil, "Publish a container's port(s) to the host")
 	cmd.Flags().String("ip", "", "IPv4 address to assign to the container")
 	cmd.Flags().String("ip6", "", "IPv6 address to assign to the container")
 	cmd.Flags().StringP("hostname", "h", "", "Container host name")
 	cmd.Flags().String("mac-address", "", "MAC address to assign to the container")
-	// #endregion
-
 	cmd.Flags().String("ipc", "", `IPC namespace to use ("host"|"private")`)
+
+	cmd.RegisterFlagCompletionFunc("platform", completion.Platforms)
+	cmd.RegisterFlagCompletionFunc("network", completion.NetworkNamesAll)
+	cmd.RegisterFlagCompletionFunc("net", completion.NetworkNamesAll)
 	cmd.RegisterFlagCompletionFunc("ipc", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return []string{"host", "private"}, cobra.ShellCompDirectiveNoFileComp
 	})
-	// #region cgroups, namespaces, and ulimits flags
+
 	cmd.Flags().Float64("cpus", 0.0, "Number of CPUs")
 	cmd.Flags().StringP("memory", "m", "", "Memory limit")
 	cmd.Flags().String("memory-reservation", "", "Memory soft limit")
@@ -282,8 +269,8 @@ func setCreateFlags(cmd *cobra.Command) {
 
 }
 
-func processCreateCommandFlagsInRun(cmd *cobra.Command) (types.ContainerCreateOptions, error) {
-	opt, err := processContainerCreateOptions(cmd)
+func processCreateCommandFlagsInRun(cmd *cobra.Command, args []string) (types.ContainerCreateOptions, error) {
+	opt, err := CreateOptions(cmd, args)
 	if err != nil {
 		return opt, err
 	}
@@ -331,7 +318,7 @@ func processCreateCommandFlagsInRun(cmd *cobra.Command) (types.ContainerCreateOp
 func runAction(cmd *cobra.Command, args []string) error {
 	var isDetached bool
 
-	createOpt, err := processCreateCommandFlagsInRun(cmd)
+	createOpt, err := processCreateCommandFlagsInRun(cmd, args)
 	if err != nil {
 		return err
 	}

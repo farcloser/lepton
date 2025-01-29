@@ -24,6 +24,7 @@ import (
 	"go.farcloser.world/containers/security/cgroups"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
+	"github.com/containerd/nerdctl/v2/cmd/nerdctl/image"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
@@ -52,17 +53,18 @@ func NewCreateCommand() *cobra.Command {
 	return createCommand
 }
 
-func processContainerCreateOptions(cmd *cobra.Command) (types.ContainerCreateOptions, error) {
+func CreateOptions(cmd *cobra.Command, args []string) (types.ContainerCreateOptions, error) {
 	var err error
 	opt := types.ContainerCreateOptions{
 		Stdout: cmd.OutOrStdout(),
 		Stderr: cmd.ErrOrStderr(),
 	}
 
-	opt.GOptions, err = helpers.ProcessRootCmdFlags(cmd)
+	goo, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return opt, err
 	}
+	opt.GOptions = *goo
 
 	opt.CliCmd, opt.CliArgs = helpers.GlobalFlags(cmd)
 
@@ -396,7 +398,7 @@ func processContainerCreateOptions(cmd *cobra.Command) (types.ContainerCreateOpt
 	// #endregion
 
 	// #region for image pull and verify options
-	imageVerifyOpt, err := helpers.ProcessImageVerifyOptions(cmd)
+	imageVerifyOpt, err := image.ProcessImageVerifyOptions(cmd, args)
 	if err != nil {
 		return opt, err
 	}
@@ -417,7 +419,7 @@ func processContainerCreateOptions(cmd *cobra.Command) (types.ContainerCreateOpt
 }
 
 func createAction(cmd *cobra.Command, args []string) error {
-	createOpt, err := processContainerCreateOptions(cmd)
+	createOpt, err := CreateOptions(cmd, args)
 	if err != nil {
 		return err
 	}

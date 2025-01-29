@@ -45,7 +45,7 @@ CAUTION: This command only encrypts image layers, but does NOT encrypt container
 To see non-encrypted information, run 'nerdctl image inspect --mode=native --platform=PLATFORM example.com/foo:encrypted' .
 `
 
-func newImageEncryptCommand() *cobra.Command {
+func EncryptCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:               "encrypt [flags] <source_ref> <target_ref>...",
 		Short:             "encrypt image layers",
@@ -56,6 +56,11 @@ func newImageEncryptCommand() *cobra.Command {
 		SilenceUsage:      true,
 		SilenceErrors:     true,
 	}
-	registerImgcryptFlags(cmd, true)
+
+	registerImgcryptFlags(cmd)
+
+	// recipient is defined as StringSlice, not StringArray, to allow specifying "--recipient=jwe:FILE1,jwe:FILE2"
+	cmd.Flags().StringSlice(flagRecipient, []string{}, "Recipient of the image is the person who can decrypt it in the form specified above (i.e. jwe:/path/to/pubkey)")
+
 	return cmd
 }

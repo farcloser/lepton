@@ -21,28 +21,29 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/native"
 	"github.com/containerd/nerdctl/v2/pkg/netutil"
 )
 
-func Inspect(ctx context.Context, options types.NetworkInspectOptions) error {
-	if options.Mode != "native" && options.Mode != "dockercompat" {
-		return fmt.Errorf("unknown mode %q", options.Mode)
+func Inspect(ctx context.Context, output io.Writer, globalOptions *options.Global, opts *options.NetworkInspect) error {
+	if opts.Mode != "native" && opts.Mode != "dockercompat" {
+		return fmt.Errorf("unknown mode %q", opts.Mode)
 	}
 
-	cniEnv, err := netutil.NewCNIEnv(options.GOptions.CNIPath, options.GOptions.CNINetConfPath, netutil.WithNamespace(options.GOptions.Namespace))
+	cniEnv, err := netutil.NewCNIEnv(globalOptions.CNIPath, globalOptions.CNINetConfPath, netutil.WithNamespace(globalOptions.Namespace))
 	if err != nil {
 		return err
 	}
 
 	var result []interface{}
-	netLists, errs := cniEnv.ListNetworksMatch(options.Networks, true)
+	netLists, errs := cniEnv.ListNetworksMatch(opts.Networks, true)
 
 	for req, netList := range netLists {
 		if len(netList) > 1 {
@@ -60,7 +61,7 @@ func Inspect(ctx context.Context, options types.NetworkInspectOptions) error {
 			CliLabels: network.CliLabels,
 			File:      network.File,
 		}
-		switch options.Mode {
+		switch opts.Mode {
 		case "native":
 			result = append(result, r)
 		case "dockercompat":
@@ -73,7 +74,7 @@ func Inspect(ctx context.Context, options types.NetworkInspectOptions) error {
 	}
 
 	if len(result) > 0 {
-		if formatErr := formatter.FormatSlice(options.Format, options.Stdout, result); formatErr != nil {
+		if formatErr := formatter.FormatSlice(opts.Format, output, result); formatErr != nil {
 			log.G(ctx).Error(formatErr)
 		}
 		err = nil

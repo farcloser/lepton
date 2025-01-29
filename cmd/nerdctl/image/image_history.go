@@ -32,19 +32,19 @@ import (
 	"go.farcloser.world/containers/specs"
 	"go.farcloser.world/core/units"
 
-	containerd "github.com/containerd/containerd/v2/client"
+	"github.com/containerd/containerd/v2/client"
 	"github.com/containerd/log"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
+	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 	"github.com/containerd/nerdctl/v2/pkg/idutil/imagewalker"
 	"github.com/containerd/nerdctl/v2/pkg/imgutil"
 )
 
 func NewHistoryCommand() *cobra.Command {
-	var historyCommand = &cobra.Command{
+	var cmd = &cobra.Command{
 		Use:               "history [flags] IMAGE",
 		Short:             "Show the history of an image",
 		Args:              helpers.IsExactArgs(1),
@@ -53,18 +53,17 @@ func NewHistoryCommand() *cobra.Command {
 		SilenceUsage:      true,
 		SilenceErrors:     true,
 	}
-	addHistoryFlags(historyCommand)
-	return historyCommand
-}
 
-func addHistoryFlags(cmd *cobra.Command) {
-	cmd.Flags().StringP("format", "f", "", "Format the output using the given Go template, e.g, '{{json .}}'")
-	cmd.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	cmd.Flags().StringP(flagFormat, "f", "", "Format the output using the given Go template, e.g, '{{json .}}'")
+	cmd.Flags().BoolP(flagQuiet, "q", false, "Only show numeric IDs")
+	cmd.Flags().BoolP(flagHuman, "H", true, "Print sizes and dates in human readable format (default true)")
+	cmd.Flags().Bool(flagNoTrunc, false, "Don't truncate output")
+
+	_ = cmd.RegisterFlagCompletionFunc(flagFormat, func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return []string{formatter.FormatJSON}, cobra.ShellCompDirectiveNoFileComp
 	})
-	cmd.Flags().BoolP("quiet", "q", false, "Only show numeric IDs")
-	cmd.Flags().BoolP("human", "H", true, "Print sizes and dates in human readable format (default true)")
-	cmd.Flags().Bool("no-trunc", false, "Don't truncate output")
+
+	return cmd
 }
 
 type historyPrintable struct {
@@ -84,21 +83,21 @@ func historyAction(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
 	walker := &imagewalker.ImageWalker{
-		Client: client,
+		Client: cli,
 		OnFound: func(ctx context.Context, found imagewalker.Found) error {
 			if found.MatchCount > 1 {
 				return fmt.Errorf("multiple IDs found with provided prefix: %s", found.Req)
 			}
 			ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 			defer cancel()
-			img := containerd.NewImage(client, found.Image)
+			img := client.NewImage(cli, found.Image)
 			imageConfig, _, err := imgutil.ReadImageConfig(ctx, img)
 			if err != nil {
 				return fmt.Errorf("failed to ReadImageConfig: %w", err)
@@ -120,7 +119,7 @@ func historyAction(cmd *cobra.Command, args []string) error {
 					diffIDs := diffIDs[0 : layerCounter+1]
 					chainID := specs.ChainID(diffIDs).String()
 
-					s := client.SnapshotService(globalOptions.Snapshotter)
+					s := cli.SnapshotService(globalOptions.Snapshotter)
 					stat, err := s.Stat(ctx, chainID)
 					if err != nil {
 						return fmt.Errorf("failed to get stat: %w", err)
@@ -179,7 +178,7 @@ func printHistory(cmd *cobra.Command, historys []historyPrintable) error {
 	var w io.Writer
 	w = os.Stdout
 
-	format, err := cmd.Flags().GetString("format")
+	format, err := cmd.Flags().GetString(flagFormat)
 	if err != nil {
 		return err
 	}

@@ -21,18 +21,18 @@ import (
 
 	"github.com/spf13/cobra"
 
-	containerd "github.com/containerd/containerd/v2/client"
+	"github.com/containerd/containerd/v2/client"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
+	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/compose"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 	"github.com/containerd/nerdctl/v2/pkg/containerutil"
 	"github.com/containerd/nerdctl/v2/pkg/labels"
 )
 
-func newComposeTopCommand() *cobra.Command {
+func TopCommand() *cobra.Command {
 	var composeTopCommand = &cobra.Command{
 		Use:                   "top [SERVICE...]",
 		Short:                 "Display the running processes of service containers",
@@ -50,7 +50,7 @@ func composeTopAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
 	if err != nil {
 		return err
 	}
@@ -59,7 +59,7 @@ func composeTopAction(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	c, err := compose.New(client, globalOptions, options, cmd.OutOrStdout(), cmd.ErrOrStderr())
+	c, err := compose.New(cli, *globalOptions, options, cmd.OutOrStdout(), cmd.ErrOrStderr())
 	if err != nil {
 		return err
 	}
@@ -77,19 +77,19 @@ func composeTopAction(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return err
 		}
-		if cStatus.Status != containerd.Running {
+		if cStatus.Status != client.Running {
 			continue
 		}
 
-		info, err := c.Info(ctx, containerd.WithoutRefreshedMetadata)
+		info, err := c.Info(ctx, client.WithoutRefreshedMetadata)
 		if err != nil {
 			return err
 		}
 		fmt.Fprintln(stdout, info.Labels[labels.Name])
 		// `compose ps` uses empty ps args
-		err = container.Top(ctx, client, []string{c.ID()}, types.ContainerTopOptions{
+		err = container.Top(ctx, cli, []string{c.ID()}, types.ContainerTopOptions{
 			Stdout:   cmd.OutOrStdout(),
-			GOptions: globalOptions,
+			GOptions: *globalOptions,
 		})
 		if err != nil {
 			return err

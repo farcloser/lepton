@@ -21,13 +21,13 @@ import (
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
+	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/image"
 )
 
 func NewTagCommand() *cobra.Command {
-	var tagCommand = &cobra.Command{
+	return &cobra.Command{
 		Use:               "tag [flags] SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]",
 		Short:             "Create a tag TARGET_IMAGE that refers to SOURCE_IMAGE",
 		Args:              helpers.IsExactArgs(2),
@@ -36,7 +36,6 @@ func NewTagCommand() *cobra.Command {
 		SilenceUsage:      true,
 		SilenceErrors:     true,
 	}
-	return tagCommand
 }
 
 func tagAction(cmd *cobra.Command, args []string) error {
@@ -46,12 +45,12 @@ func tagAction(cmd *cobra.Command, args []string) error {
 	}
 
 	options := types.ImageTagOptions{
-		GOptions: globalOptions,
+		GOptions: *globalOptions,
 		Source:   args[0],
 		Target:   args[1],
 	}
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	client, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
 	if err != nil {
 		return err
 	}

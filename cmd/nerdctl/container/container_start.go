@@ -19,12 +19,12 @@ package container
 import (
 	"github.com/spf13/cobra"
 
-	containerd "github.com/containerd/containerd/v2/client"
+	"github.com/containerd/containerd/v2/client"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
+	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 	"github.com/containerd/nerdctl/v2/pkg/consoleutil"
 )
@@ -47,7 +47,7 @@ func NewStartCommand() *cobra.Command {
 	return startCommand
 }
 
-func processContainerStartOptions(cmd *cobra.Command) (types.ContainerStartOptions, error) {
+func StartOptions(cmd *cobra.Command, _ []string) (types.ContainerStartOptions, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return types.ContainerStartOptions{}, err
@@ -62,31 +62,32 @@ func processContainerStartOptions(cmd *cobra.Command) (types.ContainerStartOptio
 	}
 	return types.ContainerStartOptions{
 		Stdout:     cmd.OutOrStdout(),
-		GOptions:   globalOptions,
+		GOptions:   *globalOptions,
 		Attach:     attach,
 		DetachKeys: detachKeys,
 	}, nil
 }
 
 func startAction(cmd *cobra.Command, args []string) error {
-	options, err := processContainerStartOptions(cmd)
+	options, err := StartOptions(cmd, args)
 	if err != nil {
 		return err
 	}
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
 	if err != nil {
 		return err
 	}
+
 	defer cancel()
 
-	return container.Start(ctx, client, args, options)
+	return container.Start(ctx, cli, args, options)
 }
 
 func startShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 	// show non-running container names
-	statusFilterFn := func(st containerd.ProcessStatus) bool {
-		return st != containerd.Running && st != containerd.Unknown
+	statusFilterFn := func(st client.ProcessStatus) bool {
+		return st != client.Running && st != client.Unknown
 	}
 	return completion.ContainerNames(cmd, statusFilterFn)
 }

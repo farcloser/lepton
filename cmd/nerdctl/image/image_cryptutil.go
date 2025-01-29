@@ -21,8 +21,8 @@ import (
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
+	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/image"
 )
 
@@ -32,58 +32,57 @@ import (
 // From:
 // - https://github.com/containerd/imgcrypt/blob/v1.1.2/cmd/ctr/commands/flags/flags.go#L23-L44 (except skip-decrypt-auth)
 // - https://github.com/containerd/imgcrypt/blob/v1.1.2/cmd/ctr/commands/images/encrypt.go#L52-L55
-func registerImgcryptFlags(cmd *cobra.Command, encrypt bool) {
+func registerImgcryptFlags(cmd *cobra.Command) {
 	flags := cmd.Flags()
 
-	// #region platform flags
-	// platform is defined as StringSlice, not StringArray, to allow specifying "--platform=amd64,arm64"
-	flags.StringSlice("platform", []string{}, "Convert content for a specific platform")
-	cmd.RegisterFlagCompletionFunc("platform", completion.Platforms)
-	flags.Bool("all-platforms", false, "Convert content for all platforms")
-	// #endregion
-
-	flags.String("gpg-homedir", "", "The GPG homedir to use; by default gpg uses ~/.gnupg")
-	flags.String("gpg-version", "", "The GPG version (\"v1\" or \"v2\"), default will make an educated guess")
-	flags.StringSlice("key", []string{}, "A secret key's filename and an optional password separated by colon; this option may be provided multiple times")
+	flags.StringSlice(flagPlatform, []string{}, "Convert content for a specific platform")
+	flags.Bool(flagAllPlatforms, false, "Convert content for all platforms")
+	flags.String(flagGPGHomeDir, "", "The GPG homedir to use; by default gpg uses ~/.gnupg")
+	flags.String(flagGPGVersion, "", "The GPG version (\"v1\" or \"v2\"), default will make an educated guess")
+	flags.StringSlice(flagKey, []string{}, "A secret key's filename and an optional password separated by colon; this option may be provided multiple times")
 	// While --recipient can be specified only for `image encrypt`,
 	// --dec-recipient can be specified for both `image encrypt` and `image decrypt`.
-	flags.StringSlice("dec-recipient", []string{}, "Recipient of the image; used only for PKCS7 and must be an x509 certificate")
+	flags.StringSlice(flagDECRecipient, []string{}, "Recipient of the image; used only for PKCS7 and must be an x509 certificate")
 
-	if encrypt {
-		// recipient is defined as StringSlice, not StringArray, to allow specifying "--recipient=jwe:FILE1,jwe:FILE2"
-		flags.StringSlice("recipient", []string{}, "Recipient of the image is the person who can decrypt it in the form specified above (i.e. jwe:/path/to/pubkey)")
-	}
+	_ = cmd.RegisterFlagCompletionFunc(flagPlatform, completion.Platforms)
 }
 
-func processImgCryptOptions(cmd *cobra.Command, _args []string, encrypt bool) (types.ImageCryptOptions, error) {
+func CryptOptions(cmd *cobra.Command, _args []string, encrypt bool) (types.ImageCryptOptions, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return types.ImageCryptOptions{}, err
 	}
-	platforms, err := cmd.Flags().GetStringSlice("platform")
+
+	platforms, err := cmd.Flags().GetStringSlice(flagPlatform)
 	if err != nil {
 		return types.ImageCryptOptions{}, err
 	}
-	allPlatforms, err := cmd.Flags().GetBool("all-platforms")
+
+	allPlatforms, err := cmd.Flags().GetBool(flagAllPlatforms)
 	if err != nil {
 		return types.ImageCryptOptions{}, err
 	}
+
 	gpgHomeDir, err := cmd.Flags().GetString("gpg-homedir")
 	if err != nil {
 		return types.ImageCryptOptions{}, err
 	}
+
 	gpgVersion, err := cmd.Flags().GetString("gpg-version")
 	if err != nil {
 		return types.ImageCryptOptions{}, err
 	}
+
 	keys, err := cmd.Flags().GetStringSlice("key")
 	if err != nil {
 		return types.ImageCryptOptions{}, err
 	}
+
 	decRecipients, err := cmd.Flags().GetStringSlice("dec-recipient")
 	if err != nil {
 		return types.ImageCryptOptions{}, err
 	}
+
 	var recipients []string
 	if encrypt {
 		recipients, err = cmd.Flags().GetStringSlice("recipient")
@@ -91,8 +90,9 @@ func processImgCryptOptions(cmd *cobra.Command, _args []string, encrypt bool) (t
 			return types.ImageCryptOptions{}, err
 		}
 	}
+
 	return types.ImageCryptOptions{
-		GOptions:      globalOptions,
+		GOptions:      *globalOptions,
 		Platforms:     platforms,
 		AllPlatforms:  allPlatforms,
 		GpgHomeDir:    gpgHomeDir,
@@ -106,14 +106,14 @@ func processImgCryptOptions(cmd *cobra.Command, _args []string, encrypt bool) (t
 
 func getImgcryptAction(encrypt bool) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
-		options, err := processImgCryptOptions(cmd, args, encrypt)
+		options, err := CryptOptions(cmd, args, encrypt)
 		if err != nil {
 			return err
 		}
 		srcRawRef := args[0]
 		targetRawRef := args[1]
 
-		client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+		client, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
 		if err != nil {
 			return err
 		}

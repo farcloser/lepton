@@ -250,7 +250,7 @@ func (vs *fileStore) List(key ...string) ([]string, error) {
 	var err error
 	path := vs.dir
 
-	// Unlike Get, Set and Delete, List can have zero length key
+	// Unlike Get, Set and Delete, NamesList can have zero length key
 	if len(key) > 0 {
 		path, err = vs.Location(key...)
 		if err != nil {

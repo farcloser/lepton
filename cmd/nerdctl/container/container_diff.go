@@ -26,7 +26,7 @@ import (
 	"github.com/spf13/cobra"
 	"go.farcloser.world/containers/specs"
 
-	containerd "github.com/containerd/containerd/v2/client"
+	"github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/leases"
 	"github.com/containerd/containerd/v2/core/mount"
 	"github.com/containerd/continuity/fs"
@@ -35,8 +35,8 @@ import (
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
+	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/idgen"
 	"github.com/containerd/nerdctl/v2/pkg/idutil/containerwalker"
 	"github.com/containerd/nerdctl/v2/pkg/imgutil"
@@ -56,7 +56,7 @@ func NewDiffCommand() *cobra.Command {
 	return diffCommand
 }
 
-func processContainerDiffOptions(cmd *cobra.Command) (types.ContainerDiffOptions, error) {
+func DiffOptions(cmd *cobra.Command, _ []string) (types.ContainerDiffOptions, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return types.ContainerDiffOptions{}, err
@@ -64,17 +64,17 @@ func processContainerDiffOptions(cmd *cobra.Command) (types.ContainerDiffOptions
 
 	return types.ContainerDiffOptions{
 		Stdout:   cmd.OutOrStdout(),
-		GOptions: globalOptions,
+		GOptions: *globalOptions,
 	}, nil
 }
 
 func diffAction(cmd *cobra.Command, args []string) error {
-	options, err := processContainerDiffOptions(cmd)
+	options, err := DiffOptions(cmd, args)
 	if err != nil {
 		return err
 	}
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	client, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
 	if err != nil {
 		return err
 	}
@@ -118,7 +118,7 @@ func diffAction(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func getChanges(ctx context.Context, client *containerd.Client, container containerd.Container) ([]fs.Change, error) {
+func getChanges(ctx context.Context, cli *client.Client, container client.Container) ([]fs.Change, error) {
 	id := container.ID()
 	info, err := container.Info(ctx)
 	if err != nil {
@@ -127,7 +127,7 @@ func getChanges(ctx context.Context, client *containerd.Client, container contai
 
 	var (
 		snName = info.Snapshotter
-		sn     = client.SnapshotService(snName)
+		sn     = cli.SnapshotService(snName)
 	)
 
 	mounts, err := sn.Mounts(ctx, id)
@@ -137,7 +137,7 @@ func getChanges(ctx context.Context, client *containerd.Client, container contai
 
 	// NOTE: Moby uses provided rootfs to run container. It doesn't support
 	// to commit container created by moby.
-	baseImgWithoutPlatform, err := client.ImageService().Get(ctx, info.Image)
+	baseImgWithoutPlatform, err := cli.ImageService().Get(ctx, info.Image)
 	if err != nil {
 		return nil, fmt.Errorf("container %q lacks image (wasn't created by nerdctl?): %w", id, err)
 	}
@@ -152,7 +152,7 @@ func getChanges(ctx context.Context, client *containerd.Client, container contai
 	}
 	log.G(ctx).Debugf("ocispecPlatform=%q", platforms.Format(ocispecPlatform))
 	platformMC := platforms.Only(ocispecPlatform)
-	baseImg := containerd.NewImageWithPlatform(client, baseImgWithoutPlatform, platformMC)
+	baseImg := client.NewImageWithPlatform(cli, baseImgWithoutPlatform, platformMC)
 
 	baseImgConfig, _, err := imgutil.ReadImageConfig(ctx, baseImg)
 	if err != nil {
@@ -160,7 +160,7 @@ func getChanges(ctx context.Context, client *containerd.Client, container contai
 	}
 
 	// Don't gc me and clean the dirty data after 1 hour!
-	ctx, done, err := client.WithLease(ctx, leases.WithRandomID(), leases.WithExpiration(1*time.Hour))
+	ctx, done, err := cli.WithLease(ctx, leases.WithRandomID(), leases.WithExpiration(1*time.Hour))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create lease for diff: %w", err)
 	}

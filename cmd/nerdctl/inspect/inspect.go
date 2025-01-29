@@ -26,8 +26,8 @@ import (
 	containerCmd "github.com/containerd/nerdctl/v2/cmd/nerdctl/container"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	imageCmd "github.com/containerd/nerdctl/v2/cmd/nerdctl/image"
+	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/image"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
@@ -36,7 +36,7 @@ import (
 )
 
 func NewInspectCommand() *cobra.Command {
-	var inspectCommand = &cobra.Command{
+	var cmd = &cobra.Command{
 		Use:               "inspect",
 		Short:             "Return low-level information on objects.",
 		Args:              cobra.MinimumNArgs(1),
@@ -46,31 +46,27 @@ func NewInspectCommand() *cobra.Command {
 		SilenceErrors:     true,
 	}
 
-	addInspectFlags(inspectCommand)
+	cmd.Flags().BoolP(flagSize, "s", false, "Display total file sizes (for containers)")
+	cmd.Flags().StringP(flagFormat, "f", "", "Format the output using the given Go template, e.g, '{{json .}}'")
+	cmd.Flags().String(flagType, "", "Return JSON for specified type")
+	cmd.Flags().String(flagMode, "dockercompat", `Inspect mode, "dockercompat" for Docker-compatible output, "native" for containerd-native output`)
 
-	return inspectCommand
+	_ = cmd.RegisterFlagCompletionFunc(flagFormat, func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return []string{formatter.FormatJSON}, cobra.ShellCompDirectiveNoFileComp
+	})
+	_ = cmd.RegisterFlagCompletionFunc(flagType, func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return []string{"image", "container", ""}, cobra.ShellCompDirectiveNoFileComp
+	})
+	_ = cmd.RegisterFlagCompletionFunc(flagMode, func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return []string{"dockercompat", "native"}, cobra.ShellCompDirectiveNoFileComp
+	})
+
+	return cmd
 }
 
 var validInspectType = map[string]bool{
 	"container": true,
 	"image":     true,
-}
-
-func addInspectFlags(cmd *cobra.Command) {
-	cmd.Flags().BoolP("size", "s", false, "Display total file sizes (for containers)")
-
-	cmd.Flags().StringP("format", "f", "", "Format the output using the given Go template, e.g, '{{json .}}'")
-	cmd.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{formatter.FormatJSON}, cobra.ShellCompDirectiveNoFileComp
-	})
-	cmd.Flags().String("type", "", "Return JSON for specified type")
-	cmd.RegisterFlagCompletionFunc("type", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{"image", "container", ""}, cobra.ShellCompDirectiveNoFileComp
-	})
-	cmd.Flags().String("mode", "dockercompat", `Inspect mode, "dockercompat" for Docker-compatible output, "native" for containerd-native output`)
-	cmd.RegisterFlagCompletionFunc("mode", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{"dockercompat", "native"}, cobra.ShellCompDirectiveNoFileComp
-	})
 }
 
 func inspectAction(cmd *cobra.Command, args []string) error {
@@ -91,7 +87,7 @@ func inspectAction(cmd *cobra.Command, args []string) error {
 
 	// container and image inspect can share the same client, since no `platform`
 	// flag will be passed for image inspect.
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), namespace, address)
+	client, ctx, cancel, err := containerd.NewClient(cmd.Context(), namespace, address)
 	if err != nil {
 		return err
 	}
@@ -124,7 +120,7 @@ func inspectAction(cmd *cobra.Command, args []string) error {
 		}
 	}
 	if inspectContainer {
-		containerInspectOptions, err = containerCmd.ProcessContainerInspectOptions(cmd)
+		containerInspectOptions, err = containerCmd.ProcessContainerInspectOptions(cmd, args)
 		if err != nil {
 			return err
 		}

@@ -35,12 +35,3 @@ func Logout(ctx context.Context, logoutServer string) (map[string]error, error) 
 
 	return credentialsStore.Erase(reg)
 }
-
-func ShellCompletion() ([]string, error) {
-	credentialsStore, err := dockerconfigresolver.NewCredentialsStore("")
-	if err != nil {
-		return nil, err
-	}
-
-	return credentialsStore.ShellCompletion(), nil
-}

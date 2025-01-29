@@ -23,13 +23,13 @@ import (
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
+	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 )
 
-func newContainerInspectCommand() *cobra.Command {
+func InspectCommand() *cobra.Command {
 	var containerInspectCommand = &cobra.Command{
 		Use:               "inspect [flags] CONTAINER [CONTAINER, ...]",
 		Short:             "Display detailed information on one or more containers.",
@@ -58,7 +58,7 @@ var validModeType = map[string]bool{
 	"dockercompat": true,
 }
 
-func ProcessContainerInspectOptions(cmd *cobra.Command) (opt types.ContainerInspectOptions, err error) {
+func ProcessContainerInspectOptions(cmd *cobra.Command, _ []string) (opt types.ContainerInspectOptions, err error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return
@@ -71,7 +71,7 @@ func ProcessContainerInspectOptions(cmd *cobra.Command) (opt types.ContainerInsp
 		err = fmt.Errorf("%q is not a valid value for --mode", mode)
 		return
 	}
-	format, err := cmd.Flags().GetString("format")
+	format, err := cmd.Flags().GetString(flagFormat)
 	if err != nil {
 		return
 	}
@@ -82,7 +82,7 @@ func ProcessContainerInspectOptions(cmd *cobra.Command) (opt types.ContainerInsp
 	}
 
 	return types.ContainerInspectOptions{
-		GOptions: globalOptions,
+		GOptions: *globalOptions,
 		Format:   format,
 		Mode:     mode,
 		Size:     size,
@@ -91,11 +91,11 @@ func ProcessContainerInspectOptions(cmd *cobra.Command) (opt types.ContainerInsp
 }
 
 func containerInspectAction(cmd *cobra.Command, args []string) error {
-	opt, err := ProcessContainerInspectOptions(cmd)
+	opt, err := ProcessContainerInspectOptions(cmd, args)
 	if err != nil {
 		return err
 	}
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), opt.GOptions.Namespace, opt.GOptions.Address)
+	client, ctx, cancel, err := containerd.NewClient(cmd.Context(), opt.GOptions.Namespace, opt.GOptions.Address)
 	if err != nil {
 		return err
 	}

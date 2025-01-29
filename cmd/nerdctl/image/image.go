@@ -19,7 +19,7 @@ package image
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/containerd/nerdctl/v2/cmd/nerdctl/builder"
+	"github.com/containerd/nerdctl/v2/cmd/nerdctl/commands/builder"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 )
 
@@ -34,7 +34,7 @@ func NewImageCommand() *cobra.Command {
 	}
 
 	cmd.AddCommand(
-		builder.NewBuildCommand(),
+		builder.BuildCommand(),
 		// commitCommand is in "container", not in "image"
 		imageLsCommand(),
 		NewHistoryCommand(),
@@ -44,11 +44,11 @@ func NewImageCommand() *cobra.Command {
 		NewSaveCommand(),
 		NewTagCommand(),
 		imageRmCommand(),
-		newImageConvertCommand(),
-		newImageInspectCommand(),
-		newImageEncryptCommand(),
-		newImageDecryptCommand(),
-		newImagePruneCommand(),
+		ConvertCommand(),
+		InspectCommand(),
+		EncryptCommand(),
+		DecryptCommand(),
+		PruneCommand(),
 	)
 
 	return cmd

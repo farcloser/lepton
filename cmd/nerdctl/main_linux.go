@@ -19,7 +19,7 @@ package main
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/containerd/nerdctl/v2/cmd/nerdctl/apparmor"
+	"github.com/containerd/nerdctl/v2/cmd/nerdctl/commands/apparmor"
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
 	"github.com/containerd/nerdctl/v2/pkg/strutil"
 )
@@ -56,5 +56,5 @@ func appNeedsRootlessParentMain(cmd *cobra.Command, args []string) bool {
 }
 
 func addApparmorCommand(rootCmd *cobra.Command) {
-	rootCmd.AddCommand(apparmor.NewApparmorCommand())
+	rootCmd.AddCommand(apparmor.Command())
 }

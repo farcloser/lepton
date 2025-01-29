@@ -22,13 +22,13 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
+	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/image"
 )
 
-func newImagePruneCommand() *cobra.Command {
-	imagePruneCommand := &cobra.Command{
+func PruneCommand() *cobra.Command {
+	cmd := &cobra.Command{
 		Use:           "prune [flags]",
 		Short:         "Remove unused images",
 		Args:          cobra.NoArgs,
@@ -37,18 +37,19 @@ func newImagePruneCommand() *cobra.Command {
 		SilenceErrors: true,
 	}
 
-	imagePruneCommand.Flags().BoolP("all", "a", false, "Remove all unused images, not just dangling ones")
-	imagePruneCommand.Flags().StringSlice("filter", []string{}, "Filter output based on conditions provided")
-	imagePruneCommand.Flags().BoolP("force", "f", false, "Do not prompt for confirmation")
-	return imagePruneCommand
+	cmd.Flags().BoolP(flagAll, "a", false, "Remove all unused images, not just dangling ones")
+	cmd.Flags().StringSlice(flagFilter, []string{}, "Filter output based on conditions provided")
+	cmd.Flags().BoolP(flagForce, "f", false, "Do not prompt for confirmation")
+
+	return cmd
 }
 
-func processImagePruneOptions(cmd *cobra.Command) (types.ImagePruneOptions, error) {
+func PruneOptions(cmd *cobra.Command, args []string) (types.ImagePruneOptions, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return types.ImagePruneOptions{}, err
 	}
-	all, err := cmd.Flags().GetBool("all")
+	all, err := cmd.Flags().GetBool(flagAll)
 	if err != nil {
 		return types.ImagePruneOptions{}, err
 	}
@@ -61,22 +62,22 @@ func processImagePruneOptions(cmd *cobra.Command) (types.ImagePruneOptions, erro
 		}
 	}
 
-	force, err := cmd.Flags().GetBool("force")
+	force, err := cmd.Flags().GetBool(flagForce)
 	if err != nil {
 		return types.ImagePruneOptions{}, err
 	}
 
 	return types.ImagePruneOptions{
 		Stdout:   cmd.OutOrStdout(),
-		GOptions: globalOptions,
+		GOptions: *globalOptions,
 		All:      all,
 		Filters:  filters,
 		Force:    force,
 	}, err
 }
 
-func imagePruneAction(cmd *cobra.Command, _ []string) error {
-	options, err := processImagePruneOptions(cmd)
+func imagePruneAction(cmd *cobra.Command, args []string) error {
+	options, err := PruneOptions(cmd, args)
 	if err != nil {
 		return err
 	}
@@ -94,7 +95,7 @@ func imagePruneAction(cmd *cobra.Command, _ []string) error {
 		}
 	}
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	client, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
 	if err != nil {
 		return err
 	}

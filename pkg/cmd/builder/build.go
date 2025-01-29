@@ -38,7 +38,7 @@ import (
 	"github.com/containerd/log"
 	"github.com/containerd/platforms"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/buildkitutil"
 	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/containerutil"
@@ -61,8 +61,8 @@ func (p platformParser) DefaultSpec() platforms.Platform {
 	return platforms.DefaultSpec()
 }
 
-func Build(ctx context.Context, client *containerd.Client, options types.BuilderBuildOptions) error {
-	buildctlBinary, buildctlArgs, needsLoading, metaFile, tags, cleanup, err := generateBuildctlArgs(ctx, client, options)
+func Build(ctx context.Context, client *containerd.Client, globalOptions *options.Global, options *options.BuilderBuild) error {
+	buildctlBinary, buildctlArgs, needsLoading, metaFile, tags, cleanup, err := generateBuildctlArgs(ctx, client, globalOptions, options)
 	if err != nil {
 		return err
 	}
@@ -96,7 +96,7 @@ func Build(ctx context.Context, client *containerd.Client, options types.Builder
 		if err != nil {
 			return err
 		}
-		if err = loadImage(ctx, buildctlStdout, options.GOptions.Namespace, options.GOptions.Address, options.GOptions.Snapshotter, options.Stdout, platMC, options.Quiet); err != nil {
+		if err = loadImage(ctx, buildctlStdout, globalOptions.Namespace, globalOptions.Address, globalOptions.Snapshotter, options.Stdout, platMC, options.Quiet); err != nil {
 			return err
 		}
 	}
@@ -193,7 +193,7 @@ func loadImage(ctx context.Context, in io.Reader, namespace, address, snapshotte
 	return nil
 }
 
-func generateBuildctlArgs(ctx context.Context, client *containerd.Client, options types.BuilderBuildOptions) (buildCtlBinary string,
+func generateBuildctlArgs(ctx context.Context, client *containerd.Client, globalOptions *options.Global, options *options.BuilderBuild) (buildCtlBinary string,
 	buildctlArgs []string, needsLoading bool, metaFile string, tags []string, cleanup func(), err error) {
 
 	buildctlBinary, err := buildkitutil.BuildctlBinary()
@@ -207,7 +207,7 @@ func generateBuildctlArgs(ctx context.Context, client *containerd.Client, option
 		if err != nil {
 			return "", nil, false, "", nil, nil, err
 		}
-		sharable, err := isImageSharable(options.BuildKitHost, options.GOptions.Namespace, info.UUID, options.GOptions.Snapshotter, options.Platform)
+		sharable, err := isImageSharable(options.BuildKitHost, globalOptions.Namespace, info.UUID, globalOptions.Snapshotter, options.Platform)
 		if err != nil {
 			return "", nil, false, "", nil, nil, err
 		}
@@ -455,7 +455,7 @@ func generateBuildctlArgs(ctx context.Context, client *containerd.Client, option
 	}
 
 	if len(options.ExtraHosts) > 0 {
-		extraHosts, err := containerutil.ParseExtraHosts(options.ExtraHosts, options.GOptions.HostGatewayIP, "=")
+		extraHosts, err := containerutil.ParseExtraHosts(options.ExtraHosts, globalOptions.HostGatewayIP, "=")
 		if err != nil {
 			return "", nil, false, "", nil, nil, err
 		}

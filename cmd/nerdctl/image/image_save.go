@@ -25,13 +25,13 @@ import (
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
+	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/image"
 )
 
 func NewSaveCommand() *cobra.Command {
-	var saveCommand = &cobra.Command{
+	var cmd = &cobra.Command{
 		Use:               "save",
 		Args:              cobra.MinimumNArgs(1),
 		Short:             "Save one or more images to a tar archive (streamed to STDOUT by default)",
@@ -41,19 +41,18 @@ func NewSaveCommand() *cobra.Command {
 		SilenceUsage:      true,
 		SilenceErrors:     true,
 	}
-	saveCommand.Flags().StringP("output", "o", "", "Write to a file, instead of STDOUT")
 
-	// #region platform flags
+	cmd.Flags().StringP(flagOutput, "o", "", "Write to a file, instead of STDOUT")
 	// platform is defined as StringSlice, not StringArray, to allow specifying "--platform=amd64,arm64"
-	saveCommand.Flags().StringSlice("platform", []string{}, "Export content for a specific platform")
-	saveCommand.RegisterFlagCompletionFunc("platform", completion.Platforms)
-	saveCommand.Flags().Bool("all-platforms", false, "Export content for all platforms")
-	// #endregion
+	cmd.Flags().StringSlice(flagPlatform, []string{}, "Export content for a specific platform")
+	cmd.Flags().Bool(flagAllPlatforms, false, "Export content for all platforms")
 
-	return saveCommand
+	_ = cmd.RegisterFlagCompletionFunc(flagPlatform, completion.Platforms)
+
+	return cmd
 }
 
-func processImageSaveOptions(cmd *cobra.Command) (types.ImageSaveOptions, error) {
+func SaveOptions(cmd *cobra.Command, args []string) (types.ImageSaveOptions, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return types.ImageSaveOptions{}, err
@@ -69,14 +68,14 @@ func processImageSaveOptions(cmd *cobra.Command) (types.ImageSaveOptions, error)
 	}
 
 	return types.ImageSaveOptions{
-		GOptions:     globalOptions,
+		GOptions:     *globalOptions,
 		AllPlatforms: allPlatforms,
 		Platform:     platform,
 	}, err
 }
 
 func saveAction(cmd *cobra.Command, args []string) error {
-	options, err := processImageSaveOptions(cmd)
+	options, err := SaveOptions(cmd, args)
 	if err != nil {
 		return err
 	}
@@ -97,7 +96,7 @@ func saveAction(cmd *cobra.Command, args []string) error {
 	}
 	options.Stdout = output
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	client, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
 	if err != nil {
 		return err
 	}

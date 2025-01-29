@@ -17,32 +17,39 @@
 package network
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
 
 	"github.com/containerd/errdefs"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/leptonic/identifiers"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/netutil"
 )
 
-func Create(options types.NetworkCreateOptions, stdout io.Writer) error {
-	if len(options.Subnets) == 0 {
-		if options.Gateway != "" || options.IPRange != "" {
-			return errors.New("cannot set gateway or ip-range without subnet, specify --subnet manually")
-		}
-		options.Subnets = []string{""}
+func Create(ctx context.Context, stdout io.Writer, globalOptions *options.Global, opts *options.NetworkCreate) error {
+	if err := identifiers.Validate(opts.Name); err != nil {
+		return fmt.Errorf("invalid network name: %w", err)
 	}
 
-	e, err := netutil.NewCNIEnv(options.GOptions.CNIPath, options.GOptions.CNINetConfPath, netutil.WithNamespace(options.GOptions.Namespace))
+	if len(opts.Subnets) == 0 {
+		if opts.Gateway != "" || opts.IPRange != "" {
+			return errors.New("cannot set gateway or ip-range without subnet, specify --subnet manually")
+		}
+
+		opts.Subnets = []string{""}
+	}
+
+	e, err := netutil.NewCNIEnv(globalOptions.CNIPath, globalOptions.CNINetConfPath, netutil.WithNamespace(globalOptions.Namespace))
 	if err != nil {
 		return err
 	}
-	net, err := e.CreateNetwork(options)
+	net, err := e.CreateNetwork(*opts)
 	if err != nil {
 		if errdefs.IsAlreadyExists(err) {
-			return fmt.Errorf("network with name %s already exists", options.Name)
+			return fmt.Errorf("network with name %s already exists", opts.Name)
 		}
 		return err
 	}

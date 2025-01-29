@@ -28,11 +28,15 @@ import (
 	"github.com/containerd/log"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
+	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 	"github.com/containerd/nerdctl/v2/pkg/infoutil"
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
+)
+
+const (
+	flagFormat = "format"
 )
 
 func newVersionCommand() *cobra.Command {
@@ -44,24 +48,30 @@ func newVersionCommand() *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
-	versionCommand.Flags().StringP("format", "f", "", "Format the output using the given Go template, e.g, '{{json .}}'")
-	versionCommand.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+
+	versionCommand.Flags().StringP(flagFormat, "f", "", "Format the output using the given Go template, e.g, '{{json .}}'")
+
+	_ = versionCommand.RegisterFlagCompletionFunc(flagFormat, func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return []string{formatter.FormatJSON}, cobra.ShellCompDirectiveNoFileComp
 	})
+
 	return versionCommand
 }
 
 func versionAction(cmd *cobra.Command, args []string) error {
 	var w io.Writer = os.Stdout
 	var tmpl *template.Template
+
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return err
 	}
-	format, err := cmd.Flags().GetString("format")
+
+	format, err := cmd.Flags().GetString(flagFormat)
 	if err != nil {
 		return err
 	}
+
 	if format != "" {
 		var err error
 		tmpl, err = formatter.ParseTemplate(format)
@@ -125,7 +135,7 @@ func versionInfo(cmd *cobra.Command, ns, address string) (dockercompat.VersionIn
 	if address == "" {
 		return v, nil
 	}
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), ns, address)
+	client, ctx, cancel, err := containerd.NewClient(cmd.Context(), ns, address)
 	if err != nil {
 		return v, err
 	}

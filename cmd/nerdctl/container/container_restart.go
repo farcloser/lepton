@@ -22,8 +22,8 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
+	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 )
 
@@ -41,7 +41,7 @@ func NewRestartCommand() *cobra.Command {
 	return restartCommand
 }
 
-func processContainerRestartOptions(cmd *cobra.Command) (types.ContainerRestartOptions, error) {
+func RestartOptions(cmd *cobra.Command, _ []string) (types.ContainerRestartOptions, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return types.ContainerRestartOptions{}, err
@@ -60,18 +60,18 @@ func processContainerRestartOptions(cmd *cobra.Command) (types.ContainerRestartO
 
 	return types.ContainerRestartOptions{
 		Stdout:  cmd.OutOrStdout(),
-		GOption: globalOptions,
+		GOption: *globalOptions,
 		Timeout: timeout,
 	}, err
 }
 
 func restartAction(cmd *cobra.Command, args []string) error {
-	options, err := processContainerRestartOptions(cmd)
+	options, err := RestartOptions(cmd, args)
 	if err != nil {
 		return err
 	}
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOption.Namespace, options.GOption.Address)
+	client, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOption.Namespace, options.GOption.Address)
 	if err != nil {
 		return err
 	}

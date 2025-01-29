@@ -40,7 +40,7 @@ var (
 // - Set([]byte("mykeyvalue"), "group", "subgroup", "my key1")
 // - Set([]byte("mykeyvalue"), "group", "subgroup", "my key2")
 // - Get("group", "subgroup", "my key1")
-// - List("group", "subgroup")
+// - NamesList("group", "subgroup")
 // Note that both Delete and Exists can be applied indifferently to specific keys, or groups.
 type Store interface {
 	Locker

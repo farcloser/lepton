@@ -23,6 +23,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"golang.org/x/net/context/ctxhttp"
 
@@ -31,7 +32,7 @@ import (
 	"github.com/containerd/errdefs"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/errutil"
 	"github.com/containerd/nerdctl/v2/pkg/imgutil/dockerconfigresolver"
 )
@@ -41,8 +42,12 @@ Configure a credential helper to remove this warning. See
 https://docs.docker.com/engine/reference/commandline/login/#credentials-store
 `
 
-func Login(ctx context.Context, options types.LoginCommandOptions, stdout io.Writer) error {
-	registryURL, err := dockerconfigresolver.Parse(options.ServerAddress)
+func Login(ctx context.Context, output io.Writer, globalOptions *options.Global, opts *options.Login) error {
+	if strings.Contains(opts.Username, ":") {
+		return errors.New("username cannot contain colons")
+	}
+
+	registryURL, err := dockerconfigresolver.Parse(opts.ServerAddress)
 	if err != nil {
 		return err
 	}
@@ -54,20 +59,20 @@ func Login(ctx context.Context, options types.LoginCommandOptions, stdout io.Wri
 
 	var responseIdentityToken string
 
-	credentials, err := credStore.Retrieve(registryURL, options.Username == "" && options.Password == "")
+	credentials, err := credStore.Retrieve(registryURL, opts.Username == "" && opts.Password == "")
 	credentials.IdentityToken = ""
 
 	if err == nil && credentials.Username != "" && credentials.Password != "" {
-		responseIdentityToken, err = loginClientSide(ctx, options.GOptions, registryURL, credentials)
+		responseIdentityToken, err = loginClientSide(ctx, *globalOptions, registryURL, credentials)
 	}
 
 	if err != nil || credentials.Username == "" || credentials.Password == "" {
-		err = promptUserForAuthentication(credentials, options.Username, options.Password, stdout)
+		err = promptUserForAuthentication(credentials, opts.Username, opts.Password, output)
 		if err != nil {
 			return err
 		}
 
-		responseIdentityToken, err = loginClientSide(ctx, options.GOptions, registryURL, credentials)
+		responseIdentityToken, err = loginClientSide(ctx, *globalOptions, registryURL, credentials)
 		if err != nil {
 			return err
 		}
@@ -81,7 +86,7 @@ func Login(ctx context.Context, options types.LoginCommandOptions, stdout io.Wri
 	// Display a warning if we're storing the users password (not a token) and credentials store type is file.
 	storageFileLocation := credStore.FileStorageLocation(registryURL)
 	if storageFileLocation != "" && credentials.Password != "" {
-		_, err = fmt.Fprintln(stdout, fmt.Sprintf(unencryptedPasswordWarning, storageFileLocation))
+		_, err = fmt.Fprintln(output, fmt.Sprintf(unencryptedPasswordWarning, storageFileLocation))
 		if err != nil {
 			return err
 		}
@@ -103,12 +108,12 @@ func Login(ctx context.Context, options types.LoginCommandOptions, stdout io.Wri
 		}
 	}
 
-	_, err = fmt.Fprintln(stdout, "Login Succeeded")
+	_, err = fmt.Fprintln(output, "Login Succeeded")
 
 	return err
 }
 
-func loginClientSide(ctx context.Context, globalOptions types.GlobalCommandOptions, registryURL *dockerconfigresolver.RegistryURL, credentials *dockerconfigresolver.Credentials) (string, error) {
+func loginClientSide(ctx context.Context, globalOptions options.Global, registryURL *dockerconfigresolver.RegistryURL, credentials *dockerconfigresolver.Credentials) (string, error) {
 	host := registryURL.Host
 	var dOpts []dockerconfigresolver.Opt
 	if globalOptions.InsecureRegistry {

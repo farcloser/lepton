@@ -47,7 +47,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/imgutil"
 )
 
-// ListCommandHandler `List` and print images matching filters in `options`.
+// ListCommandHandler `NamesList` and print images matching filters in `options`.
 func ListCommandHandler(ctx context.Context, client *containerd.Client, options *types.ImageListOptions) error {
 	imageList, err := List(ctx, client, options.Filters, options.NameAndRefFilter)
 	if err != nil {

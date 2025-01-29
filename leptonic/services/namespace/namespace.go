@@ -22,11 +22,11 @@ import (
 	"slices"
 
 	"github.com/containerd/containerd/v2/client"
-	"github.com/containerd/containerd/v2/pkg/identifiers"
 	"github.com/containerd/containerd/v2/pkg/namespaces"
 
 	"github.com/containerd/nerdctl/v2/leptonic/api"
 	"github.com/containerd/nerdctl/v2/leptonic/errs"
+	"github.com/containerd/nerdctl/v2/leptonic/identifiers"
 	"github.com/containerd/nerdctl/v2/leptonic/services/helpers"
 )
 

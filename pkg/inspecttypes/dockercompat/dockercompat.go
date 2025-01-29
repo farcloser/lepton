@@ -148,22 +148,22 @@ type Config struct {
 	AttachStdin bool   // Attach the standard input, makes possible user interaction
 	// TODO: AttachStdout bool        // Attach the standard output
 	// TODO: AttachStderr bool        // Attach the standard error
-	ExposedPorts nat.PortSet `json:",omitempty"` // List of exposed ports
+	ExposedPorts nat.PortSet `json:",omitempty"` // NamesList of exposed ports
 	// TODO: Tty          bool        // Attach standard streams to a tty, including stdin if it is not closed.
 	// TODO: OpenStdin    bool        // Open stdin
 	// TODO: StdinOnce    bool        // If true, close stdin after the 1 attached client disconnects.
-	Env []string `json:",omitempty"` // List of environment variable to set in the container
+	Env []string `json:",omitempty"` // NamesList of environment variable to set in the container
 	Cmd []string `json:",omitempty"` // Command to run when starting the container
 	// TODO Healthcheck     *HealthConfig       `json:",omitempty"` // Healthcheck describes how to check the container is healthy
 	// TODO: ArgsEscaped     bool                `json:",omitempty"` // True if command is already escaped (meaning treat as a command line) (Windows specific).
 	// TODO: Image           string              // Name of the image as it was passed by the operator (e.g. could be symbolic)
-	Volumes    map[string]struct{} `json:",omitempty"` // List of volumes (mounts) used for the container
+	Volumes    map[string]struct{} `json:",omitempty"` // NamesList of volumes (mounts) used for the container
 	WorkingDir string              `json:",omitempty"` // Current directory (PWD) in the command will be launched
 	Entrypoint []string            `json:",omitempty"` // Entrypoint to run when starting the container
 	// TODO: NetworkDisabled bool                `json:",omitempty"` // Is network disabled
 	// TODO: MacAddress      string              `json:",omitempty"` // Mac Address of the container
 	// TODO: OnBuild         []string            // ONBUILD metadata that were defined on the image Dockerfile
-	Labels map[string]string `json:",omitempty"` // List of labels set to this container
+	Labels map[string]string `json:",omitempty"` // NamesList of labels set to this container
 	// TODO: StopSignal      string              `json:",omitempty"` // Signal to stop a container
 	// TODO: StopTimeout     *int                `json:",omitempty"` // Timeout (in seconds) to stop a container
 	// TODO: Shell           []string            `json:",omitempty"` // Shell for shell-form of RUN, CMD, ENTRYPOINT

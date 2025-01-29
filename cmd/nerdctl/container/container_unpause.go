@@ -19,12 +19,12 @@ package container
 import (
 	"github.com/spf13/cobra"
 
-	containerd "github.com/containerd/containerd/v2/client"
+	"github.com/containerd/containerd/v2/client"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
+	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 )
 
@@ -41,36 +41,36 @@ func NewUnpauseCommand() *cobra.Command {
 	return unpauseCommand
 }
 
-func processContainerUnpauseOptions(cmd *cobra.Command) (types.ContainerUnpauseOptions, error) {
+func UnpauseOptions(cmd *cobra.Command, args []string) (types.ContainerUnpauseOptions, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return types.ContainerUnpauseOptions{}, err
 	}
 	return types.ContainerUnpauseOptions{
-		GOptions: globalOptions,
+		GOptions: *globalOptions,
 		Stdout:   cmd.OutOrStdout(),
 	}, nil
 }
 
 func unpauseAction(cmd *cobra.Command, args []string) error {
-	options, err := processContainerUnpauseOptions(cmd)
+	options, err := UnpauseOptions(cmd, args)
 	if err != nil {
 		return err
 	}
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	return container.Unpause(ctx, client, args, options)
+	return container.Unpause(ctx, cli, args, options)
 }
 
 func unpauseShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 	// show paused container names
-	statusFilterFn := func(st containerd.ProcessStatus) bool {
-		return st == containerd.Paused
+	statusFilterFn := func(st client.ProcessStatus) bool {
+		return st == client.Paused
 	}
 	return completion.ContainerNames(cmd, statusFilterFn)
 }

@@ -21,8 +21,8 @@ import (
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
+	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 )
 
@@ -39,23 +39,23 @@ func NewRenameCommand() *cobra.Command {
 	return renameCommand
 }
 
-func processContainerRenameOptions(cmd *cobra.Command) (types.ContainerRenameOptions, error) {
+func RenameOptions(cmd *cobra.Command, _ []string) (types.ContainerRenameOptions, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return types.ContainerRenameOptions{}, err
 	}
 	return types.ContainerRenameOptions{
-		GOptions: globalOptions,
+		GOptions: *globalOptions,
 		Stdout:   cmd.OutOrStdout(),
 	}, nil
 }
 
 func renameAction(cmd *cobra.Command, args []string) error {
-	options, err := processContainerRenameOptions(cmd)
+	options, err := RenameOptions(cmd, args)
 	if err != nil {
 		return err
 	}
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	client, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
 	if err != nil {
 		return err
 	}

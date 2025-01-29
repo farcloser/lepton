@@ -43,7 +43,7 @@ import (
 	"github.com/containerd/log"
 	"github.com/containerd/platforms"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/image"
 	"github.com/containerd/nerdctl/v2/pkg/containerutil"
@@ -68,7 +68,7 @@ var (
 	emptyDigest  = digest.Digest("")
 )
 
-func Commit(ctx context.Context, client *containerd.Client, container containerd.Container, opts *Opts, globalOptions types.GlobalCommandOptions) (digest.Digest, error) {
+func Commit(ctx context.Context, client *containerd.Client, container containerd.Container, opts *Opts, globalOptions options.Global) (digest.Digest, error) {
 	// Get labels
 	containerLabels, err := container.Labels(ctx)
 	if err != nil {

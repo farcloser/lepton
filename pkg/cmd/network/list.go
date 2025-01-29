@@ -21,11 +21,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"strings"
 	"text/tabwriter"
 	"text/template"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 	"github.com/containerd/nerdctl/v2/pkg/netutil"
 )
@@ -38,19 +39,17 @@ type networkPrintable struct {
 	file string `json:"-"`
 }
 
-func List(ctx context.Context, options types.NetworkListOptions) error {
-	globalOptions := options.GOptions
-	quiet := options.Quiet
-	format := options.Format
-	w := options.Stdout
-	filters := options.Filters
+func List(ctx context.Context, output io.Writer, globalOptions *options.Global, opts *options.NetworkList) error {
+	quiet := opts.Quiet
+	format := opts.Format
+	filters := opts.Filters
 	var tmpl *template.Template
 
 	switch format {
 	case formatter.FormatNone, formatter.FormatTable, formatter.FormatWide:
-		w = tabwriter.NewWriter(w, 4, 8, 4, ' ', 0)
+		output = tabwriter.NewWriter(output, 4, 8, 4, ' ', 0)
 		if !quiet {
-			fmt.Fprintln(w, "NETWORK ID\tNAME\tFILE")
+			fmt.Fprintln(output, "NETWORK ID\tNAME\tFILE")
 		}
 	default:
 		if quiet {
@@ -63,7 +62,7 @@ func List(ctx context.Context, options types.NetworkListOptions) error {
 		}
 	}
 
-	e, err := netutil.NewCNIEnv(globalOptions.CNIPath, globalOptions.CNINetConfPath, netutil.WithNamespace(options.GOptions.Namespace))
+	e, err := netutil.NewCNIEnv(globalOptions.CNIPath, globalOptions.CNINetConfPath, netutil.WithNamespace(globalOptions.Namespace))
 	if err != nil {
 		return err
 	}
@@ -119,18 +118,18 @@ func List(ctx context.Context, options types.NetworkListOptions) error {
 			if err := tmpl.Execute(&b, p); err != nil {
 				return err
 			}
-			if _, err = fmt.Fprintln(w, b.String()); err != nil {
+			if _, err = fmt.Fprintln(output, b.String()); err != nil {
 				return err
 			}
 		} else if quiet {
 			if p.ID != "" {
-				fmt.Fprintln(w, p.ID)
+				fmt.Fprintln(output, p.ID)
 			}
 		} else {
-			fmt.Fprintf(w, "%s\t%s\t%s\n", p.ID, p.Name, p.file)
+			fmt.Fprintf(output, "%s\t%s\t%s\n", p.ID, p.Name, p.file)
 		}
 	}
-	if f, ok := w.(formatter.Flusher); ok {
+	if f, ok := output.(formatter.Flusher); ok {
 		return f.Flush()
 	}
 	return nil

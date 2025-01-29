@@ -26,7 +26,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/version"
 )
 
-func newComposeVersionCommand() *cobra.Command {
+func VersionCommand() *cobra.Command {
 	var composeVersionCommand = &cobra.Command{
 		Use:           "version",
 		Short:         "Show the Compose version information",
@@ -53,7 +53,7 @@ func composeVersionAction(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	format, err := cmd.Flags().GetString("format")
+	format, err := cmd.Flags().GetString(flagFormat)
 	if err != nil {
 		return err
 	}
