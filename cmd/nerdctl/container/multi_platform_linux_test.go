@@ -77,7 +77,7 @@ RUN echo dummy
 }
 
 // TestMultiPlatformBuildPushNoRun tests if the push succeeds in a situation where nerdctl builds
-// a Dockerfile without RUN, COPY, etc commands. In such situation, BuildKit doesn't download the base image
+// a Dockerfile without RUN, COPY, etc. commands. In such situation, BuildKit doesn't download the base image
 // so nerdctl needs to ensure these blobs to be locally available.
 func TestMultiPlatformBuildPushNoRun(t *testing.T) {
 	testutil.DockerIncompatible(t) // non-buildx version of `docker build` lacks multi-platform. Also, `docker push` lacks --platform.

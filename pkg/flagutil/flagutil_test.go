@@ -98,7 +98,7 @@ func TestReplaceOrAppendEnvValues(t *testing.T) {
 	}
 }
 
-// Test TestParseEnvFileGoodFile for a env file with a few well formatted lines.
+// Test TestParseEnvFileGoodFile for an env file with a few well formatted lines.
 func TestParseEnvFileGoodFile(t *testing.T) {
 	content := `foo=bar
     baz=quux
@@ -148,7 +148,7 @@ func TestParseEnvFileEmptyFile(t *testing.T) {
 	}
 }
 
-// Test TestParseEnvFileNonExistentFile for a non existent file.
+// Test TestParseEnvFileNonExistentFile for a non-existent file.
 func TestParseEnvFileNonExistentFile(t *testing.T) {
 	_, err := parseEnvVars([]string{"foo_bar_baz"})
 	if err == nil {

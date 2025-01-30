@@ -45,7 +45,7 @@ var (
 )
 
 // pathSpecifier represents a path to be used by cp
-// besides exposing relevant properties (endsWithSeparator, etc), it also provides a fully resolved *host* path to
+// besides exposing relevant properties (endsWithSeparator, etc.), it also provides a fully resolved *host* path to
 // access the resource
 type pathSpecifier struct {
 	originalPath         string
@@ -354,8 +354,8 @@ func (res *resolver) resolvePath(path string) (string, error) {
 			if r < volLen || dest[r+1:] == ".." {
 				// Either path has no slashes
 				// (it's empty or just "C:")
-				// or it ends in a ".." we had to keep.
-				// Either way, keep this "..".
+				// or it ends in a `..` we had to keep.
+				// Either way, keep this `..`.
 				if len(dest) > volLen {
 					dest += pathSeparator
 				}

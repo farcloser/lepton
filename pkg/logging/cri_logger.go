@@ -55,7 +55,7 @@ const (
 )
 
 // LogTag is the tag of a log line in CRI container log.
-// Currently defined log tags:
+// Currently, defined log tags:
 // * First tag: Partial/Full - P/F.
 // The field in the container log format can be extended to include multiple
 // tags by using a delimiter, but changes should be rare. If it becomes clear
@@ -136,7 +136,7 @@ func ReadLogs(opts *LogViewOptions, stdout, stderr io.Writer, stopChannel chan o
 			}
 			l, err := r.ReadBytes(eol[0])
 			if err != nil {
-				if !errors.Is(err, io.EOF) { // This is an real error
+				if !errors.Is(err, io.EOF) { // This is a real error
 					return fmt.Errorf("failed to read log file %q: %w", logPath, err)
 				}
 				if opts.Follow {

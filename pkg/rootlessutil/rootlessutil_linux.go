@@ -72,7 +72,7 @@ func RootlessContainredSockAddress() (string, error) {
 }
 
 // DetachedNetNS returns non-empty netns path if RootlessKit is running with --detach-netns mode.
-// Otherwise returns "" without an error.
+// Otherwise, returns "" without an error.
 func DetachedNetNS() (string, error) {
 	if !IsRootless() {
 		return "", nil

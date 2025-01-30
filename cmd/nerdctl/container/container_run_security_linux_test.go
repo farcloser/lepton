@@ -278,7 +278,7 @@ func TestRunPrivileged(t *testing.T) {
 	// get device without host devices
 	res := base.Cmd("run", "--rm", "--privileged", "--security-opt", "privileged-without-host-devices", testutil.AlpineImage, "ls", devPath).Run()
 
-	// normally for not a exists file, the `ls` will return `1``.
+	// ls normally returns 1 for non-existent files
 	assert.Check(t, res.ExitCode != 0, res)
 
 	// something like `ls: /dev/dummy-zero: No such file or directory`

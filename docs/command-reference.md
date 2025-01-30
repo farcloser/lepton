@@ -136,7 +136,7 @@ Usage: `nerdctl run [OPTIONS] IMAGE [COMMAND] [ARG...]`
 Basic flags:
 
 - :whale: `-a, --attach`: Attach STDIN, STDOUT, or STDERR
-- :whale: :blue_square: `-i, --interactive`: Keep STDIN open even if not attached"
+- :whale: :blue_square: `-i, --interactive`: Keep STDIN open even if not attached
 - :whale: :blue_square: `-t, --tty`: Allocate a pseudo-TTY
   - :warning: WIP: currently `-t` conflicts with `-d`
 - :whale: `-sig-proxy`: Proxy received signals to the process (default true)
@@ -301,7 +301,7 @@ Env flags:
 Metadata flags:
 
 - :whale: :blue_square: `--name`: Assign a name to the container
-- :whale: :blue_square: `-l, --label`: Set meta data on a container (Not passed through the OCI runtime since nerdctl v2.0, with an exception for `nerdctl/bypass4netns`)
+- :whale: :blue_square: `-l, --label`: Set metadata on a container (Not passed through the OCI runtime since nerdctl v2.0, with an exception for `nerdctl/bypass4netns`)
 - :whale: :blue_square: `--label-file`: Read in a line delimited file of labels
 - :whale: :blue_square: `--annotation`: Add an annotation to the container (passed through to the OCI runtime)
 - :whale: :blue_square: `--cidfile`: Write the container ID to the file
@@ -321,7 +321,7 @@ Logging flags:
     - :whale: `--log-opt=tag=<TEMPLATE>`: Specify template to set `SYSLOG_IDENTIFIER` value in journald logs.
   - :whale: `--log-driver=fluentd`: Writes log messages to `fluentd`. The `fluentd` daemon must be running on the host machine.
     - The `fluentd` logging driver supports the following logging options:
-      - :whale: `--log-opt=fluentd-address=<ADDRESS>`: The address of the `fluentd` daemon, tcp(default) and unix sockets are supported..
+      - :whale: `--log-opt=fluentd-address=<ADDRESS>`: The address of the `fluentd` daemon, tcp(default) and unix sockets are supported.
       - :whale: `--log-opt=fluentd-async=<true|false>`: Enable async mode for fluentd. The default value is false.
       - :whale: `--log-opt=fluentd-buffer-limit=<LIMIT>`: The buffer limit for fluentd. If the buffer is full, the call to record logs will fail. The default is 8192. (<https://github.com/fluent/fluent-logger-golang/tree/master#bufferlimit>)
       - :whale: `--log-opt=fluentd-retry-wait=<1s|1ms>`: The time to wait before retrying to send logs to fluentd. The default value is 1s.
@@ -377,23 +377,23 @@ Ulimit flags:
 
 --ulimit can be used to restrict the following types of resources.
 
-| type       |  describe| value range                                                                                                                                                                                                      |
-|----|----|----|
-| core       | limits the core file size (KB)| A 64-bit integer (INT64), with no units. It can be 0, negative, where -1 represents UNLIMITED (i.e., no limit is applied), and any other negative values will be forcibly converted to a large positive integer.|
-| cpu        | max CPU time (MIN)| same as above|
-| data       |max data size (KB) | same as above|
-| fsize      | maximum filesize (KB)| same as above|
-| locks      | max number of file locks the user can hold | same as above|
-| memlock    | max locked-in-memory address space (KB) | same as above|
-| msgqueue   | max memory used by POSIX message queues (bytes)| same as above|
-| nice       | nice priority | same as above |
-| nproc      | max number of processes | same as above|
-| rss        | max resident set size (KB)| same as above|
-| rtprio     | max realtime priority| same as above|
-| rttime     | realtime timeout | same as above|
-| sigpending | max number of pending signals| same as above|
-| stack      | max stack size (KB) | same as above|
-| nofile    | max number of open file descriptors| A 64-bit integer (int64), with no units. It cannot be negative; negative values will be forcibly converted to a large number, and an "Operation not permitted" error will occur during setting|
+| type       | describe                                        | value range                                                                                                                                                                                                      |
+|------------|-------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| core       | limits the core file size (KB)                  | A 64-bit integer (INT64), with no units. It can be 0, negative, where -1 represents UNLIMITED (i.e., no limit is applied), and any other negative values will be forcibly converted to a large positive integer. |
+| cpu        | max CPU time (MIN)                              | same as above                                                                                                                                                                                                    |
+| data       | max data size (KB)                              | same as above                                                                                                                                                                                                    |
+| fsize      | maximum filesize (KB)                           | same as above                                                                                                                                                                                                    |
+| locks      | max number of file locks the user can hold      | same as above                                                                                                                                                                                                    |
+| memlock    | max locked-in-memory address space (KB)         | same as above                                                                                                                                                                                                    |
+| msgqueue   | max memory used by POSIX message queues (bytes) | same as above                                                                                                                                                                                                    |
+| nice       | nice priority                                   | same as above                                                                                                                                                                                                    |
+| nproc      | max number of processes                         | same as above                                                                                                                                                                                                    |
+| rss        | max resident set size (KB)                      | same as above                                                                                                                                                                                                    |
+| rtprio     | max realtime priority                           | same as above                                                                                                                                                                                                    |
+| rttime     | realtime timeout                                | same as above                                                                                                                                                                                                    |
+| sigpending | max number of pending signals                   | same as above                                                                                                                                                                                                    |
+| stack      | max stack size (KB)                             | same as above                                                                                                                                                                                                    |
+| nofile     | max number of open file descriptors             | A 64-bit integer (int64), with no units. It cannot be negative; negative values will be forcibly converted to a large number, and an "Operation not permitted" error will occur during setting                   |
 
 Verify flags:
 
@@ -401,8 +401,8 @@ Verify flags:
 - :nerd_face: `--cosign-key`: Path to the public key file, KMS, URI or Kubernetes Secret for `--verify=cosign`
 - :nerd_face: `--cosign-certificate-identity`: The identity expected in a valid Fulcio certificate for --verify=cosign. Valid values include email address, DNS names, IP addresses, and URIs. Either --cosign-certificate-identity or --cosign-certificate-identity-regexp must be set for keyless flows
 - :nerd_face: `--cosign-certificate-identity-regexp`: A regular expression alternative to --cosign-certificate-identity for --verify=cosign. Accepts the Go regular expression syntax described at https://golang.org/s/re2syntax. Either --cosign-certificate-identity or --cosign-certificate-identity-regexp must be set for keyless flows
-- :nerd_face: `--cosign-certificate-oidc-issuer`: The OIDC issuer expected in a valid Fulcio certificate for --verify=cosign,, e.g. https://token.actions.githubusercontent.com or https://oauth2.sigstore.dev/auth. Either --cosign-certificate-oidc-issuer or --cosign-certificate-oidc-issuer-regexp must be set for keyless flows
-- :nerd_face: `--cosign-certificate-oidc-issuer-regexp`: A regular expression alternative to --certificate-oidc-issuer for --verify=cosign,. Accepts the Go regular expression syntax described at https://golang.org/s/re2syntax. Either --cosign-certificate-oidc-issuer or --cosign-certificate-oidc-issuer-regexp must be set for keyless flows
+- :nerd_face: `--cosign-certificate-oidc-issuer`: The OIDC issuer expected in a valid Fulcio certificate for --verify=cosign, e.g. https://token.actions.githubusercontent.com or https://oauth2.sigstore.dev/auth. Either --cosign-certificate-oidc-issuer or --cosign-certificate-oidc-issuer-regexp must be set for keyless flows
+- :nerd_face: `--cosign-certificate-oidc-issuer-regexp`: A regular expression alternative to --certificate-oidc-issuer for --verify=cosign. Accepts the Go regular expression syntax described at https://golang.org/s/re2syntax. Either --cosign-certificate-oidc-issuer or --cosign-certificate-oidc-issuer-regexp must be set for keyless flows
 
 Unimplemented `docker run` flags:
     `--blkio-weight-device`, `--cpu-rt-*`, `--device-*`,
@@ -713,13 +713,13 @@ Flags:
 - :whale: `--provenance`: Shorthand for \"--attest=type=provenance\", see [`buildx_build.md`](https://github.com/docker/buildx/blob/v0.12.1/docs/reference/buildx_build.md#provenance) documentation
 - :whale: `--pull=(true|false)`: On true, always attempt to pull latest image version from remote. Default uses buildkit's default.
 - :whale: `--secret`: Secret file to expose to the build: id=mysecret,src=/local/secret
-- :whale: `--allow`: Allow extra privileged entitlement, e.g. network.host, security.insecure  (It’s required to configure the buildkitd to enable the feature, see [`buildkitd.toml`](https://github.com/moby/buildkit/blob/master/docs/buildkitd.toml.md) documentation)
+- :whale: `--allow`: Allow extra privileged entitlement, e.g. `network.host`, `security.insecure` (It’s required to configure the buildkitd to enable the feature, see [`buildkitd.toml`](https://github.com/moby/buildkit/blob/master/docs/buildkitd.toml.md) documentation)
 - :whale: `--attest`: Attestation parameters (format: "type=sbom,generator=image"), see [`buildx_build.md`](https://github.com/docker/buildx/blob/v0.12.1/docs/reference/buildx_build.md#attest) documentation
 - :whale: `--ssh`: SSH agent socket or keys to expose to the build (format: `default|<id>[=<socket>|<key>[,<key>]]`)
 - :whale: `-q, --quiet`: Suppress the build output and print image ID on success
 - :whale: `--sbom`: Shorthand for \"--attest=type=sbom\", see [`buildx_build.md`](https://github.com/docker/buildx/blob/v0.12.1/docs/reference/buildx_build.md#sbom) documentation
-- :whale: `--cache-from=CACHE`: External cache sources (eg. user/app:cache, type=local,src=path/to/dir) (compatible with `docker buildx build`)
-- :whale: `--cache-to=CACHE`: Cache export destinations (eg. user/app:cache, type=local,dest=path/to/dir) (compatible with `docker buildx build`)
+- :whale: `--cache-from=CACHE`: External cache sources (e.g. user/app:cache, type=local,src=path/to/dir) (compatible with `docker buildx build`)
+- :whale: `--cache-to=CACHE`: Cache export destinations (e.g. user/app:cache, type=local,dest=path/to/dir) (compatible with `docker buildx build`)
 - :whale: `--platform=(amd64|arm64|...)`: Set target platform for build (compatible with `docker buildx build`)
 - :whale: `--iidfile=FILE`: Write the image ID to the file
 - :whale: `--label`: Set metadata for an image
@@ -788,8 +788,8 @@ Flags:
 - :nerd_face: `--cosign-key`: Path to the public key file, KMS, URI or Kubernetes Secret for `--verify=cosign`
 - :nerd_face: `--cosign-certificate-identity`: The identity expected in a valid Fulcio certificate for --verify=cosign. Valid values include email address, DNS names, IP addresses, and URIs. Either --cosign-certificate-identity or --cosign-certificate-identity-regexp must be set for keyless flows
 - :nerd_face: `--cosign-certificate-identity-regexp`: A regular expression alternative to --cosign-certificate-identity for --verify=cosign. Accepts the Go regular expression syntax described at https://golang.org/s/re2syntax. Either --cosign-certificate-identity or --cosign-certificate-identity-regexp must be set for keyless flows
-- :nerd_face: `--cosign-certificate-oidc-issuer`: The OIDC issuer expected in a valid Fulcio certificate for --verify=cosign,, e.g. https://token.actions.githubusercontent.com or https://oauth2.sigstore.dev/auth. Either --cosign-certificate-oidc-issuer or --cosign-certificate-oidc-issuer-regexp must be set for keyless flows
-- :nerd_face: `--cosign-certificate-oidc-issuer-regexp`: A regular expression alternative to --certificate-oidc-issuer for --verify=cosign,. Accepts the Go regular expression syntax described at https://golang.org/s/re2syntax. Either --cosign-certificate-oidc-issuer or --cosign-certificate-oidc-issuer-regexp must be set for keyless flows
+- :nerd_face: `--cosign-certificate-oidc-issuer`: The OIDC issuer expected in a valid Fulcio certificate for --verify=cosign, e.g. https://token.actions.githubusercontent.com or https://oauth2.sigstore.dev/auth. Either --cosign-certificate-oidc-issuer or --cosign-certificate-oidc-issuer-regexp must be set for keyless flows
+- :nerd_face: `--cosign-certificate-oidc-issuer-regexp`: A regular expression alternative to --certificate-oidc-issuer for --verify=cosign. Accepts the Go regular expression syntax described at https://golang.org/s/re2syntax. Either --cosign-certificate-oidc-issuer or --cosign-certificate-oidc-issuer-regexp must be set for keyless flows
 - :nerd_face: `--soci-index-digest`: Specify a particular index digest for SOCI. If left empty, SOCI will automatically use the index determined by the selection policy.
 
 Unimplemented `docker pull` flags: `--all-tags`, `--disable-content-trust` (default true)
@@ -885,7 +885,7 @@ Flags:
 - :whale: `--no-trunc`: Don't truncate output
 - :whale: `-q, --quiet`: Only display snapshots IDs
 - :whale: `--format`: Format the output using the given Go template, e.g, `{{json .}}`
-- :whale: `-H, --human`: Print sizes and dates in human readable format (default true)
+- :whale: `-H, --human`: Print sizes and dates in human-readable format (default true)
 
 ### :whale: nerdctl image prune
 
@@ -897,7 +897,7 @@ Flags:
 
 - :whale: `-a, --all`: Remove all unused images, not just dangling ones
 - :whale: `-f, --filter`: Filter the images.
-  - :whale: `--filter=until=<timestamp>`: Images created before given date formatted timestamps or Go duration strings. Currently does not support Unix timestamps.
+  - :whale: `--filter=until=<timestamp>`: Images created before given date formatted timestamps or Go duration strings. Currently, does not support Unix timestamps.
   - :whale: `--filter=label<key>=<value>`: Matches images based on the presence of a label alone or a label and a value
 - :whale: `-f, --force`: Do not prompt for confirmation
 
@@ -913,7 +913,7 @@ Flags:
 
 - `--zstd`                             : Use zstd compression instead of gzip. Should be used in conjunction with '--oci'
 - `--zstd-compression-level=<LEVEL>`   : zstd compression level (default: 3)
-- `--zstdchunked`                      : Use zstd compression instead of gzip (a.k.a zstd:chunked). Should be used in conjunction with '--oci'
+- `--zstdchunked`                      : Use zstd compression instead of gzip (aka zstd:chunked). Should be used in conjunction with '--oci'
 - `--zstdchunked-record-in=<FILE>` : read `ctr-remote optimize --record-out=<FILE>` record file. :warning: This flag is experimental and subject to change.
 - `--zstdchunked-compression-level=<LEVEL>`: zstd:chunked compression level (default: 3)
 - `--zstdchunked-chunk-size=<SIZE>`: zstd:chunked chunk size
@@ -943,7 +943,7 @@ To see non-encrypted information, run `nerdctl image inspect --mode=native --pla
 Flags:
 
 - `--recipient=<RECIPIENT>`      : Recipient of the image is the person who can decrypt (e.g., `jwe:mypubkey.pem`)
-- `--dec-recipient=<RECIPIENT>`  : Recipient of the image; used only for PKCS7 and must be an x509 certificate
+- `--dec-recipient=<RECIPIENT>`  : Recipient of the image; used only for PKCS7 and must be a x509 certificate
 - `--key=<KEY>[:<PWDDESC>]`      : A secret key's filename and an optional password separated by colon, PWDDESC=<password>|pass:<password>|fd=<file descriptor>|filename
 - `--gpg-homedir=<DIR>`          : The GPG homedir to use; by default gpg uses ~/.gnupg
 - `--gpg-version=<VERSION>`      : The GPG version ("v1" or "v2"), default will make an educated guess
@@ -965,7 +965,7 @@ nerdctl image decrypt --key=mykey.pem example.com/foo:encrypted foo:decrypted
 
 Flags:
 
-- `--dec-recipient=<RECIPIENT>`  : Recipient of the image; used only for PKCS7 and must be an x509 certificate
+- `--dec-recipient=<RECIPIENT>`  : Recipient of the image; used only for PKCS7 and must be a x509 certificate
 - `--key=<KEY>[:<PWDDESC>]`      : A secret key's filename and an optional password separated by colon, PWDDESC=<password>|pass:<password>|fd=<file descriptor>|filename
 - `--gpg-homedir=<DIR>`          : The GPG homedir to use; by default gpg uses ~/.gnupg
 - `--gpg-version=<VERSION>`      : The GPG version ("v1" or "v2"), default will make an educated guess

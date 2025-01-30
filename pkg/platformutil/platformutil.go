@@ -54,7 +54,7 @@ func NewMatchComparer(all bool, ss []string) (platforms.MatchComparer, error) {
 // NewOCISpecPlatformSlice returns a slice of specs.Platform
 // If all is true, NewOCISpecPlatformSlice always returns an empty slice, regardless to the value of ss.
 // If all is false and ss is empty, NewOCISpecPlatformSlice returns DefaultSpec.
-// Otherwise NewOCISpecPlatformSlice returns the slice that correspond to ss.
+// Otherwise, NewOCISpecPlatformSlice returns the slice that correspond to ss.
 func NewOCISpecPlatformSlice(all bool, ss []string) ([]specs.Platform, error) {
 	if all {
 		return nil, nil

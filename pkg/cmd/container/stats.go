@@ -330,7 +330,7 @@ func collect(ctx context.Context, globalOptions *options.Global, s *stats2.Stats
 	)
 
 	defer func() {
-		// if error happens and we get nothing of stats, release wait group whatever
+		// if error happens, and we get nothing of stats, release wait group whatever
 		if getFirst {
 			getFirst = false
 			waitFirst.Done()

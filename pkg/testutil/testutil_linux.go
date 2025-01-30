@@ -53,7 +53,7 @@ var (
 
 	// This error string is expected when attempting to connect to a TCP socket
 	// for a service which actively refuses the connection.
-	// (e.g. attempting to connect using http to an https endpoint).
+	// (e.g. attempting to connect using http to a https endpoint).
 	// It should be "connection refused" as per the TCP RFC.
 	// https://www.rfc-editor.org/rfc/rfc793
 	ExpectedConnectionRefusedError = "connection refused"

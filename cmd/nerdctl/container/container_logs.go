@@ -120,7 +120,7 @@ func logsShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]
 	return completion.ContainerNames(cmd, nil)
 }
 
-// Attempts to parse the argument given to `-n/--tail` as a uint.
+// Attempts to parse the argument given to `-n/--tail` as an uint.
 func getTailArgAsUint(arg string) (uint, error) {
 	if arg == "all" {
 		return 0, nil

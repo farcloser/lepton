@@ -21,7 +21,7 @@ const (
 	//
 	// More work needs to be done to support windows containers in test framework
 	// for the tests that are run now this image (used in k8s upstream testing) meets the needs
-	// use gcr.io/k8s-staging-e2e-test-images/busybox:1.36-1-windows-amd64-ltsc2022 locally on windows 11
+	// use gcr.io/k8s-staging-e2e-test-images/busybox:1.36-1-windows-amd64-ltsc2022 locally on Windows 11
 	// https://github.com/microsoft/Windows-Containers/issues/179
 	BusyboxImage = "gcr.io/k8s-staging-e2e-test-images/busybox:1.36.1-1"
 	WindowsNano  = BusyboxImage
@@ -36,7 +36,7 @@ const (
 
 	// This error string is expected when attempting to connect to a TCP socket
 	// for a service which actively refuses the connection.
-	// (e.g. attempting to connect using http to an https endpoint).
+	// (e.g. attempting to connect using http to a https endpoint).
 	// It should be "connection refused" as per the TCP RFC, but it is the
 	// below string constant on Windows.
 	// https://www.rfc-editor.org/rfc/rfc793

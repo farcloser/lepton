@@ -869,7 +869,7 @@ func cpTestHelper(t *testing.T, tg *testgroup) {
 					// If we have optional setup, run that now
 					if testCase.setup != nil {
 						// Some specs may come with a trailing slash (proper or improper)
-						// Setup should still work in all cases (including if its a file), and get through to the actual test
+						// Setup should still work in all cases (including if it's a file), and get through to the actual test
 						setupDest := destinationSpec
 						setupDest = strings.TrimSuffix(setupDest, string(os.PathSeparator))
 						if !filepath.IsAbs(setupDest) {

@@ -53,7 +53,7 @@ func preparePsTestContainer(t *testing.T, identity string, restart bool, hyperv 
 		testutil.Identifier(t) + identity,
 		testutil.Identifier(t) + identity,
 	}
-	// fill the value of testLabels
+	// fill testLabels
 	for _, k := range keys {
 		testLabels[k] = k
 	}
@@ -230,8 +230,8 @@ func TestListProcessContainerWithLabels(t *testing.T) {
 		}
 
 		// check labels using map
-		// 1. the results has no guarantee to show the same order.
-		// 2. the results has no guarantee to show only configured labels.
+		// 1. the results have no guarantee to show the same order.
+		// 2. the results have no guarantee to show only configured labels.
 		labelsMap, err := strutil.ParseCSVMap(lines[0])
 		if err != nil {
 			return fmt.Errorf("failed to parse labels: %w", err)

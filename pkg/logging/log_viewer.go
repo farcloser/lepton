@@ -70,16 +70,16 @@ type LogViewOptions struct {
 	// LogPath specify the log path for container created via CRI
 	LogPath string
 
-	// Whether or not to follow the output of the container logs.
+	// Whether to follow the output of the container logs.
 	Follow bool
 
-	// Whether or not to print timestampts for each line.
+	// Whether to print timestamps for each line.
 	Timestamps bool
 
 	// Uint representing the number of most recent log entries to display. 0 = "all".
 	Tail uint
 
-	// Start/end timestampts to filter logs by.
+	// Start/end timestamps to filter logs by.
 	Since string
 	Until string
 }

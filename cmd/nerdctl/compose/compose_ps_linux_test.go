@@ -177,14 +177,14 @@ volumes:
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "--format", formatter.FormatJSON).
 		AssertOutWithFunc(assertHandler("all", 2, `"Service":"wordpress"`, `"Service":"db"`,
 			fmt.Sprintf(`"Image":"%s"`, testutil.WordpressImage), fmt.Sprintf(`"Image":"%s"`, testutil.MariaDBImage)))
-	// check wordpress is running
+	// check WordPress is running
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "--format", formatter.FormatJSON, "wordpress").
 		AssertOutWithFunc(assertHandler("wordpress", 1, `"Service":"wordpress"`, `"State":"running"`, `"TargetPort":80`, `"PublishedPort":8080`))
-	// check wordpress is stopped
+	// check WordPress is stopped
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "stop", "wordpress").AssertOK()
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "--format", formatter.FormatJSON, "wordpress", "-a").
 		AssertOutWithFunc(assertHandler("wordpress", 1, `"Service":"wordpress"`, `"State":"exited"`))
-	// check wordpress is removed
+	// check WordPress is removed
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "rm", "-f", "wordpress").AssertOK()
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "--format", formatter.FormatJSON, "wordpress").
 		AssertOutWithFunc(assertHandler("wordpress", 0))

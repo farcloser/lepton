@@ -94,7 +94,7 @@ func execActionWithContainer(ctx context.Context, client *containerd.Client, con
 	stdinC.Closer = func() {
 		process.CloseIO(ctx, containerd.WithStdinCloser)
 	}
-	// if detach, we should not call this defer
+	// if `detach`, we should not call this defer
 	if !options.Detach {
 		defer process.Delete(ctx)
 	}

@@ -21,7 +21,7 @@ See https://github.com/awslabs/soci-snapshotter to learn further information.
 ## Enable SOCI for `nerdctl run` and `nerdctl pull`
 
 | :zap: Requirement | nerdctl >= 1.5.0 |
-| ----------------- | ---------------- |
+|-------------------|------------------|
 
 - Run `nerdctl` with `--snapshotter=soci`
 ```console
@@ -38,7 +38,7 @@ For images that already have SOCI indices, see https://gallery.ecr.aws/soci-work
 ## Enable SOCI for `nerdctl push`
 
 | :zap: Requirement | nerdctl >= 1.6.0 |
-| ----------------- | ---------------- |
+|-------------------|------------------|
 
 - Push the image with SOCI index. Adding `--snapshotter=soci` arg to `nerdctl pull`, `nerdctl` will create the SOCI index and push the index to same destination as the image.
 ```console

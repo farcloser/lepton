@@ -157,7 +157,7 @@ func (m *cniNetworkManager) buildResolvConf(resolvConfPath string) error {
 			if !errors.Is(err, fs.ErrNotExist) {
 				return err
 			}
-			// if resolvConf file does't exist, using default resolvers
+			// if resolvConf file doesn't exist, using default resolvers
 			conf = &resolvconf.File{}
 			log.L.WithError(err).Debugf("resolvConf file doesn't exist on host")
 		}

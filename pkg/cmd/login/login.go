@@ -92,7 +92,7 @@ func Login(ctx context.Context, options *options.LoginCommand, stdout io.Writer)
 		return fmt.Errorf("error saving credentials: %w", err)
 	}
 
-	// When the port is the https default (443), other clients cannot be expected to necessarily lookup the variants with port
+	// When the port is the https default (443), other clients cannot be expected to necessarily look up the variants with port
 	// so save it both with and without port.
 	// This is the case for at least buildctl: https://github.com/containerd/nerdctl/issues/3748
 	if registryURL.Port() == dockerconfigresolver.StandardHTTPSPort {

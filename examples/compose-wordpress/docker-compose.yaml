@@ -1,4 +1,4 @@
-# Docker Compose stack for Wordpress, from https://hub.docker.com/_/wordpress
+# Docker Compose stack for WordPress, from https://hub.docker.com/_/wordpress
 
 # !!! Make sure to substitute "examplepass" with your own password !!!
 
@@ -10,7 +10,7 @@ services:
     image: wordpress:5.7
     restart: always
     ports:
-      - 8080:80
+      - "8080:80"
     environment:
       WORDPRESS_DB_HOST: db
       WORDPRESS_DB_USER: exampleuser

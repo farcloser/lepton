@@ -32,7 +32,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nettestutil"
 )
 
-// Tests various port mapping argument combinations by starting an nginx container and
+// Tests various port mapping argument combinations by starting a nginx container and
 // verifying its connectivity and that its serves its index.html from the external
 // host IP as well as through the loopback interface.
 // `loopbackIsolationEnabled` indicates whether the test should expect connections between

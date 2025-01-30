@@ -94,13 +94,13 @@ type ImageCrypt struct {
 	Platforms []string
 	// AllPlatforms convert content for all platforms
 	AllPlatforms bool
-	// GpgHomeDir the GPG homedir to use; by default gpg uses ~/.gnupg"
+	// GpgHomeDir the GPG homedir to use; by default gpg uses ~/.gnupg
 	GpgHomeDir string
 	// GpgVersion the GPG version ("v1" or "v2"), default will make an educated guess
 	GpgVersion string
 	// Keys a secret key's filename and an optional password separated by colon;
 	Keys []string
-	// DecRecipients recipient of the image; used only for PKCS7 and must be an x509 certificate
+	// DecRecipients recipient of the image; used only for PKCS7 and must be a x509 certificate
 	DecRecipients []string
 	// Recipients of the image is the person who can decrypt it in the form specified above (i.e. jwe:/path/to/pubkey)
 	Recipients []string

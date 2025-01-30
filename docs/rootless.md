@@ -162,7 +162,7 @@ In `detach-netns` mode:
 - Rootlesskit Parent NetNS is the host network namespace
 - step1: `nerdctl` calls `containerd` in the host network namespace.
 - step2: `containerd` calls `runc` in the host network namespace.
-- step3: `runc` creates container with dedicated namespaces (e.g network ns) in the Parent netns.
+- step3: `runc` creates container with dedicated namespaces (e.g. network ns) in the Parent netns.
 - step4: `runc` nsenter Rootlesskit Child NetNS before triggering nerdctl ocihook.
 - step5: `nerdctl` ocihook module leverages CNI.
 - step6: CNI configures container network namespace: create network interfaces `eth0` -> `veth0` -> `nerdctl0`.

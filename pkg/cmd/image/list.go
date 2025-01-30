@@ -63,7 +63,7 @@ func ListCommandHandler(ctx context.Context, client *containerd.Client, options 
 // - since=<image>[:<tag>]: Images created after given image (exclusive)
 // - label=<key>[=<value>]: Matches images based on the presence of a label alone or a label and a value
 // - dangling=true: Filter images by dangling
-// - reference=<image>[:<tag>]: Filter images by reference (Matches both docker compatible wildcard pattern and regexp
+// - reference=<image>[:<tag>]: Filter images by reference (Matches both docker compatible wildcard pattern and regexp)
 //
 // nameAndRefFilter has the format of `name==(<image>[:<tag>])|ID`,
 // and they will be used when getting images from containerd,

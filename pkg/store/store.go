@@ -64,7 +64,7 @@ type Manager interface {
 	Delete(key ...string) error
 	// Location returns the absolute path to a certain resource
 	// Note that this technically "leaks" (filesystem) implementation details up.
-	// It is necessary though when we are going to pass these filepath to containerd for eg.
+	// It is necessary though when we are going to pass these filepath to containerd for e.g.
 	Location(key ...string) (string, error)
 
 	// GroupSize will return the combined size of all objects stored under the group (eg: dir)

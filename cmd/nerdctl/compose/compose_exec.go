@@ -53,7 +53,7 @@ func newComposeExecCommand() *cobra.Command {
 
 	composeExecCommand.Flags().BoolP("interactive", "i", true, "Keep STDIN open even if not attached")
 	composeExecCommand.Flags().MarkHidden("interactive")
-	// The -t does not has effect to keep the compatibility with docker.
+	// The -t does not have effect to keep the compatibility with docker.
 	// The proposal of -t is to keep "muscle memory" with compose v1: https://github.com/docker/compose/issues/9207
 	// FYI: https://github.com/docker/compose/blob/v2.23.1/cmd/compose/exec.go#L77
 	composeExecCommand.Flags().BoolP("tty", "t", true, "Allocate a pseudo-TTY")
