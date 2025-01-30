@@ -28,7 +28,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/strutil"
 )
 
-func Prune(ctx context.Context, client *containerd.Client, options options.NetworkPrune) error {
+func Prune(ctx context.Context, client *containerd.Client, options *options.NetworkPrune) error {
 	e, err := netutil.NewCNIEnv(options.GOptions.CNIPath, options.GOptions.CNINetConfPath, netutil.WithNamespace(options.GOptions.Namespace))
 	if err != nil {
 		return err

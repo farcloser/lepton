@@ -27,7 +27,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/strutil"
 )
 
-func Create(name string, options options.VolumeCreate) (*native.Volume, error) {
+func Create(name string, options *options.VolumeCreate) (*native.Volume, error) {
 	if name == "" {
 		name = stringid.GenerateRandomID()
 		options.Labels = append(options.Labels, labels.AnonymousVolumes+"=")

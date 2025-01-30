@@ -97,7 +97,7 @@ func Info(ctx context.Context, client *containerd.Client, options *options.Syste
 	return nil
 }
 
-func fulfillNativeInfo(di *native.DaemonInfo, globalOptions options.Global) *native.Info {
+func fulfillNativeInfo(di *native.DaemonInfo, globalOptions *options.Global) *native.Info {
 	info := &native.Info{
 		Daemon: di,
 	}
@@ -141,7 +141,7 @@ func prettyPrintInfoNative(w io.Writer, info *native.Info) error {
 	return nil
 }
 
-func prettyPrintInfoDockerCompat(stdout io.Writer, stderr io.Writer, info *dockercompat.Info, globalOptions options.Global) error {
+func prettyPrintInfoDockerCompat(stdout io.Writer, stderr io.Writer, info *dockercompat.Info, globalOptions *options.Global) error {
 	w := stdout
 	debug := globalOptions.Debug
 	fmt.Fprintf(w, "Client:\n")

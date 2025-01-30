@@ -31,7 +31,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/netutil"
 )
 
-func Inspect(ctx context.Context, options options.NetworkInspect) error {
+func Inspect(ctx context.Context, options *options.NetworkInspect) error {
 	if options.Mode != "native" && options.Mode != "dockercompat" {
 		return fmt.Errorf("unknown mode %q", options.Mode)
 	}

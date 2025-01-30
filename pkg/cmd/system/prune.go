@@ -33,14 +33,14 @@ import (
 
 // Prune will remove all unused containers, networks,
 // images (dangling only or both dangling and unreferenced), and optionally, volumes.
-func Prune(ctx context.Context, client *containerd.Client, opts options.SystemPrune) error {
+func Prune(ctx context.Context, client *containerd.Client, opts *options.SystemPrune) error {
 	if err := container.Prune(ctx, client, types.ContainerPruneOptions{
 		GOptions: opts.GOptions,
 		Stdout:   opts.Stdout,
 	}); err != nil {
 		return err
 	}
-	if err := network.Prune(ctx, client, options.NetworkPrune{
+	if err := network.Prune(ctx, client, &options.NetworkPrune{
 		GOptions:             opts.GOptions,
 		NetworkDriversToKeep: opts.NetworkDriversToKeep,
 		Stdout:               opts.Stdout,
@@ -48,7 +48,7 @@ func Prune(ctx context.Context, client *containerd.Client, opts options.SystemPr
 		return err
 	}
 	if opts.Volumes {
-		if err := volume.Prune(ctx, client, options.VolumePrune{
+		if err := volume.Prune(ctx, client, &options.VolumePrune{
 			GOptions: opts.GOptions,
 			All:      false,
 			Force:    true,
@@ -67,7 +67,7 @@ func Prune(ctx context.Context, client *containerd.Client, opts options.SystemPr
 	}
 
 	if opts.BuildKitHost != "" {
-		prunedObjects, err := builder.Prune(ctx, options.BuilderPrune{
+		prunedObjects, err := builder.Prune(ctx, &options.BuilderPrune{
 			Stderr:       opts.Stderr,
 			GOptions:     opts.GOptions,
 			All:          opts.All,

@@ -28,7 +28,7 @@ import (
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/leptonic/services/image"
 	"github.com/containerd/nerdctl/v2/leptonic/services/namespace"
-	types "github.com/containerd/nerdctl/v2/pkg/api/options"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/volume"
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/native"
 	"github.com/containerd/nerdctl/v2/pkg/labels"
@@ -198,7 +198,7 @@ func Platforms(cmd *cobra.Command, args []string, toComplete string) ([]string, 
 	return candidates, cobra.ShellCompDirectiveNoFileComp
 }
 
-func getVolumes(cmd *cobra.Command, globalOptions types.Global) (map[string]native.Volume, error) {
+func getVolumes(cmd *cobra.Command, globalOptions *options.Global) (map[string]native.Volume, error) {
 	volumeSize, err := cmd.Flags().GetBool("size")
 	if err != nil {
 		// The `volume rm` does not have the flag `size`, so set it to false as the default value.

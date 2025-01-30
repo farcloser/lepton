@@ -29,7 +29,7 @@ import (
 	"github.com/containerd/containerd/v2/core/images"
 	"github.com/containerd/log"
 
-	types "github.com/containerd/nerdctl/v2/pkg/api/options"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/containerdutil"
 	"github.com/containerd/nerdctl/v2/pkg/errutil"
 	"github.com/containerd/nerdctl/v2/pkg/imgutil/dockerconfigresolver"
@@ -37,7 +37,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/platformutil"
 )
 
-func EnsureAllContent(ctx context.Context, client *containerd.Client, srcName string, options types.Global) error {
+func EnsureAllContent(ctx context.Context, client *containerd.Client, srcName string, options *options.Global) error {
 	// Get the image from the srcName
 	imageService := client.ImageService()
 	img, err := imageService.Get(ctx, srcName)
@@ -60,7 +60,7 @@ func EnsureAllContent(ctx context.Context, client *containerd.Client, srcName st
 	return nil
 }
 
-func ensureOne(ctx context.Context, client *containerd.Client, rawRef string, target specs.Descriptor, platform specs.Platform, options types.Global) error {
+func ensureOne(ctx context.Context, client *containerd.Client, rawRef string, target specs.Descriptor, platform specs.Platform, options *options.Global) error {
 	parsedReference, err := reference.Parse(rawRef)
 	if err != nil {
 		return err

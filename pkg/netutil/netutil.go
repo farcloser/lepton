@@ -314,7 +314,7 @@ type cniNetworkConfig struct {
 	Plugins    []CNIPlugin       `json:"plugins"`
 }
 
-func (e *CNIEnv) CreateNetwork(opts options.NetworkCreate) (*NetworkConfig, error) {
+func (e *CNIEnv) CreateNetwork(opts *options.NetworkCreate) (*NetworkConfig, error) {
 	var netConf *NetworkConfig
 
 	fn := func() error {
@@ -437,7 +437,7 @@ func (e *CNIEnv) createDefaultNetworkConfig(bridgeIP string) error {
 		bridgeGatewayIP = bIP.String()
 		bridgeCIDR = bCIDR.String()
 	}
-	opts := options.NetworkCreate{
+	opts := &options.NetworkCreate{
 		Name:       DefaultNetworkName,
 		Driver:     DefaultNetworkName,
 		Subnets:    []string{bridgeCIDR},

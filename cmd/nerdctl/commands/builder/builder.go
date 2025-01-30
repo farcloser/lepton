@@ -102,28 +102,28 @@ func builderPruneAction(cmd *cobra.Command, _ []string) error {
 	return nil
 }
 
-func processBuilderPruneOptions(cmd *cobra.Command) (options.BuilderPrune, error) {
+func processBuilderPruneOptions(cmd *cobra.Command) (*options.BuilderPrune, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return options.BuilderPrune{}, err
+		return nil, err
 	}
 
 	buildkitHost, err := GetBuildkitHost(cmd, globalOptions.Namespace)
 	if err != nil {
-		return options.BuilderPrune{}, err
+		return nil, err
 	}
 
 	all, err := cmd.Flags().GetBool("all")
 	if err != nil {
-		return options.BuilderPrune{}, err
+		return nil, err
 	}
 
 	force, err := cmd.Flags().GetBool("force")
 	if err != nil {
-		return options.BuilderPrune{}, err
+		return nil, err
 	}
 
-	return options.BuilderPrune{
+	return &options.BuilderPrune{
 		Stderr:       cmd.OutOrStderr(),
 		GOptions:     globalOptions,
 		BuildKitHost: buildkitHost,

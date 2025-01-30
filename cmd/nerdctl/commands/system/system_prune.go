@@ -47,20 +47,20 @@ func newSystemPruneCommand() *cobra.Command {
 	return systemPruneCommand
 }
 
-func processSystemPruneOptions(cmd *cobra.Command) (options.SystemPrune, error) {
+func processSystemPruneOptions(cmd *cobra.Command) (*options.SystemPrune, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return options.SystemPrune{}, err
+		return nil, err
 	}
 
 	all, err := cmd.Flags().GetBool("all")
 	if err != nil {
-		return options.SystemPrune{}, err
+		return nil, err
 	}
 
 	vFlag, err := cmd.Flags().GetBool("volumes")
 	if err != nil {
-		return options.SystemPrune{}, err
+		return nil, err
 	}
 
 	buildkitHost, err := builder.GetBuildkitHost(cmd, globalOptions.Namespace)
@@ -69,7 +69,7 @@ func processSystemPruneOptions(cmd *cobra.Command) (options.SystemPrune, error) 
 		buildkitHost = ""
 	}
 
-	return options.SystemPrune{
+	return &options.SystemPrune{
 		Stdout:               cmd.OutOrStdout(),
 		Stderr:               cmd.ErrOrStderr(),
 		GOptions:             globalOptions,
@@ -80,7 +80,7 @@ func processSystemPruneOptions(cmd *cobra.Command) (options.SystemPrune, error) 
 	}, nil
 }
 
-func grantSystemPrunePermission(cmd *cobra.Command, options options.SystemPrune) (bool, error) {
+func grantSystemPrunePermission(cmd *cobra.Command, options *options.SystemPrune) (bool, error) {
 	force, err := cmd.Flags().GetBool("force")
 	if err != nil {
 		return false, err

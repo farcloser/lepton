@@ -46,28 +46,28 @@ func newVolumeLsCommand() *cobra.Command {
 	return volumeLsCommand
 }
 
-func processVolumeLsOptions(cmd *cobra.Command) (options.VolumeList, error) {
+func processVolumeLsOptions(cmd *cobra.Command) (*options.VolumeList, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return options.VolumeList{}, err
+		return nil, err
 	}
 	quiet, err := cmd.Flags().GetBool("quiet")
 	if err != nil {
-		return options.VolumeList{}, err
+		return nil, err
 	}
 	format, err := cmd.Flags().GetString("format")
 	if err != nil {
-		return options.VolumeList{}, err
+		return nil, err
 	}
 	size, err := cmd.Flags().GetBool("size")
 	if err != nil {
-		return options.VolumeList{}, err
+		return nil, err
 	}
 	filters, err := cmd.Flags().GetStringSlice("filter")
 	if err != nil {
-		return options.VolumeList{}, err
+		return nil, err
 	}
-	return options.VolumeList{
+	return &options.VolumeList{
 		GOptions: globalOptions,
 		Quiet:    quiet,
 		Format:   format,

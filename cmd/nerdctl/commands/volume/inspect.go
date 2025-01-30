@@ -44,20 +44,20 @@ func newVolumeInspectCommand() *cobra.Command {
 	return volumeInspectCommand
 }
 
-func processVolumeInspectOptions(cmd *cobra.Command) (options.VolumeInspect, error) {
+func processVolumeInspectOptions(cmd *cobra.Command) (*options.VolumeInspect, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return options.VolumeInspect{}, err
+		return nil, err
 	}
 	volumeSize, err := cmd.Flags().GetBool("size")
 	if err != nil {
-		return options.VolumeInspect{}, err
+		return nil, err
 	}
 	format, err := cmd.Flags().GetString("format")
 	if err != nil {
-		return options.VolumeInspect{}, err
+		return nil, err
 	}
-	return options.VolumeInspect{
+	return &options.VolumeInspect{
 		GOptions: globalOptions,
 		Format:   format,
 		Size:     volumeSize,

@@ -60,7 +60,7 @@ func networkInspectAction(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	return network.Inspect(cmd.Context(), options.NetworkInspect{
+	return network.Inspect(cmd.Context(), &options.NetworkInspect{
 		GOptions: globalOptions,
 		Mode:     mode,
 		Format:   format,

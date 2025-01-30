@@ -27,7 +27,7 @@ import (
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/leptonic/services/namespace"
 	"github.com/containerd/nerdctl/v2/leptonic/utils"
-	types "github.com/containerd/nerdctl/v2/pkg/api/options"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 )
 
 type namespaceUpdateOptions namespaceCreateOptions
@@ -47,7 +47,7 @@ func newNamespacelabelUpdateCommand() *cobra.Command {
 	return namespaceLableCommand
 }
 
-func processNamespaceUpdateCommandOption(cmd *cobra.Command) (*types.Global, *namespaceUpdateOptions, error) {
+func processNamespaceUpdateCommandOption(cmd *cobra.Command) (*options.Global, *namespaceUpdateOptions, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return nil, nil, err
@@ -55,10 +55,10 @@ func processNamespaceUpdateCommandOption(cmd *cobra.Command) (*types.Global, *na
 
 	labels, err := cmd.Flags().GetStringArray("label")
 	if err != nil {
-		return &globalOptions, nil, err
+		return globalOptions, nil, err
 	}
 
-	return &globalOptions, &namespaceUpdateOptions{Labels: utils.StringSlice2KVMap(labels, "=")}, nil
+	return globalOptions, &namespaceUpdateOptions{Labels: utils.StringSlice2KVMap(labels, "=")}, nil
 }
 
 func labelUpdateAction(cmd *cobra.Command, args []string) error {

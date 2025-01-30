@@ -32,7 +32,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/mountutil"
 )
 
-func Remove(ctx context.Context, client *containerd.Client, volumes []string, options options.VolumeRemove) error {
+func Remove(ctx context.Context, client *containerd.Client, volumes []string, options *options.VolumeRemove) error {
 	volStore, err := Store(options.GOptions.Namespace, options.GOptions.DataRoot, options.GOptions.Address)
 	if err != nil {
 		return err

@@ -145,7 +145,7 @@ func generateEventFilters(filters []string) (map[string][]EventFilter, error) {
 }
 
 // Events is from https://github.com/containerd/containerd/blob/v1.4.3/cmd/ctr/commands/events/events.go
-func Events(ctx context.Context, client *containerd.Client, options options.SystemEvents) error {
+func Events(ctx context.Context, client *containerd.Client, options *options.SystemEvents) error {
 	eventsClient := client.EventService()
 	eventsCh, errCh := eventsClient.Subscribe(ctx)
 	var tmpl *template.Template

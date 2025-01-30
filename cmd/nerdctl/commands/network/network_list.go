@@ -61,7 +61,7 @@ func networkLsAction(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	return network.List(cmd.Context(), options.NetworkList{
+	return network.List(cmd.Context(), &options.NetworkList{
 		GOptions: globalOptions,
 		Quiet:    quiet,
 		Format:   format,

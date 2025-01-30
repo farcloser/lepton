@@ -28,7 +28,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/labels"
 )
 
-func Prune(ctx context.Context, client *containerd.Client, options options.VolumePrune) error {
+func Prune(ctx context.Context, client *containerd.Client, options *options.VolumePrune) error {
 	// Get the volume store and lock it until we are done.
 	// This will prevent racing new containers from being created or removed until we are done with the cleanup of volumes
 	volStore, err := Store(options.GOptions.Namespace, options.GOptions.DataRoot, options.GOptions.Address)

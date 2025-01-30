@@ -45,50 +45,50 @@ func NewLoginCommand() *cobra.Command {
 	return loginCommand
 }
 
-func processLoginOptions(cmd *cobra.Command) (options.LoginCommand, error) {
+func processLoginOptions(cmd *cobra.Command) (*options.LoginCommand, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return options.LoginCommand{}, err
+		return nil, err
 	}
 
 	username, err := cmd.Flags().GetString("username")
 	if err != nil {
-		return options.LoginCommand{}, err
+		return nil, err
 	}
 	password, err := cmd.Flags().GetString("password")
 	if err != nil {
-		return options.LoginCommand{}, err
+		return nil, err
 	}
 	passwordStdin, err := cmd.Flags().GetBool("password-stdin")
 	if err != nil {
-		return options.LoginCommand{}, err
+		return nil, err
 	}
 
 	if strings.Contains(username, ":") {
-		return options.LoginCommand{}, errors.New("username cannot contain colons")
+		return nil, errors.New("username cannot contain colons")
 	}
 
 	if password != "" {
 		log.L.Warn("WARNING! Using --password via the CLI is insecure. Use --password-stdin.")
 		if passwordStdin {
-			return options.LoginCommand{}, errors.New("--password and --password-stdin are mutually exclusive")
+			return nil, errors.New("--password and --password-stdin are mutually exclusive")
 		}
 	}
 
 	if passwordStdin {
 		if username == "" {
-			return options.LoginCommand{}, errors.New("must provide --username with --password-stdin")
+			return nil, errors.New("must provide --username with --password-stdin")
 		}
 
 		contents, err := io.ReadAll(cmd.InOrStdin())
 		if err != nil {
-			return options.LoginCommand{}, err
+			return nil, err
 		}
 
 		password = strings.TrimSuffix(string(contents), "\n")
 		password = strings.TrimSuffix(password, "\r")
 	}
-	return options.LoginCommand{
+	return &options.LoginCommand{
 		GOptions: globalOptions,
 		Username: username,
 		Password: password,

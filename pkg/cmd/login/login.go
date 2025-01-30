@@ -41,7 +41,7 @@ Configure a credential helper to remove this warning. See
 https://docs.docker.com/engine/reference/commandline/login/#credentials-store
 `
 
-func Login(ctx context.Context, options options.LoginCommand, stdout io.Writer) error {
+func Login(ctx context.Context, options *options.LoginCommand, stdout io.Writer) error {
 	registryURL, err := dockerconfigresolver.Parse(options.ServerAddress)
 	if err != nil {
 		return err
@@ -108,7 +108,7 @@ func Login(ctx context.Context, options options.LoginCommand, stdout io.Writer) 
 	return err
 }
 
-func loginClientSide(ctx context.Context, globalOptions options.Global, registryURL *dockerconfigresolver.RegistryURL, credentials *dockerconfigresolver.Credentials) (string, error) {
+func loginClientSide(ctx context.Context, globalOptions *options.Global, registryURL *dockerconfigresolver.RegistryURL, credentials *dockerconfigresolver.Credentials) (string, error) {
 	host := registryURL.Host
 	var dOpts []dockerconfigresolver.Opt
 	if globalOptions.InsecureRegistry {

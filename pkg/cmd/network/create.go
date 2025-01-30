@@ -28,7 +28,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/netutil"
 )
 
-func Create(options options.NetworkCreate, stdout io.Writer) error {
+func Create(options *options.NetworkCreate, stdout io.Writer) error {
 	if err := identifiers.Validate(options.Name); err != nil {
 		return fmt.Errorf("invalid network name: %w", err)
 	}

@@ -28,7 +28,7 @@ import (
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/leptonic/services/namespace"
-	types "github.com/containerd/nerdctl/v2/pkg/api/options"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 	"github.com/containerd/nerdctl/v2/pkg/mountutil/volumestore"
@@ -55,7 +55,7 @@ func newNamespaceLsCommand() *cobra.Command {
 	return namespaceLsCommand
 }
 
-func processNamespaceListCommandOption(cmd *cobra.Command) (*types.Global, *namespaceListOptions, error) {
+func processNamespaceListCommandOption(cmd *cobra.Command) (*options.Global, *namespaceListOptions, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return nil, nil, err
@@ -63,15 +63,15 @@ func processNamespaceListCommandOption(cmd *cobra.Command) (*types.Global, *name
 
 	quiet, err := cmd.Flags().GetBool("quiet")
 	if err != nil {
-		return &globalOptions, nil, err
+		return globalOptions, nil, err
 	}
 
 	format, err := cmd.Flags().GetString("format")
 	if err != nil {
-		return &globalOptions, nil, err
+		return globalOptions, nil, err
 	}
 
-	return &globalOptions, &namespaceListOptions{
+	return globalOptions, &namespaceListOptions{
 		Quiet:  quiet,
 		Format: format,
 	}, nil

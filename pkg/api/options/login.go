@@ -18,7 +18,7 @@ package options
 
 type LoginCommand struct {
 	// GOptions is the global options.
-	GOptions Global
+	GOptions *Global
 	// ServerAddress is the server address to log in to.
 	ServerAddress string
 	// Username is the username to log in as.

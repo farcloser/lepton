@@ -26,7 +26,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 )
 
-func Inspect(ctx context.Context, volumes []string, options options.VolumeInspect) error {
+func Inspect(ctx context.Context, volumes []string, options *options.VolumeInspect) error {
 	volStore, err := Store(options.GOptions.Namespace, options.GOptions.DataRoot, options.GOptions.Address)
 	if err != nil {
 		return err

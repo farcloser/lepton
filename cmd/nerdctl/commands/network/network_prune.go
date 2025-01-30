@@ -65,7 +65,7 @@ func networkPruneAction(cmd *cobra.Command, _ []string) error {
 			return nil
 		}
 	}
-	options := options.NetworkPrune{
+	options := &options.NetworkPrune{
 		GOptions:             globalOptions,
 		NetworkDriversToKeep: NetworkDriversToKeep,
 		Stdout:               cmd.OutOrStdout(),

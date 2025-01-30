@@ -42,16 +42,16 @@ func newVolumeRmCommand() *cobra.Command {
 	return volumeRmCommand
 }
 
-func processVolumeRmOptions(cmd *cobra.Command) (options.VolumeRemove, error) {
+func processVolumeRmOptions(cmd *cobra.Command) (*options.VolumeRemove, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return options.VolumeRemove{}, err
+		return nil, err
 	}
 	force, err := cmd.Flags().GetBool("force")
 	if err != nil {
-		return options.VolumeRemove{}, err
+		return nil, err
 	}
-	return options.VolumeRemove{
+	return &options.VolumeRemove{
 		GOptions: globalOptions,
 		Force:    force,
 		Stdout:   cmd.OutOrStdout(),

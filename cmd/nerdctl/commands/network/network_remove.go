@@ -48,7 +48,7 @@ func networkRmAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	options := options.NetworkRemove{
+	options := &options.NetworkRemove{
 		GOptions: globalOptions,
 		Networks: args,
 		Stdout:   cmd.OutOrStdout(),

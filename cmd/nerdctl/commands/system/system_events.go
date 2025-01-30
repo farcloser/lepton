@@ -46,20 +46,20 @@ func NewEventsCommand() *cobra.Command {
 	return eventsCommand
 }
 
-func processSystemEventsOptions(cmd *cobra.Command) (options.SystemEvents, error) {
+func processSystemEventsOptions(cmd *cobra.Command) (*options.SystemEvents, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return options.SystemEvents{}, err
+		return nil, err
 	}
 	format, err := cmd.Flags().GetString("format")
 	if err != nil {
-		return options.SystemEvents{}, err
+		return nil, err
 	}
 	filters, err := cmd.Flags().GetStringSlice("filter")
 	if err != nil {
-		return options.SystemEvents{}, err
+		return nil, err
 	}
-	return options.SystemEvents{
+	return &options.SystemEvents{
 		Stdout:   cmd.OutOrStdout(),
 		GOptions: globalOptions,
 		Format:   format,

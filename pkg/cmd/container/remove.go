@@ -99,7 +99,7 @@ func Remove(ctx context.Context, client *containerd.Client, containers []string,
 // - delete the container
 // - then and ONLY then, on a successful container remove, clean things-up on our side (volume store, etcetera)
 // If you do need to add more cleanup, please do so at the bottom of the defer function
-func RemoveContainer(ctx context.Context, c containerd.Container, globalOptions options.Global, force bool, removeAnonVolumes bool, client *containerd.Client) (retErr error) {
+func RemoveContainer(ctx context.Context, c containerd.Container, globalOptions *options.Global, force bool, removeAnonVolumes bool, client *containerd.Client) (retErr error) {
 	// Get labels
 	containerLabels, err := c.Labels(ctx)
 	if err != nil {

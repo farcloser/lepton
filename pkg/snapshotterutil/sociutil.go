@@ -30,7 +30,7 @@ import (
 )
 
 // CreateSoci creates a SOCI index(`rawRef`)
-func CreateSoci(rawRef string, gOpts options.Global, allPlatform bool, platforms []string, sOpts types.SociOptions) error {
+func CreateSoci(rawRef string, gOpts *options.Global, allPlatform bool, platforms []string, sOpts *types.SociOptions) error {
 	sociExecutable, err := exec.LookPath("soci")
 	if err != nil {
 		log.L.WithError(err).Error("soci executable not found in path $PATH")
@@ -86,7 +86,7 @@ func CreateSoci(rawRef string, gOpts options.Global, allPlatform bool, platforms
 
 // PushSoci pushes a SOCI index(`rawRef`)
 // `hostsDirs` are used to resolve image `rawRef`
-func PushSoci(rawRef string, gOpts options.Global, allPlatform bool, platforms []string) error {
+func PushSoci(rawRef string, gOpts *options.Global, allPlatform bool, platforms []string) error {
 	log.L.Debugf("pushing SOCI index: %s", rawRef)
 
 	sociExecutable, err := exec.LookPath("soci")

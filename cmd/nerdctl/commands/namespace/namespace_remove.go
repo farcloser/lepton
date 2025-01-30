@@ -27,7 +27,7 @@ import (
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/leptonic/services/namespace"
-	types "github.com/containerd/nerdctl/v2/pkg/api/options"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 )
 
 type namespaceRemoveOptions struct {
@@ -52,7 +52,7 @@ func newNamespaceRmCommand() *cobra.Command {
 	return namespaceRmCommand
 }
 
-func processNamespaceRemoveOptions(cmd *cobra.Command) (*types.Global, *namespaceRemoveOptions, error) {
+func processNamespaceRemoveOptions(cmd *cobra.Command) (*options.Global, *namespaceRemoveOptions, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return nil, nil, err
@@ -60,10 +60,10 @@ func processNamespaceRemoveOptions(cmd *cobra.Command) (*types.Global, *namespac
 
 	cgroup, err := cmd.Flags().GetBool("cgroup")
 	if err != nil {
-		return &globalOptions, nil, err
+		return globalOptions, nil, err
 	}
 
-	return &globalOptions, &namespaceRemoveOptions{
+	return globalOptions, &namespaceRemoveOptions{
 		CGroup: cgroup,
 	}, nil
 }

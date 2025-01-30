@@ -30,7 +30,7 @@ import (
 )
 
 // Prune will prune all build cache.
-func Prune(ctx context.Context, options options.BuilderPrune) ([]buildkitutil.UsageInfo, error) {
+func Prune(ctx context.Context, options *options.BuilderPrune) ([]buildkitutil.UsageInfo, error) {
 	buildctlBinary, err := buildkitutil.BuildctlBinary()
 	if err != nil {
 		return nil, err

@@ -40,22 +40,22 @@ func newVolumeCreateCommand() *cobra.Command {
 	return volumeCreateCommand
 }
 
-func processVolumeCreateOptions(cmd *cobra.Command) (options.VolumeCreate, error) {
+func processVolumeCreateOptions(cmd *cobra.Command) (*options.VolumeCreate, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return options.VolumeCreate{}, err
+		return nil, err
 	}
 	labels, err := cmd.Flags().GetStringArray("label")
 	if err != nil {
-		return options.VolumeCreate{}, err
+		return nil, err
 	}
 	for _, label := range labels {
 		if label == "" {
-			return options.VolumeCreate{}, fmt.Errorf("labels cannot be empty (%w)", errs.ErrInvalidArgument)
+			return &options.VolumeCreate{}, fmt.Errorf("labels cannot be empty (%w)", errs.ErrInvalidArgument)
 		}
 	}
 
-	return options.VolumeCreate{
+	return &options.VolumeCreate{
 		GOptions: globalOptions,
 		Labels:   labels,
 		Stdout:   cmd.OutOrStdout(),

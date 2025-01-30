@@ -95,7 +95,7 @@ func networkCreateAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	return network.Create(options.NetworkCreate{
+	return network.Create(&options.NetworkCreate{
 		GOptions:    globalOptions,
 		Name:        name,
 		Driver:      driver,

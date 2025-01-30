@@ -26,7 +26,7 @@ import (
 type ImageLoadOptions struct {
 	Stdout   io.Writer
 	Stdin    io.Reader
-	GOptions options.Global
+	GOptions *options.Global
 	// Input read from tar archive file, instead of STDIN
 	Input string
 	// Platform import content for a specific platform

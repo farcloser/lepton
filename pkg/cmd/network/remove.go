@@ -28,7 +28,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/netutil"
 )
 
-func Remove(ctx context.Context, client *containerd.Client, options options.NetworkRemove) error {
+func Remove(ctx context.Context, client *containerd.Client, options *options.NetworkRemove) error {
 	cniEnv, err := netutil.NewCNIEnv(options.GOptions.CNIPath, options.GOptions.CNINetConfPath, netutil.WithNamespace(options.GOptions.Namespace))
 	if err != nil {
 		return err

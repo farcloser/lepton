@@ -26,7 +26,7 @@ type BuilderBuild struct {
 	Stdout io.Writer
 	Stderr io.Writer
 	// GOptions is the global options
-	GOptions Global
+	GOptions *Global
 	// BuildKitHost is the buildkit host
 	BuildKitHost string
 	// Tag is the tag of the image
@@ -81,7 +81,7 @@ type BuilderBuild struct {
 type BuilderPrune struct {
 	Stderr io.Writer
 	// GOptions is the global options
-	GOptions Global
+	GOptions *Global
 	// BuildKitHost is the buildkit host
 	BuildKitHost string
 	// All will remove all unused images and all build cache, not just dangling ones

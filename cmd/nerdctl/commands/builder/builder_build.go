@@ -84,132 +84,132 @@ If Dockerfile is not present and -f is not specified, it will look for Container
 	return buildCommand
 }
 
-func processBuildCommandFlag(cmd *cobra.Command, args []string) (options.BuilderBuild, error) {
+func processBuildCommandFlag(cmd *cobra.Command, args []string) (*options.BuilderBuild, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return options.BuilderBuild{}, err
+		return nil, err
 	}
 	buildKitHost, err := GetBuildkitHost(cmd, globalOptions.Namespace)
 	if err != nil {
-		return options.BuilderBuild{}, err
+		return nil, err
 	}
 	extraHosts, err := cmd.Flags().GetStringArray("add-host")
 	if err != nil {
-		return options.BuilderBuild{}, err
+		return nil, err
 	}
 	platform, err := cmd.Flags().GetStringSlice("platform")
 	if err != nil {
-		return options.BuilderBuild{}, err
+		return nil, err
 	}
 	platform = strutil.DedupeStrSlice(platform)
 	if len(args) < 1 {
-		return options.BuilderBuild{}, errors.New("context needs to be specified")
+		return nil, errors.New("context needs to be specified")
 	}
 	buildContext := args[0]
 	if buildContext == "-" || strings.Contains(buildContext, "://") {
-		return options.BuilderBuild{}, fmt.Errorf("unsupported build context: %q", buildContext)
+		return &options.BuilderBuild{}, fmt.Errorf("unsupported build context: %q", buildContext)
 	}
 	output, err := cmd.Flags().GetString("output")
 	if err != nil {
-		return options.BuilderBuild{}, err
+		return nil, err
 	}
 	tagValue, err := cmd.Flags().GetStringArray("tag")
 	if err != nil {
-		return options.BuilderBuild{}, err
+		return nil, err
 	}
 	progress, err := cmd.Flags().GetString("progress")
 	if err != nil {
-		return options.BuilderBuild{}, err
+		return nil, err
 	}
 	filename, err := cmd.Flags().GetString("file")
 	if err != nil {
-		return options.BuilderBuild{}, err
+		return nil, err
 	}
 	target, err := cmd.Flags().GetString("target")
 	if err != nil {
-		return options.BuilderBuild{}, err
+		return nil, err
 	}
 	buildArgs, err := cmd.Flags().GetStringArray("build-arg")
 	if err != nil {
-		return options.BuilderBuild{}, err
+		return nil, err
 	}
 	label, err := cmd.Flags().GetStringArray("label")
 	if err != nil {
-		return options.BuilderBuild{}, err
+		return nil, err
 	}
 	noCache, err := cmd.Flags().GetBool("no-cache")
 	if err != nil {
-		return options.BuilderBuild{}, err
+		return nil, err
 	}
 	var pull *bool
 	if cmd.Flags().Changed("pull") {
 		pullFlag, err := cmd.Flags().GetBool("pull")
 		if err != nil {
-			return options.BuilderBuild{}, err
+			return nil, err
 		}
 		pull = &pullFlag
 	}
 	secret, err := cmd.Flags().GetStringArray("secret")
 	if err != nil {
-		return options.BuilderBuild{}, err
+		return nil, err
 	}
 	allow, err := cmd.Flags().GetStringArray("allow")
 	if err != nil {
-		return options.BuilderBuild{}, err
+		return nil, err
 	}
 	ssh, err := cmd.Flags().GetStringArray("ssh")
 	if err != nil {
-		return options.BuilderBuild{}, err
+		return nil, err
 	}
 	cacheFrom, err := cmd.Flags().GetStringArray("cache-from")
 	if err != nil {
-		return options.BuilderBuild{}, err
+		return nil, err
 	}
 	cacheTo, err := cmd.Flags().GetStringArray("cache-to")
 	if err != nil {
-		return options.BuilderBuild{}, err
+		return nil, err
 	}
 	rm, err := cmd.Flags().GetBool("rm")
 	if err != nil {
-		return options.BuilderBuild{}, err
+		return nil, err
 	}
 	iidfile, err := cmd.Flags().GetString("iidfile")
 	if err != nil {
-		return options.BuilderBuild{}, err
+		return nil, err
 	}
 	quiet, err := cmd.Flags().GetBool("quiet")
 	if err != nil {
-		return options.BuilderBuild{}, err
+		return nil, err
 	}
 	network, err := cmd.Flags().GetString("network")
 	if err != nil {
-		return options.BuilderBuild{}, err
+		return nil, err
 	}
 
 	attest, err := cmd.Flags().GetStringArray("attest")
 	if err != nil {
-		return options.BuilderBuild{}, err
+		return nil, err
 	}
 	sbom, err := cmd.Flags().GetString("sbom")
 	if err != nil {
-		return options.BuilderBuild{}, err
+		return nil, err
 	}
 	if sbom != "" {
 		attest = append(attest, canonicalizeAttest("sbom", sbom))
 	}
 	provenance, err := cmd.Flags().GetString("provenance")
 	if err != nil {
-		return options.BuilderBuild{}, err
+		return nil, err
 	}
 	if provenance != "" {
 		attest = append(attest, canonicalizeAttest("provenance", provenance))
 	}
 	extendedBuildCtx, err := cmd.Flags().GetStringArray("build-context")
 	if err != nil {
-		return options.BuilderBuild{}, err
+		return nil, err
 	}
 
-	return options.BuilderBuild{
+	return &options.BuilderBuild{
 		GOptions:             globalOptions,
 		BuildKitHost:         buildKitHost,
 		BuildContext:         buildContext,

@@ -38,7 +38,7 @@ type networkPrintable struct {
 	file string `json:"-"`
 }
 
-func List(ctx context.Context, options options.NetworkList) error {
+func List(ctx context.Context, options *options.NetworkList) error {
 	globalOptions := options.GOptions
 	quiet := options.Quiet
 	format := options.Format
