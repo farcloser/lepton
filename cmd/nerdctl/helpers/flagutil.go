@@ -22,6 +22,7 @@ import (
 	"github.com/spf13/cobra"
 	"go.farcloser.world/containers/security/cgroups"
 
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 )
 
@@ -47,68 +48,68 @@ func ProcessImageVerifyOptions(cmd *cobra.Command) (opt types.ImageVerifyOptions
 	return
 }
 
-func ProcessRootCmdFlags(cmd *cobra.Command) (types.GlobalCommandOptions, error) {
+func ProcessRootCmdFlags(cmd *cobra.Command) (options.Global, error) {
 	debug, err := cmd.Flags().GetBool("debug")
 	if err != nil {
-		return types.GlobalCommandOptions{}, err
+		return options.Global{}, err
 	}
 	debugFull, err := cmd.Flags().GetBool("debug-full")
 	if err != nil {
-		return types.GlobalCommandOptions{}, err
+		return options.Global{}, err
 	}
 	address, err := cmd.Flags().GetString("address")
 	if err != nil {
-		return types.GlobalCommandOptions{}, err
+		return options.Global{}, err
 	}
 	namespace, err := cmd.Flags().GetString("namespace")
 	if err != nil {
-		return types.GlobalCommandOptions{}, err
+		return options.Global{}, err
 	}
 	snapshotter, err := cmd.Flags().GetString("snapshotter")
 	if err != nil {
-		return types.GlobalCommandOptions{}, err
+		return options.Global{}, err
 	}
 	cniPath, err := cmd.Flags().GetString("cni-path")
 	if err != nil {
-		return types.GlobalCommandOptions{}, err
+		return options.Global{}, err
 	}
 	cniConfigPath, err := cmd.Flags().GetString("cni-netconfpath")
 	if err != nil {
-		return types.GlobalCommandOptions{}, err
+		return options.Global{}, err
 	}
 	dataRoot, err := cmd.Flags().GetString("data-root")
 	if err != nil {
-		return types.GlobalCommandOptions{}, err
+		return options.Global{}, err
 	}
 	cgroupManager, err := cmd.Flags().GetString("cgroup-manager")
 	if err != nil {
-		return types.GlobalCommandOptions{}, err
+		return options.Global{}, err
 	}
 	insecureRegistry, err := cmd.Flags().GetBool("insecure-registry")
 	if err != nil {
-		return types.GlobalCommandOptions{}, err
+		return options.Global{}, err
 	}
 	hostsDir, err := cmd.Flags().GetStringSlice("hosts-dir")
 	if err != nil {
-		return types.GlobalCommandOptions{}, err
+		return options.Global{}, err
 	}
 	experimental, err := cmd.Flags().GetBool("experimental")
 	if err != nil {
-		return types.GlobalCommandOptions{}, err
+		return options.Global{}, err
 	}
 	hostGatewayIP, err := cmd.Flags().GetString("host-gateway-ip")
 	if err != nil {
-		return types.GlobalCommandOptions{}, err
+		return options.Global{}, err
 	}
 	bridgeIP, err := cmd.Flags().GetString("bridge-ip")
 	if err != nil {
-		return types.GlobalCommandOptions{}, err
+		return options.Global{}, err
 	}
 	kubeHideDupe, err := cmd.Flags().GetBool("kube-hide-dupe")
 	if err != nil {
-		return types.GlobalCommandOptions{}, err
+		return options.Global{}, err
 	}
-	return types.GlobalCommandOptions{
+	return options.Global{
 		Debug:            debug,
 		DebugFull:        debugFull,
 		Address:          address,

@@ -36,7 +36,7 @@ import (
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	types "github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	nerdctlContainer "github.com/containerd/nerdctl/v2/pkg/cmd/container"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
@@ -119,7 +119,7 @@ func updateAction(cmd *cobra.Command, args []string) error {
 	return walker.WalkAll(ctx, args, true)
 }
 
-func getUpdateOption(cmd *cobra.Command, globalOptions types.GlobalCommandOptions) (updateResourceOptions, error) {
+func getUpdateOption(cmd *cobra.Command, globalOptions types.Global) (updateResourceOptions, error) {
 	var options updateResourceOptions
 	cpus, err := cmd.Flags().GetFloat64("cpus")
 	if err != nil {

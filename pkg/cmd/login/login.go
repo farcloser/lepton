@@ -31,6 +31,7 @@ import (
 	"github.com/containerd/errdefs"
 	"github.com/containerd/log"
 
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/errutil"
 	"github.com/containerd/nerdctl/v2/pkg/imgutil/dockerconfigresolver"
@@ -108,7 +109,7 @@ func Login(ctx context.Context, options types.LoginCommandOptions, stdout io.Wri
 	return err
 }
 
-func loginClientSide(ctx context.Context, globalOptions types.GlobalCommandOptions, registryURL *dockerconfigresolver.RegistryURL, credentials *dockerconfigresolver.Credentials) (string, error) {
+func loginClientSide(ctx context.Context, globalOptions options.Global, registryURL *dockerconfigresolver.RegistryURL, credentials *dockerconfigresolver.Credentials) (string, error) {
 	host := registryURL.Host
 	var dOpts []dockerconfigresolver.Opt
 	if globalOptions.InsecureRegistry {

@@ -28,7 +28,7 @@ import (
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/leptonic/services/namespace"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	types "github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 	"github.com/containerd/nerdctl/v2/pkg/mountutil/volumestore"
@@ -55,7 +55,7 @@ func newNamespaceLsCommand() *cobra.Command {
 	return namespaceLsCommand
 }
 
-func processNamespaceListCommandOption(cmd *cobra.Command) (*types.GlobalCommandOptions, *namespaceListOptions, error) {
+func processNamespaceListCommandOption(cmd *cobra.Command) (*types.Global, *namespaceListOptions, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return nil, nil, err

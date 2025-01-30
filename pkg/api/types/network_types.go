@@ -18,12 +18,14 @@ package types
 
 import (
 	"io"
+
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 )
 
 // NetworkCreateOptions specifies options for `network create`.
 type NetworkCreateOptions struct {
 	// GOptions is the global options
-	GOptions GlobalCommandOptions
+	GOptions options.Global
 
 	Name        string
 	Driver      string
@@ -41,7 +43,7 @@ type NetworkCreateOptions struct {
 type NetworkInspectOptions struct {
 	Stdout io.Writer
 	// GOptions is the global options
-	GOptions GlobalCommandOptions
+	GOptions options.Global
 	// Inspect mode, "dockercompat" for Docker-compatible output, "native" for containerd-native output
 	Mode string
 	// Format the output using the given Go template, e.g, '{{json .}}'
@@ -54,7 +56,7 @@ type NetworkInspectOptions struct {
 type NetworkListOptions struct {
 	Stdout io.Writer
 	// GOptions is the global options
-	GOptions GlobalCommandOptions
+	GOptions options.Global
 	// Quiet only show numeric IDs
 	Quiet bool
 	// Format the output using the given Go template, e.g, '{{json .}}', 'wide'
@@ -67,7 +69,7 @@ type NetworkListOptions struct {
 type NetworkPruneOptions struct {
 	Stdout io.Writer
 	// GOptions is the global options
-	GOptions GlobalCommandOptions
+	GOptions options.Global
 	// Network drivers to keep while pruning
 	NetworkDriversToKeep []string
 }
@@ -76,7 +78,7 @@ type NetworkPruneOptions struct {
 type NetworkRemoveOptions struct {
 	Stdout io.Writer
 	// GOptions is the global options
-	GOptions GlobalCommandOptions
+	GOptions options.Global
 	// Networks are the networks to be removed
 	Networks []string
 }

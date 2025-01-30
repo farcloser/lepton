@@ -32,7 +32,7 @@ import (
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/leptonic/services/namespace"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	types "github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/native"
@@ -63,7 +63,7 @@ func newNamespaceInspectCommand() *cobra.Command {
 	return namespaceInspectCommand
 }
 
-func processNamespaceInspectOptions(cmd *cobra.Command) (*types.GlobalCommandOptions, *namespaceInspectOptions, error) {
+func processNamespaceInspectOptions(cmd *cobra.Command) (*types.Global, *namespaceInspectOptions, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return &globalOptions, nil, err

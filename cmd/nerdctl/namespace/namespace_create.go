@@ -23,7 +23,7 @@ import (
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/leptonic/services/namespace"
 	"github.com/containerd/nerdctl/v2/leptonic/utils"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	types "github.com/containerd/nerdctl/v2/pkg/api/options"
 )
 
 type namespaceCreateOptions struct {
@@ -45,7 +45,7 @@ func newNamespaceCreateCommand() *cobra.Command {
 	return namespaceCreateCommand
 }
 
-func processNamespaceCreateCommandOption(cmd *cobra.Command) (*types.GlobalCommandOptions, *namespaceUpdateOptions, error) {
+func processNamespaceCreateCommandOption(cmd *cobra.Command) (*types.Global, *namespaceUpdateOptions, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return nil, nil, err
