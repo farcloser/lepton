@@ -32,7 +32,7 @@ func createCommand() *cobra.Command {
 		Use:           "create [flags] [VOLUME]",
 		Short:         "Create a volume",
 		Args:          cobra.MaximumNArgs(1),
-		RunE:          volumeCreateAction,
+		RunE:          createAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
@@ -40,7 +40,7 @@ func createCommand() *cobra.Command {
 	return volumeCreateCommand
 }
 
-func processVolumeCreateOptions(cmd *cobra.Command) (*options.VolumeCreate, error) {
+func createOptions(cmd *cobra.Command) (*options.VolumeCreate, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return nil, err
@@ -62,8 +62,8 @@ func processVolumeCreateOptions(cmd *cobra.Command) (*options.VolumeCreate, erro
 	}, nil
 }
 
-func volumeCreateAction(cmd *cobra.Command, args []string) error {
-	options, err := processVolumeCreateOptions(cmd)
+func createAction(cmd *cobra.Command, args []string) error {
+	options, err := createOptions(cmd)
 	if err != nil {
 		return err
 	}

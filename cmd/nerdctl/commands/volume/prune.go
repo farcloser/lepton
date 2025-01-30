@@ -33,7 +33,7 @@ func pruneCommand() *cobra.Command {
 		Use:           "prune [flags]",
 		Short:         "Remove all unused local volumes",
 		Args:          cobra.NoArgs,
-		RunE:          volumePruneAction,
+		RunE:          pruneAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
@@ -42,7 +42,7 @@ func pruneCommand() *cobra.Command {
 	return volumePruneCommand
 }
 
-func processVolumePruneOptions(cmd *cobra.Command) (*options.VolumePrune, error) {
+func pruneOptions(cmd *cobra.Command) (*options.VolumePrune, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return nil, err
@@ -67,8 +67,8 @@ func processVolumePruneOptions(cmd *cobra.Command) (*options.VolumePrune, error)
 	return options, nil
 }
 
-func volumePruneAction(cmd *cobra.Command, _ []string) error {
-	options, err := processVolumePruneOptions(cmd)
+func pruneAction(cmd *cobra.Command, _ []string) error {
+	options, err := pruneOptions(cmd)
 	if err != nil {
 		return err
 	}

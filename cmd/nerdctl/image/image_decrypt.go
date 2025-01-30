@@ -51,7 +51,7 @@ func newImageDecryptCommand() *cobra.Command {
 		Short:             "decrypt an image",
 		Long:              imageDecryptHelp,
 		Args:              cobra.MinimumNArgs(2),
-		RunE:              getImgcryptAction(false),
+		RunE:              imgcryptAction(false),
 		ValidArgsFunction: imgcryptShellComplete,
 		SilenceUsage:      true,
 		SilenceErrors:     true,

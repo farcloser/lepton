@@ -63,7 +63,7 @@ func inspectCommand() *cobra.Command {
 	return namespaceInspectCommand
 }
 
-func processNamespaceInspectOptions(cmd *cobra.Command) (*options.Global, *namespaceInspectOptions, error) {
+func inspectOptions(cmd *cobra.Command) (*options.Global, *namespaceInspectOptions, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return globalOptions, nil, err
@@ -88,7 +88,7 @@ type namespaceInspectOutput struct {
 }
 
 func inspectAction(cmd *cobra.Command, args []string) error {
-	globalOptions, options, err := processNamespaceInspectOptions(cmd)
+	globalOptions, options, err := inspectOptions(cmd)
 	if err != nil {
 		return err
 	}

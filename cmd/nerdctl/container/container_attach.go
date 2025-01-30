@@ -50,7 +50,7 @@ Caveats:
 		Args:              cobra.ExactArgs(1),
 		Short:             shortHelp,
 		Long:              longHelp,
-		RunE:              containerAttachAction,
+		RunE:              attachAction,
 		ValidArgsFunction: attachShellComplete,
 		SilenceUsage:      true,
 		SilenceErrors:     true,
@@ -59,7 +59,7 @@ Caveats:
 	return attachCommand
 }
 
-func processContainerAttachOptions(cmd *cobra.Command) (options.ContainerAttach, error) {
+func attachOptions(cmd *cobra.Command) (options.ContainerAttach, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return options.ContainerAttach{}, err
@@ -77,8 +77,8 @@ func processContainerAttachOptions(cmd *cobra.Command) (options.ContainerAttach,
 	}, nil
 }
 
-func containerAttachAction(cmd *cobra.Command, args []string) error {
-	options, err := processContainerAttachOptions(cmd)
+func attachAction(cmd *cobra.Command, args []string) error {
+	options, err := attachOptions(cmd)
 	if err != nil {
 		return err
 	}

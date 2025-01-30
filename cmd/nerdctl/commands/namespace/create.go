@@ -36,7 +36,7 @@ func createCommand() *cobra.Command {
 		Use:           "create NAMESPACE",
 		Short:         "Create a new namespace",
 		Args:          cobra.MinimumNArgs(1),
-		RunE:          namespaceCreateAction,
+		RunE:          createAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
@@ -57,7 +57,7 @@ func processNamespaceCreateCommandOption(cmd *cobra.Command) (*options.Global, *
 	return globalOptions, &namespaceUpdateOptions{Labels: utils.StringSlice2KVMap(labels, "=")}, nil
 }
 
-func namespaceCreateAction(cmd *cobra.Command, args []string) error {
+func createAction(cmd *cobra.Command, args []string) error {
 	globalOptions, options, err := processNamespaceCreateCommandOption(cmd)
 	if err != nil {
 		return err

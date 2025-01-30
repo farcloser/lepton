@@ -30,7 +30,7 @@ func listCommand() *cobra.Command {
 		Use:           "ls",
 		Aliases:       []string{"list"},
 		Short:         "List volumes",
-		RunE:          volumeLsAction,
+		RunE:          listAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
@@ -46,7 +46,7 @@ func listCommand() *cobra.Command {
 	return volumeLsCommand
 }
 
-func processVolumeLsOptions(cmd *cobra.Command) (*options.VolumeList, error) {
+func listOptions(cmd *cobra.Command) (*options.VolumeList, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return nil, err
@@ -77,8 +77,8 @@ func processVolumeLsOptions(cmd *cobra.Command) (*options.VolumeList, error) {
 	}, nil
 }
 
-func volumeLsAction(cmd *cobra.Command, args []string) error {
-	options, err := processVolumeLsOptions(cmd)
+func listAction(cmd *cobra.Command, args []string) error {
+	options, err := listOptions(cmd)
 	if err != nil {
 		return err
 	}

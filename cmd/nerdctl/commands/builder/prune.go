@@ -33,7 +33,7 @@ func pruneCommand() *cobra.Command {
 		Use:           "prune",
 		Args:          cobra.NoArgs,
 		Short:         shortHelp,
-		RunE:          builderPruneAction,
+		RunE:          pruneAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
@@ -45,8 +45,8 @@ func pruneCommand() *cobra.Command {
 	return buildPruneCommand
 }
 
-func builderPruneAction(cmd *cobra.Command, _ []string) error {
-	opts, err := processBuilderPruneOptions(cmd)
+func pruneAction(cmd *cobra.Command, _ []string) error {
+	opts, err := pruneOptions(cmd)
 	if err != nil {
 		return err
 	}
@@ -81,7 +81,7 @@ func builderPruneAction(cmd *cobra.Command, _ []string) error {
 	return err
 }
 
-func processBuilderPruneOptions(cmd *cobra.Command) (*options.BuilderPrune, error) {
+func pruneOptions(cmd *cobra.Command) (*options.BuilderPrune, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return nil, err

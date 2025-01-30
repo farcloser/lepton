@@ -33,7 +33,7 @@ func WaitCommand() *cobra.Command {
 		Use:               "wait [flags] CONTAINER [CONTAINER, ...]",
 		Args:              cobra.MinimumNArgs(1),
 		Short:             "Block until one or more containers stop, then print their exit codes.",
-		RunE:              containerWaitAction,
+		RunE:              waitAction,
 		ValidArgsFunction: waitShellComplete,
 		SilenceUsage:      true,
 		SilenceErrors:     true,
@@ -41,7 +41,7 @@ func WaitCommand() *cobra.Command {
 	return waitCommand
 }
 
-func processContainerWaitOptions(cmd *cobra.Command) (options.ContainerWait, error) {
+func waitOptions(cmd *cobra.Command) (options.ContainerWait, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return options.ContainerWait{}, err
@@ -52,8 +52,8 @@ func processContainerWaitOptions(cmd *cobra.Command) (options.ContainerWait, err
 	}, nil
 }
 
-func containerWaitAction(cmd *cobra.Command, args []string) error {
-	options, err := processContainerWaitOptions(cmd)
+func waitAction(cmd *cobra.Command, args []string) error {
+	options, err := waitOptions(cmd)
 	if err != nil {
 		return err
 	}

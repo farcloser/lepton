@@ -56,7 +56,7 @@ The following containers are supported:
 	return logsCommand
 }
 
-func processContainerLogsOptions(cmd *cobra.Command) (options.ContainerLogs, error) {
+func logsOptions(cmd *cobra.Command) (options.ContainerLogs, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return options.ContainerLogs{}, err
@@ -101,7 +101,7 @@ func processContainerLogsOptions(cmd *cobra.Command) (options.ContainerLogs, err
 }
 
 func logsAction(cmd *cobra.Command, args []string) error {
-	options, err := processContainerLogsOptions(cmd)
+	options, err := logsOptions(cmd)
 	if err != nil {
 		return err
 	}

@@ -30,12 +30,12 @@ func loadCommand() *cobra.Command {
 		Use:           "load",
 		Short:         fmt.Sprintf("Load the default AppArmor profile %q. Requires root.", defaults.AppArmorProfileName),
 		Args:          cobra.NoArgs,
-		RunE:          apparmorLoadAction,
+		RunE:          loadAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
 }
 
-func apparmorLoadAction(_ *cobra.Command, _ []string) error {
+func loadAction(_ *cobra.Command, _ []string) error {
 	return apparmor.Load()
 }

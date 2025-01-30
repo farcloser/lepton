@@ -41,7 +41,7 @@ func RestartCommand() *cobra.Command {
 	return restartCommand
 }
 
-func processContainerRestartOptions(cmd *cobra.Command) (options.ContainerRestart, error) {
+func restartOptions(cmd *cobra.Command) (options.ContainerRestart, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return options.ContainerRestart{}, err
@@ -66,7 +66,7 @@ func processContainerRestartOptions(cmd *cobra.Command) (options.ContainerRestar
 }
 
 func restartAction(cmd *cobra.Command, args []string) error {
-	options, err := processContainerRestartOptions(cmd)
+	options, err := restartOptions(cmd)
 	if err != nil {
 		return err
 	}

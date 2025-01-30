@@ -31,7 +31,7 @@ func listCommand() *cobra.Command {
 		Aliases:       []string{"ls"},
 		Short:         "List the loaded AppArmor profiles",
 		Args:          cobra.NoArgs,
-		RunE:          apparmorLsAction,
+		RunE:          listAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
@@ -46,7 +46,7 @@ func listCommand() *cobra.Command {
 	return cmd
 }
 
-func processApparmorListOptions(cmd *cobra.Command) (*apparmor.ListOptions, error) {
+func listOptions(cmd *cobra.Command) (*apparmor.ListOptions, error) {
 	quiet, err := cmd.Flags().GetBool("quiet")
 	if err != nil {
 		return nil, err
@@ -67,8 +67,8 @@ func processApparmorListOptions(cmd *cobra.Command) (*apparmor.ListOptions, erro
 	}, nil
 }
 
-func apparmorLsAction(cmd *cobra.Command, args []string) error {
-	options, err := processApparmorListOptions(cmd)
+func listAction(cmd *cobra.Command, args []string) error {
+	options, err := listOptions(cmd)
 	if err != nil {
 		return err
 	}

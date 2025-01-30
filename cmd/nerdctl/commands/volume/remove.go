@@ -33,7 +33,7 @@ func removeCommand() *cobra.Command {
 		Short:             "Remove one or more volumes",
 		Long:              "NOTE: You cannot remove a volume that is in use by a container.",
 		Args:              cobra.MinimumNArgs(1),
-		RunE:              volumeRmAction,
+		RunE:              removeAction,
 		ValidArgsFunction: volumeRmShellComplete,
 		SilenceUsage:      true,
 		SilenceErrors:     true,
@@ -42,7 +42,7 @@ func removeCommand() *cobra.Command {
 	return volumeRmCommand
 }
 
-func processVolumeRmOptions(cmd *cobra.Command) (*options.VolumeRemove, error) {
+func removeOptions(cmd *cobra.Command) (*options.VolumeRemove, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return nil, err
@@ -58,8 +58,8 @@ func processVolumeRmOptions(cmd *cobra.Command) (*options.VolumeRemove, error) {
 	}, nil
 }
 
-func volumeRmAction(cmd *cobra.Command, args []string) error {
-	options, err := processVolumeRmOptions(cmd)
+func removeAction(cmd *cobra.Command, args []string) error {
+	options, err := removeOptions(cmd)
 	if err != nil {
 		return err
 	}

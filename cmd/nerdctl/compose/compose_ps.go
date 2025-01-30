@@ -45,7 +45,7 @@ func newComposePsCommand() *cobra.Command {
 	var composePsCommand = &cobra.Command{
 		Use:           "ps [flags] [SERVICE...]",
 		Short:         "List containers of services",
-		RunE:          composePsAction,
+		RunE:          psAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
@@ -74,7 +74,7 @@ type composeContainerPrintable struct {
 	Ports      string `json:"-"`
 }
 
-func composePsAction(cmd *cobra.Command, args []string) error {
+func psAction(cmd *cobra.Command, args []string) error {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return err

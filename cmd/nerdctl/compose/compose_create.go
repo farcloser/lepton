@@ -31,7 +31,7 @@ func newComposeCreateCommand() *cobra.Command {
 	var composeCreateCommand = &cobra.Command{
 		Use:           "create [flags] [SERVICE...]",
 		Short:         "Creates containers for one or more services",
-		RunE:          composeCreateAction,
+		RunE:          createAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
@@ -43,7 +43,7 @@ func newComposeCreateCommand() *cobra.Command {
 	return composeCreateCommand
 }
 
-func composeCreateAction(cmd *cobra.Command, args []string) error {
+func createAction(cmd *cobra.Command, args []string) error {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return err

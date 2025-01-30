@@ -36,7 +36,7 @@ func updateCommand() *cobra.Command {
 	namespaceLableCommand := &cobra.Command{
 		Use:           "update [flags] NAMESPACE",
 		Short:         "Update labels for a namespace",
-		RunE:          labelUpdateAction,
+		RunE:          updateAction,
 		Args:          cobra.MinimumNArgs(1),
 		SilenceUsage:  true,
 		SilenceErrors: true,
@@ -61,7 +61,7 @@ func processNamespaceUpdateCommandOption(cmd *cobra.Command) (*options.Global, *
 	return globalOptions, &namespaceUpdateOptions{Labels: utils.StringSlice2KVMap(labels, "=")}, nil
 }
 
-func labelUpdateAction(cmd *cobra.Command, args []string) error {
+func updateAction(cmd *cobra.Command, args []string) error {
 	globalOptions, options, err := processNamespaceUpdateCommandOption(cmd)
 	if err != nil {
 		return err

@@ -33,7 +33,7 @@ func newImageInspectCommand() *cobra.Command {
 		Args:              cobra.MinimumNArgs(1),
 		Short:             "Display detailed information on one or more images.",
 		Long:              "Hint: set `--mode=native` for showing the full output",
-		RunE:              imageInspectAction,
+		RunE:              inspectAction,
 		ValidArgsFunction: completion.ImageNames,
 		SilenceUsage:      true,
 		SilenceErrors:     true,
@@ -89,7 +89,7 @@ func ProcessImageInspectOptions(cmd *cobra.Command, platform *string) (options.I
 	}, nil
 }
 
-func imageInspectAction(cmd *cobra.Command, args []string) error {
+func inspectAction(cmd *cobra.Command, args []string) error {
 	options, err := ProcessImageInspectOptions(cmd, nil)
 	if err != nil {
 		return err

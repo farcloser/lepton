@@ -35,7 +35,7 @@ func newComposeCopyCommand() *cobra.Command {
 		Use:           usage,
 		Short:         "Copy files/folders between a service container and the local filesystem",
 		Args:          cobra.ExactArgs(2),
-		RunE:          composeCopyAction,
+		RunE:          copyAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
@@ -45,7 +45,7 @@ func newComposeCopyCommand() *cobra.Command {
 	return composeCpCommand
 }
 
-func composeCopyAction(cmd *cobra.Command, args []string) error {
+func copyAction(cmd *cobra.Command, args []string) error {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return err

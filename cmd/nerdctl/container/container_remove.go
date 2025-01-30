@@ -31,7 +31,7 @@ func RmCommand() *cobra.Command {
 		Use:               "rm [flags] CONTAINER [CONTAINER, ...]",
 		Args:              cobra.MinimumNArgs(1),
 		Short:             "Remove one or more containers",
-		RunE:              rmAction,
+		RunE:              removeAction,
 		ValidArgsFunction: rmShellComplete,
 		SilenceUsage:      true,
 		SilenceErrors:     true,
@@ -42,7 +42,7 @@ func RmCommand() *cobra.Command {
 	return rmCommand
 }
 
-func rmAction(cmd *cobra.Command, args []string) error {
+func removeAction(cmd *cobra.Command, args []string) error {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return err

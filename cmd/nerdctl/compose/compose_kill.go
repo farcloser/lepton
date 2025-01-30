@@ -29,7 +29,7 @@ func newComposeKillCommand() *cobra.Command {
 	var composeKillCommand = &cobra.Command{
 		Use:           "kill [flags] [SERVICE...]",
 		Short:         "Force stop service containers",
-		RunE:          composeKillAction,
+		RunE:          killAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
@@ -37,7 +37,7 @@ func newComposeKillCommand() *cobra.Command {
 	return composeKillCommand
 }
 
-func composeKillAction(cmd *cobra.Command, args []string) error {
+func killAction(cmd *cobra.Command, args []string) error {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return err

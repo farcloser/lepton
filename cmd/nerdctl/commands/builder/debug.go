@@ -34,7 +34,7 @@ func debugCommand() *cobra.Command {
 		Use:           "debug",
 		Short:         shortHelp,
 		PreRunE:       helpers.CheckExperimental("`builder debug`"),
-		RunE:          builderDebugAction,
+		RunE:          debugAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
@@ -47,7 +47,7 @@ func debugCommand() *cobra.Command {
 	return buildDebugCommand
 }
 
-func builderDebugAction(cmd *cobra.Command, args []string) error {
+func debugAction(cmd *cobra.Command, args []string) error {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return err

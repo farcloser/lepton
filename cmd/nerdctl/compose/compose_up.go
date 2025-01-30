@@ -34,7 +34,7 @@ func newComposeUpCommand() *cobra.Command {
 	var composeUpCommand = &cobra.Command{
 		Use:           "up [flags] [SERVICE...]",
 		Short:         "Create and start containers",
-		RunE:          composeUpAction,
+		RunE:          upAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
@@ -53,7 +53,7 @@ func newComposeUpCommand() *cobra.Command {
 	return composeUpCommand
 }
 
-func composeUpAction(cmd *cobra.Command, services []string) error {
+func upAction(cmd *cobra.Command, services []string) error {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return err

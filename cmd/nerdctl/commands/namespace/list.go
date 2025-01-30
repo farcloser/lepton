@@ -44,7 +44,7 @@ func listCommand() *cobra.Command {
 		Use:           "ls",
 		Aliases:       []string{"list"},
 		Short:         "ListNames containerd namespaces",
-		RunE:          namespaceLsAction,
+		RunE:          listAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
@@ -85,7 +85,7 @@ type namespaceListOutput struct {
 	Labels     map[string]string `json:"labels,omitempty"`
 }
 
-func namespaceLsAction(cmd *cobra.Command, args []string) error {
+func listAction(cmd *cobra.Command, args []string) error {
 	globalOptions, options, err := processNamespaceListCommandOption(cmd)
 	if err != nil {
 		return err

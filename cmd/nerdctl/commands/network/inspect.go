@@ -31,7 +31,7 @@ func inspectCommand() *cobra.Command {
 		Use:               "inspect [flags] NETWORK [NETWORK, ...]",
 		Short:             "Display detailed information on one or more networks",
 		Args:              cobra.MinimumNArgs(1),
-		RunE:              networkInspectAction,
+		RunE:              inspectAction,
 		ValidArgsFunction: networkInspectShellComplete,
 		SilenceUsage:      true,
 		SilenceErrors:     true,
@@ -47,7 +47,7 @@ func inspectCommand() *cobra.Command {
 	return networkInspectCommand
 }
 
-func networkInspectAction(cmd *cobra.Command, args []string) error {
+func inspectAction(cmd *cobra.Command, args []string) error {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return err

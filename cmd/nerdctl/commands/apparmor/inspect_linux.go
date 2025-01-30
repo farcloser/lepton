@@ -30,12 +30,12 @@ func inspectCommand() *cobra.Command {
 		Use:           "inspect",
 		Short:         fmt.Sprintf("Display the default AppArmor profile %q. Other profiles cannot be displayed with this command.", defaults.AppArmorProfileName),
 		Args:          cobra.NoArgs,
-		RunE:          apparmorInspectAction,
+		RunE:          inspectAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
 }
 
-func apparmorInspectAction(cmd *cobra.Command, _ []string) error {
+func inspectAction(cmd *cobra.Command, _ []string) error {
 	return apparmor.Inspect(cmd.OutOrStdout())
 }

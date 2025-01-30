@@ -34,7 +34,7 @@ func removeCommand() *cobra.Command {
 		Short:             "Remove one or more networks",
 		Long:              "NOTE: network in use is deleted without caution",
 		Args:              cobra.MinimumNArgs(1),
-		RunE:              networkRmAction,
+		RunE:              removeAction,
 		ValidArgsFunction: networkRmShellComplete,
 		SilenceUsage:      true,
 		SilenceErrors:     true,
@@ -42,7 +42,7 @@ func removeCommand() *cobra.Command {
 	return networkRmCommand
 }
 
-func networkRmAction(cmd *cobra.Command, args []string) error {
+func removeAction(cmd *cobra.Command, args []string) error {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return err

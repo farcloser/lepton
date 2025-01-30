@@ -283,7 +283,7 @@ func setCreateFlags(cmd *cobra.Command) {
 }
 
 func processCreateCommandFlagsInRun(cmd *cobra.Command) (*options.ContainerCreate, error) {
-	opt, err := processContainerCreateOptions(cmd)
+	opt, err := createOptions(cmd)
 	if err != nil {
 		return opt, err
 	}

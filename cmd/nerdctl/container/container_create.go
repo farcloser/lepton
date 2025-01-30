@@ -52,7 +52,7 @@ func CreateCommand() *cobra.Command {
 	return createCommand
 }
 
-func processContainerCreateOptions(cmd *cobra.Command) (*options.ContainerCreate, error) {
+func createOptions(cmd *cobra.Command) (*options.ContainerCreate, error) {
 	var err error
 	opt := &options.ContainerCreate{
 		Stdout: cmd.OutOrStdout(),
@@ -417,7 +417,7 @@ func processContainerCreateOptions(cmd *cobra.Command) (*options.ContainerCreate
 }
 
 func createAction(cmd *cobra.Command, args []string) error {
-	createOpt, err := processContainerCreateOptions(cmd)
+	createOpt, err := createOptions(cmd)
 	if err != nil {
 		return err
 	}

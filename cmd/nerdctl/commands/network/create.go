@@ -33,7 +33,7 @@ func createCommand() *cobra.Command {
 		Short:         "Create a network",
 		Long:          `NOTE: To isolate CNI bridge, CNI plugin "firewall" (>= v1.1.0) is needed.`,
 		Args:          helpers.IsExactArgs(1),
-		RunE:          networkCreateAction,
+		RunE:          createAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
@@ -51,7 +51,7 @@ func createCommand() *cobra.Command {
 	return networkCreateCommand
 }
 
-func networkCreateAction(cmd *cobra.Command, args []string) error {
+func createAction(cmd *cobra.Command, args []string) error {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return err

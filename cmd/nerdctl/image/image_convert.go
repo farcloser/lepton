@@ -43,7 +43,7 @@ func newImageConvertCommand() *cobra.Command {
 		Short:             "convert an image",
 		Long:              imageConvertHelp,
 		Args:              cobra.MinimumNArgs(2),
-		RunE:              imageConvertAction,
+		RunE:              convertAction,
 		ValidArgsFunction: imageConvertShellComplete,
 		SilenceUsage:      true,
 		SilenceErrors:     true,
@@ -78,7 +78,7 @@ func newImageConvertCommand() *cobra.Command {
 	return imageConvertCommand
 }
 
-func processImageConvertOptions(cmd *cobra.Command) (options.ImageConvert, error) {
+func convertOptions(cmd *cobra.Command) (options.ImageConvert, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return options.ImageConvert{}, err
@@ -164,8 +164,8 @@ func processImageConvertOptions(cmd *cobra.Command) (options.ImageConvert, error
 	}, nil
 }
 
-func imageConvertAction(cmd *cobra.Command, args []string) error {
-	options, err := processImageConvertOptions(cmd)
+func convertAction(cmd *cobra.Command, args []string) error {
+	options, err := convertOptions(cmd)
 	if err != nil {
 		return err
 	}

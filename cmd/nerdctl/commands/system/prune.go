@@ -37,7 +37,7 @@ func pruneCommand() *cobra.Command {
 		Use:           "prune [flags]",
 		Short:         "Remove unused data",
 		Args:          cobra.NoArgs,
-		RunE:          systemPruneAction,
+		RunE:          pruneAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
@@ -47,7 +47,7 @@ func pruneCommand() *cobra.Command {
 	return systemPruneCommand
 }
 
-func processSystemPruneOptions(cmd *cobra.Command) (*options.SystemPrune, error) {
+func pruneOptions(cmd *cobra.Command) (*options.SystemPrune, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return nil, err
@@ -117,8 +117,8 @@ func grantSystemPrunePermission(cmd *cobra.Command, options *options.SystemPrune
 	return true, nil
 }
 
-func systemPruneAction(cmd *cobra.Command, _ []string) error {
-	options, err := processSystemPruneOptions(cmd)
+func pruneAction(cmd *cobra.Command, _ []string) error {
+	options, err := pruneOptions(cmd)
 	if err != nil {
 		return err
 	}

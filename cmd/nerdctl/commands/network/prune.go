@@ -35,7 +35,7 @@ func pruneCommand() *cobra.Command {
 		Use:           "prune [flags]",
 		Short:         "Remove all unused networks",
 		Args:          cobra.NoArgs,
-		RunE:          networkPruneAction,
+		RunE:          pruneAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
@@ -43,7 +43,7 @@ func pruneCommand() *cobra.Command {
 	return networkPruneCommand
 }
 
-func networkPruneAction(cmd *cobra.Command, _ []string) error {
+func pruneAction(cmd *cobra.Command, _ []string) error {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return err

@@ -31,7 +31,7 @@ func listCommand() *cobra.Command {
 		Aliases:       []string{"list"},
 		Short:         "List networks",
 		Args:          cobra.NoArgs,
-		RunE:          networkLsAction,
+		RunE:          listAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
@@ -44,7 +44,7 @@ func listCommand() *cobra.Command {
 	return cmd
 }
 
-func networkLsAction(cmd *cobra.Command, args []string) error {
+func listAction(cmd *cobra.Command, args []string) error {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return err

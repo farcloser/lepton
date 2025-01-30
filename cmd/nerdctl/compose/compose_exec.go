@@ -34,7 +34,7 @@ func newComposeExecCommand() *cobra.Command {
 		Use:           "exec [flags] SERVICE COMMAND [ARGS...]",
 		Short:         "Execute a command in a running container of the service",
 		Args:          cobra.MinimumNArgs(2),
-		RunE:          composeExecAction,
+		RunE:          execAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
@@ -62,7 +62,7 @@ func newComposeExecCommand() *cobra.Command {
 	return composeExecCommand
 }
 
-func composeExecAction(cmd *cobra.Command, args []string) error {
+func execAction(cmd *cobra.Command, args []string) error {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return err

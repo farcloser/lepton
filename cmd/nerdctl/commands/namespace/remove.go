@@ -42,7 +42,7 @@ func removeCommand() *cobra.Command {
 		Args:              cobra.MinimumNArgs(1),
 		ValidArgsFunction: completion.NamespaceNames,
 		Short:             "Remove one or more namespaces",
-		RunE:              namespaceRmAction,
+		RunE:              removeAction,
 		SilenceUsage:      true,
 		SilenceErrors:     true,
 	}
@@ -52,7 +52,7 @@ func removeCommand() *cobra.Command {
 	return namespaceRmCommand
 }
 
-func processNamespaceRemoveOptions(cmd *cobra.Command) (*options.Global, *namespaceRemoveOptions, error) {
+func removeOptions(cmd *cobra.Command) (*options.Global, *namespaceRemoveOptions, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return nil, nil, err
@@ -68,8 +68,8 @@ func processNamespaceRemoveOptions(cmd *cobra.Command) (*options.Global, *namesp
 	}, nil
 }
 
-func namespaceRmAction(cmd *cobra.Command, args []string) error {
-	globalOptions, options, err := processNamespaceRemoveOptions(cmd)
+func removeAction(cmd *cobra.Command, args []string) error {
+	globalOptions, options, err := removeOptions(cmd)
 	if err != nil {
 		return err
 	}

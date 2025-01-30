@@ -55,7 +55,7 @@ func ExecCommand() *cobra.Command {
 	return execCommand
 }
 
-func processExecCommandOptions(cmd *cobra.Command) (options.ContainerExec, error) {
+func execOptions(cmd *cobra.Command) (options.ContainerExec, error) {
 	// We do not check if we have a terminal here, as container.Exec calling console.Current will ensure that
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
@@ -123,7 +123,7 @@ func processExecCommandOptions(cmd *cobra.Command) (options.ContainerExec, error
 }
 
 func execAction(cmd *cobra.Command, args []string) error {
-	options, err := processExecCommandOptions(cmd)
+	options, err := execOptions(cmd)
 	if err != nil {
 		return err
 	}

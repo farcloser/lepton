@@ -35,7 +35,7 @@ func newContainerInspectCommand() *cobra.Command {
 		Short:             "Display detailed information on one or more containers.",
 		Long:              "Hint: set `--mode=native` for showing the full output",
 		Args:              cobra.MinimumNArgs(1),
-		RunE:              containerInspectAction,
+		RunE:              inspectAction,
 		ValidArgsFunction: containerInspectShellComplete,
 		SilenceUsage:      true,
 		SilenceErrors:     true,
@@ -90,7 +90,7 @@ func ProcessContainerInspectOptions(cmd *cobra.Command) (opt options.ContainerIn
 	}, nil
 }
 
-func containerInspectAction(cmd *cobra.Command, args []string) error {
+func inspectAction(cmd *cobra.Command, args []string) error {
 	opt, err := ProcessContainerInspectOptions(cmd)
 	if err != nil {
 		return err
