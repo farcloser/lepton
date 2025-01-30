@@ -28,7 +28,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 )
 
-func NewWaitCommand() *cobra.Command {
+func WaitCommand() *cobra.Command {
 	var waitCommand = &cobra.Command{
 		Use:               "wait [flags] CONTAINER [CONTAINER, ...]",
 		Args:              cobra.MinimumNArgs(1),

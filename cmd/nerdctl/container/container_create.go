@@ -30,7 +30,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/containerutil"
 )
 
-func NewCreateCommand() *cobra.Command {
+func CreateCommand() *cobra.Command {
 	shortHelp := "Create a new container."
 	longHelp := shortHelp
 	if runtime.GOOS == "windows" {

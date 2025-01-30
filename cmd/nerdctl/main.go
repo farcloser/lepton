@@ -35,7 +35,7 @@ import (
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/commands/builder"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/commands/namespace"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/commands/network"
-	"github.com/containerd/nerdctl/v2/cmd/nerdctl/commands/registry/login"
+	login2 "github.com/containerd/nerdctl/v2/cmd/nerdctl/commands/registry"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/commands/system"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/commands/volume"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
@@ -262,79 +262,79 @@ Config file ($%s_TOML): %s
 	}
 	rootCmd.RunE = helpers.UnknownSubcommandAction
 	rootCmd.AddCommand(
-		container.NewCreateCommand(),
+		container.CreateCommand(),
 		// #region Run & Exec
-		container.NewRunCommand(),
-		container.NewUpdateCommand(),
-		container.NewExecCommand(),
+		container.RunCommand(),
+		container.UpdateCommand(),
+		container.ExecCommand(),
 		// #endregion
 
 		// #region Container management
-		container.NewPsCommand(),
-		container.NewLogsCommand(),
-		container.NewPortCommand(),
-		container.NewStopCommand(),
-		container.NewStartCommand(),
-		container.NewDiffCommand(),
-		container.NewRestartCommand(),
-		container.NewKillCommand(),
-		container.NewRmCommand(),
-		container.NewPauseCommand(),
-		container.NewUnpauseCommand(),
-		container.NewCommitCommand(),
-		container.NewWaitCommand(),
-		container.NewRenameCommand(),
-		container.NewAttachCommand(),
+		container.PsCommand(),
+		container.LogsCommand(),
+		container.PortCommand(),
+		container.StopCommand(),
+		container.StartCommand(),
+		container.DiffCommand(),
+		container.RestartCommand(),
+		container.KillCommand(),
+		container.RmCommand(),
+		container.PauseCommand(),
+		container.UnpauseCommand(),
+		container.CommitCommand(),
+		container.WaitCommand(),
+		container.RenameCommand(),
+		container.AttachCommand(),
 		// #endregion
 
 		// Build
-		builder.NewBuildCommand(),
+		builder.BuildCommand(),
 
 		// #region Image management
-		image.NewImagesCommand(),
-		image.NewPullCommand(),
-		image.NewPushCommand(),
-		image.NewLoadCommand(),
-		image.NewSaveCommand(),
-		image.NewTagCommand(),
-		image.NewRmiCommand(),
-		image.NewHistoryCommand(),
+		image.ImagesCommand(),
+		image.PullCommand(),
+		image.PushCommand(),
+		image.LoadCommand(),
+		image.SaveCommand(),
+		image.TagCommand(),
+		image.RmiCommand(),
+		image.HistoryCommand(),
 		// #endregion
 
 		// #region System
-		system.NewEventsCommand(),
-		system.NewInfoCommand(),
+		system.EventsCommand(),
+		system.InfoCommand(),
 		newVersionCommand(),
 		// #endregion
 
 		// Inspect
-		inspect.NewInspectCommand(),
+		inspect.Command(),
 
 		// stats
-		container.NewTopCommand(),
-		container.NewStatsCommand(),
+		container.TopCommand(),
+		container.StatsCommand(),
 
 		// #region helpers.Management
-		container.NewContainerCommand(),
-		image.NewImageCommand(),
-		network.NewNetworkCommand(),
-		volume.NewVolumeCommand(),
-		system.NewSystemCommand(),
-		namespace.NewNamespaceCommand(),
-		builder.NewBuilderCommand(),
+		container.Command(),
+		image.Command(),
+		network.Command(),
+		volume.Command(),
+		system.Command(),
+		namespace.Command(),
+		builder.Command(),
 		// #endregion
 
 		// Internal
-		internal.NewInternalCommand(),
+		internal.Command(),
 
 		// login
-		login.NewLoginCommand(),
+		login2.LoginCommand(),
 
 		// Logout
-		login.NewLogoutCommand(),
+		login2.LogoutCommand(),
 
 		// Compose
-		compose.NewComposeCommand(),
+		compose.Command(),
 	)
 	addApparmorCommand(rootCmd)
 	container.AddCpCommand(rootCmd)

@@ -26,7 +26,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 )
 
-func NewRenameCommand() *cobra.Command {
+func RenameCommand() *cobra.Command {
 	var renameCommand = &cobra.Command{
 		Use:               "rename [flags] CONTAINER NEW_NAME",
 		Args:              helpers.IsExactArgs(2),

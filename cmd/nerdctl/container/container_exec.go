@@ -30,7 +30,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 )
 
-func NewExecCommand() *cobra.Command {
+func ExecCommand() *cobra.Command {
 	var execCommand = &cobra.Command{
 		Use:               "exec [flags] CONTAINER COMMAND [ARG...]",
 		Args:              cobra.MinimumNArgs(2),

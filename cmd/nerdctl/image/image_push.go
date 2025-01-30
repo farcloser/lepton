@@ -30,7 +30,7 @@ const (
 	allowNonDistFlag = "allow-nondistributable-artifacts"
 )
 
-func NewPushCommand() *cobra.Command {
+func PushCommand() *cobra.Command {
 	var pushCommand = &cobra.Command{
 		Use:               "push [flags] NAME[:TAG]",
 		Short:             "Push an image or a repository to a registry.",

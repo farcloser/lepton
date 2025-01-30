@@ -32,7 +32,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
 )
 
-func NewTopCommand() *cobra.Command {
+func TopCommand() *cobra.Command {
 	var topCommand = &cobra.Command{
 		Use:               "top CONTAINER [ps OPTIONS]",
 		Args:              cobra.MinimumNArgs(1),

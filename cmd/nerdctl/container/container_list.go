@@ -33,7 +33,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 )
 
-func NewPsCommand() *cobra.Command {
+func PsCommand() *cobra.Command {
 	var psCommand = &cobra.Command{
 		Use:           "ps",
 		Args:          cobra.NoArgs,

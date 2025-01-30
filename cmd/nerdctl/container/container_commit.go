@@ -26,7 +26,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 )
 
-func NewCommitCommand() *cobra.Command {
+func CommitCommand() *cobra.Command {
 	var commitCommand = &cobra.Command{
 		Use:               "commit [flags] CONTAINER REPOSITORY[:TAG]",
 		Short:             "Create a new image from a container's changes",

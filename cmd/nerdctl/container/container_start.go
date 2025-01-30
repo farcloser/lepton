@@ -29,7 +29,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/consoleutil"
 )
 
-func NewStartCommand() *cobra.Command {
+func StartCommand() *cobra.Command {
 	var startCommand = &cobra.Command{
 		Use:               "start [flags] CONTAINER [CONTAINER, ...]",
 		Args:              cobra.MinimumNArgs(1),

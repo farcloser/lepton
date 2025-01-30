@@ -26,7 +26,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 )
 
-func newVolumeInspectCommand() *cobra.Command {
+func inspectCommand() *cobra.Command {
 	volumeInspectCommand := &cobra.Command{
 		Use:               "inspect [flags] VOLUME [VOLUME...]",
 		Short:             "Display detailed information on one or more volumes",

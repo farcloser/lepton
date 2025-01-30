@@ -29,7 +29,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 )
 
-func NewLogsCommand() *cobra.Command {
+func LogsCommand() *cobra.Command {
 	const shortUsage = "Fetch the logs of a container. Expected to be used with 'nerdctl run -d'."
 	const longUsage = `Fetch the logs of a container.
 

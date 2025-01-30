@@ -29,7 +29,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/consoleutil"
 )
 
-func NewAttachCommand() *cobra.Command {
+func AttachCommand() *cobra.Command {
 	const shortHelp = "Attach stdin, stdout, and stderr to a running container."
 	const longHelp = `Attach stdin, stdout, and stderr to a running container. For example:
 

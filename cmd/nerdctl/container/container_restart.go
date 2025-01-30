@@ -27,7 +27,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 )
 
-func NewRestartCommand() *cobra.Command {
+func RestartCommand() *cobra.Command {
 	var restartCommand = &cobra.Command{
 		Use:               "restart [flags] CONTAINER [CONTAINER, ...]",
 		Args:              cobra.MinimumNArgs(1),

@@ -25,7 +25,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 )
 
-func newApparmorListCommand() *cobra.Command {
+func listCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "list",
 		Aliases:       []string{"ls"},

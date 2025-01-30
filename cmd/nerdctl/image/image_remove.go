@@ -26,7 +26,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/cmd/image"
 )
 
-func NewRmiCommand() *cobra.Command {
+func RmiCommand() *cobra.Command {
 	var rmiCommand = &cobra.Command{
 		Use:               "rmi [flags] IMAGE [IMAGE, ...]",
 		Short:             "Remove one or more images",

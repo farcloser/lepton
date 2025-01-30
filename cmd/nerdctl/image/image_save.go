@@ -30,7 +30,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/cmd/image"
 )
 
-func NewSaveCommand() *cobra.Command {
+func SaveCommand() *cobra.Command {
 	var saveCommand = &cobra.Command{
 		Use:               "save",
 		Args:              cobra.MinimumNArgs(1),

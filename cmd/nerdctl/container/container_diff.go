@@ -43,7 +43,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/labels"
 )
 
-func NewDiffCommand() *cobra.Command {
+func DiffCommand() *cobra.Command {
 	var diffCommand = &cobra.Command{
 		Use:               "diff [CONTAINER]",
 		Short:             "Inspect changes to files or directories on a container's filesystem",

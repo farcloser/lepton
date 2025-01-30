@@ -26,7 +26,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 )
 
-func NewRmCommand() *cobra.Command {
+func RmCommand() *cobra.Command {
 	var rmCommand = &cobra.Command{
 		Use:               "rm [flags] CONTAINER [CONTAINER, ...]",
 		Args:              cobra.MinimumNArgs(1),

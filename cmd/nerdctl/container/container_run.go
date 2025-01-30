@@ -48,7 +48,7 @@ const (
 	tiniInitBinary = "tini"
 )
 
-func NewRunCommand() *cobra.Command {
+func RunCommand() *cobra.Command {
 	shortHelp := "Run a command in a new container."
 	longHelp := shortHelp
 	if runtime.GOOS == "windows" {

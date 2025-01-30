@@ -30,7 +30,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 )
 
-func NewStopCommand() *cobra.Command {
+func StopCommand() *cobra.Command {
 	var stopCommand = &cobra.Command{
 		Use:               "stop [flags] CONTAINER [CONTAINER, ...]",
 		Args:              cobra.MinimumNArgs(1),

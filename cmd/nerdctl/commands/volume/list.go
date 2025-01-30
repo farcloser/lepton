@@ -25,7 +25,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 )
 
-func newVolumeLsCommand() *cobra.Command {
+func listCommand() *cobra.Command {
 	volumeLsCommand := &cobra.Command{
 		Use:           "ls",
 		Aliases:       []string{"list"},

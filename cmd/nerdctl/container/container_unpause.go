@@ -28,7 +28,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 )
 
-func NewUnpauseCommand() *cobra.Command {
+func UnpauseCommand() *cobra.Command {
 	var unpauseCommand = &cobra.Command{
 		Use:               "unpause [flags] CONTAINER [CONTAINER, ...]",
 		Args:              cobra.MinimumNArgs(1),

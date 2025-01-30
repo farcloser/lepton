@@ -27,7 +27,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/cmd/volume"
 )
 
-func newVolumeCreateCommand() *cobra.Command {
+func createCommand() *cobra.Command {
 	volumeCreateCommand := &cobra.Command{
 		Use:           "create [flags] [VOLUME]",
 		Short:         "Create a volume",

@@ -28,7 +28,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 )
 
-func NewImagesCommand() *cobra.Command {
+func ImagesCommand() *cobra.Command {
 	shortHelp := "List images"
 	longHelp := shortHelp + `
 

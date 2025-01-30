@@ -28,7 +28,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 )
 
-func NewKillCommand() *cobra.Command {
+func KillCommand() *cobra.Command {
 	var killCommand = &cobra.Command{
 		Use:               "kill [flags] CONTAINER [CONTAINER, ...]",
 		Short:             "Kill one or more running containers",
