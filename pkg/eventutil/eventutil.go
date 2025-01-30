@@ -28,7 +28,7 @@ type EventHandler struct {
 }
 
 // InitEventHandler initializes and returns an eventHandler
-func InitEventHandler() *EventHandler { //nolint:revive
+func InitEventHandler() *EventHandler {
 	return &EventHandler{handlers: make(map[string]func(events.Envelope))}
 }
 
