@@ -95,7 +95,7 @@ func distroName(r io.Reader) string {
 	return UnameO
 }
 
-var osReleaseAttribRegex = regexp.MustCompile(`([^\s=]+)\s*=\s*("{0,1})([^"]*)("{0,1})`)
+var osReleaseAttribRegex = regexp.MustCompile(`([^\s=]+)\s*=\s*("?)([^"]*)("?)`)
 
 func getOSReleaseAttrib(line string) (string, string) {
 	splitBySlash := strings.SplitN(line, "#", 2)

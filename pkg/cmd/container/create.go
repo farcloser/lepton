@@ -412,9 +412,9 @@ func generateRootfsOpts(args []string, id string, ensured *imgutil.EnsuredImage,
 		opts = append(opts, oci.WithProcessArgs(processArgs...))
 	}
 
-	isEntryPointSystemd := (entrypointPath == "/sbin/init" ||
+	isEntryPointSystemd := entrypointPath == "/sbin/init" ||
 		entrypointPath == "/usr/sbin/init" ||
-		entrypointPath == "/usr/local/sbin/init")
+		entrypointPath == "/usr/local/sbin/init"
 
 	stopSignal := options.StopSignal
 

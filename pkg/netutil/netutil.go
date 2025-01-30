@@ -85,7 +85,7 @@ func (e *CNIEnv) ListNetworksMatch(reqs []string, allowPseudoNetwork bool) (list
 		if len(result) == 0 {
 			for _, networkConfig := range networkConfigs {
 				if networkConfig.CliID != nil {
-					if len(req) <= len((*networkConfig.CliID)) && (*networkConfig.CliID)[0:len(req)] == req {
+					if len(req) <= len(*networkConfig.CliID) && (*networkConfig.CliID)[0:len(req)] == req {
 						result = append(result, networkConfig)
 					}
 				}
