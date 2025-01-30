@@ -24,9 +24,9 @@ import (
 
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/cmd/nerdctl/builder"
+	"github.com/containerd/nerdctl/v2/cmd/nerdctl/commands/builder"
+	"github.com/containerd/nerdctl/v2/cmd/nerdctl/commands/network"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
-	"github.com/containerd/nerdctl/v2/cmd/nerdctl/network"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/system"
