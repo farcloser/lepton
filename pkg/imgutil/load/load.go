@@ -30,13 +30,13 @@ import (
 	"github.com/containerd/containerd/v2/pkg/archive/compression"
 	"github.com/containerd/platforms"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/imgutil"
 	"github.com/containerd/nerdctl/v2/pkg/platformutil"
 )
 
 // FromArchive loads and unpacks the images from the tar archive specified in image load options.
-func FromArchive(ctx context.Context, client *containerd.Client, options types.ImageLoadOptions) ([]images.Image, error) {
+func FromArchive(ctx context.Context, client *containerd.Client, options options.ImageLoad) ([]images.Image, error) {
 	if options.Input != "" {
 		f, err := os.Open(options.Input)
 		if err != nil {
@@ -78,7 +78,7 @@ func FromArchive(ctx context.Context, client *containerd.Client, options types.I
 }
 
 // FromOCIArchive loads and unpacks the images from the OCI formatted archive at the provided file system path.
-func FromOCIArchive(ctx context.Context, client *containerd.Client, pathToOCIArchive string, options types.ImageLoadOptions) ([]images.Image, error) {
+func FromOCIArchive(ctx context.Context, client *containerd.Client, pathToOCIArchive string, options options.ImageLoad) ([]images.Image, error) {
 	const ociArchivePrefix = "oci-archive://"
 	pathToOCIArchive = strings.TrimPrefix(pathToOCIArchive, ociArchivePrefix)
 
@@ -131,7 +131,7 @@ func importImages(ctx context.Context, client *containerd.Client, in io.Reader, 
 	return imgs, nil
 }
 
-func unpackImage(ctx context.Context, client *containerd.Client, model images.Image, platform platforms.MatchComparer, options types.ImageLoadOptions) error {
+func unpackImage(ctx context.Context, client *containerd.Client, model images.Image, platform platforms.MatchComparer, options options.ImageLoad) error {
 	image := containerd.NewImageWithPlatform(client, model, platform)
 
 	if !options.Quiet {

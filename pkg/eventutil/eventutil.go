@@ -22,17 +22,17 @@ import (
 	"github.com/containerd/containerd/v2/core/events"
 )
 
-type eventHandler struct {
+type EventHandler struct {
 	handlers map[string]func(events.Envelope)
 	mu       sync.Mutex
 }
 
 // InitEventHandler initializes and returns an eventHandler
-func InitEventHandler() *eventHandler { //nolint:revive
-	return &eventHandler{handlers: make(map[string]func(events.Envelope))}
+func InitEventHandler() *EventHandler {
+	return &EventHandler{handlers: make(map[string]func(events.Envelope))}
 }
 
-func (w *eventHandler) Handle(action string, h func(events.Envelope)) {
+func (w *EventHandler) Handle(action string, h func(events.Envelope)) {
 	w.mu.Lock()
 	w.handlers[action] = h
 	w.mu.Unlock()
@@ -41,7 +41,7 @@ func (w *eventHandler) Handle(action string, h func(events.Envelope)) {
 // Watch ranges over the passed in event chan and processes the events based on the
 // handlers created for a given action.
 // To stop watching, close the event chan.
-func (w *eventHandler) Watch(c <-chan *events.Envelope) {
+func (w *EventHandler) Watch(c <-chan *events.Envelope) {
 	for e := range c {
 		w.mu.Lock()
 		h, exists := w.handlers[e.Topic]

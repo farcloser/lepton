@@ -42,7 +42,7 @@ var (
 	// schemeNerdctlExperimental is currently provisional, to unlock namespace based host authentication
 	// This may change or break without notice, and you should have no expectations that credentials saved like that
 	// will be supported in the future
-	schemeNerdctlExperimental scheme = scheme(version.RootName + "-experimental")
+	schemeNerdctlExperimental = scheme(version.RootName + "-experimental")
 
 	ErrUnableToInstantiate = errors.New("unable to instantiate docker credentials store")
 	ErrUnableToErase       = errors.New("unable to erase credentials")

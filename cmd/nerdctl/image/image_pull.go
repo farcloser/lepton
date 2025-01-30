@@ -22,7 +22,7 @@ import (
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/image"
 	"github.com/containerd/nerdctl/v2/pkg/platformutil"
 	"github.com/containerd/nerdctl/v2/pkg/strutil"
@@ -70,56 +70,56 @@ func NewPullCommand() *cobra.Command {
 	return pullCommand
 }
 
-func processPullCommandFlags(cmd *cobra.Command) (types.ImagePullOptions, error) {
+func processPullCommandFlags(cmd *cobra.Command) (options.ImagePull, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return types.ImagePullOptions{}, err
+		return options.ImagePull{}, err
 	}
 	allPlatforms, err := cmd.Flags().GetBool("all-platforms")
 	if err != nil {
-		return types.ImagePullOptions{}, err
+		return options.ImagePull{}, err
 	}
 	platform, err := cmd.Flags().GetStringSlice("platform")
 	if err != nil {
-		return types.ImagePullOptions{}, err
+		return options.ImagePull{}, err
 	}
 
 	ociSpecPlatform, err := platformutil.NewOCISpecPlatformSlice(allPlatforms, platform)
 	if err != nil {
-		return types.ImagePullOptions{}, err
+		return options.ImagePull{}, err
 	}
 
 	unpackStr, err := cmd.Flags().GetString("unpack")
 	if err != nil {
-		return types.ImagePullOptions{}, err
+		return options.ImagePull{}, err
 	}
 	unpack, err := strutil.ParseBoolOrAuto(unpackStr)
 	if err != nil {
-		return types.ImagePullOptions{}, err
+		return options.ImagePull{}, err
 	}
 
 	quiet, err := cmd.Flags().GetBool("quiet")
 	if err != nil {
-		return types.ImagePullOptions{}, err
+		return options.ImagePull{}, err
 	}
 
 	sociIndexDigest, err := cmd.Flags().GetString("soci-index-digest")
 	if err != nil {
-		return types.ImagePullOptions{}, err
+		return options.ImagePull{}, err
 	}
 
 	verifyOptions, err := helpers.ProcessImageVerifyOptions(cmd)
 	if err != nil {
-		return types.ImagePullOptions{}, err
+		return options.ImagePull{}, err
 	}
-	return types.ImagePullOptions{
+	return options.ImagePull{
 		GOptions:        globalOptions,
 		VerifyOptions:   verifyOptions,
 		OCISpecPlatform: ociSpecPlatform,
 		Unpack:          unpack,
 		Mode:            "always",
 		Quiet:           quiet,
-		RFlags: types.RemoteSnapshotterFlags{
+		RFlags: options.RemoteSnapshotterFlags{
 			SociIndexDigest: sociIndexDigest,
 		},
 		Stdout:                 cmd.OutOrStdout(),

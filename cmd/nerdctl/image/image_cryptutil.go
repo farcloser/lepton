@@ -22,7 +22,7 @@ import (
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/image"
 )
 
@@ -55,43 +55,43 @@ func registerImgcryptFlags(cmd *cobra.Command, encrypt bool) {
 	}
 }
 
-func processImgCryptOptions(cmd *cobra.Command, _args []string, encrypt bool) (types.ImageCryptOptions, error) {
+func processImgCryptOptions(cmd *cobra.Command, _args []string, encrypt bool) (options.ImageCrypt, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return types.ImageCryptOptions{}, err
+		return options.ImageCrypt{}, err
 	}
 	platforms, err := cmd.Flags().GetStringSlice("platform")
 	if err != nil {
-		return types.ImageCryptOptions{}, err
+		return options.ImageCrypt{}, err
 	}
 	allPlatforms, err := cmd.Flags().GetBool("all-platforms")
 	if err != nil {
-		return types.ImageCryptOptions{}, err
+		return options.ImageCrypt{}, err
 	}
 	gpgHomeDir, err := cmd.Flags().GetString("gpg-homedir")
 	if err != nil {
-		return types.ImageCryptOptions{}, err
+		return options.ImageCrypt{}, err
 	}
 	gpgVersion, err := cmd.Flags().GetString("gpg-version")
 	if err != nil {
-		return types.ImageCryptOptions{}, err
+		return options.ImageCrypt{}, err
 	}
 	keys, err := cmd.Flags().GetStringSlice("key")
 	if err != nil {
-		return types.ImageCryptOptions{}, err
+		return options.ImageCrypt{}, err
 	}
 	decRecipients, err := cmd.Flags().GetStringSlice("dec-recipient")
 	if err != nil {
-		return types.ImageCryptOptions{}, err
+		return options.ImageCrypt{}, err
 	}
 	var recipients []string
 	if encrypt {
 		recipients, err = cmd.Flags().GetStringSlice("recipient")
 		if err != nil {
-			return types.ImageCryptOptions{}, err
+			return options.ImageCrypt{}, err
 		}
 	}
-	return types.ImageCryptOptions{
+	return options.ImageCrypt{
 		GOptions:      globalOptions,
 		Platforms:     platforms,
 		AllPlatforms:  allPlatforms,

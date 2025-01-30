@@ -24,12 +24,12 @@ import (
 
 	containerd "github.com/containerd/containerd/v2/client"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/idutil/containerwalker"
 )
 
 // Wait blocks until all the containers specified by reqs have stopped, then print their exit codes.
-func Wait(ctx context.Context, client *containerd.Client, reqs []string, options types.ContainerWaitOptions) error {
+func Wait(ctx context.Context, client *containerd.Client, reqs []string, options options.ContainerWait) error {
 	var containers []containerd.Container
 	walker := &containerwalker.ContainerWalker{
 		Client: client,

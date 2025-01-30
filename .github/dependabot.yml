@@ -30,7 +30,7 @@ updates:
           - "github.com/containerd/containerd"
           - "github.com/containerd/containerd/api"
 
-  # Dependencies listed in .github/workflows/*.yml
+  # Dependencies listed in `.github/workflows/*.yml`
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:

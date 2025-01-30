@@ -17,7 +17,7 @@ As a mature project, it is also conservatively (and rightfully) focused on backw
 Lepton departs from this in a few important ways:
 - lepton is removing support for unstable or otherwise experimental, or lesser used features
   - this is meant to reduce maintenance burden, simplify code and increase quality
-- docker cli compatibility is best effort, and will be broken where it makes sense
+- docker cli compatibility is best-effort, and will be broken where it makes sense
 - before 1.0, there should be no expectation of backward compatibility - API will change,
 and only the latest versions of dependencies will be supported
 - lepton is departing from the way nerdctl is storing data
@@ -80,7 +80,7 @@ packages up into https://github.com/farcloser/go-containers
 
  ✅ [Optional] Supports [container image signing and verifying (cosign)](./docs/cosign.md)
 
-nerdctl is a **non-core** sub-project of containerd.
+nerdctl is a **non-core** subproject of containerd.
 
 ## Examples
 
@@ -282,8 +282,8 @@ The same feature was later introduced in Docker v25 with a different syntax. ner
 
 ## Developer guide
 
-nerdctl is a containerd **non-core** sub-project, licensed under the [Apache 2.0 license](./LICENSE).
-As a containerd non-core sub-project, you will find the:
+nerdctl is a containerd **non-core** subproject, licensed under the [Apache 2.0 license](./LICENSE).
+As a containerd non-core subproject, you will find the:
 
 - [Project governance](https://github.com/containerd/project/blob/main/GOVERNANCE.md),
 - [Maintainers](./MAINTAINERS),

@@ -67,15 +67,15 @@ func newBuilderPruneCommand() *cobra.Command {
 }
 
 func builderPruneAction(cmd *cobra.Command, _ []string) error {
-	options, err := processBuilderPruneOptions(cmd)
+	opts, err := processBuilderPruneOptions(cmd)
 	if err != nil {
 		return err
 	}
 
-	if !options.Force {
+	if !opts.Force {
 		var msg string
 
-		if options.All {
+		if opts.All {
 			msg = "This will remove all build cache."
 		} else {
 			msg = "This will remove any dangling build cache."
@@ -86,7 +86,7 @@ func builderPruneAction(cmd *cobra.Command, _ []string) error {
 		}
 	}
 
-	prunedObjects, err := builder.Prune(cmd.Context(), options)
+	prunedObjects, err := builder.Prune(cmd.Context(), opts)
 	if err != nil {
 		return err
 	}
@@ -97,9 +97,9 @@ func builderPruneAction(cmd *cobra.Command, _ []string) error {
 		totalReclaimedSpace += prunedObject.Size
 	}
 
-	fmt.Fprintf(cmd.OutOrStdout(), "Total:  %s\n", units.BytesSize(float64(totalReclaimedSpace)))
+	_, err = fmt.Fprintf(cmd.OutOrStdout(), "Total:  %s\n", units.BytesSize(float64(totalReclaimedSpace)))
 
-	return nil
+	return err
 }
 
 func processBuilderPruneOptions(cmd *cobra.Command) (*options.BuilderPrune, error) {

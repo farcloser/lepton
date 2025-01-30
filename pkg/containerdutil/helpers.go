@@ -29,7 +29,7 @@ var ReadBlob = readBlobWithCache()
 type readBlob func(ctx context.Context, provider content.Provider, desc specs.Descriptor) ([]byte, error)
 
 func readBlobWithCache() readBlob {
-	var cache = make(map[string]([]byte))
+	var cache = make(map[string][]byte)
 
 	return func(ctx context.Context, provider content.Provider, desc specs.Descriptor) ([]byte, error) {
 		var err error

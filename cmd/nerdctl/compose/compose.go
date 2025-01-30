@@ -68,30 +68,30 @@ func NewComposeCommand() *cobra.Command {
 	return composeCommand
 }
 
-func getComposeOptions(cmd *cobra.Command, debugFull, experimental bool) (composer.Options, error) {
+func getComposeOptions(cmd *cobra.Command, debugFull, experimental bool) (*composer.Options, error) {
 	nerdctlCmd, nerdctlArgs := helpers.GlobalFlags(cmd)
 	projectDirectory, err := cmd.Flags().GetString("project-directory")
 	if err != nil {
-		return composer.Options{}, err
+		return nil, err
 	}
 	envFile, err := cmd.Flags().GetString("env-file")
 	if err != nil {
-		return composer.Options{}, err
+		return nil, err
 	}
 	projectName, err := cmd.Flags().GetString("project-name")
 	if err != nil {
-		return composer.Options{}, err
+		return nil, err
 	}
 	files, err := cmd.Flags().GetStringArray("file")
 	if err != nil {
-		return composer.Options{}, err
+		return nil, err
 	}
 	profiles, err := cmd.Flags().GetStringArray("profile")
 	if err != nil {
-		return composer.Options{}, err
+		return nil, err
 	}
 
-	return composer.Options{
+	return &composer.Options{
 		Project:          projectName,
 		ProjectDirectory: projectDirectory,
 		ConfigPaths:      files,

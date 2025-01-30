@@ -25,11 +25,11 @@ import (
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 )
 
 // Prune remove all stopped containers
-func Prune(ctx context.Context, client *containerd.Client, options types.ContainerPruneOptions) error {
+func Prune(ctx context.Context, client *containerd.Client, options options.ContainerPrune) error {
 	containers, err := client.Containers(ctx)
 	if err != nil {
 		return err

@@ -23,10 +23,9 @@ import (
 	"go.farcloser.world/containers/security/cgroups"
 
 	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
 )
 
-func ProcessImageVerifyOptions(cmd *cobra.Command) (opt types.ImageVerifyOptions, err error) {
+func ProcessImageVerifyOptions(cmd *cobra.Command) (opt options.ImageVerify, err error) {
 	if opt.Provider, err = cmd.Flags().GetString("verify"); err != nil {
 		return
 	}

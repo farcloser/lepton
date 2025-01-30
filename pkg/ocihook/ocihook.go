@@ -55,7 +55,7 @@ var (
 	// precedence over the PID based resolution (/proc/<pid>/ns/net) where pid is
 	// spec.State.Pid.
 	// This is mostly used for VM based runtime, where the spec.State PID does not
-	// necessarily lives in the created container networking namespace.
+	// necessarily live in the created container networking namespace.
 	//
 	// On Windows, this label will contain the UUID of a namespace managed by
 	// the Host Compute Network Service (HCN) API.
@@ -315,7 +315,7 @@ func getNetNSPath(state *specs.State) (string, error) {
 		return "", errors.New("both state.Pid and the netNs annotation are unset")
 	}
 
-	// We dont't have a networking namespace annotation, but we have a PID.
+	// We don't have a networking namespace annotation, but we have a PID.
 	s := fmt.Sprintf("/proc/%d/ns/net", state.Pid)
 	if _, err := os.Stat(s); err != nil {
 		return "", err

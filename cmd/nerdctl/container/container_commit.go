@@ -22,7 +22,7 @@ import (
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 )
 
@@ -43,30 +43,30 @@ func NewCommitCommand() *cobra.Command {
 	return commitCommand
 }
 
-func processCommitCommandOptions(cmd *cobra.Command) (types.ContainerCommitOptions, error) {
+func processCommitCommandOptions(cmd *cobra.Command) (options.ContainerCommit, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return types.ContainerCommitOptions{}, err
+		return options.ContainerCommit{}, err
 	}
 	author, err := cmd.Flags().GetString("author")
 	if err != nil {
-		return types.ContainerCommitOptions{}, err
+		return options.ContainerCommit{}, err
 	}
 	message, err := cmd.Flags().GetString("message")
 	if err != nil {
-		return types.ContainerCommitOptions{}, err
+		return options.ContainerCommit{}, err
 	}
 	pause, err := cmd.Flags().GetBool("pause")
 	if err != nil {
-		return types.ContainerCommitOptions{}, err
+		return options.ContainerCommit{}, err
 	}
 
 	change, err := cmd.Flags().GetStringArray("change")
 	if err != nil {
-		return types.ContainerCommitOptions{}, err
+		return options.ContainerCommit{}, err
 	}
 
-	return types.ContainerCommitOptions{
+	return options.ContainerCommit{
 		Stdout:   cmd.OutOrStdout(),
 		GOptions: globalOptions,
 		Author:   author,

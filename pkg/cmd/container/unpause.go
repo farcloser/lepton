@@ -22,13 +22,13 @@ import (
 
 	containerd "github.com/containerd/containerd/v2/client"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/containerutil"
 	"github.com/containerd/nerdctl/v2/pkg/idutil/containerwalker"
 )
 
 // Unpause unpauses all containers specified by `reqs`.
-func Unpause(ctx context.Context, client *containerd.Client, reqs []string, options types.ContainerUnpauseOptions) error {
+func Unpause(ctx context.Context, client *containerd.Client, reqs []string, options options.ContainerUnpauseOptions) error {
 	walker := &containerwalker.ContainerWalker{
 		Client: client,
 		OnFound: func(ctx context.Context, found containerwalker.Found) error {

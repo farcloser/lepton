@@ -104,7 +104,7 @@ Login Succeeded
 <details>
 <summary>Alternative method: <code>docker-credential-ecr-login</code></summary>
 
-This methods is more secure but needs an external dependency.
+This method is more secure but needs an external dependency.
 
 <p>
 
@@ -295,7 +295,7 @@ See also https://cloud.google.com/artifact-registry/docs/docker/authentication
 <details>
 <summary>Alternative method: <code>docker-credential-gcloud</code> (<code>gcloud auth configure-docker</code>)</summary>
 
-This methods is more secure but needs an external dependency.
+This method is more secure but needs an external dependency.
 
 <p>
 
@@ -361,7 +361,7 @@ See also https://cloud.google.com/container-registry/docs/advanced-authenticatio
 <details>
 <summary>Alternative method: <code>docker-credential-gcloud</code> (<code>gcloud auth configure-docker</code>)</summary>
 
-This methods is more secure but needs an external dependency.
+This method is more secure but needs an external dependency.
 
 <p>
 

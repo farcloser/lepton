@@ -11,7 +11,7 @@ BuildKit has 2 types of backends.
 You need to set up BuildKit with either of the above workers.
 
 Note that OCI worker cannot access base images (`FROM` images in Dockerfiles) managed by containerd.
-Thus you cannot let `nerdctl build` use containerd-managed images as the base image.
+Thus, you cannot let `nerdctl build` use containerd-managed images as the base image.
 They include images previously built using `nerdctl build`.
 
 For example, the following build `bar` fails with OCI worker because it tries to use the previously built and containerd-managed image `foo`.

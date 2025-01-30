@@ -573,7 +573,7 @@ services:
 	psCmd.AssertOutContains(serviceProfiled)
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "down", "-v").AssertOK()
 
-	// in this sub-test we are ensuring that flags '-d' and '--abort-on-container-exit' cannot be ran together
+	// in this subtest we are ensuring that flags '-d' and '--abort-on-container-exit' cannot be run together
 	c := base.ComposeCmd("-f", comp.YAMLFullPath(), "up", "-d", "--abort-on-container-exit")
 	expected := icmd.Expected{
 		ExitCode: 1,

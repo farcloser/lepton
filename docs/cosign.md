@@ -211,4 +211,4 @@ $ sudo env "COSIGN_PASSWORD="$COSIGN_PASSWORD"" nerdctl compose --experimental=t
 $ sudo nerdctl compose down
 ```
 
-Check your logs to confirm that svc0 is verified by cosign (have cosign logs) and svc1 is not. You can also change the public key in `docker-compose.yaml` to a random value to see verify failure will stop the container being `pull|up|run`.
+Check your logs to confirm that svc0 is verified by cosign (e.g. has `cosign` logs) and svc1 is not. You can also change the public key in `docker-compose.yaml` to a random value to see verify failure will stop the container being `pull|up|run`.

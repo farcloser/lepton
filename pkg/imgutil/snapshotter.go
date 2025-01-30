@@ -24,7 +24,7 @@ import (
 	ctdsnapshotters "github.com/containerd/containerd/v2/pkg/snapshotters"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/imgutil/pull"
 	"github.com/containerd/nerdctl/v2/pkg/snapshotterutil"
 )
@@ -41,7 +41,7 @@ var builtinRemoteSnapshotterOpts = map[string]snapshotterOpts{
 // snapshotterOpts is used to update pull config
 // for different snapshotters
 type snapshotterOpts interface {
-	apply(config *pull.Config, ref string, rFlags types.RemoteSnapshotterFlags)
+	apply(config *pull.Config, ref string, rFlags options.RemoteSnapshotterFlags)
 	isRemote() bool
 }
 
@@ -63,14 +63,14 @@ func getSnapshotterOpts(snapshotter string) snapshotterOpts {
 // interface `snapshotterOpts.isRemote()` function
 type remoteSnapshotterOpts struct {
 	snapshotter string
-	extraLabels func(func(images.Handler) images.Handler, types.RemoteSnapshotterFlags) func(images.Handler) images.Handler
+	extraLabels func(func(images.Handler) images.Handler, options.RemoteSnapshotterFlags) func(images.Handler) images.Handler
 }
 
 func (rs *remoteSnapshotterOpts) isRemote() bool {
 	return true
 }
 
-func (rs *remoteSnapshotterOpts) apply(config *pull.Config, ref string, rFlags types.RemoteSnapshotterFlags) {
+func (rs *remoteSnapshotterOpts) apply(config *pull.Config, ref string, rFlags options.RemoteSnapshotterFlags) {
 	h := ctdsnapshotters.AppendInfoHandlerWrapper(ref)
 	if rs.extraLabels != nil {
 		h = rs.extraLabels(h, rFlags)
@@ -88,7 +88,7 @@ type defaultSnapshotterOpts struct {
 	snapshotter string
 }
 
-func (dsn *defaultSnapshotterOpts) apply(config *pull.Config, _ref string, rFlags types.RemoteSnapshotterFlags) {
+func (dsn *defaultSnapshotterOpts) apply(config *pull.Config, _ref string, rFlags options.RemoteSnapshotterFlags) {
 	config.RemoteOpts = append(
 		config.RemoteOpts,
 		containerd.WithPullSnapshotter(dsn.snapshotter))
@@ -99,6 +99,6 @@ func (dsn *defaultSnapshotterOpts) isRemote() bool {
 	return false
 }
 
-func sociExtraLabels(f func(images.Handler) images.Handler, rFlags types.RemoteSnapshotterFlags) func(images.Handler) images.Handler {
+func sociExtraLabels(f func(images.Handler) images.Handler, rFlags options.RemoteSnapshotterFlags) func(images.Handler) images.Handler {
 	return snapshotterutil.SociAppendDefaultLabelsHandlerWrapper(rFlags.SociIndexDigest, f)
 }

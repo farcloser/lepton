@@ -44,7 +44,7 @@ import (
 
 // containerTop was inspired from https://github.com/moby/moby/blob/v20.10.6/daemon/top_unix.go#L133-L189
 //
-// ContainerTop lists the processes running inside of the given
+// ContainerTop lists the processes running inside the given
 // container by calling ps with the given args, or with the flags
 // "-ef" if no args are given.  An error is returned if the container
 // is not found, or is not running, or if there are any problems
@@ -150,7 +150,7 @@ func psPidsArg(pids []uint32) string {
 
 // validatePSArgs is from https://github.com/moby/moby/blob/v20.10.6/daemon/top_unix.go#L19-L35
 func validatePSArgs(psArgs string) error {
-	// NOTE: \\s does not detect unicode whitespaces.
+	// NOTE: \\s does not detect Unicode whitespaces.
 	// So we use fieldsASCII instead of strings.Fields in parsePSOutput.
 	// See https://github.com/docker/docker/pull/24358
 	re := regexp.MustCompile(`\s+(\S*)=\s*(PID\S*)`)

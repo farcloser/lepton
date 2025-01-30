@@ -23,7 +23,7 @@ import (
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/image"
 )
 
@@ -43,30 +43,30 @@ func newImagePruneCommand() *cobra.Command {
 	return imagePruneCommand
 }
 
-func processImagePruneOptions(cmd *cobra.Command) (types.ImagePruneOptions, error) {
+func processImagePruneOptions(cmd *cobra.Command) (options.ImagePrune, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return types.ImagePruneOptions{}, err
+		return options.ImagePrune{}, err
 	}
 	all, err := cmd.Flags().GetBool("all")
 	if err != nil {
-		return types.ImagePruneOptions{}, err
+		return options.ImagePrune{}, err
 	}
 
 	var filters []string
 	if cmd.Flags().Changed("filter") {
 		filters, err = cmd.Flags().GetStringSlice("filter")
 		if err != nil {
-			return types.ImagePruneOptions{}, err
+			return options.ImagePrune{}, err
 		}
 	}
 
 	force, err := cmd.Flags().GetBool("force")
 	if err != nil {
-		return types.ImagePruneOptions{}, err
+		return options.ImagePrune{}, err
 	}
 
-	return types.ImagePruneOptions{
+	return options.ImagePrune{
 		Stdout:   cmd.OutOrStdout(),
 		GOptions: globalOptions,
 		All:      all,

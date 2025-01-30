@@ -28,7 +28,7 @@ import (
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 )
@@ -58,23 +58,23 @@ func NewPsCommand() *cobra.Command {
 	return psCommand
 }
 
-func processOptions(cmd *cobra.Command) (types.ContainerListOptions, FormattingAndPrintingOptions, error) {
+func processOptions(cmd *cobra.Command) (options.ContainerList, FormattingAndPrintingOptions, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return types.ContainerListOptions{}, FormattingAndPrintingOptions{}, err
+		return options.ContainerList{}, FormattingAndPrintingOptions{}, err
 	}
 	all, err := cmd.Flags().GetBool("all")
 	if err != nil {
-		return types.ContainerListOptions{}, FormattingAndPrintingOptions{}, err
+		return options.ContainerList{}, FormattingAndPrintingOptions{}, err
 	}
 	latest, err := cmd.Flags().GetBool("latest")
 	if err != nil {
-		return types.ContainerListOptions{}, FormattingAndPrintingOptions{}, err
+		return options.ContainerList{}, FormattingAndPrintingOptions{}, err
 	}
 
 	lastN, err := cmd.Flags().GetInt("last")
 	if err != nil {
-		return types.ContainerListOptions{}, FormattingAndPrintingOptions{}, err
+		return options.ContainerList{}, FormattingAndPrintingOptions{}, err
 	}
 	if lastN == -1 && latest {
 		lastN = 1
@@ -82,33 +82,33 @@ func processOptions(cmd *cobra.Command) (types.ContainerListOptions, FormattingA
 
 	filters, err := cmd.Flags().GetStringSlice("filter")
 	if err != nil {
-		return types.ContainerListOptions{}, FormattingAndPrintingOptions{}, err
+		return options.ContainerList{}, FormattingAndPrintingOptions{}, err
 	}
 
 	noTrunc, err := cmd.Flags().GetBool("no-trunc")
 	if err != nil {
-		return types.ContainerListOptions{}, FormattingAndPrintingOptions{}, err
+		return options.ContainerList{}, FormattingAndPrintingOptions{}, err
 	}
 	trunc := !noTrunc
 
 	quiet, err := cmd.Flags().GetBool("quiet")
 	if err != nil {
-		return types.ContainerListOptions{}, FormattingAndPrintingOptions{}, err
+		return options.ContainerList{}, FormattingAndPrintingOptions{}, err
 	}
 	format, err := cmd.Flags().GetString("format")
 	if err != nil {
-		return types.ContainerListOptions{}, FormattingAndPrintingOptions{}, err
+		return options.ContainerList{}, FormattingAndPrintingOptions{}, err
 	}
 
 	size := false
 	if !quiet {
 		size, err = cmd.Flags().GetBool("size")
 		if err != nil {
-			return types.ContainerListOptions{}, FormattingAndPrintingOptions{}, err
+			return options.ContainerList{}, FormattingAndPrintingOptions{}, err
 		}
 	}
 
-	return types.ContainerListOptions{
+	return options.ContainerList{
 			GOptions: globalOptions,
 			All:      all,
 			LastN:    lastN,

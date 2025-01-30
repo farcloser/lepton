@@ -105,7 +105,7 @@ func IntersectsWithNetworks(n *net.IPNet, networklist []*net.IPNet) bool {
 // lastIPInSubnet gets the last IP in a subnet
 // https://github.com/containers/podman/blob/v4.0.0-rc1/libpod/network/util/ip.go#L18
 func LastIPInSubnet(addr *net.IPNet) (net.IP, error) {
-	// re-parse to ensure clean network address
+	// reparse to ensure clean network address
 	_, cidr, err := net.ParseCIDR(addr.String())
 	if err != nil {
 		return nil, err
@@ -123,7 +123,7 @@ func LastIPInSubnet(addr *net.IPNet) (net.IP, error) {
 // firstIPInSubnet gets the first IP in a subnet
 // https://github.com/containers/podman/blob/v4.0.0-rc1/libpod/network/util/ip.go#L36
 func FirstIPInSubnet(addr *net.IPNet) (net.IP, error) {
-	// re-parse to ensure clean network address
+	// reparse to ensure clean network address
 	_, cidr, err := net.ParseCIDR(addr.String())
 	if err != nil {
 		return nil, err

@@ -11,7 +11,7 @@
   - [Does nerdctl run on Windows ?](#does-nerdctl-run-on-windows-)
 - [Configuration](#configuration)
   - [nerdctl ignores `[plugins."io.containerd.grpc.v1.cri"]` config](#nerdctl-ignores-pluginsiocontainerdgrpcv1cri-config)
-  - [How to login to a registry?](#how-to-login-to-a-registry)
+  - [How to log in to a registry?](#how-to-log-in-to-a-registry)
   - [How to use a non-HTTPS registry?](#how-to-use-a-non-https-registry)
   - [How to specify the CA certificate of the registry?](#how-to-specify-the-ca-certificate-of-the-registry)
   - [How to change the cgroup driver?](#how-to-change-the-cgroup-driver)
@@ -93,7 +93,7 @@ Expected behavior, because nerdctl does not use CRI (Kubernetes Container Runtim
 
 See the questions below for how to configure nerdctl.
 
-### How to login to a registry?
+### How to log in to a registry?
 
 Use `nerdctl login`, or just create `~/.docker/config.json`.
 nerdctl also supports credential helper binaries such as `docker-credential-ecr-login`.
@@ -337,7 +337,7 @@ See https://rootlesscontaine.rs/getting-started/common/login/ .
 
 Running a rootless container with `systemd` cgroup driver requires dbus to be running as a user session service.
 
-Otherwise runc may fail with an error like below:
+Otherwise, runc may fail with an error like below:
 ```
 FATA[0000] failed to create shim task: OCI runtime create failed: runc create failed: unable to start container process: unable to apply cgroup configuration: unable to start unit "nerdctl-7bda4abaa1f006ab9feeb98c06953db43f212f1c0aaf658fb8a88d6f63dff9f9.scope" (properties [{Name:Description Value:"libcontainer container 7bda4abaa1f006ab9feeb98c06953db43f212f1c0aaf658fb8a88d6f63dff9f9"} {Name:Slice Value:"user.slice"} {Name:Delegate Value:true} {Name:PIDs Value:@au [1154]} {Name:MemoryAccounting Value:true} {Name:CPUAccounting Value:true} {Name:IOAccounting Value:true} {Name:TasksAccounting Value:true} {Name:DefaultDependencies Value:false}]): Permission denied: unknown
 ```

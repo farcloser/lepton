@@ -47,7 +47,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/image"
 	"github.com/containerd/nerdctl/v2/pkg/containerutil"
-	imgutil "github.com/containerd/nerdctl/v2/pkg/imgutil"
+	"github.com/containerd/nerdctl/v2/pkg/imgutil"
 	"github.com/containerd/nerdctl/v2/pkg/labels"
 )
 
@@ -276,7 +276,7 @@ func generateCommitImageConfig(ctx context.Context, container containerd.Contain
 			CreatedBy:  createdBy,
 			Author:     opts.Author,
 			Comment:    opts.Message,
-			EmptyLayer: (diffID == emptyGZLayer),
+			EmptyLayer: diffID == emptyGZLayer,
 		}),
 	}, nil
 }

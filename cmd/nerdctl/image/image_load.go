@@ -22,7 +22,7 @@ import (
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/imgutil/load"
 )
 
@@ -50,28 +50,28 @@ func NewLoadCommand() *cobra.Command {
 	return loadCommand
 }
 
-func processLoadCommandFlags(cmd *cobra.Command) (types.ImageLoadOptions, error) {
+func processLoadCommandFlags(cmd *cobra.Command) (options.ImageLoad, error) {
 	input, err := cmd.Flags().GetString("input")
 	if err != nil {
-		return types.ImageLoadOptions{}, err
+		return options.ImageLoad{}, err
 	}
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return types.ImageLoadOptions{}, err
+		return options.ImageLoad{}, err
 	}
 	allPlatforms, err := cmd.Flags().GetBool("all-platforms")
 	if err != nil {
-		return types.ImageLoadOptions{}, err
+		return options.ImageLoad{}, err
 	}
 	platform, err := cmd.Flags().GetStringSlice("platform")
 	if err != nil {
-		return types.ImageLoadOptions{}, err
+		return options.ImageLoad{}, err
 	}
 	quiet, err := cmd.Flags().GetBool("quiet")
 	if err != nil {
-		return types.ImageLoadOptions{}, err
+		return options.ImageLoad{}, err
 	}
-	return types.ImageLoadOptions{
+	return options.ImageLoad{
 		GOptions:     globalOptions,
 		Input:        input,
 		Platform:     platform,

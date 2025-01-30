@@ -24,7 +24,7 @@ import (
 	"go.farcloser.world/containers/security/cgroups"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 	"github.com/containerd/nerdctl/v2/pkg/containerutil"
@@ -52,9 +52,9 @@ func NewCreateCommand() *cobra.Command {
 	return createCommand
 }
 
-func processContainerCreateOptions(cmd *cobra.Command) (types.ContainerCreateOptions, error) {
+func processContainerCreateOptions(cmd *cobra.Command) (*options.ContainerCreate, error) {
 	var err error
-	opt := types.ContainerCreateOptions{
+	opt := &options.ContainerCreate{
 		Stdout: cmd.OutOrStdout(),
 		Stderr: cmd.ErrOrStderr(),
 	}
@@ -404,7 +404,7 @@ func processContainerCreateOptions(cmd *cobra.Command) (types.ContainerCreateOpt
 	if err != nil {
 		return opt, err
 	}
-	opt.ImagePullOpt = types.ImagePullOptions{
+	opt.ImagePullOpt = options.ImagePull{
 		GOptions:      opt.GOptions,
 		VerifyOptions: imageVerifyOpt,
 		Stdout:        opt.Stdout,

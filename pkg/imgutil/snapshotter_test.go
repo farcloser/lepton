@@ -28,7 +28,7 @@ import (
 	containerd "github.com/containerd/containerd/v2/client"
 	ctdsnapshotters "github.com/containerd/containerd/v2/pkg/snapshotters"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/imgutil/pull"
 )
 
@@ -83,7 +83,7 @@ func sameOpts(want snapshotterOpts) func(*testing.T, snapshotterOpts) {
 func getAndApplyRemoteOpts(t *testing.T, sn string) *containerd.RemoteContext {
 	config := &pull.Config{}
 	snOpts := getSnapshotterOpts(sn)
-	rFlags := types.RemoteSnapshotterFlags{}
+	rFlags := options.RemoteSnapshotterFlags{}
 	snOpts.apply(config, testRef, rFlags)
 
 	rc := &containerd.RemoteContext{}

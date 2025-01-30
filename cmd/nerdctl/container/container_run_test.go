@@ -59,7 +59,7 @@ CMD ["echo", "bar"]
 	base.Cmd("run", "--rm", "--entrypoint", "", imageName).AssertFail()
 	base.Cmd("run", "--rm", "--entrypoint", "", imageName, "echo", "blah").AssertOutWithFunc(func(stdout string) error {
 		if !strings.Contains(stdout, "blah") {
-			return errors.New("echo blah was not executed?")
+			return errors.New("echo blah was not executed")
 		}
 		if strings.Contains(stdout, "bar") {
 			return errors.New("echo bar should not be executed")
@@ -72,7 +72,7 @@ CMD ["echo", "bar"]
 	base.Cmd("run", "--rm", "--entrypoint", "time", imageName).AssertFail()
 	base.Cmd("run", "--rm", "--entrypoint", "time", imageName, "echo", "blah").AssertOutWithFunc(func(stdout string) error {
 		if !strings.Contains(stdout, "blah") {
-			return errors.New("echo blah was not executed?")
+			return errors.New("echo blah was not executed")
 		}
 		if strings.Contains(stdout, "bar") {
 			return errors.New("echo bar should not be executed")
@@ -493,7 +493,7 @@ COPY --from=builder /go/src/logger/logger /
 }
 
 // history: There was a bug that the --add-host items disappear when the another container created.
-// This case ensures that it's doesn't happen.
+// This case ensures that it doesn't happen.
 // (https://github.com/containerd/nerdctl/issues/2560)
 func TestRunAddHostRemainsWhenAnotherContainerCreated(t *testing.T) {
 	if runtime.GOOS == "windows" {

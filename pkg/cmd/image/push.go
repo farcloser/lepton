@@ -32,7 +32,7 @@ import (
 	dockerconfig "github.com/containerd/containerd/v2/core/remotes/docker/config"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/errutil"
 	"github.com/containerd/nerdctl/v2/pkg/imgutil/dockerconfigresolver"
 	"github.com/containerd/nerdctl/v2/pkg/imgutil/push"
@@ -42,7 +42,7 @@ import (
 )
 
 // Push pushes an image specified by `rawRef`.
-func Push(ctx context.Context, client *containerd.Client, rawRef string, options types.ImagePushOptions) error {
+func Push(ctx context.Context, client *containerd.Client, rawRef string, options options.ImagePush) error {
 	parsedReference, err := reference.Parse(rawRef)
 	if err != nil {
 		return err
@@ -57,7 +57,7 @@ func Push(ctx context.Context, client *containerd.Client, rawRef string, options
 	pushRef := ref
 	if !options.AllPlatforms {
 		pushRef = ref + "-tmp-reduced-platform"
-		// Push fails with "400 Bad Request" when the manifest is multi-platform but we do not locally have multi-platform blobs.
+		// Push fails with "400 Bad Request" when the manifest is multi-platform, but we do not locally have multi-platform blobs.
 		// So we create a tmp reduced-platform image to avoid the error.
 		platImg, err := converter.Convert(ctx, client, pushRef, ref, converter.WithPlatform(platMC))
 		if err != nil {

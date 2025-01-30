@@ -4,7 +4,7 @@
 
 You _may_ want to read this if you are developing something in nerdctl that would involve storing persistent information.
 
-If there is a "store" already in the codebase (eg: volumestore, namestore, etc) that does provide the methods that you need,
+If there is a "store" already in the codebase (eg: volumestore, namestore, etc.) that does provide the methods that you need,
 you are fine and should just stick to that.
 
 On the other hand, if you are curious, or if what you want to write is "new", then _you should_ have a look at this document:
@@ -144,7 +144,7 @@ Users of the `namestore` do not have to bother with locking. These methods are s
 This is a good example of how to leverage core store primitives to implement a developer friendly, safe storage for
 "something" (in that case "names").
 
-Finaly note an important point - mentioned above: locking should be done to the smallest possible "segment" of sub-directories.
+Finaly note an important point - mentioned above: locking should be done to the smallest possible "segment" of subdirectories.
 Specifically, any store should lock only - at most - resources under the _namespace_ being manipulated.
 
 For example, a container lifecycle storage should not lock out any other container, but only its own private directory.

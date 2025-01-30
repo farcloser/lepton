@@ -22,13 +22,13 @@ import (
 
 	containerd "github.com/containerd/containerd/v2/client"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/containerutil"
 	"github.com/containerd/nerdctl/v2/pkg/idutil/containerwalker"
 )
 
 // Cp copies files/folders between a running container and the local filesystem.
-func Cp(ctx context.Context, client *containerd.Client, options types.ContainerCpOptions) error {
+func Cp(ctx context.Context, client *containerd.Client, options options.ContainerCp) error {
 	walker := &containerwalker.ContainerWalker{
 		Client: client,
 		OnFound: func(ctx context.Context, found containerwalker.Found) error {

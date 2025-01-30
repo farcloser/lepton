@@ -22,13 +22,13 @@ import (
 
 	containerd "github.com/containerd/containerd/v2/client"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/containerutil"
 	"github.com/containerd/nerdctl/v2/pkg/idutil/containerwalker"
 )
 
 // Restart will restart one or more containers.
-func Restart(ctx context.Context, client *containerd.Client, containers []string, options types.ContainerRestartOptions) error {
+func Restart(ctx context.Context, client *containerd.Client, containers []string, options options.ContainerRestart) error {
 	walker := &containerwalker.ContainerWalker{
 		Client: client,
 		OnFound: func(ctx context.Context, found containerwalker.Found) error {

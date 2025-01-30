@@ -145,7 +145,7 @@ func getKernelVersion(sw windowsInfoUtil) (string, error) {
 	}
 
 	// Get Version: Contains the major and minor version numbers of the operating system.
-	// Eg. "10.0"
+	// E.g. "10.0"
 	osvi := sw.RtlGetVersion()
 
 	// Concatenate the OS version and BuildLabEx values to get the Kernel version information

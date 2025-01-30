@@ -27,7 +27,7 @@ import (
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	imageCmd "github.com/containerd/nerdctl/v2/cmd/nerdctl/image"
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/image"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
@@ -114,8 +114,8 @@ func inspectAction(cmd *cobra.Command, args []string) error {
 	inspectImage := len(inspectType) == 0 || inspectType == "image"
 	inspectContainer := len(inspectType) == 0 || inspectType == "container"
 
-	var imageInspectOptions types.ImageInspectOptions
-	var containerInspectOptions types.ContainerInspectOptions
+	var imageInspectOptions options.ImageInspect
+	var containerInspectOptions options.ContainerInspect
 	if inspectImage {
 		platform := ""
 		imageInspectOptions, err = imageCmd.ProcessImageInspectOptions(cmd, &platform)

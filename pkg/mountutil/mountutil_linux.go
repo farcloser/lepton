@@ -439,12 +439,12 @@ func ProcessFlagMount(s string, volStore volumestore.VolumeStore) (*Processed, e
 // copy from https://github.com/moby/moby/blob/085c6a98d54720e70b28354ccec6da9b1b9e7fcf/volume/mounts/linux_parser.go#L375
 func getTmpfsSize(size int64) string {
 	// calculate suffix here, making this linux specific, but that is
-	// okay, since API is that way anyways.
+	// okay, since API is that way anyway.
 
 	// we do this by finding the suffix that divides evenly into the
 	// value, returning the value itself, with no suffix, if it fails.
 	//
-	// For the most part, we don't enforce any semantic to this values.
+	// For the most part, we don't enforce any semantic to this value.
 	// The operating system will usually align this and enforce minimum
 	// and maximums.
 	var (

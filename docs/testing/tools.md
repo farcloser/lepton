@@ -31,7 +31,7 @@ func TestMyThing(t *testing.T) {
 	// Declare your test
 	myTest := nerdtest.Setup()
 	// This is going to run `nerdctl info` (or `docker info`)
-	mytest.Command = test.Command("info")
+	myTest.Command = test.Command("info")
     // Verify the command exits with 0, and stdout contains the word `Kernel`
     myTest.Expected = test.Expects(0, nil, test.Contains("Kernel"))
 	// Run it

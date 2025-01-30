@@ -68,7 +68,7 @@ func NewComposeDir(t testing.TB, dockerComposeYAML string) *ComposeDir {
 	return cd
 }
 
-// Load is used only for unit testing.
+// LoadProject is used only for unit testing.
 func LoadProject(fileName, projectName string, envMap map[string]string) (*compose.Project, error) {
 	if envMap == nil {
 		envMap = make(map[string]string)

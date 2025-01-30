@@ -22,7 +22,7 @@ import (
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 )
 
@@ -39,12 +39,12 @@ func NewRenameCommand() *cobra.Command {
 	return renameCommand
 }
 
-func processContainerRenameOptions(cmd *cobra.Command) (types.ContainerRenameOptions, error) {
+func processContainerRenameOptions(cmd *cobra.Command) (options.ContainerRename, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return types.ContainerRenameOptions{}, err
+		return options.ContainerRename{}, err
 	}
-	return types.ContainerRenameOptions{
+	return options.ContainerRename{
 		GOptions: globalOptions,
 		Stdout:   cmd.OutOrStdout(),
 	}, nil

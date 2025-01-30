@@ -32,7 +32,6 @@ import (
 
 	"github.com/containerd/nerdctl/v2/leptonic/errs"
 	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/containerutil"
 	"github.com/containerd/nerdctl/v2/pkg/dnsutil/hostsstore"
@@ -63,7 +62,7 @@ func NewStatusError(id string, status containerd.ProcessStatus) error {
 }
 
 // Remove removes a list of `containers`.
-func Remove(ctx context.Context, client *containerd.Client, containers []string, options types.ContainerRemoveOptions) error {
+func Remove(ctx context.Context, client *containerd.Client, containers []string, options options.ContainerRemove) error {
 	walker := &containerwalker.ContainerWalker{
 		Client: client,
 		OnFound: func(ctx context.Context, found containerwalker.Found) error {

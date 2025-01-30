@@ -35,7 +35,7 @@ import (
 
 // containerTop was inspired from https://github.com/moby/moby/blob/master/daemon/top_windows.go
 //
-// ContainerTop lists the processes running inside of the given
+// ContainerTop lists the processes running inside the given
 // container. An error is returned if the container
 // is not found, or is not running.
 func containerTop(ctx context.Context, stdio io.Writer, client *containerd.Client, id string, psArgs string) error {

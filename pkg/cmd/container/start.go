@@ -23,13 +23,13 @@ import (
 
 	containerd "github.com/containerd/containerd/v2/client"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/containerutil"
 	"github.com/containerd/nerdctl/v2/pkg/idutil/containerwalker"
 )
 
 // Start starts a list of `containers`. If attach is true, it only starts a single container.
-func Start(ctx context.Context, client *containerd.Client, reqs []string, options types.ContainerStartOptions) error {
+func Start(ctx context.Context, client *containerd.Client, reqs []string, options options.ContainerStart) error {
 	if options.Attach && len(reqs) > 1 {
 		return errors.New("you cannot start and attach multiple containers at once")
 	}

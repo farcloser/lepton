@@ -29,7 +29,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 )
 
-// TestRunInternetConnectivity tests Internet connectivity by pinging github.com.
+// TestRunInternetConnectivity tests Internet connectivity by pinging GitHub.
 func TestRunInternetConnectivity(t *testing.T) {
 	base := testutil.NewBase(t)
 
@@ -65,7 +65,7 @@ func TestRunPort(t *testing.T) {
 }
 
 // Asserts whether the container with the provided has any HNS endpoints with the expected
-// naming format (`${container_id}_${network_name}`) for all of the provided network names.
+// naming format (`${container_id}_${network_name}`) for all the provided network names.
 // The container ID can be a regex.
 func assertHnsEndpointsExistence(t *testing.T, shouldExist bool, containerIDRegex string, networkNames ...string) {
 	for _, netName := range networkNames {

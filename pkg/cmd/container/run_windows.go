@@ -30,7 +30,7 @@ import (
 	"github.com/containerd/containerd/v2/core/containers"
 	"github.com/containerd/containerd/v2/pkg/oci"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 )
 
 const (
@@ -48,7 +48,7 @@ func setPlatformOptions(
 	client *containerd.Client,
 	id, uts string,
 	internalLabels *internalLabels,
-	options types.ContainerCreateOptions,
+	options *options.ContainerCreate,
 ) ([]oci.SpecOpts, error) {
 	opts := []oci.SpecOpts{}
 	if options.CPUs > 0.0 {

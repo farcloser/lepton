@@ -26,11 +26,10 @@ import (
 	"github.com/containerd/log"
 
 	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
 )
 
 // CreateSoci creates a SOCI index(`rawRef`)
-func CreateSoci(rawRef string, gOpts *options.Global, allPlatform bool, platforms []string, sOpts *types.SociOptions) error {
+func CreateSoci(rawRef string, gOpts *options.Global, allPlatform bool, platforms []string, sOpts *options.Soci) error {
 	sociExecutable, err := exec.LookPath("soci")
 	if err != nil {
 		log.L.WithError(err).Error("soci executable not found in path $PATH")

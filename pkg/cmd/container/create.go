@@ -43,7 +43,7 @@ import (
 
 	"github.com/containerd/nerdctl/v2/leptonic/errs"
 	"github.com/containerd/nerdctl/v2/pkg/annotations"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/image"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/volume"
@@ -66,10 +66,10 @@ import (
 )
 
 // Create will create a container.
-func Create(ctx context.Context, client *containerd.Client, args []string, netManager containerutil.NetworkOptionsManager, options types.ContainerCreateOptions) (containerd.Container, func(), error) {
+func Create(ctx context.Context, client *containerd.Client, args []string, netManager containerutil.NetworkOptionsManager, opts *options.ContainerCreate) (containerd.Container, func(), error) {
 	// Acquire an exclusive lock on the volume store until we are done to avoid being raced by any other
 	// volume operations (or any other operation involving volume manipulation)
-	volStore, err := volume.Store(options.GOptions.Namespace, options.GOptions.DataRoot, options.GOptions.Address)
+	volStore, err := volume.Store(opts.GOptions.Namespace, opts.GOptions.DataRoot, opts.GOptions.Address)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -87,26 +87,26 @@ func Create(ctx context.Context, client *containerd.Client, args []string, netMa
 		args = newArg
 	}
 	var internalLabels internalLabels
-	internalLabels.platform = options.Platform
-	internalLabels.namespace = options.GOptions.Namespace
+	internalLabels.platform = opts.Platform
+	internalLabels.namespace = opts.GOptions.Namespace
 
 	var (
-		id    = idgen.GenerateID()
-		opts  []oci.SpecOpts
-		cOpts []containerd.NewContainerOpts
+		id       = idgen.GenerateID()
+		specOpts []oci.SpecOpts
+		cOpts    []containerd.NewContainerOpts
 	)
 
-	if options.CidFile != "" {
-		if err := writeCIDFile(options.CidFile, id); err != nil {
+	if opts.CidFile != "" {
+		if err := writeCIDFile(opts.CidFile, id); err != nil {
 			return nil, nil, err
 		}
 	}
-	dataStore, err := clientutil.DataStore(options.GOptions.DataRoot, options.GOptions.Address)
+	dataStore, err := clientutil.DataStore(opts.GOptions.DataRoot, opts.GOptions.Address)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	internalLabels.stateDir, err = containerutil.ContainerStateDirPath(options.GOptions.Namespace, dataStore, id)
+	internalLabels.stateDir, err = containerutil.ContainerStateDirPath(opts.GOptions.Namespace, dataStore, id)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -114,15 +114,15 @@ func Create(ctx context.Context, client *containerd.Client, args []string, netMa
 		return nil, nil, err
 	}
 
-	opts = append(opts,
+	specOpts = append(specOpts,
 		oci.WithDefaultSpec(),
 	)
 
-	platformOpts, err := setPlatformOptions(ctx, client, id, netManager.NetworkOptions().UTSNamespace, &internalLabels, options)
+	platformOpts, err := setPlatformOptions(ctx, client, id, netManager.NetworkOptions().UTSNamespace, &internalLabels, opts)
 	if err != nil {
 		return nil, generateRemoveStateDirFunc(ctx, id, internalLabels), err
 	}
-	opts = append(opts, platformOpts...)
+	specOpts = append(specOpts, platformOpts...)
 
 	if _, err := reference.Parse(args[0]); errors.Is(err, reference.ErrLoadOCIArchiveRequired) {
 		imageRef := args[0]
@@ -130,16 +130,16 @@ func Create(ctx context.Context, client *containerd.Client, args []string, netMa
 		// Load and create the platform specified by the user.
 		// If none specified, fallback to the default platform.
 		platform := []string{}
-		if options.Platform != "" {
-			platform = append(platform, options.Platform)
+		if opts.Platform != "" {
+			platform = append(platform, opts.Platform)
 		}
 
-		images, err := load.FromOCIArchive(ctx, client, imageRef, types.ImageLoadOptions{
-			Stdout:       options.Stdout,
-			GOptions:     options.GOptions,
+		images, err := load.FromOCIArchive(ctx, client, imageRef, options.ImageLoad{
+			Stdout:       opts.Stdout,
+			GOptions:     opts.GOptions,
 			Platform:     platform,
 			AllPlatforms: false,
-			Quiet:        options.ImagePullOpt.Quiet,
+			Quiet:        opts.ImagePullOpt.Quiet,
 		})
 		if err != nil {
 			return nil, nil, err
@@ -158,10 +158,10 @@ func Create(ctx context.Context, client *containerd.Client, args []string, netMa
 	}
 
 	var ensuredImage *imgutil.EnsuredImage
-	if !options.Rootfs {
+	if !opts.Rootfs {
 		var platformSS []string // len: 0 or 1
-		if options.Platform != "" {
-			platformSS = append(platformSS, options.Platform)
+		if opts.Platform != "" {
+			platformSS = append(platformSS, opts.Platform)
 		}
 		ocispecPlatforms, err := platformutil.NewOCISpecPlatformSlice(false, platformSS)
 		if err != nil {
@@ -169,48 +169,48 @@ func Create(ctx context.Context, client *containerd.Client, args []string, netMa
 		}
 		rawRef := args[0]
 
-		options.ImagePullOpt.Mode = options.Pull
-		options.ImagePullOpt.OCISpecPlatform = ocispecPlatforms
-		options.ImagePullOpt.Unpack = nil
+		opts.ImagePullOpt.Mode = opts.Pull
+		opts.ImagePullOpt.OCISpecPlatform = ocispecPlatforms
+		opts.ImagePullOpt.Unpack = nil
 
-		ensuredImage, err = image.EnsureImage(ctx, client, rawRef, options.ImagePullOpt)
+		ensuredImage, err = image.EnsureImage(ctx, client, rawRef, opts.ImagePullOpt)
 		if err != nil {
 			return nil, generateRemoveStateDirFunc(ctx, id, internalLabels), err
 		}
 	}
 
-	rootfsOpts, rootfsCOpts, err := generateRootfsOpts(args, id, ensuredImage, options)
+	rootfsOpts, rootfsCOpts, err := generateRootfsOpts(args, id, ensuredImage, opts)
 	if err != nil {
 		return nil, generateRemoveStateDirFunc(ctx, id, internalLabels), err
 	}
-	opts = append(opts, rootfsOpts...)
+	specOpts = append(specOpts, rootfsOpts...)
 	cOpts = append(cOpts, rootfsCOpts...)
 
-	if options.Workdir != "" {
-		opts = append(opts, oci.WithProcessCwd(options.Workdir))
+	if opts.Workdir != "" {
+		specOpts = append(specOpts, oci.WithProcessCwd(opts.Workdir))
 	}
 
-	envs, err := flagutil.MergeEnvFileAndOSEnv(options.EnvFile, options.Env)
+	envs, err := flagutil.MergeEnvFileAndOSEnv(opts.EnvFile, opts.Env)
 	if err != nil {
 		return nil, generateRemoveStateDirFunc(ctx, id, internalLabels), err
 	}
 
-	if options.Interactive {
-		if options.Detach {
+	if opts.Interactive {
+		if opts.Detach {
 			return nil, generateRemoveStateDirFunc(ctx, id, internalLabels), errors.New("currently flag -i and -d cannot be specified together (FIXME)")
 		}
 	}
 
-	if options.TTY {
-		opts = append(opts, oci.WithTTY)
+	if opts.TTY {
+		specOpts = append(specOpts, oci.WithTTY)
 	}
 
 	var mountOpts []oci.SpecOpts
-	mountOpts, internalLabels.anonVolumes, internalLabels.mountPoints, err = generateMountOpts(ctx, client, ensuredImage, volStore, options)
+	mountOpts, internalLabels.anonVolumes, internalLabels.mountPoints, err = generateMountOpts(ctx, client, ensuredImage, volStore, opts)
 	if err != nil {
 		return nil, generateRemoveStateDirFunc(ctx, id, internalLabels), err
 	}
-	opts = append(opts, mountOpts...)
+	specOpts = append(specOpts, mountOpts...)
 
 	// Always set internalLabels.logURI
 	// to support restart the container that run with "-it", like
@@ -218,13 +218,13 @@ func Create(ctx context.Context, client *containerd.Client, args []string, netMa
 	// 1, nerdctl run --name demo -it imagename
 	// 2, ctrl + c to stop demo container
 	// 3, nerdctl start/restart demo
-	logConfig, err := generateLogConfig(dataStore, id, options.LogDriver, options.LogOpt, options.GOptions.Namespace, options.GOptions.Address)
+	logConfig, err := generateLogConfig(dataStore, id, opts.LogDriver, opts.LogOpt, opts.GOptions.Namespace, opts.GOptions.Address)
 	if err != nil {
 		return nil, generateRemoveStateDirFunc(ctx, id, internalLabels), err
 	}
 	internalLabels.logURI = logConfig.LogURI
 
-	restartOpts, err := generateRestartOpts(ctx, client, options.Restart, logConfig.LogURI, options.InRun)
+	restartOpts, err := generateRestartOpts(ctx, client, opts.Restart, logConfig.LogURI, opts.InRun)
 	if err != nil {
 		return nil, generateRemoveStateDirFunc(ctx, id, internalLabels), err
 	}
@@ -238,7 +238,7 @@ func Create(ctx context.Context, client *containerd.Client, args []string, netMa
 	if err != nil {
 		return nil, generateRemoveOrphanedDirsFunc(ctx, id, dataStore, internalLabels), fmt.Errorf("failed to generate networking spec options: %w", err)
 	}
-	opts = append(opts, netOpts...)
+	specOpts = append(specOpts, netOpts...)
 	cOpts = append(cOpts, netNewContainerOpts...)
 
 	netLabelOpts, err := netManager.InternalNetworkingOptionLabels(ctx)
@@ -247,7 +247,7 @@ func Create(ctx context.Context, client *containerd.Client, args []string, netMa
 	}
 
 	envs = append(envs, "HOSTNAME="+netLabelOpts.Hostname)
-	opts = append(opts, oci.WithEnv(envs))
+	specOpts = append(specOpts, oci.WithEnv(envs))
 
 	internalLabels.loadNetOpts(netLabelOpts)
 
@@ -256,35 +256,35 @@ func Create(ctx context.Context, client *containerd.Client, args []string, netMa
 	// perform network setup and teardown when using CNI networking.
 	// On Windows, we are forced to set up and tear down the networking from within nerdctl.
 	if runtime.GOOS != "windows" {
-		hookOpt, err := withOCIHook(options.CliCmd, options.CliArgs)
+		hookOpt, err := withOCIHook(opts.CliCmd, opts.CliArgs)
 		if err != nil {
 			return nil, generateRemoveOrphanedDirsFunc(ctx, id, dataStore, internalLabels), err
 		}
-		opts = append(opts, hookOpt)
+		specOpts = append(specOpts, hookOpt)
 	}
 
-	uOpts := generateUserOpts(options.User)
-	opts = append(opts, uOpts...)
-	gOpts := generateGroupsOpts(options.GroupAdd)
-	opts = append(opts, gOpts...)
+	uOpts := generateUserOpts(opts.User)
+	specOpts = append(specOpts, uOpts...)
+	gOpts := generateGroupsOpts(opts.GroupAdd)
+	specOpts = append(specOpts, gOpts...)
 
-	umaskOpts, err := generateUmaskOpts(options.Umask)
+	umaskOpts, err := generateUmaskOpts(opts.Umask)
 	if err != nil {
 		return nil, generateRemoveOrphanedDirsFunc(ctx, id, dataStore, internalLabels), err
 	}
-	opts = append(opts, umaskOpts...)
+	specOpts = append(specOpts, umaskOpts...)
 
-	rtCOpts := generateRuntimeCOpts(options.GOptions.CgroupManager, options.Runtime)
+	rtCOpts := generateRuntimeCOpts(opts.GOptions.CgroupManager, opts.Runtime)
 	cOpts = append(cOpts, rtCOpts...)
 
-	lCOpts, err := withContainerLabels(options.Label, options.LabelFile, ensuredImage)
+	lCOpts, err := withContainerLabels(opts.Label, opts.LabelFile, ensuredImage)
 	if err != nil {
 		return nil, generateRemoveOrphanedDirsFunc(ctx, id, dataStore, internalLabels), err
 	}
 	cOpts = append(cOpts, lCOpts...)
 
 	var containerNameStore namestore.NameStore
-	if options.Name == "" && !options.NameChanged {
+	if opts.Name == "" && !opts.NameChanged {
 		// Automatically set the container name, unless `--name=""` was explicitly specified.
 		var imageRef string
 		if ensuredImage != nil {
@@ -295,27 +295,27 @@ func Create(ctx context.Context, client *containerd.Client, args []string, netMa
 		if err != nil && imageRef != "" {
 			return nil, generateRemoveOrphanedDirsFunc(ctx, id, dataStore, internalLabels), err
 		}
-		options.Name = parsedReference.SuggestContainerName(id)
+		opts.Name = parsedReference.SuggestContainerName(id)
 	}
-	if options.Name != "" {
-		containerNameStore, err = namestore.New(dataStore, options.GOptions.Namespace)
+	if opts.Name != "" {
+		containerNameStore, err = namestore.New(dataStore, opts.GOptions.Namespace)
 		if err != nil {
 			return nil, generateRemoveOrphanedDirsFunc(ctx, id, dataStore, internalLabels), err
 		}
-		if err := containerNameStore.Acquire(options.Name, id); err != nil {
+		if err := containerNameStore.Acquire(opts.Name, id); err != nil {
 			return nil, generateRemoveOrphanedDirsFunc(ctx, id, dataStore, internalLabels), err
 		}
 	}
-	internalLabels.name = options.Name
-	internalLabels.pidFile = options.PidFile
+	internalLabels.name = opts.Name
+	internalLabels.pidFile = opts.PidFile
 
-	extraHosts, err := containerutil.ParseExtraHosts(netManager.NetworkOptions().AddHost, options.GOptions.HostGatewayIP, ":")
+	extraHosts, err := containerutil.ParseExtraHosts(netManager.NetworkOptions().AddHost, opts.GOptions.HostGatewayIP, ":")
 	if err != nil {
 		return nil, generateRemoveOrphanedDirsFunc(ctx, id, dataStore, internalLabels), err
 	}
 	internalLabels.extraHosts = extraHosts
 
-	internalLabels.rm = containerutil.EncodeContainerRmOptLabel(options.Rm)
+	internalLabels.rm = containerutil.EncodeContainerRmOptLabel(opts.Rm)
 
 	// TODO: abolish internal labels and only use annotations
 	ilOpt, err := withInternalLabels(internalLabels)
@@ -324,11 +324,11 @@ func Create(ctx context.Context, client *containerd.Client, args []string, netMa
 	}
 	cOpts = append(cOpts, ilOpt)
 
-	opts = append(opts, propagateInternalContainerdLabelsToOCIAnnotations(),
-		oci.WithAnnotations(utils.KeyValueStringsToMap(options.Annotations)))
+	specOpts = append(specOpts, propagateInternalContainerdLabelsToOCIAnnotations(),
+		oci.WithAnnotations(utils.KeyValueStringsToMap(opts.Annotations)))
 
 	var s specs.Spec
-	spec := containerd.WithSpec(&s, opts...)
+	spec := containerd.WithSpec(&s, specOpts...)
 
 	cOpts = append(cOpts, spec)
 
@@ -346,13 +346,13 @@ func Create(ctx context.Context, client *containerd.Client, args []string, netMa
 		if netSetupErr != nil {
 			returnedError = netSetupErr // mutually exclusive
 		}
-		return nil, generateGcFunc(ctx, c, options.GOptions.Namespace, id, options.Name, dataStore, containerErr, containerNameStore, netManager, internalLabels), returnedError
+		return nil, generateGcFunc(ctx, c, opts.GOptions.Namespace, id, opts.Name, dataStore, containerErr, containerNameStore, netManager, internalLabels), returnedError
 	}
 
 	return c, nil, nil
 }
 
-func generateRootfsOpts(args []string, id string, ensured *imgutil.EnsuredImage, options types.ContainerCreateOptions) (opts []oci.SpecOpts, cOpts []containerd.NewContainerOpts, err error) {
+func generateRootfsOpts(args []string, id string, ensured *imgutil.EnsuredImage, options *options.ContainerCreate) (opts []oci.SpecOpts, cOpts []containerd.NewContainerOpts, err error) {
 	if !options.Rootfs {
 		cOpts = append(cOpts,
 			containerd.WithImage(ensured.Image),
@@ -412,9 +412,9 @@ func generateRootfsOpts(args []string, id string, ensured *imgutil.EnsuredImage,
 		opts = append(opts, oci.WithProcessArgs(processArgs...))
 	}
 
-	isEntryPointSystemd := (entrypointPath == "/sbin/init" ||
+	isEntryPointSystemd := entrypointPath == "/sbin/init" ||
 		entrypointPath == "/usr/sbin/init" ||
-		entrypointPath == "/usr/local/sbin/init")
+		entrypointPath == "/usr/local/sbin/init"
 
 	stopSignal := options.StopSignal
 
@@ -719,7 +719,7 @@ func withInternalLabels(internalLabels internalLabels) (containerd.NewContainerO
 }
 
 // loadNetOpts loads network options into InternalLabels.
-func (il *internalLabels) loadNetOpts(opts types.NetworkOptions) {
+func (il *internalLabels) loadNetOpts(opts options.ContainerNetwork) {
 	il.hostname = opts.Hostname
 	il.ports = opts.PortMappings
 	il.ipAddress = opts.IPAddress

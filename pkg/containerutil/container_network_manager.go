@@ -35,7 +35,6 @@ import (
 	"github.com/containerd/log"
 
 	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/dnsutil/hostsstore"
 	"github.com/containerd/nerdctl/v2/pkg/idutil/containerwalker"
@@ -90,8 +89,8 @@ func withCustomHosts(src string) func(context.Context, oci.Client, *containers.C
 // NetworkOptionsManager types.NetworkOptionsManager is an interface for reading/setting networking
 // options for containers based on the provided command flags.
 type NetworkOptionsManager interface {
-	// NetworkOptions Returns a copy of the internal types.NetworkOptions.
-	NetworkOptions() types.NetworkOptions
+	// NetworkOptions Returns a copy of the internal types.ContainerNetwork.
+	NetworkOptions() options.ContainerNetwork
 
 	// VerifyNetworkOptions Verifies that the internal network settings are correct.
 	VerifyNetworkOptions(ctx context.Context) error
@@ -109,7 +108,7 @@ type NetworkOptionsManager interface {
 	// that the NetworkOptionsManager was initially instantiated with.
 	// E.g: in container networking mode, the label will be normalized to an ID:
 	// `--net=container:myContainer` => `--net=container:<ID of myContainer>`.
-	InternalNetworkingOptionLabels(ctx context.Context) (types.NetworkOptions, error)
+	InternalNetworkingOptionLabels(ctx context.Context) (options.ContainerNetwork, error)
 
 	// ContainerNetworkingOpts Returns a slice of `oci.SpecOpts` and `containerd.NewContainerOpts` which represent
 	// the network specs which need to be applied to the container with the given ID.
@@ -117,7 +116,7 @@ type NetworkOptionsManager interface {
 }
 
 // NewNetworkingOptionsManager Returns a types.NetworkOptionsManager based on the provided command's flags.
-func NewNetworkingOptionsManager(globalOptions *options.Global, netOpts types.NetworkOptions, client *containerd.Client) (NetworkOptionsManager, error) {
+func NewNetworkingOptionsManager(globalOptions *options.Global, netOpts options.ContainerNetwork, client *containerd.Client) (NetworkOptionsManager, error) {
 	netType, err := nettype.Detect(netOpts.NetworkSlice)
 	if err != nil {
 		return nil, err
@@ -147,12 +146,12 @@ func NewNetworkingOptionsManager(globalOptions *options.Global, netOpts types.Ne
 // No-op types.NetworkOptionsManager for network-less containers.
 type noneNetworkManager struct {
 	globalOptions *options.Global
-	netOpts       types.NetworkOptions
+	netOpts       options.ContainerNetwork
 	client        *containerd.Client
 }
 
-// NetworkOptions Returns a copy of the internal types.NetworkOptions.
-func (m *noneNetworkManager) NetworkOptions() types.NetworkOptions {
+// NetworkOptions Returns a copy of the internal types.ContainerNetwork.
+func (m *noneNetworkManager) NetworkOptions() options.ContainerNetwork {
 	return m.netOpts
 }
 
@@ -174,7 +173,7 @@ func (m *noneNetworkManager) CleanupNetworking(_ context.Context, _ containerd.C
 }
 
 // InternalNetworkingOptionLabels Returns the set of NetworkingOptions which should be set as labels on the container.
-func (m *noneNetworkManager) InternalNetworkingOptionLabels(_ context.Context) (types.NetworkOptions, error) {
+func (m *noneNetworkManager) InternalNetworkingOptionLabels(_ context.Context) (options.ContainerNetwork, error) {
 	return m.netOpts, nil
 }
 
@@ -188,12 +187,12 @@ func (m *noneNetworkManager) ContainerNetworkingOpts(_ context.Context, _ string
 // types.NetworkOptionsManager implementation for container networking settings.
 type containerNetworkManager struct {
 	globalOptions *options.Global
-	netOpts       types.NetworkOptions
+	netOpts       options.ContainerNetwork
 	client        *containerd.Client
 }
 
-// NetworkOptions Returns a copy of the internal types.NetworkOptions.
-func (m *containerNetworkManager) NetworkOptions() types.NetworkOptions {
+// NetworkOptions Returns a copy of the internal types.ContainerNetwork.
+func (m *containerNetworkManager) NetworkOptions() options.ContainerNetwork {
 	return m.netOpts
 }
 
@@ -297,7 +296,7 @@ func (m *containerNetworkManager) getNetworkingContainerForArgument(ctx context.
 }
 
 // InternalNetworkingOptionLabels Returns the set of NetworkingOptions which should be set as labels on the container.
-func (m *containerNetworkManager) InternalNetworkingOptionLabels(ctx context.Context) (types.NetworkOptions, error) {
+func (m *containerNetworkManager) InternalNetworkingOptionLabels(ctx context.Context) (options.ContainerNetwork, error) {
 	opts := m.netOpts
 	if m.netOpts.NetworkSlice == nil || len(m.netOpts.NetworkSlice) != 1 {
 		return opts, errors.New("conflicting options: exactly one network specification is allowed when using '--network=container:<container>'")
@@ -359,12 +358,12 @@ func (m *containerNetworkManager) ContainerNetworkingOpts(ctx context.Context, _
 // types.NetworkOptionsManager implementation for host networking settings.
 type hostNetworkManager struct {
 	globalOptions *options.Global
-	netOpts       types.NetworkOptions
+	netOpts       options.ContainerNetwork
 	client        *containerd.Client
 }
 
-// NetworkOptions Returns a copy of the internal types.NetworkOptions.
-func (m *hostNetworkManager) NetworkOptions() types.NetworkOptions {
+// NetworkOptions Returns a copy of the internal types.ContainerNetwork.
+func (m *hostNetworkManager) NetworkOptions() options.ContainerNetwork {
 	return m.netOpts
 }
 
@@ -450,7 +449,7 @@ func (m *hostNetworkManager) CleanupNetworking(ctx context.Context, container co
 }
 
 // InternalNetworkingOptionLabels Returns the set of NetworkingOptions which should be set as labels on the container.
-func (m *hostNetworkManager) InternalNetworkingOptionLabels(_ context.Context) (types.NetworkOptions, error) {
+func (m *hostNetworkManager) InternalNetworkingOptionLabels(_ context.Context) (options.ContainerNetwork, error) {
 	opts := m.netOpts
 	// Cannot have a MAC address in host networking mode.
 	opts.MACAddress = ""
@@ -626,17 +625,17 @@ func withRemoveSysfs(_ context.Context, _ oci.Client, c *containers.Container, s
 // struct provides different implementations on different platforms.
 type cniNetworkManager struct {
 	globalOptions *options.Global
-	netOpts       types.NetworkOptions
+	netOpts       options.ContainerNetwork
 	client        *containerd.Client
 	cniNetworkManagerPlatform
 }
 
-// NetworkOptions Returns a copy of the internal types.NetworkOptions.
-func (m *cniNetworkManager) NetworkOptions() types.NetworkOptions {
+// NetworkOptions Returns a copy of the internal types.ContainerNetwork.
+func (m *cniNetworkManager) NetworkOptions() options.ContainerNetwork {
 	return m.netOpts
 }
 
-func validateUtsSettings(netOpts types.NetworkOptions) error {
+func validateUtsSettings(netOpts options.ContainerNetwork) error {
 	utsNamespace := netOpts.UTSNamespace
 	if utsNamespace == "" {
 		return nil
@@ -706,9 +705,9 @@ func verifyNetworkTypes(env *netutil.CNIEnv, networkSlice []string, supportedTyp
 	return res, nil
 }
 
-// NetworkOptionsFromSpec Returns the NetworkOptions used in a container's creation from its spec.Annotations.
-func NetworkOptionsFromSpec(spec *specs.Spec) (types.NetworkOptions, error) {
-	opts := types.NetworkOptions{}
+// NetworkOptionsFromSpec Returns the ContainerNetwork used in a container's creation from its spec.Annotations.
+func NetworkOptionsFromSpec(spec *specs.Spec) (options.ContainerNetwork, error) {
+	opts := options.ContainerNetwork{}
 
 	if spec == nil {
 		return opts, errors.New("cannot determine networking options from nil spec")

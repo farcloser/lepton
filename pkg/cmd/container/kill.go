@@ -33,7 +33,6 @@ import (
 	"github.com/containerd/log"
 
 	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/containerutil"
 	"github.com/containerd/nerdctl/v2/pkg/idutil/containerwalker"
 	"github.com/containerd/nerdctl/v2/pkg/labels"
@@ -44,7 +43,7 @@ import (
 )
 
 // Kill kills a list of containers
-func Kill(ctx context.Context, client *containerd.Client, reqs []string, options types.ContainerKillOptions) error {
+func Kill(ctx context.Context, client *containerd.Client, reqs []string, options options.ContainerKill) error {
 	if !strings.HasPrefix(options.KillSignal, "SIG") {
 		options.KillSignal = "SIG" + options.KillSignal
 	}

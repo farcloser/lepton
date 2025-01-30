@@ -72,7 +72,7 @@ func preparePsTestContainer(t *testing.T, identity string, keepAlive bool) (*tes
 		testutil.Identifier(t) + identity,
 		testutil.Identifier(t) + identity,
 	}
-	// fill the value of testLabels
+	// fill testLabels
 	for _, k := range keys {
 		testLabels[k] = k
 	}
@@ -217,8 +217,8 @@ func TestContainerListWithLabels(t *testing.T) {
 		}
 
 		// check labels using map
-		// 1. the results has no guarantee to show the same order.
-		// 2. the results has no guarantee to show only configured labels.
+		// 1. the results have no guarantee to show the same order.
+		// 2. the results have no guarantee to show only configured labels.
 		labelsMap, err := strutil.ParseCSVMap(lines[0])
 		if err != nil {
 			return fmt.Errorf("failed to parse labels: %w", err)
@@ -399,7 +399,7 @@ func TestContainerListWithFilter(t *testing.T) {
 					break
 				}
 			}
-			// there are other containers such as **wordpress** could be listed since
+			// there are other containers such as WordPress could be listed since
 			// their created times are ahead of testContainerB too
 			if !foundA {
 				return fmt.Errorf("expected container %s not found", testContainerA.name)
@@ -436,7 +436,7 @@ func TestContainerListWithFilter(t *testing.T) {
 				break
 			}
 		}
-		// there are other containers such as **wordpress** could be listed since
+		// there are other containers such as WordPress could be listed since
 		// their created times are ahead of testContainerB too
 		if !foundA {
 			return fmt.Errorf("expected container %s not found", testContainerA.name)

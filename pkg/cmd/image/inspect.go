@@ -30,7 +30,7 @@ import (
 
 	"github.com/containerd/nerdctl/v2/leptonic/api"
 	"github.com/containerd/nerdctl/v2/leptonic/services/image"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/containerdutil"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 	"github.com/containerd/nerdctl/v2/pkg/imageinspector"
@@ -42,7 +42,7 @@ func inspectIdentifier(ctx context.Context, client *containerd.Client, identifie
 }
 
 // Inspect prints detailed information of each image in `images`.
-func Inspect(ctx context.Context, client *containerd.Client, identifiers []string, options types.ImageInspectOptions) error {
+func Inspect(ctx context.Context, client *containerd.Client, identifiers []string, options options.ImageInspect) error {
 	// Verify we have a valid mode
 	// TODO: move this out of here, to Cobra command line arg validation
 	if options.Mode != "native" && options.Mode != "dockercompat" {

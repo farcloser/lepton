@@ -28,13 +28,13 @@ import (
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/idutil/containerwalker"
 	"github.com/containerd/nerdctl/v2/pkg/imgutil/commit"
 )
 
 // Commit will commit a container’s file changes or settings into a new image.
-func Commit(ctx context.Context, client *containerd.Client, rawRef string, req string, options types.ContainerCommitOptions) error {
+func Commit(ctx context.Context, client *containerd.Client, rawRef string, req string, options options.ContainerCommit) error {
 	parsedReference, err := reference.Parse(rawRef)
 	if err != nil {
 		return err

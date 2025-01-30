@@ -26,7 +26,7 @@ import (
 	"github.com/containerd/containerd/v2/pkg/cio"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/consoleutil"
 	"github.com/containerd/nerdctl/v2/pkg/containerutil"
 	"github.com/containerd/nerdctl/v2/pkg/errutil"
@@ -36,7 +36,7 @@ import (
 )
 
 // Attach attaches stdin, stdout, and stderr to a running container.
-func Attach(ctx context.Context, client *containerd.Client, req string, options types.ContainerAttachOptions) error {
+func Attach(ctx context.Context, client *containerd.Client, req string, options options.ContainerAttach) error {
 	// Find the container.
 	var container containerd.Container
 	var cStatus containerd.Status

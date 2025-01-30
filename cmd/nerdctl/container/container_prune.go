@@ -21,7 +21,7 @@ import (
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 )
 
@@ -38,13 +38,13 @@ func newContainerPruneCommand() *cobra.Command {
 	return containerPruneCommand
 }
 
-func processContainerPruneOptions(cmd *cobra.Command) (types.ContainerPruneOptions, error) {
+func processContainerPruneOptions(cmd *cobra.Command) (options.ContainerPrune, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return types.ContainerPruneOptions{}, err
+		return options.ContainerPrune{}, err
 	}
 
-	return types.ContainerPruneOptions{
+	return options.ContainerPrune{
 		GOptions: globalOptions,
 		Stdout:   cmd.OutOrStdout(),
 	}, nil

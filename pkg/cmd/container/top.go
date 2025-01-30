@@ -24,12 +24,12 @@ import (
 	containerd "github.com/containerd/containerd/v2/client"
 
 	"github.com/containerd/nerdctl/v2/leptonic/container"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/idutil/containerwalker"
 )
 
 // Top performs the equivalent of running `top` inside of container(s)
-func Top(ctx context.Context, client *containerd.Client, containers []string, opt types.ContainerTopOptions) error {
+func Top(ctx context.Context, client *containerd.Client, containers []string, opt options.ContainerTop) error {
 	walker := &containerwalker.ContainerWalker{
 		Client: client,
 		OnFound: func(ctx context.Context, found containerwalker.Found) error {

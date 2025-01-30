@@ -27,12 +27,12 @@ import (
 	"github.com/containerd/log"
 	"github.com/containerd/platforms"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/imgutil"
 )
 
 // Prune will remove all dangling images. If all is specified, will also remove all images not referenced by any container.
-func Prune(ctx context.Context, client *containerd.Client, options types.ImagePruneOptions) error {
+func Prune(ctx context.Context, client *containerd.Client, options options.ImagePrune) error {
 	var (
 		imageStore   = client.ImageService()
 		contentStore = client.ContentStore()

@@ -26,7 +26,7 @@ import (
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 )
 
@@ -55,61 +55,61 @@ func NewExecCommand() *cobra.Command {
 	return execCommand
 }
 
-func processExecCommandOptions(cmd *cobra.Command) (types.ContainerExecOptions, error) {
+func processExecCommandOptions(cmd *cobra.Command) (options.ContainerExec, error) {
 	// We do not check if we have a terminal here, as container.Exec calling console.Current will ensure that
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return types.ContainerExecOptions{}, err
+		return options.ContainerExec{}, err
 	}
 
 	flagI, err := cmd.Flags().GetBool("interactive")
 	if err != nil {
-		return types.ContainerExecOptions{}, err
+		return options.ContainerExec{}, err
 	}
 	flagT, err := cmd.Flags().GetBool("tty")
 	if err != nil {
-		return types.ContainerExecOptions{}, err
+		return options.ContainerExec{}, err
 	}
 	flagD, err := cmd.Flags().GetBool("detach")
 	if err != nil {
-		return types.ContainerExecOptions{}, err
+		return options.ContainerExec{}, err
 	}
 
 	if flagI {
 		if flagD {
-			return types.ContainerExecOptions{}, errors.New("currently flag -i and -d cannot be specified together (FIXME)")
+			return options.ContainerExec{}, errors.New("currently flag -i and -d cannot be specified together (FIXME)")
 		}
 	}
 
 	if flagT {
 		if flagD {
-			return types.ContainerExecOptions{}, errors.New("currently flag -t and -d cannot be specified together (FIXME)")
+			return options.ContainerExec{}, errors.New("currently flag -t and -d cannot be specified together (FIXME)")
 		}
 	}
 
 	workdir, err := cmd.Flags().GetString("workdir")
 	if err != nil {
-		return types.ContainerExecOptions{}, err
+		return options.ContainerExec{}, err
 	}
 
 	envFile, err := cmd.Flags().GetStringSlice("env-file")
 	if err != nil {
-		return types.ContainerExecOptions{}, err
+		return options.ContainerExec{}, err
 	}
 	env, err := cmd.Flags().GetStringArray("env")
 	if err != nil {
-		return types.ContainerExecOptions{}, err
+		return options.ContainerExec{}, err
 	}
 	privileged, err := cmd.Flags().GetBool("privileged")
 	if err != nil {
-		return types.ContainerExecOptions{}, err
+		return options.ContainerExec{}, err
 	}
 	user, err := cmd.Flags().GetString("user")
 	if err != nil {
-		return types.ContainerExecOptions{}, err
+		return options.ContainerExec{}, err
 	}
 
-	return types.ContainerExecOptions{
+	return options.ContainerExec{
 		GOptions:    globalOptions,
 		TTY:         flagT,
 		Interactive: flagI,

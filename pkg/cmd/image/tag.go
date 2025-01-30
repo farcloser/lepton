@@ -26,11 +26,11 @@ import (
 	"github.com/containerd/errdefs"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/idutil/imagewalker"
 )
 
-func Tag(ctx context.Context, client *containerd.Client, options types.ImageTagOptions) error {
+func Tag(ctx context.Context, client *containerd.Client, options options.ImageTag) error {
 	imageService := client.ImageService()
 	var srcName string
 	walker := &imagewalker.ImageWalker{

@@ -169,7 +169,7 @@ func isValidPath(s string) (bool, error) {
 /*
 For docker compatibility on Windows platforms:
 Docker only allows for absolute paths as anonymous volumes.
-Docker does not allows anonymous named volumes or anonymous named piped
+Docker does not allow anonymous named volumes or anonymous named piped
 to be mounted into a container.
 */
 func validateAnonymousVolumeDestination(s string) (bool, error) {

@@ -63,7 +63,7 @@ docker run -t --rm --privileged test-integration
 
 ### Principles
 
-#### Tests should be parallelized (with best effort)
+#### Tests should be parallelized (best-effort)
 
 ##### General case
 

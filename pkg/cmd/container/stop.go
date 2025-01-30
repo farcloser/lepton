@@ -23,13 +23,13 @@ import (
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/errdefs"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/containerutil"
 	"github.com/containerd/nerdctl/v2/pkg/idutil/containerwalker"
 )
 
 // Stop stops a list of containers specified by `reqs`.
-func Stop(ctx context.Context, client *containerd.Client, reqs []string, opt types.ContainerStopOptions) error {
+func Stop(ctx context.Context, client *containerd.Client, reqs []string, opt options.ContainerStop) error {
 	walker := &containerwalker.ContainerWalker{
 		Client: client,
 		OnFound: func(ctx context.Context, found containerwalker.Found) error {

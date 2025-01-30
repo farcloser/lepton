@@ -69,9 +69,9 @@ func TestMapBoolValueAsOpt(t *testing.T) {
 
 	for i, tt := range tests {
 		got, err := MapBoolValueAsOpt(tt.m, tt.key)
-		assert.Equal(t, got, tt.want, fmt.Sprintf("case %d", (i+1)))
+		assert.Equal(t, got, tt.want, fmt.Sprintf("case %d", i+1))
 		if (err != nil) != tt.wantErr {
-			t.Errorf("MapBoolValueAsOpt() case %d error = %v, wantErr %v", (i + 1), err, tt.wantErr)
+			t.Errorf("MapBoolValueAsOpt() case %d error = %v, wantErr %v", i+1, err, tt.wantErr)
 		}
 	}
 }

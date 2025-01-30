@@ -41,14 +41,14 @@ import (
 	"github.com/containerd/log"
 	"github.com/containerd/platforms"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/containerdutil"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 	"github.com/containerd/nerdctl/v2/pkg/imgutil"
 )
 
 // ListCommandHandler `List` and print images matching filters in `options`.
-func ListCommandHandler(ctx context.Context, client *containerd.Client, options *types.ImageListOptions) error {
+func ListCommandHandler(ctx context.Context, client *containerd.Client, options *options.ImageList) error {
 	imageList, err := List(ctx, client, options.Filters, options.NameAndRefFilter)
 	if err != nil {
 		return err
@@ -63,7 +63,7 @@ func ListCommandHandler(ctx context.Context, client *containerd.Client, options 
 // - since=<image>[:<tag>]: Images created after given image (exclusive)
 // - label=<key>[=<value>]: Matches images based on the presence of a label alone or a label and a value
 // - dangling=true: Filter images by dangling
-// - reference=<image>[:<tag>]: Filter images by reference (Matches both docker compatible wildcard pattern and regexp
+// - reference=<image>[:<tag>]: Filter images by reference (Matches both docker compatible wildcard pattern and regexp)
 //
 // nameAndRefFilter has the format of `name==(<image>[:<tag>])|ID`,
 // and they will be used when getting images from containerd,
@@ -127,7 +127,7 @@ type imagePrintable struct {
 	Platform string // extension
 }
 
-func printImages(ctx context.Context, client *containerd.Client, imageList []images.Image, options *types.ImageListOptions) error {
+func printImages(ctx context.Context, client *containerd.Client, imageList []images.Image, options *options.ImageList) error {
 	w := options.Stdout
 	var finalImageList []images.Image
 	/*

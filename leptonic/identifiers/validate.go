@@ -17,7 +17,7 @@
 // Package identifiers provides common validation for identifiers and keys
 // across containerd.
 //
-// Identifiers in containerd must be a alphanumeric, allowing limited
+// Identifiers in containerd must be an alphanumeric, allowing limited
 // underscores, dashes and dots.
 //
 // While the character set may be expanded in the future, identifiers

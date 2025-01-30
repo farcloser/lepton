@@ -38,7 +38,6 @@ import (
 	"github.com/containerd/typeurl/v2"
 
 	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/containerutil"
 	"github.com/containerd/nerdctl/v2/pkg/eventutil"
@@ -84,7 +83,7 @@ func (s *statsStruct) isKnownContainer(cid string) (int, bool) {
 }
 
 // Stats displays a live stream of container(s) resource usage statistics.
-func Stats(ctx context.Context, client *containerd.Client, containerIDs []string, options types.ContainerStatsOptions) error {
+func Stats(ctx context.Context, client *containerd.Client, containerIDs []string, options options.ContainerStats) error {
 	if rootlessutil.IsRootless() && cgroups.Version() < 2 {
 		return errors.New("stats requires cgroup v2 for rootless containers, see https://rootlesscontaine.rs/getting-started/common/cgroup2/")
 	}
@@ -331,7 +330,7 @@ func collect(ctx context.Context, globalOptions *options.Global, s *stats2.Stats
 	)
 
 	defer func() {
-		// if error happens and we get nothing of stats, release wait group whatever
+		// if error happens, and we get nothing of stats, release wait group whatever
 		if getFirst {
 			getFirst = false
 			waitFirst.Done()

@@ -25,7 +25,7 @@ import (
 	"github.com/containerd/containerd/v2/core/snapshots"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/containerdutil"
 	"github.com/containerd/nerdctl/v2/pkg/containerinspector"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
@@ -35,7 +35,7 @@ import (
 )
 
 // Inspect prints detailed information for each container in `containers`.
-func Inspect(ctx context.Context, client *containerd.Client, containers []string, options types.ContainerInspectOptions) error {
+func Inspect(ctx context.Context, client *containerd.Client, containers []string, options options.ContainerInspect) error {
 	f := &containerInspector{
 		mode:        options.Mode,
 		size:        options.Size,
