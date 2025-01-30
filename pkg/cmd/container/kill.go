@@ -32,6 +32,7 @@ import (
 	"github.com/containerd/go-cni"
 	"github.com/containerd/log"
 
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/containerutil"
 	"github.com/containerd/nerdctl/v2/pkg/idutil/containerwalker"
@@ -120,7 +121,7 @@ func killContainer(ctx context.Context, container containerd.Container, signal s
 }
 
 // cleanupNetwork removes cni network setup, specifically the forwards
-func cleanupNetwork(ctx context.Context, container containerd.Container, globalOpts types.GlobalCommandOptions) error {
+func cleanupNetwork(ctx context.Context, container containerd.Container, globalOpts options.Global) error {
 	return rootlessutil.WithDetachedNetNSIfAny(func() error {
 		// retrieve info to get current active port mappings
 		info, err := container.Info(ctx, containerd.WithoutRefreshedMetadata)

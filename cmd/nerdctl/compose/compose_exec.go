@@ -24,12 +24,12 @@ import (
 	"go.farcloser.world/core/term"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
+	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/compose"
 	"github.com/containerd/nerdctl/v2/pkg/composer"
 )
 
-func newComposeExecCommand() *cobra.Command {
+func ExecCommand() *cobra.Command {
 	var composeExecCommand = &cobra.Command{
 		Use:           "exec [flags] SERVICE COMMAND [ARGS...]",
 		Short:         "Execute a command in a running container of the service",
@@ -112,7 +112,7 @@ func composeExecAction(cmd *cobra.Command, args []string) error {
 		return errors.New("currently flag -d should be specified with --no-TTY (FIXME)")
 	}
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
+	client, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
 	if err != nil {
 		return err
 	}
@@ -121,7 +121,7 @@ func composeExecAction(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	c, err := compose.New(client, globalOptions, options, cmd.OutOrStdout(), cmd.ErrOrStderr())
+	c, err := compose.New(client, *globalOptions, options, cmd.OutOrStdout(), cmd.ErrOrStderr())
 	if err != nil {
 		return err
 	}

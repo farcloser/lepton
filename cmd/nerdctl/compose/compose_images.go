@@ -26,12 +26,12 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
 
-	containerd "github.com/containerd/containerd/v2/client"
+	"github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/snapshots"
 	"github.com/containerd/containerd/v2/pkg/progress"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
+	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/compose"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 	"github.com/containerd/nerdctl/v2/pkg/imgutil"
@@ -39,10 +39,10 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/strutil"
 )
 
-func newComposeImagesCommand() *cobra.Command {
+func ImagesCommand() *cobra.Command {
 	var composeImagesCommand = &cobra.Command{
 		Use:           "images [flags] [SERVICE...]",
-		Short:         "List images used by created containers in services",
+		Short:         "NamesList images used by created containers in services",
 		RunE:          composeImagesAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
@@ -62,7 +62,7 @@ func composeImagesAction(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	format, err := cmd.Flags().GetString("format")
+	format, err := cmd.Flags().GetString(flagFormat)
 	if err != nil {
 		return err
 	}
@@ -70,7 +70,7 @@ func composeImagesAction(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("unsupported format %s, supported formats are: [json]", format)
 	}
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
+	client, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
 	if err != nil {
 		return err
 	}
@@ -80,7 +80,7 @@ func composeImagesAction(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	c, err := compose.New(client, globalOptions, options, cmd.OutOrStdout(), cmd.ErrOrStderr())
+	c, err := compose.New(client, *globalOptions, options, cmd.OutOrStdout(), cmd.ErrOrStderr())
 	if err != nil {
 		return err
 	}
@@ -104,7 +104,7 @@ func composeImagesAction(cmd *cobra.Command, args []string) error {
 	return printComposeImages(ctx, cmd, containers, sn, format)
 }
 
-func printComposeImageIDs(ctx context.Context, containers []containerd.Container) error {
+func printComposeImageIDs(ctx context.Context, containers []client.Container) error {
 	ids := []string{}
 	for _, c := range containers {
 		image, err := c.Image(ctx)
@@ -125,7 +125,7 @@ func printComposeImageIDs(ctx context.Context, containers []containerd.Container
 	return nil
 }
 
-func printComposeImages(ctx context.Context, cmd *cobra.Command, containers []containerd.Container, sn snapshots.Snapshotter, format string) error {
+func printComposeImages(ctx context.Context, cmd *cobra.Command, containers []client.Container, sn snapshots.Snapshotter, format string) error {
 	type composeImagePrintable struct {
 		ContainerName string
 		Repository    string
@@ -139,7 +139,7 @@ func printComposeImages(ctx context.Context, cmd *cobra.Command, containers []co
 	for i, c := range containers {
 		i, c := i, c
 		eg.Go(func() error {
-			info, err := c.Info(ctx, containerd.WithoutRefreshedMetadata)
+			info, err := c.Info(ctx, client.WithoutRefreshedMetadata)
 			if err != nil {
 				return err
 			}

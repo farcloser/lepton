@@ -28,6 +28,7 @@ import (
 	"github.com/containerd/errdefs"
 	"github.com/containerd/platforms"
 
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/volume"
 	"github.com/containerd/nerdctl/v2/pkg/composer"
@@ -39,7 +40,7 @@ import (
 )
 
 // New returns a new *composer.Composer.
-func New(client *containerd.Client, globalOptions types.GlobalCommandOptions, options composer.Options, stdout, stderr io.Writer) (*composer.Composer, error) {
+func New(client *containerd.Client, globalOptions options.Global, options composer.Options, stdout, stderr io.Writer) (*composer.Composer, error) {
 	if err := composer.Lock(globalOptions.DataRoot, globalOptions.Address); err != nil {
 		return nil, err
 	}

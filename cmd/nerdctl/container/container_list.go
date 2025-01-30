@@ -27,8 +27,8 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
+	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 )
@@ -37,7 +37,7 @@ func NewPsCommand() *cobra.Command {
 	var psCommand = &cobra.Command{
 		Use:           "ps",
 		Args:          cobra.NoArgs,
-		Short:         "List containers",
+		Short:         "NamesList containers",
 		RunE:          psAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
@@ -58,12 +58,12 @@ func NewPsCommand() *cobra.Command {
 	return psCommand
 }
 
-func processOptions(cmd *cobra.Command) (types.ContainerListOptions, FormattingAndPrintingOptions, error) {
+func processOptions(cmd *cobra.Command, _ []string) (types.ContainerListOptions, FormattingAndPrintingOptions, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return types.ContainerListOptions{}, FormattingAndPrintingOptions{}, err
 	}
-	all, err := cmd.Flags().GetBool("all")
+	all, err := cmd.Flags().GetBool(flagAll)
 	if err != nil {
 		return types.ContainerListOptions{}, FormattingAndPrintingOptions{}, err
 	}
@@ -95,7 +95,7 @@ func processOptions(cmd *cobra.Command) (types.ContainerListOptions, FormattingA
 	if err != nil {
 		return types.ContainerListOptions{}, FormattingAndPrintingOptions{}, err
 	}
-	format, err := cmd.Flags().GetString("format")
+	format, err := cmd.Flags().GetString(flagFormat)
 	if err != nil {
 		return types.ContainerListOptions{}, FormattingAndPrintingOptions{}, err
 	}
@@ -109,7 +109,7 @@ func processOptions(cmd *cobra.Command) (types.ContainerListOptions, FormattingA
 	}
 
 	return types.ContainerListOptions{
-			GOptions: globalOptions,
+			GOptions: *globalOptions,
 			All:      all,
 			LastN:    lastN,
 			Truncate: trunc,
@@ -124,12 +124,12 @@ func processOptions(cmd *cobra.Command) (types.ContainerListOptions, FormattingA
 }
 
 func psAction(cmd *cobra.Command, args []string) error {
-	clOpts, fpOpts, err := processOptions(cmd)
+	clOpts, fpOpts, err := processOptions(cmd, args)
 	if err != nil {
 		return err
 	}
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), clOpts.GOptions.Namespace, clOpts.GOptions.Address)
+	client, ctx, cancel, err := containerd.NewClient(cmd.Context(), clOpts.GOptions.Namespace, clOpts.GOptions.Address)
 	if err != nil {
 		return err
 	}

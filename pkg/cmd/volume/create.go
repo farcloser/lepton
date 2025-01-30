@@ -17,30 +17,35 @@
 package volume
 
 import (
+	"context"
 	"fmt"
+	"io"
 
 	"github.com/docker/docker/pkg/stringid"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/native"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/labels"
 	"github.com/containerd/nerdctl/v2/pkg/strutil"
 )
 
-func Create(name string, options types.VolumeCreateOptions) (*native.Volume, error) {
+func Create(ctx context.Context, out io.Writer, globalOptions *options.Global, options *options.VolumeCreate) error {
+	volStore, err := Store(globalOptions.Namespace, globalOptions.DataRoot, globalOptions.Address)
+	if err != nil {
+		return err
+	}
+
+	name := options.Name
 	if name == "" {
 		name = stringid.GenerateRandomID()
 		options.Labels = append(options.Labels, labels.AnonymousVolumes+"=")
 	}
-	volStore, err := Store(options.GOptions.Namespace, options.GOptions.DataRoot, options.GOptions.Address)
+
+	_, err = volStore.Create(name, strutil.DedupeStrSlice(options.Labels))
 	if err != nil {
-		return nil, err
+		return err
 	}
-	labels := strutil.DedupeStrSlice(options.Labels)
-	vol, err := volStore.Create(name, labels)
-	if err != nil {
-		return nil, err
-	}
-	fmt.Fprintln(options.Stdout, name)
-	return vol, nil
+
+	_, err = fmt.Fprintln(out, name)
+
+	return err
 }

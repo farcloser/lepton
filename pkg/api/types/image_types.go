@@ -20,13 +20,15 @@ import (
 	"io"
 
 	"go.farcloser.world/containers/specs"
+
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 )
 
 // ImageListOptions specifies options for `image list`.
 type ImageListOptions struct {
 	Stdout io.Writer
 	// GOptions is the global options
-	GOptions GlobalCommandOptions
+	GOptions options.Global
 	// Quiet only show numeric IDs
 	Quiet bool
 	// NoTrunc don't truncate output
@@ -48,7 +50,7 @@ type ImageListOptions struct {
 // ImageConvertOptions specifies options for `image convert`.
 type ImageConvertOptions struct {
 	Stdout   io.Writer
-	GOptions GlobalCommandOptions
+	GOptions options.Global
 
 	// #region generic flags
 	// Uncompress convert tar.gz layers to uncompressed tar layers
@@ -89,7 +91,7 @@ type ImageConvertOptions struct {
 // ImageCryptOptions specifies options for `image encrypt` and `image decrypt`.
 type ImageCryptOptions struct {
 	Stdout   io.Writer
-	GOptions GlobalCommandOptions
+	GOptions options.Global
 	// Platforms convert content for a specific platform
 	Platforms []string
 	// AllPlatforms convert content for all platforms
@@ -109,7 +111,7 @@ type ImageCryptOptions struct {
 // ImageInspectOptions specifies options for `image inspect`.
 type ImageInspectOptions struct {
 	Stdout   io.Writer
-	GOptions GlobalCommandOptions
+	GOptions options.Global
 	// Mode Inspect mode, "dockercompat" for Docker-compatible output, "native" for containerd-native output
 	Mode string
 	// Format the output using the given Go template, e.g, 'json'
@@ -121,7 +123,7 @@ type ImageInspectOptions struct {
 // ImagePushOptions specifies options for `(image) push`.
 type ImagePushOptions struct {
 	Stdout      io.Writer
-	GOptions    GlobalCommandOptions
+	GOptions    options.Global
 	SignOptions ImageSignOptions
 	SociOptions SociOptions
 	// Platforms convert content for a specific platform
@@ -148,7 +150,7 @@ type ImagePullOptions struct {
 	// ProgressOutputToStdout directs progress output to stdout instead of stderr
 	ProgressOutputToStdout bool
 
-	GOptions      GlobalCommandOptions
+	GOptions      options.Global
 	VerifyOptions ImageVerifyOptions
 	// Unpack the image for the current single platform.
 	// If nil, it will unpack automatically if only 1 platform is specified.
@@ -166,7 +168,7 @@ type ImagePullOptions struct {
 // ImageTagOptions specifies options for `(image) tag`.
 type ImageTagOptions struct {
 	// GOptions is the global options
-	GOptions GlobalCommandOptions
+	GOptions options.Global
 	// Source is the image to be referenced.
 	Source string
 	// Target is the image to be created.
@@ -177,7 +179,7 @@ type ImageTagOptions struct {
 type ImageRemoveOptions struct {
 	Stdout io.Writer
 	// GOptions is the global options
-	GOptions GlobalCommandOptions
+	GOptions options.Global
 	// Force removal of the image
 	Force bool
 	// Async asynchronous mode or not
@@ -188,7 +190,7 @@ type ImageRemoveOptions struct {
 type ImagePruneOptions struct {
 	Stdout io.Writer
 	// GOptions is the global options.
-	GOptions GlobalCommandOptions
+	GOptions options.Global
 	// All Remove all unused images, not just dangling ones.
 	All bool
 	// Filters output based on conditions provided for the --filter argument
@@ -200,7 +202,7 @@ type ImagePruneOptions struct {
 // ImageSaveOptions specifies options for `(image) save`.
 type ImageSaveOptions struct {
 	Stdout   io.Writer
-	GOptions GlobalCommandOptions
+	GOptions options.Global
 	// Export content for all platforms
 	AllPlatforms bool
 	// Export content for a specific platform

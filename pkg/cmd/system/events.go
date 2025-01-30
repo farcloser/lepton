@@ -22,6 +22,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"strings"
 	"text/template"
 	"time"
@@ -32,7 +33,7 @@ import (
 	"github.com/containerd/log"
 	"github.com/containerd/typeurl/v2"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 )
 
@@ -145,23 +146,23 @@ func generateEventFilters(filters []string) (map[string][]EventFilter, error) {
 }
 
 // Events is from https://github.com/containerd/containerd/blob/v1.4.3/cmd/ctr/commands/events/events.go
-func Events(ctx context.Context, client *containerd.Client, options types.SystemEventsOptions) error {
+func Events(ctx context.Context, client *containerd.Client, out io.Writer, globalOptions *options.Global, opts *options.SystemEvents) error {
 	eventsClient := client.EventService()
 	eventsCh, errCh := eventsClient.Subscribe(ctx)
 	var tmpl *template.Template
-	switch options.Format {
+	switch opts.Format {
 	case formatter.FormatNone:
 		tmpl = nil
 	case formatter.FormatTable, formatter.FormatWide:
 		return errors.New("unsupported format: \"table\", and \"wide\"")
 	default:
 		var err error
-		tmpl, err = formatter.ParseTemplate(options.Format)
+		tmpl, err = formatter.ParseTemplate(opts.Format)
 		if err != nil {
 			return err
 		}
 	}
-	filterMap, err := generateEventFilters(options.Filters)
+	filterMap, err := generateEventFilters(opts.Filters)
 	if err != nil {
 		return err
 	}
@@ -173,7 +174,7 @@ func Events(ctx context.Context, client *containerd.Client, options types.System
 			return err
 		}
 		if e != nil {
-			var out []byte
+			var output []byte
 			var id string
 			if e.Event != nil {
 				v, err := typeurl.UnmarshalAny(e.Event)
@@ -181,14 +182,14 @@ func Events(ctx context.Context, client *containerd.Client, options types.System
 					log.G(ctx).WithError(err).Warn("cannot unmarshal an event from Any")
 					continue
 				}
-				out, err = json.Marshal(v)
+				output, err = json.Marshal(v)
 				if err != nil {
 					log.G(ctx).WithError(err).Warn("cannot marshal Any into JSON")
 					continue
 				}
 			}
 			var data map[string]interface{}
-			err := json.Unmarshal(out, &data)
+			err := json.Unmarshal(output, &data)
 			if err != nil {
 				log.G(ctx).WithError(err).Warn("cannot marshal Any into JSON")
 			} else {
@@ -198,7 +199,7 @@ func Events(ctx context.Context, client *containerd.Client, options types.System
 				}
 			}
 
-			eOut := EventOut{e.Timestamp, id, e.Namespace, e.Topic, TopicToStatus(e.Topic), string(out)}
+			eOut := EventOut{e.Timestamp, id, e.Namespace, e.Topic, TopicToStatus(e.Topic), string(output)}
 			match := applyFilters(&eOut, filterMap)
 			if match {
 				if tmpl != nil {
@@ -206,16 +207,16 @@ func Events(ctx context.Context, client *containerd.Client, options types.System
 					if err := tmpl.Execute(&b, eOut); err != nil {
 						return err
 					}
-					if _, err := fmt.Fprintln(options.Stdout, b.String()+"\n"); err != nil {
+					if _, err := fmt.Fprintln(out, b.String()+"\n"); err != nil {
 						return err
 					}
 				} else {
 					if _, err := fmt.Fprintln(
-						options.Stdout,
+						out,
 						e.Timestamp,
 						e.Namespace,
 						e.Topic,
-						string(out),
+						string(output),
 					); err != nil {
 						return err
 					}

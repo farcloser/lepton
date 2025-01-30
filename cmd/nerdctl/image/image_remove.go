@@ -21,13 +21,13 @@ import (
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
+	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/image"
 )
 
 func NewRmiCommand() *cobra.Command {
-	var rmiCommand = &cobra.Command{
+	var cmd = &cobra.Command{
 		Use:               "rmi [flags] IMAGE [IMAGE, ...]",
 		Short:             "Remove one or more images",
 		Args:              cobra.MinimumNArgs(1),
@@ -36,19 +36,21 @@ func NewRmiCommand() *cobra.Command {
 		SilenceUsage:      true,
 		SilenceErrors:     true,
 	}
-	rmiCommand.Flags().BoolP("force", "f", false, "Force removal of the image")
+
+	cmd.Flags().BoolP(flagForce, "f", false, "Force removal of the image")
 	// Alias `-a` is reserved for `--all`. Should be compatible with `podman rmi --all`.
-	rmiCommand.Flags().Bool("async", false, "Asynchronous mode")
-	return rmiCommand
+	cmd.Flags().Bool(flagAsync, false, "Asynchronous mode")
+
+	return cmd
 }
 
-func processImageRemoveOptions(cmd *cobra.Command) (types.ImageRemoveOptions, error) {
+func RemoveOptions(cmd *cobra.Command, args []string) (types.ImageRemoveOptions, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return types.ImageRemoveOptions{}, err
 	}
 
-	force, err := cmd.Flags().GetBool("force")
+	force, err := cmd.Flags().GetBool(flagForce)
 	if err != nil {
 		return types.ImageRemoveOptions{}, err
 	}
@@ -59,19 +61,19 @@ func processImageRemoveOptions(cmd *cobra.Command) (types.ImageRemoveOptions, er
 
 	return types.ImageRemoveOptions{
 		Stdout:   cmd.OutOrStdout(),
-		GOptions: globalOptions,
+		GOptions: *globalOptions,
 		Force:    force,
 		Async:    async,
 	}, nil
 }
 
 func rmiAction(cmd *cobra.Command, args []string) error {
-	options, err := processImageRemoveOptions(cmd)
+	options, err := RemoveOptions(cmd, args)
 	if err != nil {
 		return err
 	}
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	client, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
 	if err != nil {
 		return err
 	}

@@ -21,13 +21,13 @@ import (
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
+	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/imgutil/load"
 )
 
 func NewLoadCommand() *cobra.Command {
-	var loadCommand = &cobra.Command{
+	var cmd = &cobra.Command{
 		Use:           "load",
 		Args:          cobra.NoArgs,
 		Short:         "Load an image from a tar archive or STDIN",
@@ -37,21 +37,18 @@ func NewLoadCommand() *cobra.Command {
 		SilenceErrors: true,
 	}
 
-	loadCommand.Flags().StringP("input", "i", "", "Read from tar archive file, instead of STDIN")
-	loadCommand.Flags().BoolP("quiet", "q", false, "Suppress the load output")
+	cmd.Flags().StringP(flagInput, "i", "", "Read from tar archive file, instead of STDIN")
+	cmd.Flags().BoolP(flagQuiet, "q", false, "Suppress the load output")
+	cmd.Flags().StringSlice(flagPlatform, []string{}, "Import content for a specific platform")
+	cmd.Flags().Bool(flagAllPlatforms, false, "Import content for all platforms")
 
-	// #region platform flags
-	// platform is defined as StringSlice, not StringArray, to allow specifying "--platform=amd64,arm64"
-	loadCommand.Flags().StringSlice("platform", []string{}, "Import content for a specific platform")
-	loadCommand.RegisterFlagCompletionFunc("platform", completion.Platforms)
-	loadCommand.Flags().Bool("all-platforms", false, "Import content for all platforms")
-	// #endregion
+	_ = cmd.RegisterFlagCompletionFunc(flagPlatform, completion.Platforms)
 
-	return loadCommand
+	return cmd
 }
 
 func processLoadCommandFlags(cmd *cobra.Command) (types.ImageLoadOptions, error) {
-	input, err := cmd.Flags().GetString("input")
+	input, err := cmd.Flags().GetString(flagInput)
 	if err != nil {
 		return types.ImageLoadOptions{}, err
 	}
@@ -59,11 +56,11 @@ func processLoadCommandFlags(cmd *cobra.Command) (types.ImageLoadOptions, error)
 	if err != nil {
 		return types.ImageLoadOptions{}, err
 	}
-	allPlatforms, err := cmd.Flags().GetBool("all-platforms")
+	allPlatforms, err := cmd.Flags().GetBool(flagAllPlatforms)
 	if err != nil {
 		return types.ImageLoadOptions{}, err
 	}
-	platform, err := cmd.Flags().GetStringSlice("platform")
+	platform, err := cmd.Flags().GetStringSlice(flagPlatform)
 	if err != nil {
 		return types.ImageLoadOptions{}, err
 	}
@@ -72,7 +69,7 @@ func processLoadCommandFlags(cmd *cobra.Command) (types.ImageLoadOptions, error)
 		return types.ImageLoadOptions{}, err
 	}
 	return types.ImageLoadOptions{
-		GOptions:     globalOptions,
+		GOptions:     *globalOptions,
 		Input:        input,
 		Platform:     platform,
 		AllPlatforms: allPlatforms,
@@ -88,7 +85,7 @@ func loadAction(cmd *cobra.Command, _ []string) error {
 		return err
 	}
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	client, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
 	if err != nil {
 		return err
 	}

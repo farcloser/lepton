@@ -28,6 +28,11 @@ import (
 	"github.com/containerd/log"
 )
 
+const (
+	Category   = "category"
+	Management = "Management"
+)
+
 // UnknownSubcommandAction is needed to let `system non-existent-command` fail
 // https://github.com/containerd/nerdctl/issues/487
 //

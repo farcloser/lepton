@@ -21,17 +21,13 @@ import (
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
+	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/image"
 )
 
-const (
-	allowNonDistFlag = "allow-nondistributable-artifacts"
-)
-
 func NewPushCommand() *cobra.Command {
-	var pushCommand = &cobra.Command{
+	var cmd = &cobra.Command{
 		Use:               "push [flags] NAME[:TAG]",
 		Short:             "Push an image or a repository to a registry.",
 		Args:              helpers.IsExactArgs(1),
@@ -40,65 +36,64 @@ func NewPushCommand() *cobra.Command {
 		SilenceUsage:      true,
 		SilenceErrors:     true,
 	}
-	// #region platform flags
-	// platform is defined as StringSlice, not StringArray, to allow specifying "--platform=amd64,arm64"
-	pushCommand.Flags().StringSlice("platform", []string{}, "Push content for a specific platform")
-	pushCommand.RegisterFlagCompletionFunc("platform", completion.Platforms)
-	pushCommand.Flags().Bool("all-platforms", false, "Push content for all platforms")
-	// #endregion
 
-	// #region sign flags
-	pushCommand.Flags().String("sign", "none", "Sign the image (none|cosign|notation")
-	pushCommand.RegisterFlagCompletionFunc("sign", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	// platform is defined as StringSlice, not StringArray, to allow specifying "--platform=amd64,arm64"
+	cmd.Flags().StringSlice(flagPlatform, []string{}, "Push content for a specific platform")
+	cmd.Flags().Bool(flagAllPlatforms, false, "Push content for all platforms")
+	cmd.Flags().String(flagSign, "none", "Sign the image (none|cosign|notation")
+	cmd.Flags().String(flagCosignKey, "", "Path to the private key file, KMS URI or Kubernetes Secret for --sign=cosign")
+	cmd.Flags().String(flagNotationKeyName, "", "Signing key name for a key previously added to notation's key list for --sign=notation")
+	cmd.Flags().Int64(flagSociSpanSize, -1, "Span size that soci index uses to segment layer data. Default is 4 MiB.")
+	cmd.Flags().Int64(flagSociMinLayerSize, -1, "Minimum layer size to build zTOC for. Smaller layers won't have zTOC and not lazy pulled. Default is 10 MiB.")
+	cmd.Flags().BoolP(flagQuiet, "q", false, "Suppress verbose output")
+	cmd.Flags().Bool(flagAllowNonDist, false, "Allow pushing images with non-distributable blobs")
+
+	_ = cmd.RegisterFlagCompletionFunc(flagPlatform, completion.Platforms)
+	_ = cmd.RegisterFlagCompletionFunc(flagSign, func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return []string{"none", "cosign", "notation"}, cobra.ShellCompDirectiveNoFileComp
 	})
-	pushCommand.Flags().String("cosign-key", "", "Path to the private key file, KMS URI or Kubernetes Secret for --sign=cosign")
-	pushCommand.Flags().String("notation-key-name", "", "Signing key name for a key previously added to notation's key list for --sign=notation")
-	// #endregion
 
-	// #region soci flags
-	pushCommand.Flags().Int64("soci-span-size", -1, "Span size that soci index uses to segment layer data. Default is 4 MiB.")
-	pushCommand.Flags().Int64("soci-min-layer-size", -1, "Minimum layer size to build zTOC for. Smaller layers won't have zTOC and not lazy pulled. Default is 10 MiB.")
-	// #endregion
-
-	pushCommand.Flags().BoolP("quiet", "q", false, "Suppress verbose output")
-
-	pushCommand.Flags().Bool(allowNonDistFlag, false, "Allow pushing images with non-distributable blobs")
-
-	return pushCommand
+	return cmd
 }
 
-func processImagePushOptions(cmd *cobra.Command) (types.ImagePushOptions, error) {
+func PushOptions(cmd *cobra.Command, args []string) (types.ImagePushOptions, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return types.ImagePushOptions{}, err
 	}
+
 	platform, err := cmd.Flags().GetStringSlice("platform")
 	if err != nil {
 		return types.ImagePushOptions{}, err
 	}
+
 	allPlatforms, err := cmd.Flags().GetBool("all-platforms")
 	if err != nil {
 		return types.ImagePushOptions{}, err
 	}
+
 	quiet, err := cmd.Flags().GetBool("quiet")
 	if err != nil {
 		return types.ImagePushOptions{}, err
 	}
-	allowNonDist, err := cmd.Flags().GetBool(allowNonDistFlag)
+
+	allowNonDist, err := cmd.Flags().GetBool(flagAllowNonDist)
 	if err != nil {
 		return types.ImagePushOptions{}, err
 	}
-	signOptions, err := processImageSignOptions(cmd)
+
+	signOptions, err := SignOptions(cmd, args)
 	if err != nil {
 		return types.ImagePushOptions{}, err
 	}
-	sociOptions, err := processSociOptions(cmd)
+
+	sociOptions, err := processSociOptions(cmd, args)
 	if err != nil {
 		return types.ImagePushOptions{}, err
 	}
+
 	return types.ImagePushOptions{
-		GOptions:                       globalOptions,
+		GOptions:                       *globalOptions,
 		SignOptions:                    signOptions,
 		SociOptions:                    sociOptions,
 		Platforms:                      platform,
@@ -110,13 +105,13 @@ func processImagePushOptions(cmd *cobra.Command) (types.ImagePushOptions, error)
 }
 
 func pushAction(cmd *cobra.Command, args []string) error {
-	options, err := processImagePushOptions(cmd)
+	options, err := PushOptions(cmd, args)
 	if err != nil {
 		return err
 	}
 	rawRef := args[0]
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	client, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
 	if err != nil {
 		return err
 	}
@@ -130,7 +125,7 @@ func pushShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]
 	return completion.ImageNames(cmd, args, toComplete)
 }
 
-func processImageSignOptions(cmd *cobra.Command) (opt types.ImageSignOptions, err error) {
+func SignOptions(cmd *cobra.Command, _ []string) (opt types.ImageSignOptions, err error) {
 	if opt.Provider, err = cmd.Flags().GetString("sign"); err != nil {
 		return
 	}
@@ -143,7 +138,7 @@ func processImageSignOptions(cmd *cobra.Command) (opt types.ImageSignOptions, er
 	return
 }
 
-func processSociOptions(cmd *cobra.Command) (opt types.SociOptions, err error) {
+func processSociOptions(cmd *cobra.Command, _ []string) (opt types.SociOptions, err error) {
 	if opt.SpanSize, err = cmd.Flags().GetInt64("soci-span-size"); err != nil {
 		return
 	}

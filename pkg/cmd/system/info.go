@@ -32,7 +32,7 @@ import (
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 	"github.com/containerd/nerdctl/v2/pkg/infoutil"
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
@@ -42,13 +42,13 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/strutil"
 )
 
-func Info(ctx context.Context, client *containerd.Client, options *types.SystemInfoOptions) error {
+func Info(ctx context.Context, client *containerd.Client, out io.Writer, globalOptions *options.Global, opts *options.SystemInfo) error {
 	var (
 		tmpl *template.Template
 		err  error
 	)
-	if options.Format != "" {
-		tmpl, err = formatter.ParseTemplate(options.Format)
+	if opts.Format != "" {
+		tmpl, err = formatter.ParseTemplate(opts.Format)
 		if err != nil {
 			return err
 		}
@@ -58,21 +58,21 @@ func Info(ctx context.Context, client *containerd.Client, options *types.SystemI
 		infoNative *native.Info
 		infoCompat *dockercompat.Info
 	)
-	switch options.Mode {
+	switch opts.Mode {
 	case "native":
 		di, err := infoutil.NativeDaemonInfo(ctx, client)
 		if err != nil {
 			return err
 		}
-		infoNative = fulfillNativeInfo(di, options.GOptions)
+		infoNative = fulfillNativeInfo(di, *globalOptions)
 	case "dockercompat":
-		infoCompat, err = infoutil.Info(ctx, client, options.GOptions.Snapshotter, options.GOptions.CgroupManager)
+		infoCompat, err = infoutil.Info(ctx, client, globalOptions.Snapshotter, globalOptions.CgroupManager)
 		if err != nil {
 			return err
 		}
 		infoCompat.Plugins.Log = logging.Drivers()
 	default:
-		return fmt.Errorf("unknown mode %q", options.Mode)
+		return fmt.Errorf("unknown mode %q", opts.Mode)
 	}
 
 	if tmpl != nil {
@@ -80,24 +80,23 @@ func Info(ctx context.Context, client *containerd.Client, options *types.SystemI
 		if infoCompat != nil {
 			x = infoCompat
 		}
-		w := options.Stdout
-		if err := tmpl.Execute(w, x); err != nil {
+		if err := tmpl.Execute(out, x); err != nil {
 			return err
 		}
-		_, err = fmt.Fprintln(w)
+		_, err = fmt.Fprintln(out)
 		return err
 	}
 
-	switch options.Mode {
+	switch opts.Mode {
 	case "native":
-		return prettyPrintInfoNative(options.Stdout, infoNative)
+		return prettyPrintInfoNative(out, infoNative)
 	case "dockercompat":
-		return prettyPrintInfoDockerCompat(options.Stdout, options.Stderr, infoCompat, options.GOptions)
+		return prettyPrintInfoDockerCompat(out, opts.Stderr, infoCompat, *globalOptions)
 	}
 	return nil
 }
 
-func fulfillNativeInfo(di *native.DaemonInfo, globalOptions types.GlobalCommandOptions) *native.Info {
+func fulfillNativeInfo(di *native.DaemonInfo, globalOptions options.Global) *native.Info {
 	info := &native.Info{
 		Daemon: di,
 	}
@@ -141,7 +140,7 @@ func prettyPrintInfoNative(w io.Writer, info *native.Info) error {
 	return nil
 }
 
-func prettyPrintInfoDockerCompat(stdout io.Writer, stderr io.Writer, info *dockercompat.Info, globalOptions types.GlobalCommandOptions) error {
+func prettyPrintInfoDockerCompat(stdout io.Writer, stderr io.Writer, info *dockercompat.Info, globalOptions options.Global) error {
 	w := stdout
 	debug := globalOptions.Debug
 	fmt.Fprintf(w, "Client:\n")

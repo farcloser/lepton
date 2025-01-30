@@ -28,7 +28,7 @@ import (
 	"go.farcloser.world/containers/specs"
 	"go.farcloser.world/core/units"
 
-	containerd "github.com/containerd/containerd/v2/client"
+	"github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/containers"
 	"github.com/containerd/errdefs"
 	"github.com/containerd/log"
@@ -36,8 +36,8 @@ import (
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
+	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	nerdctlContainer "github.com/containerd/nerdctl/v2/pkg/cmd/container"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 	"github.com/containerd/nerdctl/v2/pkg/idutil/containerwalker"
@@ -96,12 +96,12 @@ func updateAction(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
+	client, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
-	options, err := getUpdateOption(cmd, globalOptions)
+	options, err := getUpdateOption(cmd, *globalOptions)
 	if err != nil {
 		return err
 	}
@@ -119,7 +119,7 @@ func updateAction(cmd *cobra.Command, args []string) error {
 	return walker.WalkAll(ctx, args, true)
 }
 
-func getUpdateOption(cmd *cobra.Command, globalOptions types.GlobalCommandOptions) (updateResourceOptions, error) {
+func getUpdateOption(cmd *cobra.Command, globalOptions options.Global) (updateResourceOptions, error) {
 	var options updateResourceOptions
 	cpus, err := cmd.Flags().GetFloat64("cpus")
 	if err != nil {
@@ -242,8 +242,8 @@ func getUpdateOption(cmd *cobra.Command, globalOptions types.GlobalCommandOption
 	return options, nil
 }
 
-func updateContainer(ctx context.Context, client *containerd.Client, id string, opts updateResourceOptions, cmd *cobra.Command) (retErr error) {
-	container, err := client.LoadContainer(ctx, id)
+func updateContainer(ctx context.Context, cli *client.Client, id string, opts updateResourceOptions, cmd *cobra.Command) (retErr error) {
+	container, err := cli.LoadContainer(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -358,7 +358,7 @@ func updateContainer(ctx context.Context, client *containerd.Client, id string, 
 		return err
 	}
 	if cmd.Flags().Changed("restart") && restart != "" {
-		if err := nerdctlContainer.UpdateContainerRestartPolicyLabel(ctx, client, container, restart); err != nil {
+		if err := nerdctlContainer.UpdateContainerRestartPolicyLabel(ctx, cli, container, restart); err != nil {
 			return err
 		}
 	}
@@ -376,11 +376,11 @@ func updateContainer(ctx context.Context, client *containerd.Client, id string, 
 		}
 		return fmt.Errorf("failed to get task:%w", err)
 	}
-	return task.Update(ctx, containerd.WithResources(spec.Linux.Resources))
+	return task.Update(ctx, client.WithResources(spec.Linux.Resources))
 }
 
-func updateContainerSpec(ctx context.Context, container containerd.Container, spec *specs.Spec) error {
-	if err := container.Update(ctx, func(ctx context.Context, client *containerd.Client, c *containers.Container) error {
+func updateContainerSpec(ctx context.Context, container client.Container, spec *specs.Spec) error {
+	if err := container.Update(ctx, func(ctx context.Context, cli *client.Client, c *containers.Container) error {
 		a, err := typeurl.MarshalAny(spec)
 		if err != nil {
 			return fmt.Errorf("failed to marshal spec %+v:%w", spec, err)

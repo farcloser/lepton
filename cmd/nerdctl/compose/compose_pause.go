@@ -20,11 +20,11 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
+	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/compose"
 )
 
-func newComposePauseCommand() *cobra.Command {
+func PauseCommand() *cobra.Command {
 	var composePauseCommand = &cobra.Command{
 		Use:                   "pause [SERVICE...]",
 		Short:                 "Pause all processes within containers of service(s). They can be unpaused with nerdctl compose unpause",
@@ -42,7 +42,7 @@ func composePauseAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
+	client, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
 	if err != nil {
 		return err
 	}
@@ -51,7 +51,7 @@ func composePauseAction(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	c, err := compose.New(client, globalOptions, options, cmd.OutOrStdout(), cmd.ErrOrStderr())
+	c, err := compose.New(client, *globalOptions, options, cmd.OutOrStdout(), cmd.ErrOrStderr())
 	if err != nil {
 		return err
 	}
@@ -59,7 +59,7 @@ func composePauseAction(cmd *cobra.Command, args []string) error {
 	return c.Pause(ctx, args, cmd.OutOrStdout())
 }
 
-func newComposeUnpauseCommand() *cobra.Command {
+func UnpauseCommand() *cobra.Command {
 	var composeUnpauseCommand = &cobra.Command{
 		Use:                   "unpause [SERVICE...]",
 		Short:                 "Unpause all processes within containers of service(s).",
@@ -77,7 +77,7 @@ func composeUnpauseAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
+	client, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
 	if err != nil {
 		return err
 	}
@@ -87,7 +87,7 @@ func composeUnpauseAction(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	c, err := compose.New(client, globalOptions, options, cmd.OutOrStdout(), cmd.ErrOrStderr())
+	c, err := compose.New(client, *globalOptions, options, cmd.OutOrStdout(), cmd.ErrOrStderr())
 	if err != nil {
 		return err
 	}

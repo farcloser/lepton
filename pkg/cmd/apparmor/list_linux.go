@@ -23,10 +23,11 @@ import (
 	"text/tabwriter"
 
 	"github.com/containerd/nerdctl/v2/leptonic/services/apparmor"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 )
 
-func List(out io.Writer, options *ListOptions) error {
+func List(out io.Writer, options *options.AppArmorList) error {
 	profiles, err := apparmor.List()
 	if err != nil {
 		return err

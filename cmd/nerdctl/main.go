@@ -32,7 +32,12 @@ import (
 
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/cmd/nerdctl/builder"
+	builder2 "github.com/containerd/nerdctl/v2/cmd/nerdctl/commands/builder"
+	"github.com/containerd/nerdctl/v2/cmd/nerdctl/commands/namespace"
+	"github.com/containerd/nerdctl/v2/cmd/nerdctl/commands/network"
+	"github.com/containerd/nerdctl/v2/cmd/nerdctl/commands/registry"
+	"github.com/containerd/nerdctl/v2/cmd/nerdctl/commands/system"
+	"github.com/containerd/nerdctl/v2/cmd/nerdctl/commands/volume"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/compose"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/container"
@@ -40,11 +45,6 @@ import (
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/image"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/inspect"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/internal"
-	"github.com/containerd/nerdctl/v2/cmd/nerdctl/login"
-	"github.com/containerd/nerdctl/v2/cmd/nerdctl/namespace"
-	"github.com/containerd/nerdctl/v2/cmd/nerdctl/network"
-	"github.com/containerd/nerdctl/v2/cmd/nerdctl/system"
-	"github.com/containerd/nerdctl/v2/cmd/nerdctl/volume"
 	"github.com/containerd/nerdctl/v2/pkg/config"
 	ncdefaults "github.com/containerd/nerdctl/v2/pkg/defaults"
 	"github.com/containerd/nerdctl/v2/pkg/errutil"
@@ -109,7 +109,7 @@ func usage(c *cobra.Command) error {
 		t += "\n"
 		return t
 	}
-	s += printCommands("helpers.Management commands", managementCommands)
+	s += printCommands(helpers.Management+" commands", managementCommands)
 	s += printCommands("Commands", nonManagementCommands)
 
 	s += Bold("Flags") + ":\n"
@@ -120,8 +120,10 @@ func usage(c *cobra.Command) error {
 	} else {
 		s += "See also '" + c.Root().CommandPath() + " --help' for the global flags such as '--namespace', '--snapshotter', and '--cgroup-manager'."
 	}
-	fmt.Fprintln(c.OutOrStdout(), s)
-	return nil
+
+	_, err := fmt.Fprintln(c.OutOrStdout(), s)
+
+	return err
 }
 
 func main() {
@@ -288,7 +290,7 @@ Config file ($%s_TOML): %s
 		// #endregion
 
 		// Build
-		builder.NewBuildCommand(),
+		builder2.BuildCommand(),
 
 		// #region Image management
 		image.NewImagesCommand(),
@@ -302,8 +304,8 @@ Config file ($%s_TOML): %s
 		// #endregion
 
 		// #region System
-		system.NewEventsCommand(),
-		system.NewInfoCommand(),
+		system.EventsCommand(),
+		system.InfoCommand(),
 		newVersionCommand(),
 		// #endregion
 
@@ -317,25 +319,27 @@ Config file ($%s_TOML): %s
 		// #region helpers.Management
 		container.NewContainerCommand(),
 		image.NewImageCommand(),
-		network.NewNetworkCommand(),
-		volume.NewVolumeCommand(),
-		system.NewSystemCommand(),
-		namespace.NewNamespaceCommand(),
-		builder.NewBuilderCommand(),
+		network.Command(),
+		volume.Command(),
+		system.Command(),
+		namespace.Command(),
+		registry.Command(),
+		builder2.Command(),
 		// #endregion
 
 		// Internal
-		internal.NewInternalCommand(),
+		internal.Command(),
 
 		// login
-		login.NewLoginCommand(),
+		registry.LoginCommand(),
 
 		// Logout
-		login.NewLogoutCommand(),
+		registry.LogoutCommand(),
 
 		// Compose
 		compose.NewComposeCommand(),
 	)
+
 	addApparmorCommand(rootCmd)
 	container.AddCpCommand(rootCmd)
 

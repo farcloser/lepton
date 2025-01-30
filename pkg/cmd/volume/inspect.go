@@ -19,22 +19,23 @@ package volume
 import (
 	"context"
 	"errors"
+	"io"
 
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 )
 
-func Inspect(ctx context.Context, volumes []string, options types.VolumeInspectOptions) error {
-	volStore, err := Store(options.GOptions.Namespace, options.GOptions.DataRoot, options.GOptions.Address)
+func Inspect(ctx context.Context, out io.Writer, globalOptions *options.Global, options *options.VolumeInspect) error {
+	volStore, err := Store(globalOptions.Namespace, globalOptions.DataRoot, globalOptions.Address)
 	if err != nil {
 		return err
 	}
-	result := []interface{}{}
 
+	result := []interface{}{}
 	warns := []error{}
-	for _, name := range volumes {
+	for _, name := range options.NamesList {
 		var vol, err = volStore.Get(name, options.Size)
 		if err != nil {
 			warns = append(warns, err)
@@ -42,10 +43,12 @@ func Inspect(ctx context.Context, volumes []string, options types.VolumeInspectO
 		}
 		result = append(result, vol)
 	}
-	err = formatter.FormatSlice(options.Format, options.Stdout, result)
+
+	err = formatter.FormatSlice(options.Format, out, result)
 	if err != nil {
 		return err
 	}
+
 	for _, warn := range warns {
 		log.G(ctx).Warn(warn)
 	}
@@ -53,5 +56,6 @@ func Inspect(ctx context.Context, volumes []string, options types.VolumeInspectO
 	if len(warns) != 0 {
 		return errors.New("some volumes could not be inspected")
 	}
+
 	return nil
 }

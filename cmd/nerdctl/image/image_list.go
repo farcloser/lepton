@@ -22,17 +22,17 @@ import (
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
+	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/image"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 )
 
 func NewImagesCommand() *cobra.Command {
-	shortHelp := "List images"
-	longHelp := shortHelp + `
-
-Properties:
+	var cmd = &cobra.Command{
+		Use:   "images [flags] [REPOSITORY[:TAG]]",
+		Short: "List images",
+		Long: `Properties:
 - REPOSITORY: Repository
 - TAG:        Tag
 - NAME:       Name of the image, --names for skip parsing as repository and tag.
@@ -41,11 +41,7 @@ Properties:
 - PLATFORM:   Platform
 - SIZE:       Size of the unpacked snapshots
 - BLOB SIZE:  Size of the blobs (such as layer tarballs) in the content store
-`
-	var imagesCommand = &cobra.Command{
-		Use:                   "images [flags] [REPOSITORY[:TAG]]",
-		Short:                 shortHelp,
-		Long:                  longHelp,
+`,
 		Args:                  cobra.MaximumNArgs(1),
 		RunE:                  imagesAction,
 		ValidArgsFunction:     imagesShellComplete,
@@ -54,22 +50,22 @@ Properties:
 		DisableFlagsInUseLine: true,
 	}
 
-	imagesCommand.Flags().BoolP("quiet", "q", false, "Only show numeric IDs")
-	imagesCommand.Flags().Bool("no-trunc", false, "Don't truncate output")
-	// Alias "-f" is reserved for "--filter"
-	imagesCommand.Flags().String("format", "", "Format the output using the given Go template, e.g, '{{json .}}', 'wide'")
-	imagesCommand.Flags().StringSliceP("filter", "f", []string{}, "Filter output based on conditions provided")
-	imagesCommand.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	cmd.Flags().BoolP(flagQuiet, "q", false, "Only show numeric IDs")
+	cmd.Flags().Bool(flagNoTrunc, false, "Don't truncate output")
+	cmd.Flags().String(flagFormat, "", "Format the output using the given Go template, e.g, '{{json .}}', 'wide'")
+	cmd.Flags().StringSliceP(flagFilter, "f", []string{}, "Filter output based on conditions provided")
+	cmd.Flags().Bool(flagDigests, false, "Show digests (compatible with Docker, unlike ID)")
+	cmd.Flags().Bool(flagNames, false, "Show image names")
+	cmd.Flags().BoolP(flagAll, "a", true, "(unimplemented yet, always true)")
+
+	_ = cmd.RegisterFlagCompletionFunc(flagFormat, func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return []string{formatter.FormatJSON, formatter.FormatTable, formatter.FormatWide}, cobra.ShellCompDirectiveNoFileComp
 	})
-	imagesCommand.Flags().Bool("digests", false, "Show digests (compatible with Docker, unlike ID)")
-	imagesCommand.Flags().Bool("names", false, "Show image names")
-	imagesCommand.Flags().BoolP("all", "a", true, "(unimplemented yet, always true)")
 
-	return imagesCommand
+	return cmd
 }
 
-func processImageListOptions(cmd *cobra.Command, args []string) (*types.ImageListOptions, error) {
+func ListOptions(cmd *cobra.Command, args []string) (*types.ImageListOptions, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return nil, err
@@ -90,7 +86,7 @@ func processImageListOptions(cmd *cobra.Command, args []string) (*types.ImageLis
 	if err != nil {
 		return nil, err
 	}
-	format, err := cmd.Flags().GetString("format")
+	format, err := cmd.Flags().GetString(flagFormat)
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +106,7 @@ func processImageListOptions(cmd *cobra.Command, args []string) (*types.ImageLis
 		return nil, err
 	}
 	return &types.ImageListOptions{
-		GOptions:         globalOptions,
+		GOptions:         *globalOptions,
 		Quiet:            quiet,
 		NoTrunc:          noTrunc,
 		Format:           format,
@@ -125,7 +121,7 @@ func processImageListOptions(cmd *cobra.Command, args []string) (*types.ImageLis
 }
 
 func imagesAction(cmd *cobra.Command, args []string) error {
-	options, err := processImageListOptions(cmd, args)
+	options, err := ListOptions(cmd, args)
 	if err != nil {
 		return err
 	}
@@ -133,7 +129,7 @@ func imagesAction(cmd *cobra.Command, args []string) error {
 		options.All = true
 	}
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	client, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
 	if err != nil {
 		return err
 	}

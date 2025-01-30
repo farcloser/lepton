@@ -34,6 +34,7 @@ import (
 	"github.com/containerd/containerd/v2/pkg/oci"
 	"github.com/containerd/log"
 
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/dnsutil/hostsstore"
@@ -116,7 +117,7 @@ type NetworkOptionsManager interface {
 }
 
 // NewNetworkingOptionsManager Returns a types.NetworkOptionsManager based on the provided command's flags.
-func NewNetworkingOptionsManager(globalOptions types.GlobalCommandOptions, netOpts types.NetworkOptions, client *containerd.Client) (NetworkOptionsManager, error) {
+func NewNetworkingOptionsManager(globalOptions options.Global, netOpts types.NetworkOptions, client *containerd.Client) (NetworkOptionsManager, error) {
 	netType, err := nettype.Detect(netOpts.NetworkSlice)
 	if err != nil {
 		return nil, err
@@ -145,7 +146,7 @@ func NewNetworkingOptionsManager(globalOptions types.GlobalCommandOptions, netOp
 
 // No-op types.NetworkOptionsManager for network-less containers.
 type noneNetworkManager struct {
-	globalOptions types.GlobalCommandOptions
+	globalOptions options.Global
 	netOpts       types.NetworkOptions
 	client        *containerd.Client
 }
@@ -186,7 +187,7 @@ func (m *noneNetworkManager) ContainerNetworkingOpts(_ context.Context, _ string
 
 // types.NetworkOptionsManager implementation for container networking settings.
 type containerNetworkManager struct {
-	globalOptions types.GlobalCommandOptions
+	globalOptions options.Global
 	netOpts       types.NetworkOptions
 	client        *containerd.Client
 }
@@ -357,7 +358,7 @@ func (m *containerNetworkManager) ContainerNetworkingOpts(ctx context.Context, _
 
 // types.NetworkOptionsManager implementation for host networking settings.
 type hostNetworkManager struct {
-	globalOptions types.GlobalCommandOptions
+	globalOptions options.Global
 	netOpts       types.NetworkOptions
 	client        *containerd.Client
 }
@@ -624,7 +625,7 @@ func withRemoveSysfs(_ context.Context, _ oci.Client, c *containers.Container, s
 // This is a more specialized and OS-dependendant networking model so this
 // struct provides different implementations on different platforms.
 type cniNetworkManager struct {
-	globalOptions types.GlobalCommandOptions
+	globalOptions options.Global
 	netOpts       types.NetworkOptions
 	client        *containerd.Client
 	cniNetworkManagerPlatform
@@ -655,7 +656,7 @@ func validateUtsSettings(netOpts types.NetworkOptions) error {
 // spec for the file to be mounted under /etc/hostname in the new container.
 // If the hostname is empty, the leading 12 characters of the containerID
 // This sets world readable permissions on /etc/hostname, ignoring umask
-func writeEtcHostnameForContainer(globalOptions types.GlobalCommandOptions, hostname string, containerID string) ([]oci.SpecOpts, error) {
+func writeEtcHostnameForContainer(globalOptions options.Global, hostname string, containerID string) ([]oci.SpecOpts, error) {
 	if containerID == "" {
 		return nil, errors.New("container ID is required for setting up hostname file")
 	}

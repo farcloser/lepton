@@ -38,7 +38,9 @@ import (
 	"github.com/containerd/log"
 
 	"github.com/containerd/nerdctl/v2/leptonic/errs"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/bypass4netnsutil"
+	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/dnsutil/hostsstore"
 	"github.com/containerd/nerdctl/v2/pkg/labels"
 	"github.com/containerd/nerdctl/v2/pkg/namestore"
@@ -62,13 +64,18 @@ var (
 	NetworkNamespace = labels.Prefix + "network-namespace"
 )
 
-func Run(stdin io.Reader, stderr io.Writer, event, dataStore, cniPath, cniNetconfPath, bridgeIP string) error {
-	if stdin == nil || event == "" || dataStore == "" || cniPath == "" || cniNetconfPath == "" {
+func Run(ctx context.Context, globalOptions *options.Global, opts *options.OCIHook) error {
+	dataStore, err := clientutil.DataStore(globalOptions.DataRoot, globalOptions.Address)
+	if err != nil {
+		return err
+	}
+
+	if opts.Stdin == nil || opts.Event == "" || dataStore == "" || globalOptions.CNIPath == "" || globalOptions.CNINetConfPath == "" {
 		return errors.New("got insufficient args")
 	}
 
 	var state specs.State
-	if err := json.NewDecoder(stdin).Decode(&state); err != nil {
+	if err := json.NewDecoder(opts.Stdin).Decode(&state); err != nil {
 		return err
 	}
 
@@ -79,13 +86,13 @@ func Run(stdin io.Reader, stderr io.Writer, event, dataStore, cniPath, cniNetcon
 	if err := os.MkdirAll(containerStateDir, 0o700); err != nil {
 		return fmt.Errorf("failed to create %q: %w", containerStateDir, err)
 	}
-	logFilePath := filepath.Join(containerStateDir, "oci-hook."+event+".log")
+	logFilePath := filepath.Join(containerStateDir, "oci-hook."+opts.Event+".log")
 	logFile, err := os.Create(logFilePath)
 	if err != nil {
 		return err
 	}
 	currentOutput := log.L.Logger.Out
-	log.L.Logger.SetOutput(io.MultiWriter(stderr, logFile))
+	log.L.Logger.SetOutput(io.MultiWriter(opts.Stderr, logFile))
 	defer func() {
 		log.L.Logger.SetOutput(currentOutput)
 		err = logFile.Close()
@@ -104,28 +111,28 @@ func Run(stdin io.Reader, stderr io.Writer, event, dataStore, cniPath, cniNetcon
 	// This below is a stopgap solution that just enforces a global lock
 	// Note this here is probably not enough, as concurrent CNI operations may happen outside of the scope of ocihooks
 	// through explicit calls to Remove, etc.
-	err = os.MkdirAll(cniNetconfPath, 0o700)
+	err = os.MkdirAll(globalOptions.CNINetConfPath, 0o700)
 	if err != nil {
 		return err
 	}
-	lock, err := filesystem.Lock(cniNetconfPath)
+	lock, err := filesystem.Lock(globalOptions.CNINetConfPath)
 	if err != nil {
 		return err
 	}
 	defer filesystem.Unlock(lock)
 
-	opts, err := newHandlerOpts(&state, dataStore, cniPath, cniNetconfPath, bridgeIP)
+	sopts, err := newHandlerOpts(&state, dataStore, globalOptions.CNIPath, globalOptions.CNINetConfPath, globalOptions.BridgeIP)
 	if err != nil {
 		return err
 	}
 
-	switch event {
+	switch opts.Event {
 	case "createRuntime":
-		return onCreateRuntime(opts)
+		return onCreateRuntime(sopts)
 	case "postStop":
-		return onPostStop(opts)
+		return onPostStop(sopts)
 	default:
-		return fmt.Errorf("unexpected event %q", event)
+		return fmt.Errorf("unexpected event %q", opts.Event)
 	}
 }
 

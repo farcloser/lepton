@@ -34,8 +34,8 @@ import (
 	"gotest.tools/v3/icmd"
 	"gotest.tools/v3/poll"
 
-	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
+	"github.com/containerd/nerdctl/v2/pkg/testutil/helpers"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
 )
 

@@ -28,7 +28,7 @@ import (
 	"github.com/containerd/errdefs"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/identifiers"
+	"github.com/containerd/nerdctl/v2/leptonic/identifiers"
 	"github.com/containerd/nerdctl/v2/pkg/reflectutil"
 )
 
@@ -85,7 +85,7 @@ func parseBuildConfig(c *types.BuildConfig, project *types.Project, imageName st
 	for _, s := range c.Secrets {
 		fileRef := types.FileReferenceConfig(s)
 
-		if err := identifiers.ValidateDockerCompat(fileRef.Source); err != nil {
+		if err := identifiers.Validate(fileRef.Source); err != nil {
 			return nil, fmt.Errorf("invalid secret source name: %w", err)
 		}
 

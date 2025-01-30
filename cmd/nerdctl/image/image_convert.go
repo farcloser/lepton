@@ -21,8 +21,8 @@ import (
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
+	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/image"
 )
 
@@ -37,8 +37,8 @@ For encryption and decryption, use 'nerdctl image (encrypt|decrypt)' command.
 `
 
 // imageConvertCommand is from https://github.com/containerd/stargz-snapshotter/blob/d58f43a8235e46da73fb94a1a35280cb4d607b2c/cmd/ctr-remote/commands/convert.go
-func newImageConvertCommand() *cobra.Command {
-	imageConvertCommand := &cobra.Command{
+func ConvertCommand() *cobra.Command {
+	cmd := &cobra.Command{
 		Use:               "convert [flags] <source_ref> <target_ref>...",
 		Short:             "convert an image",
 		Long:              imageConvertHelp,
@@ -49,41 +49,29 @@ func newImageConvertCommand() *cobra.Command {
 		SilenceErrors:     true,
 	}
 
-	imageConvertCommand.Flags().String("format", "", "Format the output using the given Go template, e.g, 'json'")
+	cmd.Flags().String(flagFormat, "", "Format the output using the given Go template, e.g, 'json'")
+	cmd.Flags().Bool(flagZstd, false, "Convert legacy tar(.gz) layers to zstd. Should be used in conjunction with '--oci'")
+	cmd.Flags().Int(flagZstdCompressionLevel, 3, "zstd compression level")
+	cmd.Flags().Bool(flagZstdchunked, false, "Convert legacy tar(.gz) layers to zstd:chunked for lazy pulling. Should be used in conjunction with '--oci'")
+	cmd.Flags().String(flagZstdchunkedRecordIn, "", "Read 'ctr-remote optimize --record-out=<FILE>' record file (EXPERIMENTAL)")
+	cmd.Flags().Int(flagZstdchunkedCompressionLevel, 3, "zstd:chunked compression level") // SpeedDefault; see also https://pkg.go.dev/github.com/klauspost/compress/zstd#EncoderLevel
+	cmd.Flags().Int(flagZstdchunkedChunkSize, 0, "zstd:chunked chunk size")
+	cmd.Flags().Bool(flagUncompress, false, "Convert tar.gz layers to uncompressed tar layers")
+	cmd.Flags().Bool(flagOCI, false, "Convert Docker media types to OCI media types")
+	cmd.Flags().StringSlice(flagPlatform, []string{}, "Convert content for a specific platform")
+	cmd.Flags().Bool(flagAllPlatforms, false, "Convert content for all platforms")
 
-	// #region zstd flags
-	imageConvertCommand.Flags().Bool("zstd", false, "Convert legacy tar(.gz) layers to zstd. Should be used in conjunction with '--oci'")
-	imageConvertCommand.Flags().Int("zstd-compression-level", 3, "zstd compression level")
-	// #endregion
+	_ = cmd.RegisterFlagCompletionFunc("platform", completion.Platforms)
 
-	// #region zstd:chunked flags
-	imageConvertCommand.Flags().Bool("zstdchunked", false, "Convert legacy tar(.gz) layers to zstd:chunked for lazy pulling. Should be used in conjunction with '--oci'")
-	imageConvertCommand.Flags().String("zstdchunked-record-in", "", "Read 'ctr-remote optimize --record-out=<FILE>' record file (EXPERIMENTAL)")
-	imageConvertCommand.Flags().Int("zstdchunked-compression-level", 3, "zstd:chunked compression level") // SpeedDefault; see also https://pkg.go.dev/github.com/klauspost/compress/zstd#EncoderLevel
-	imageConvertCommand.Flags().Int("zstdchunked-chunk-size", 0, "zstd:chunked chunk size")
-	// #endregion
-
-	// #region generic flags
-	imageConvertCommand.Flags().Bool("uncompress", false, "Convert tar.gz layers to uncompressed tar layers")
-	imageConvertCommand.Flags().Bool("oci", false, "Convert Docker media types to OCI media types")
-	// #endregion
-
-	// #region platform flags
-	// platform is defined as StringSlice, not StringArray, to allow specifying "--platform=amd64,arm64"
-	imageConvertCommand.Flags().StringSlice("platform", []string{}, "Convert content for a specific platform")
-	imageConvertCommand.RegisterFlagCompletionFunc("platform", completion.Platforms)
-	imageConvertCommand.Flags().Bool("all-platforms", false, "Convert content for all platforms")
-	// #endregion
-
-	return imageConvertCommand
+	return cmd
 }
 
-func processImageConvertOptions(cmd *cobra.Command) (types.ImageConvertOptions, error) {
+func ConvertOptions(cmd *cobra.Command, args []string) (types.ImageConvertOptions, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return types.ImageConvertOptions{}, err
 	}
-	format, err := cmd.Flags().GetString("format")
+	format, err := cmd.Flags().GetString(flagFormat)
 	if err != nil {
 		return types.ImageConvertOptions{}, err
 	}
@@ -140,7 +128,7 @@ func processImageConvertOptions(cmd *cobra.Command) (types.ImageConvertOptions, 
 	}
 	// #endregion
 	return types.ImageConvertOptions{
-		GOptions: globalOptions,
+		GOptions: *globalOptions,
 		Format:   format,
 		// #region zstd flags
 		Zstd:                 zstd,
@@ -165,14 +153,14 @@ func processImageConvertOptions(cmd *cobra.Command) (types.ImageConvertOptions, 
 }
 
 func imageConvertAction(cmd *cobra.Command, args []string) error {
-	options, err := processImageConvertOptions(cmd)
+	options, err := ConvertOptions(cmd, args)
 	if err != nil {
 		return err
 	}
 	srcRawRef := args[0]
 	destRawRef := args[1]
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	client, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
 	if err != nil {
 		return err
 	}

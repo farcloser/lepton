@@ -30,7 +30,7 @@ import (
 	"github.com/containerd/log"
 
 	"github.com/containerd/nerdctl/v2/leptonic/errs"
-	"github.com/containerd/nerdctl/v2/pkg/identifiers"
+	"github.com/containerd/nerdctl/v2/leptonic/identifiers"
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/native"
 	"github.com/containerd/nerdctl/v2/pkg/store"
 )
@@ -112,7 +112,7 @@ func (vs *volumeStore) Exists(name string) (doesExist bool, err error) {
 		}
 	}()
 
-	if err = identifiers.ValidateDockerCompat(name); err != nil {
+	if err = identifiers.Validate(name); err != nil {
 		return false, err
 	}
 
@@ -128,7 +128,7 @@ func (vs *volumeStore) Get(name string, size bool) (vol *native.Volume, err erro
 		}
 	}()
 
-	if err = identifiers.ValidateDockerCompat(name); err != nil {
+	if err = identifiers.Validate(name); err != nil {
 		return nil, err
 	}
 
@@ -156,7 +156,7 @@ func (vs *volumeStore) CreateWithoutLock(name string, labels []string) (vol *nat
 		}
 	}()
 
-	if err = identifiers.ValidateDockerCompat(name); err != nil {
+	if err = identifiers.Validate(name); err != nil {
 		return nil, err
 	}
 
@@ -170,7 +170,7 @@ func (vs *volumeStore) Create(name string, labels []string) (vol *native.Volume,
 		}
 	}()
 
-	if err = identifiers.ValidateDockerCompat(name); err != nil {
+	if err = identifiers.Validate(name); err != nil {
 		return nil, err
 	}
 
@@ -249,7 +249,7 @@ func (vs *volumeStore) Remove(generator func() ([]string, []error, error)) (remo
 
 		for _, name := range names {
 			// Invalid name, soft error
-			if err = identifiers.ValidateDockerCompat(name); err != nil {
+			if err = identifiers.Validate(name); err != nil {
 				// TODO: we are clearly mixing presentation concerns here
 				// This should be handled by the cli, not here
 				warns = append(warns, err)

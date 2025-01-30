@@ -19,12 +19,12 @@ package container
 import (
 	"github.com/spf13/cobra"
 
-	containerd "github.com/containerd/containerd/v2/client"
+	"github.com/containerd/containerd/v2/client"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
+	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 )
 
@@ -56,7 +56,7 @@ func processStatsCommandFlags(cmd *cobra.Command) (types.ContainerStatsOptions, 
 		return types.ContainerStatsOptions{}, err
 	}
 
-	all, err := cmd.Flags().GetBool("all")
+	all, err := cmd.Flags().GetBool(flagAll)
 	if err != nil {
 		return types.ContainerStatsOptions{}, err
 	}
@@ -66,7 +66,7 @@ func processStatsCommandFlags(cmd *cobra.Command) (types.ContainerStatsOptions, 
 		return types.ContainerStatsOptions{}, err
 	}
 
-	format, err := cmd.Flags().GetString("format")
+	format, err := cmd.Flags().GetString(flagFormat)
 	if err != nil {
 		return types.ContainerStatsOptions{}, err
 	}
@@ -79,7 +79,7 @@ func processStatsCommandFlags(cmd *cobra.Command) (types.ContainerStatsOptions, 
 	return types.ContainerStatsOptions{
 		Stdout:   cmd.OutOrStdout(),
 		Stderr:   cmd.ErrOrStderr(),
-		GOptions: globalOptions,
+		GOptions: *globalOptions,
 		All:      all,
 		Format:   format,
 		NoStream: noStream,
@@ -93,19 +93,20 @@ func statsAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
 	if err != nil {
 		return err
 	}
+
 	defer cancel()
 
-	return container.Stats(ctx, client, args, options)
+	return container.Stats(ctx, cli, args, options)
 }
 
 func statsShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 	// show running container names
-	statusFilterFn := func(st containerd.ProcessStatus) bool {
-		return st == containerd.Running
+	statusFilterFn := func(st client.ProcessStatus) bool {
+		return st == client.Running
 	}
 	return completion.ContainerNames(cmd, statusFilterFn)
 }

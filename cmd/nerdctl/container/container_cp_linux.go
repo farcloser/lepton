@@ -24,8 +24,8 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
+	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
 )
@@ -71,7 +71,7 @@ func cpAction(cmd *cobra.Command, args []string) error {
 			return err
 		}
 	}
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	client, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
 	if err != nil {
 		return err
 	}
@@ -121,7 +121,7 @@ func processCpOptions(cmd *cobra.Command, args []string) (types.ContainerCpOptio
 		containerReq = *destSpec.Container
 	}
 	return types.ContainerCpOptions{
-		GOptions:       globalOptions,
+		GOptions:       *globalOptions,
 		Container2Host: container2host,
 		ContainerReq:   containerReq,
 		DestPath:       destSpec.Path,

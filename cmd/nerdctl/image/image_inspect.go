@@ -27,8 +27,8 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 )
 
-func newImageInspectCommand() *cobra.Command {
-	var imageInspectCommand = &cobra.Command{
+func InspectCommand() *cobra.Command {
+	var cmd = &cobra.Command{
 		Use:               "inspect [flags] IMAGE [IMAGE...]",
 		Args:              cobra.MinimumNArgs(1),
 		Short:             "Display detailed information on one or more images.",
@@ -39,21 +39,19 @@ func newImageInspectCommand() *cobra.Command {
 		SilenceErrors:     true,
 	}
 
-	imageInspectCommand.Flags().String("mode", "dockercompat", `Inspect mode, "dockercompat" for Docker-compatible output, "native" for containerd-native output`)
-	imageInspectCommand.RegisterFlagCompletionFunc("mode", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	cmd.Flags().String(flagMode, "dockercompat", `Inspect mode, "dockercompat" for Docker-compatible output, "native" for containerd-native output`)
+	cmd.Flags().StringP(flagFormat, "f", "", "Format the output using the given Go template, e.g, '{{json .}}'")
+	cmd.Flags().String(flagPlatform, "", "Inspect a specific platform") // not a slice, and there is no --all-platforms
+
+	_ = cmd.RegisterFlagCompletionFunc(flagMode, func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return []string{"dockercompat", "native"}, cobra.ShellCompDirectiveNoFileComp
 	})
-	imageInspectCommand.Flags().StringP("format", "f", "", "Format the output using the given Go template, e.g, '{{json .}}'")
-	imageInspectCommand.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	_ = cmd.RegisterFlagCompletionFunc(flagFormat, func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return []string{formatter.FormatJSON}, cobra.ShellCompDirectiveNoFileComp
 	})
+	_ = cmd.RegisterFlagCompletionFunc(flagPlatform, completion.Platforms)
 
-	// #region platform flags
-	imageInspectCommand.Flags().String("platform", "", "Inspect a specific platform") // not a slice, and there is no --all-platforms
-	imageInspectCommand.RegisterFlagCompletionFunc("platform", completion.Platforms)
-	// #endregion
-
-	return imageInspectCommand
+	return cmd
 }
 
 func ProcessImageInspectOptions(cmd *cobra.Command, platform *string) (types.ImageInspectOptions, error) {
@@ -67,7 +65,7 @@ func ProcessImageInspectOptions(cmd *cobra.Command, platform *string) (types.Ima
 		return types.ImageInspectOptions{}, err
 	}
 
-	format, err := cmd.Flags().GetString("format")
+	format, err := cmd.Flags().GetString(flagFormat)
 	if err != nil {
 		return types.ImageInspectOptions{}, err
 	}
@@ -81,7 +79,7 @@ func ProcessImageInspectOptions(cmd *cobra.Command, platform *string) (types.Ima
 	}
 
 	return types.ImageInspectOptions{
-		GOptions: globalOptions,
+		GOptions: *globalOptions,
 		Mode:     mode,
 		Format:   format,
 		Platform: *platform,
@@ -90,12 +88,17 @@ func ProcessImageInspectOptions(cmd *cobra.Command, platform *string) (types.Ima
 }
 
 func imageInspectAction(cmd *cobra.Command, args []string) error {
+	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
+	if err != nil {
+		return err
+	}
+
 	options, err := ProcessImageInspectOptions(cmd, nil)
 	if err != nil {
 		return err
 	}
 
-	client, ctx, cancel, err := clientutil.NewClientWithPlatform(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address, options.Platform)
+	client, ctx, cancel, err := clientutil.NewClientWithPlatform(cmd.Context(), globalOptions.Namespace, globalOptions.Address, options.Platform)
 	if err != nil {
 		return err
 	}

@@ -22,93 +22,86 @@ import (
 	"github.com/spf13/cobra"
 	"go.farcloser.world/containers/security/cgroups"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 )
 
-func ProcessImageVerifyOptions(cmd *cobra.Command) (opt types.ImageVerifyOptions, err error) {
-	if opt.Provider, err = cmd.Flags().GetString("verify"); err != nil {
-		return
-	}
-	if opt.CosignKey, err = cmd.Flags().GetString("cosign-key"); err != nil {
-		return
-	}
-	if opt.CosignCertificateIdentity, err = cmd.Flags().GetString("cosign-certificate-identity"); err != nil {
-		return
-	}
-	if opt.CosignCertificateIdentityRegexp, err = cmd.Flags().GetString("cosign-certificate-identity-regexp"); err != nil {
-		return
-	}
-	if opt.CosignCertificateOidcIssuer, err = cmd.Flags().GetString("cosign-certificate-oidc-issuer"); err != nil {
-		return
-	}
-	if opt.CosignCertificateOidcIssuerRegexp, err = cmd.Flags().GetString("cosign-certificate-oidc-issuer-regexp"); err != nil {
-		return
-	}
-	return
-}
-
-func ProcessRootCmdFlags(cmd *cobra.Command) (types.GlobalCommandOptions, error) {
+func ProcessRootCmdFlags(cmd *cobra.Command) (*options.Global, error) {
 	debug, err := cmd.Flags().GetBool("debug")
 	if err != nil {
-		return types.GlobalCommandOptions{}, err
+		return nil, err
 	}
+
 	debugFull, err := cmd.Flags().GetBool("debug-full")
 	if err != nil {
-		return types.GlobalCommandOptions{}, err
+		return nil, err
 	}
+
 	address, err := cmd.Flags().GetString("address")
 	if err != nil {
-		return types.GlobalCommandOptions{}, err
+		return nil, err
 	}
+
 	namespace, err := cmd.Flags().GetString("namespace")
 	if err != nil {
-		return types.GlobalCommandOptions{}, err
+		return nil, err
 	}
+
 	snapshotter, err := cmd.Flags().GetString("snapshotter")
 	if err != nil {
-		return types.GlobalCommandOptions{}, err
+		return nil, err
 	}
+
 	cniPath, err := cmd.Flags().GetString("cni-path")
 	if err != nil {
-		return types.GlobalCommandOptions{}, err
+		return nil, err
 	}
+
 	cniConfigPath, err := cmd.Flags().GetString("cni-netconfpath")
 	if err != nil {
-		return types.GlobalCommandOptions{}, err
+		return nil, err
 	}
+
 	dataRoot, err := cmd.Flags().GetString("data-root")
 	if err != nil {
-		return types.GlobalCommandOptions{}, err
+		return nil, err
 	}
+
 	cgroupManager, err := cmd.Flags().GetString("cgroup-manager")
 	if err != nil {
-		return types.GlobalCommandOptions{}, err
+		return nil, err
 	}
+
 	insecureRegistry, err := cmd.Flags().GetBool("insecure-registry")
 	if err != nil {
-		return types.GlobalCommandOptions{}, err
+		return nil, err
 	}
+
 	hostsDir, err := cmd.Flags().GetStringSlice("hosts-dir")
 	if err != nil {
-		return types.GlobalCommandOptions{}, err
+		return nil, err
 	}
+
 	experimental, err := cmd.Flags().GetBool("experimental")
 	if err != nil {
-		return types.GlobalCommandOptions{}, err
+		return nil, err
 	}
+
 	hostGatewayIP, err := cmd.Flags().GetString("host-gateway-ip")
 	if err != nil {
-		return types.GlobalCommandOptions{}, err
+		return nil, err
 	}
+
 	bridgeIP, err := cmd.Flags().GetString("bridge-ip")
 	if err != nil {
-		return types.GlobalCommandOptions{}, err
+		return nil, err
 	}
+
 	kubeHideDupe, err := cmd.Flags().GetBool("kube-hide-dupe")
 	if err != nil {
-		return types.GlobalCommandOptions{}, err
+		return nil, err
 	}
-	return types.GlobalCommandOptions{
+
+	return &options.Global{
 		Debug:            debug,
 		DebugFull:        debugFull,
 		Address:          address,
@@ -127,14 +120,14 @@ func ProcessRootCmdFlags(cmd *cobra.Command) (types.GlobalCommandOptions, error)
 	}, nil
 }
 
-func CheckExperimental(feature string) func(cmd *cobra.Command, args []string) error {
+func RequireExperimental(feature string) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
 		globalOptions, err := ProcessRootCmdFlags(cmd)
 		if err != nil {
 			return err
 		}
 		if !globalOptions.Experimental {
-			return fmt.Errorf("%s is experimental feature, you should enable experimental config", feature)
+			return fmt.Errorf("to use %s, you must enable 'experimental' either in config or passing the --experimental flag", feature)
 		}
 		return nil
 	}

@@ -21,13 +21,15 @@ import (
 	"time"
 
 	"go.farcloser.world/containers/security/cgroups"
+
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 )
 
 // ContainerStartOptions specifies options for the `(container) start`.
 type ContainerStartOptions struct {
 	Stdout io.Writer
 	// GOptions is the global options
-	GOptions GlobalCommandOptions
+	GOptions options.Global
 	// Attach specifies whether to attach to the container's stdio.
 	Attach bool
 	// The key sequence for detaching a container.
@@ -39,7 +41,7 @@ type ContainerKillOptions struct {
 	Stdout io.Writer
 	Stderr io.Writer
 	// GOptions is the global options
-	GOptions GlobalCommandOptions
+	GOptions options.Global
 	// KillSignal is the signal to send to the container
 	KillSignal string
 }
@@ -49,7 +51,7 @@ type ContainerCreateOptions struct {
 	Stdout io.Writer
 	Stderr io.Writer
 	// GOptions is the global options
-	GOptions GlobalCommandOptions
+	GOptions options.Global
 
 	// CliCmd is the command name
 	CliCmd string
@@ -268,7 +270,7 @@ type ContainerStopOptions struct {
 	Stdout io.Writer
 	Stderr io.Writer
 	// GOptions is the global options
-	GOptions GlobalCommandOptions
+	GOptions options.Global
 	// Timeout specifies how long to wait after sending a SIGTERM and before sending a SIGKILL.
 	// If it's nil, the default is 10 seconds.
 	Timeout *time.Duration
@@ -277,7 +279,7 @@ type ContainerStopOptions struct {
 // ContainerRestartOptions specifies options for `(container) restart`.
 type ContainerRestartOptions struct {
 	Stdout  io.Writer
-	GOption GlobalCommandOptions
+	GOption options.Global
 	// Time to wait after sending a SIGTERM and before sending a SIGKILL.
 	Timeout *time.Duration
 }
@@ -286,14 +288,14 @@ type ContainerRestartOptions struct {
 type ContainerPauseOptions struct {
 	Stdout io.Writer
 	// GOptions is the global options
-	GOptions GlobalCommandOptions
+	GOptions options.Global
 }
 
 // ContainerPruneOptions specifies options for `(container) prune`.
 type ContainerPruneOptions struct {
 	Stdout io.Writer
 	// GOptions is the global options
-	GOptions GlobalCommandOptions
+	GOptions options.Global
 }
 
 // ContainerUnpauseOptions specifies options for `(container) unpause`.
@@ -303,7 +305,7 @@ type ContainerUnpauseOptions ContainerPauseOptions
 type ContainerRemoveOptions struct {
 	Stdout io.Writer
 	// GOptions is the global options
-	GOptions GlobalCommandOptions
+	GOptions options.Global
 	// Force enables to remove a running|paused|unknown container (uses SIGKILL)
 	Force bool
 	// Volumes removes anonymous volumes associated with the container
@@ -314,21 +316,21 @@ type ContainerRemoveOptions struct {
 type ContainerRenameOptions struct {
 	Stdout io.Writer
 	// GOptions is the global options
-	GOptions GlobalCommandOptions
+	GOptions options.Global
 }
 
 // ContainerTopOptions specifies options for `top`.
 type ContainerTopOptions struct {
 	Stdout io.Writer
 	// GOptions is the global options
-	GOptions GlobalCommandOptions
+	GOptions options.Global
 }
 
 // ContainerInspectOptions specifies options for `container inspect`
 type ContainerInspectOptions struct {
 	Stdout io.Writer
 	// GOptions is the global options
-	GOptions GlobalCommandOptions
+	GOptions options.Global
 	// Format of the output
 	Format string
 	// Whether to report the size
@@ -341,7 +343,7 @@ type ContainerInspectOptions struct {
 type ContainerCommitOptions struct {
 	Stdout io.Writer
 	// GOptions is the global options
-	GOptions GlobalCommandOptions
+	GOptions options.Global
 	// Author (e.g., "contributor <dev@example.com>")
 	Author string
 	// Commit message
@@ -356,7 +358,7 @@ type ContainerCommitOptions struct {
 type ContainerDiffOptions struct {
 	Stdout io.Writer
 	// GOptions is the global options
-	GOptions GlobalCommandOptions
+	GOptions options.Global
 }
 
 // ContainerLogsOptions specifies options for `(container) logs`.
@@ -364,7 +366,7 @@ type ContainerLogsOptions struct {
 	Stdout io.Writer
 	Stderr io.Writer
 	// GOptions is the global options.
-	GOptions GlobalCommandOptions
+	GOptions options.Global
 	// Follow specifies whether to stream the logs or just print the existing logs.
 	Follow bool
 	// Timestamps specifies whether to show the timestamps of the logs.
@@ -382,7 +384,7 @@ type ContainerLogsOptions struct {
 type ContainerWaitOptions struct {
 	Stdout io.Writer
 	// GOptions is the global options.
-	GOptions GlobalCommandOptions
+	GOptions options.Global
 }
 
 // ContainerAttachOptions specifies options for `(container) attach`.
@@ -392,14 +394,14 @@ type ContainerAttachOptions struct {
 	Stderr io.Writer
 
 	// GOptions is the global options.
-	GOptions GlobalCommandOptions
+	GOptions options.Global
 	// DetachKeys is the key sequences to detach from the container.
 	DetachKeys string
 }
 
 // ContainerExecOptions specifies options for `(container) exec`
 type ContainerExecOptions struct {
-	GOptions GlobalCommandOptions
+	GOptions options.Global
 	// Allocate a pseudo-TTY
 	TTY bool
 	// Keep STDIN open even if not attached
@@ -421,7 +423,7 @@ type ContainerExecOptions struct {
 // ContainerListOptions specifies options for `(container) list`.
 type ContainerListOptions struct {
 	// GOptions is the global options.
-	GOptions GlobalCommandOptions
+	GOptions options.Global
 	// Show all containers (default shows just running).
 	All bool
 	// Show n last created containers (includes all states). Non-positive values are ignored.
@@ -438,7 +440,7 @@ type ContainerListOptions struct {
 // ContainerCpOptions specifies options for `(container) cp`
 type ContainerCpOptions struct {
 	// GOptions is the global options.
-	GOptions GlobalCommandOptions
+	GOptions options.Global
 	// ContainerReq is name, short ID, or long ID of container to copy to/from.
 	ContainerReq   string
 	Container2Host bool
@@ -455,7 +457,7 @@ type ContainerStatsOptions struct {
 	Stdout io.Writer
 	Stderr io.Writer
 	// GOptions is the global options.
-	GOptions GlobalCommandOptions
+	GOptions options.Global
 	// Show all containers (default shows just running).
 	All bool
 	// Pretty-print images using a Go template, e.g., {{json .}}.

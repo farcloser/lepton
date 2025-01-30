@@ -20,12 +20,12 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
+	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 )
 
-func newContainerPruneCommand() *cobra.Command {
+func PruneCommand() *cobra.Command {
 	containerPruneCommand := &cobra.Command{
 		Use:           "prune [flags]",
 		Short:         "Remove all stopped containers",
@@ -38,20 +38,20 @@ func newContainerPruneCommand() *cobra.Command {
 	return containerPruneCommand
 }
 
-func processContainerPruneOptions(cmd *cobra.Command) (types.ContainerPruneOptions, error) {
+func PruneOptions(cmd *cobra.Command, _ []string) (types.ContainerPruneOptions, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return types.ContainerPruneOptions{}, err
 	}
 
 	return types.ContainerPruneOptions{
-		GOptions: globalOptions,
+		GOptions: *globalOptions,
 		Stdout:   cmd.OutOrStdout(),
 	}, nil
 }
 
 func grantPrunePermission(cmd *cobra.Command) (bool, error) {
-	force, err := cmd.Flags().GetBool("force")
+	force, err := cmd.Flags().GetBool(flagForce)
 	if err != nil {
 		return false, err
 	}
@@ -62,8 +62,8 @@ func grantPrunePermission(cmd *cobra.Command) (bool, error) {
 	return true, nil
 }
 
-func containerPruneAction(cmd *cobra.Command, _ []string) error {
-	options, err := processContainerPruneOptions(cmd)
+func containerPruneAction(cmd *cobra.Command, args []string) error {
+	options, err := PruneOptions(cmd, args)
 	if err != nil {
 		return err
 	}
@@ -74,7 +74,7 @@ func containerPruneAction(cmd *cobra.Command, _ []string) error {
 		return nil
 	}
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	client, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
 	if err != nil {
 		return err
 	}

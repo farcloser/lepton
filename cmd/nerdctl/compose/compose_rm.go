@@ -23,12 +23,12 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
+	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/compose"
 	"github.com/containerd/nerdctl/v2/pkg/composer"
 )
 
-func newComposeRemoveCommand() *cobra.Command {
+func RemoveCommand() *cobra.Command {
 	var composeRemoveCommand = &cobra.Command{
 		Use:           "rm [flags] [SERVICE...]",
 		Short:         "Remove stopped service containers",
@@ -47,7 +47,7 @@ func composeRemoveAction(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	force, err := cmd.Flags().GetBool("force")
+	force, err := cmd.Flags().GetBool(flagForce)
 	if err != nil {
 		return err
 	}
@@ -73,7 +73,7 @@ func composeRemoveAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
+	client, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
 	if err != nil {
 		return err
 	}
@@ -82,7 +82,7 @@ func composeRemoveAction(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	c, err := compose.New(client, globalOptions, options, cmd.OutOrStdout(), cmd.ErrOrStderr())
+	c, err := compose.New(client, *globalOptions, options, cmd.OutOrStdout(), cmd.ErrOrStderr())
 	if err != nil {
 		return err
 	}

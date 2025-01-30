@@ -20,16 +20,17 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/netutil"
 )
 
-func Remove(ctx context.Context, client *containerd.Client, options types.NetworkRemoveOptions) error {
-	cniEnv, err := netutil.NewCNIEnv(options.GOptions.CNIPath, options.GOptions.CNINetConfPath, netutil.WithNamespace(options.GOptions.Namespace))
+func Remove(ctx context.Context, client *containerd.Client, output io.Writer, globalOptions *options.Global, opts *options.NetworkRemove) error {
+	cniEnv, err := netutil.NewCNIEnv(globalOptions.CNIPath, globalOptions.CNINetConfPath, netutil.WithNamespace(globalOptions.Namespace))
 	if err != nil {
 		return err
 	}
@@ -40,7 +41,7 @@ func Remove(ctx context.Context, client *containerd.Client, options types.Networ
 	}
 
 	var result []string
-	netLists, errs := cniEnv.ListNetworksMatch(options.Networks, false)
+	netLists, errs := cniEnv.ListNetworksMatch(opts.Networks, false)
 
 	for req, netList := range netLists {
 		if len(netList) > 1 {
@@ -79,7 +80,7 @@ func Remove(ctx context.Context, client *containerd.Client, options types.Networ
 	}
 	if len(result) > 0 {
 		for _, id := range result {
-			fmt.Fprintln(options.Stdout, id)
+			fmt.Fprintln(output, id)
 		}
 		err = nil
 	} else {

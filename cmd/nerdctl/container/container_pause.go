@@ -19,12 +19,12 @@ package container
 import (
 	"github.com/spf13/cobra"
 
-	containerd "github.com/containerd/containerd/v2/client"
+	"github.com/containerd/containerd/v2/client"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
+	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 )
 
@@ -41,24 +41,24 @@ func NewPauseCommand() *cobra.Command {
 	return pauseCommand
 }
 
-func processContainerPauseOptions(cmd *cobra.Command) (types.ContainerPauseOptions, error) {
+func PauseOptions(cmd *cobra.Command, _ []string) (types.ContainerPauseOptions, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return types.ContainerPauseOptions{}, err
 	}
 	return types.ContainerPauseOptions{
-		GOptions: globalOptions,
+		GOptions: *globalOptions,
 		Stdout:   cmd.OutOrStdout(),
 	}, nil
 }
 
 func pauseAction(cmd *cobra.Command, args []string) error {
-	options, err := processContainerPauseOptions(cmd)
+	options, err := PauseOptions(cmd, args)
 	if err != nil {
 		return err
 	}
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	client, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
 	if err != nil {
 		return err
 	}
@@ -69,8 +69,8 @@ func pauseAction(cmd *cobra.Command, args []string) error {
 
 func pauseShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 	// show running container names
-	statusFilterFn := func(st containerd.ProcessStatus) bool {
-		return st == containerd.Running
+	statusFilterFn := func(st client.ProcessStatus) bool {
+		return st == client.Running
 	}
 	return completion.ContainerNames(cmd, statusFilterFn)
 }

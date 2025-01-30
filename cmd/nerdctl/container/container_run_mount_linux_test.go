@@ -28,9 +28,9 @@ import (
 
 	"github.com/containerd/containerd/v2/core/mount"
 
-	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
+	"github.com/containerd/nerdctl/v2/pkg/testutil/helpers"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
 )
 

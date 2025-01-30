@@ -21,19 +21,20 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/errdefs"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
 	"github.com/containerd/nerdctl/v2/pkg/labels"
 	"github.com/containerd/nerdctl/v2/pkg/mountutil"
 )
 
-func Remove(ctx context.Context, client *containerd.Client, volumes []string, options types.VolumeRemoveOptions) error {
-	volStore, err := Store(options.GOptions.Namespace, options.GOptions.DataRoot, options.GOptions.Address)
+func Remove(ctx context.Context, client *containerd.Client, out io.Writer, globalOptions *options.Global, opts *options.VolumeRemove) error {
+	volStore, err := Store(globalOptions.Namespace, globalOptions.DataRoot, globalOptions.Address)
 	if err != nil {
 		return err
 	}
@@ -50,7 +51,7 @@ func Remove(ctx context.Context, client *containerd.Client, volumes []string, op
 			return nil, nil, err
 		}
 
-		for _, name := range volumes {
+		for _, name := range opts.NamesList {
 			if _, ok := usedVolumesList[name]; ok {
 				cannotRemove = append(cannotRemove, fmt.Errorf("volume %q is in use (%w)", name, errdefs.ErrFailedPrecondition))
 				continue
@@ -67,7 +68,10 @@ func Remove(ctx context.Context, client *containerd.Client, volumes []string, op
 	}
 	// Otherwise, output on stdout whatever was successful
 	for _, name := range removedNames {
-		fmt.Fprintln(options.Stdout, name)
+		_, err = fmt.Fprintln(out, name)
+		if err != nil {
+			return err
+		}
 	}
 	// Log the rest
 	for _, volErr := range cannotRemove {

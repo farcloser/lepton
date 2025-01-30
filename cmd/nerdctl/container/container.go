@@ -37,7 +37,7 @@ func NewContainerCommand() *cobra.Command {
 		NewUpdateCommand(),
 		NewExecCommand(),
 		containerLsCommand(),
-		newContainerInspectCommand(),
+		InspectCommand(),
 		NewLogsCommand(),
 		NewPortCommand(),
 		NewRmCommand(),
@@ -51,7 +51,7 @@ func NewContainerCommand() *cobra.Command {
 		NewUnpauseCommand(),
 		NewCommitCommand(),
 		NewRenameCommand(),
-		newContainerPruneCommand(),
+		PruneCommand(),
 		NewStatsCommand(),
 		NewAttachCommand(),
 	)
