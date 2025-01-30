@@ -25,10 +25,10 @@ import (
 
 	"gotest.tools/v3/assert"
 
-	testhelpers "github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
+	testhelpers "github.com/containerd/nerdctl/v2/pkg/testutil/various"
 )
 
 func TestSaveContent(t *testing.T) {

@@ -27,10 +27,10 @@ import (
 
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nettestutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/testregistry"
+	"github.com/containerd/nerdctl/v2/pkg/testutil/various"
 )
 
 func TestComposeRun(t *testing.T) {
@@ -434,7 +434,7 @@ func TestComposePushAndPullWithCosignVerify(t *testing.T) {
 	base := testutil.NewBase(t)
 	base.Env = append(base.Env, "COSIGN_PASSWORD=1")
 
-	keyPair := helpers.NewCosignKeyPair(t, "cosign-key-pair", "1")
+	keyPair := various.NewCosignKeyPair(t, "cosign-key-pair", "1")
 	reg := testregistry.NewWithNoAuth(base, 0, false)
 	t.Cleanup(func() {
 		keyPair.Cleanup()

@@ -38,13 +38,13 @@ import (
 	"github.com/containerd/containerd/v2/defaults"
 	"github.com/containerd/containerd/v2/pkg/netns"
 
-	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/leptonic/errs"
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nettestutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
+	"github.com/containerd/nerdctl/v2/pkg/testutil/various"
 )
 
 func extractHostPort(portMapping string, port string) (string, error) {
@@ -739,7 +739,7 @@ func TestRunContainerWithStaticIP6(t *testing.T) {
 				return
 			}
 			cmd.AssertOutWithFunc(func(stdout string) error {
-				ip := helpers.FindIPv6(stdout)
+				ip := various.FindIPv6(stdout)
 				if !subnet.Contains(ip) {
 					return fmt.Errorf("expected subnet %s include ip %s", subnet, ip)
 				}

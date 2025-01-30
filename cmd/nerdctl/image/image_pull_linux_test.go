@@ -26,18 +26,18 @@ import (
 
 	"gotest.tools/v3/assert"
 
-	testhelpers "github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/testregistry"
+	"github.com/containerd/nerdctl/v2/pkg/testutil/various"
 )
 
 func TestImagePullWithCosign(t *testing.T) {
 	nerdtest.Setup()
 
 	var registry *testregistry.RegistryServer
-	var keyPair *testhelpers.CosignKeyPair
+	var keyPair *various.CosignKeyPair
 
 	testCase := &test.Case{
 		Require: test.Require(
@@ -50,7 +50,7 @@ func TestImagePullWithCosign(t *testing.T) {
 			"COSIGN_PASSWORD": "1",
 		},
 		Setup: func(data test.Data, helpers test.Helpers) {
-			keyPair = testhelpers.NewCosignKeyPair(t, "cosign-key-pair", "1")
+			keyPair = various.NewCosignKeyPair(t, "cosign-key-pair", "1")
 			base := testutil.NewBase(t)
 			registry = testregistry.NewWithNoAuth(base, 0, false)
 			testImageRef := fmt.Sprintf("%s:%d/%s", "127.0.0.1", registry.Port, data.Identifier())
@@ -93,7 +93,7 @@ CMD ["echo", "build-test-string"]
 					"COSIGN_PASSWORD": "2",
 				},
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-					newKeyPair := testhelpers.NewCosignKeyPair(t, "cosign-key-pair-test", "2")
+					newKeyPair := various.NewCosignKeyPair(t, "cosign-key-pair-test", "2")
 					return helpers.Command("pull", "--verify=cosign", "--cosign-key="+newKeyPair.PublicKey, data.Get("imageref")+":two")
 				},
 				Expected: test.Expects(12, nil, nil),

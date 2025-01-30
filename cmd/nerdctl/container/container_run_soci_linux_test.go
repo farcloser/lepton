@@ -21,8 +21,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
+	"github.com/containerd/nerdctl/v2/pkg/testutil/various"
 )
 
 func TestRunSoci(t *testing.T) {
@@ -42,7 +42,7 @@ func TestRunSoci(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			base := testutil.NewBase(t)
-			helpers.RequiresSoci(base)
+			various.RequiresSoci(base)
 
 			// counting initial snapshot mounts
 			initialMounts, err := exec.Command("mount").Output()

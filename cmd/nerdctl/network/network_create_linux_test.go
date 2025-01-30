@@ -23,10 +23,10 @@ import (
 
 	"gotest.tools/v3/assert"
 
-	ipv6helper "github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
+	ipv6helper "github.com/containerd/nerdctl/v2/pkg/testutil/various"
 )
 
 func TestNetworkCreate(t *testing.T) {
