@@ -26,7 +26,7 @@ import (
 	"github.com/spf13/cobra"
 	"go.farcloser.world/containers/specs"
 
-	containerd "github.com/containerd/containerd/v2/client"
+	"github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/leases"
 	"github.com/containerd/containerd/v2/core/mount"
 	"github.com/containerd/continuity/fs"
@@ -74,19 +74,19 @@ func diffAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
 	walker := &containerwalker.ContainerWalker{
-		Client: client,
+		Client: cli,
 		OnFound: func(ctx context.Context, found containerwalker.Found) error {
 			if found.MatchCount > 1 {
 				return fmt.Errorf("multiple IDs found with provided prefix: %s", found.Req)
 			}
-			changes, err := getChanges(ctx, client, found.Container)
+			changes, err := getChanges(ctx, cli, found.Container)
 			if err != nil {
 				return err
 			}
@@ -118,7 +118,7 @@ func diffAction(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func getChanges(ctx context.Context, client *containerd.Client, container containerd.Container) ([]fs.Change, error) {
+func getChanges(ctx context.Context, cli *client.Client, container client.Container) ([]fs.Change, error) {
 	id := container.ID()
 	info, err := container.Info(ctx)
 	if err != nil {
@@ -127,7 +127,7 @@ func getChanges(ctx context.Context, client *containerd.Client, container contai
 
 	var (
 		snName = info.Snapshotter
-		sn     = client.SnapshotService(snName)
+		sn     = cli.SnapshotService(snName)
 	)
 
 	mounts, err := sn.Mounts(ctx, id)
@@ -137,7 +137,7 @@ func getChanges(ctx context.Context, client *containerd.Client, container contai
 
 	// NOTE: Moby uses provided rootfs to run container. It doesn't support
 	// to commit container created by moby.
-	baseImgWithoutPlatform, err := client.ImageService().Get(ctx, info.Image)
+	baseImgWithoutPlatform, err := cli.ImageService().Get(ctx, info.Image)
 	if err != nil {
 		return nil, fmt.Errorf("container %q lacks image (wasn't created by nerdctl?): %w", id, err)
 	}
@@ -152,7 +152,7 @@ func getChanges(ctx context.Context, client *containerd.Client, container contai
 	}
 	log.G(ctx).Debugf("ocispecPlatform=%q", platforms.Format(ocispecPlatform))
 	platformMC := platforms.Only(ocispecPlatform)
-	baseImg := containerd.NewImageWithPlatform(client, baseImgWithoutPlatform, platformMC)
+	baseImg := client.NewImageWithPlatform(cli, baseImgWithoutPlatform, platformMC)
 
 	baseImgConfig, _, err := imgutil.ReadImageConfig(ctx, baseImg)
 	if err != nil {
@@ -160,7 +160,7 @@ func getChanges(ctx context.Context, client *containerd.Client, container contai
 	}
 
 	// Don't gc me and clean the dirty data after 1 hour!
-	ctx, done, err := client.WithLease(ctx, leases.WithRandomID(), leases.WithExpiration(1*time.Hour))
+	ctx, done, err := cli.WithLease(ctx, leases.WithRandomID(), leases.WithExpiration(1*time.Hour))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create lease for diff: %w", err)
 	}

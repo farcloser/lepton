@@ -16,13 +16,17 @@
 
 package types
 
-import "io"
+import (
+	"io"
+
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
+)
 
 // ImageLoadOptions specifies options for `(image) load`.
 type ImageLoadOptions struct {
 	Stdout   io.Writer
 	Stdin    io.Reader
-	GOptions GlobalCommandOptions
+	GOptions options.Global
 	// Input read from tar archive file, instead of STDIN
 	Input string
 	// Platform import content for a specific platform

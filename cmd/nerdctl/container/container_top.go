@@ -22,7 +22,7 @@ import (
 	"github.com/spf13/cobra"
 	"go.farcloser.world/containers/security/cgroups"
 
-	containerd "github.com/containerd/containerd/v2/client"
+	"github.com/containerd/containerd/v2/client"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
@@ -58,12 +58,12 @@ func topAction(cmd *cobra.Command, args []string) error {
 	if globalOptions.CgroupManager == cgroups.NoneManager {
 		return errors.New("cgroup manager must not be \"none\"")
 	}
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
+	cli, ctx, cancel, err := clientutil.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
-	return container.Top(ctx, client, args, types.ContainerTopOptions{
+	return container.Top(ctx, cli, args, types.ContainerTopOptions{
 		Stdout:   cmd.OutOrStdout(),
 		GOptions: globalOptions,
 	})
@@ -72,8 +72,8 @@ func topAction(cmd *cobra.Command, args []string) error {
 
 func topShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 	// show running container names
-	statusFilterFn := func(st containerd.ProcessStatus) bool {
-		return st == containerd.Running
+	statusFilterFn := func(st client.ProcessStatus) bool {
+		return st == client.Running
 	}
 	return completion.ContainerNames(cmd, statusFilterFn)
 }

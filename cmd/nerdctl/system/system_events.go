@@ -72,10 +72,10 @@ func eventsAction(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
-	return system.Events(ctx, client, options)
+	return system.Events(ctx, cli, options)
 }

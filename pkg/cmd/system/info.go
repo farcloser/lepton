@@ -32,6 +32,7 @@ import (
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/log"
 
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 	"github.com/containerd/nerdctl/v2/pkg/infoutil"
@@ -97,7 +98,7 @@ func Info(ctx context.Context, client *containerd.Client, options *types.SystemI
 	return nil
 }
 
-func fulfillNativeInfo(di *native.DaemonInfo, globalOptions types.GlobalCommandOptions) *native.Info {
+func fulfillNativeInfo(di *native.DaemonInfo, globalOptions options.Global) *native.Info {
 	info := &native.Info{
 		Daemon: di,
 	}
@@ -141,7 +142,7 @@ func prettyPrintInfoNative(w io.Writer, info *native.Info) error {
 	return nil
 }
 
-func prettyPrintInfoDockerCompat(stdout io.Writer, stderr io.Writer, info *dockercompat.Info, globalOptions types.GlobalCommandOptions) error {
+func prettyPrintInfoDockerCompat(stdout io.Writer, stderr io.Writer, info *dockercompat.Info, globalOptions options.Global) error {
 	w := stdout
 	debug := globalOptions.Debug
 	fmt.Fprintf(w, "Client:\n")

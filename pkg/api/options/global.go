@@ -14,8 +14,8 @@
    limitations under the License.
 */
 
-package types
+package options
 
 import "github.com/containerd/nerdctl/v2/pkg/config"
 
-type GlobalCommandOptions config.Config
+type Global config.Config

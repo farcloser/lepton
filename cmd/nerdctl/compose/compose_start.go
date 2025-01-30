@@ -24,7 +24,7 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
 
-	containerd "github.com/containerd/containerd/v2/client"
+	"github.com/containerd/containerd/v2/client"
 	"github.com/containerd/errdefs"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
@@ -52,7 +52,7 @@ func composeStartAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
+	cli, ctx, cancel, err := clientutil.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
 	if err != nil {
 		return err
 	}
@@ -61,7 +61,7 @@ func composeStartAction(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	c, err := compose.New(client, globalOptions, options, cmd.OutOrStdout(), cmd.ErrOrStderr())
+	c, err := compose.New(cli, globalOptions, options, cmd.OutOrStdout(), cmd.ErrOrStderr())
 	if err != nil {
 		return err
 	}
@@ -86,7 +86,7 @@ func composeStartAction(cmd *cobra.Command, args []string) error {
 			return fmt.Errorf("service %q has no container to start", svcName)
 		}
 
-		if err := startContainers(ctx, client, containers); err != nil {
+		if err := startContainers(ctx, cli, containers); err != nil {
 			return err
 		}
 	}
@@ -94,7 +94,7 @@ func composeStartAction(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func startContainers(ctx context.Context, client *containerd.Client, containers []containerd.Container) error {
+func startContainers(ctx context.Context, cli *client.Client, containers []client.Container) error {
 	eg, ctx := errgroup.WithContext(ctx)
 	for _, c := range containers {
 		c := c
@@ -107,15 +107,15 @@ func startContainers(ctx context.Context, client *containerd.Client, containers 
 				if !errdefs.IsNotFound(err) {
 					return err
 				}
-			} else if cStatus.Status == containerd.Running {
+			} else if cStatus.Status == client.Running {
 				return nil
 			}
 
 			// in compose, always disable attach
-			if err := containerutil.Start(ctx, c, false, client, ""); err != nil {
+			if err := containerutil.Start(ctx, c, false, cli, ""); err != nil {
 				return err
 			}
-			info, err := c.Info(ctx, containerd.WithoutRefreshedMetadata)
+			info, err := c.Info(ctx, client.WithoutRefreshedMetadata)
 			if err != nil {
 				return err
 			}

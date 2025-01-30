@@ -27,7 +27,7 @@ import (
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/leptonic/services/namespace"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	types "github.com/containerd/nerdctl/v2/pkg/api/options"
 )
 
 type namespaceRemoveOptions struct {
@@ -52,7 +52,7 @@ func newNamespaceRmCommand() *cobra.Command {
 	return namespaceRmCommand
 }
 
-func processNamespaceRemoveOptions(cmd *cobra.Command) (*types.GlobalCommandOptions, *namespaceRemoveOptions, error) {
+func processNamespaceRemoveOptions(cmd *cobra.Command) (*types.Global, *namespaceRemoveOptions, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return nil, nil, err
@@ -74,14 +74,14 @@ func namespaceRmAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	client, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
 	if err != nil {
 		return err
 	}
 
 	defer cancel()
 
-	errs := namespace.Remove(ctx, client, args, options.CGroup)
+	errs := namespace.Remove(ctx, cli, args, options.CGroup)
 
 	if len(errs) > 0 {
 		for _, err = range errs {

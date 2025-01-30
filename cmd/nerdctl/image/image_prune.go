@@ -94,11 +94,11 @@ func imagePruneAction(cmd *cobra.Command, _ []string) error {
 		}
 	}
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	return image.Prune(ctx, client, options)
+	return image.Prune(ctx, cli, options)
 }

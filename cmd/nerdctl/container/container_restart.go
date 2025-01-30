@@ -71,11 +71,11 @@ func restartAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOption.Namespace, options.GOption.Address)
+	cli, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOption.Namespace, options.GOption.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	return container.Restart(ctx, client, args, options)
+	return container.Restart(ctx, cli, args, options)
 }

@@ -71,11 +71,11 @@ func networkPruneAction(cmd *cobra.Command, _ []string) error {
 		Stdout:               cmd.OutOrStdout(),
 	}
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	return network.Prune(ctx, client, options)
+	return network.Prune(ctx, cli, options)
 }

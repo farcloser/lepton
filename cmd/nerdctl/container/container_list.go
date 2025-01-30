@@ -129,13 +129,13 @@ func psAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), clOpts.GOptions.Namespace, clOpts.GOptions.Address)
+	cli, ctx, cancel, err := clientutil.NewClient(cmd.Context(), clOpts.GOptions.Namespace, clOpts.GOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	containers, err := container.List(ctx, client, clOpts)
+	containers, err := container.List(ctx, cli, clOpts)
 	if err != nil {
 		return err
 	}

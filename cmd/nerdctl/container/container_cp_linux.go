@@ -71,13 +71,13 @@ func cpAction(cmd *cobra.Command, args []string) error {
 			return err
 		}
 	}
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	return container.Cp(ctx, client, options)
+	return container.Cp(ctx, cli, options)
 }
 
 func processCpOptions(cmd *cobra.Command, args []string) (types.ContainerCpOptions, error) {

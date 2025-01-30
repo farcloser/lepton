@@ -133,13 +133,13 @@ func imagesAction(cmd *cobra.Command, args []string) error {
 		options.All = true
 	}
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	return image.ListCommandHandler(ctx, client, options)
+	return image.ListCommandHandler(ctx, cli, options)
 }
 
 func imagesShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {

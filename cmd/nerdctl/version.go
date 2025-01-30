@@ -125,11 +125,11 @@ func versionInfo(cmd *cobra.Command, ns, address string) (dockercompat.VersionIn
 	if address == "" {
 		return v, nil
 	}
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), ns, address)
+	cli, ctx, cancel, err := clientutil.NewClient(cmd.Context(), ns, address)
 	if err != nil {
 		return v, err
 	}
 	defer cancel()
-	v.Server, err = infoutil.ServerVersion(ctx, client)
+	v.Server, err = infoutil.ServerVersion(ctx, cli)
 	return v, err
 }

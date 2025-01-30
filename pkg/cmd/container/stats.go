@@ -37,6 +37,7 @@ import (
 	"github.com/containerd/log"
 	"github.com/containerd/typeurl/v2"
 
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/containerutil"
@@ -322,7 +323,7 @@ func Stats(ctx context.Context, client *containerd.Client, containerIDs []string
 	return err
 }
 
-func collect(ctx context.Context, globalOptions types.GlobalCommandOptions, s *stats2.Stats, waitFirst *sync.WaitGroup, id string, _noStream bool) {
+func collect(ctx context.Context, globalOptions options.Global, s *stats2.Stats, waitFirst *sync.WaitGroup, id string, _noStream bool) {
 	log.G(ctx).Debugf("collecting stats for %s", s.ID)
 	var (
 		getFirst = true

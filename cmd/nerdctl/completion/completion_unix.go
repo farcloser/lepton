@@ -40,14 +40,14 @@ func SnapshotterNames(cmd *cobra.Command, _ []string, _ string) ([]string, cobra
 		return nil, cobra.ShellCompDirectiveError
 	}
 
-	client, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
 	if err != nil {
 		return nil, cobra.ShellCompDirectiveError
 	}
 
 	defer cancel()
 
-	snapshotterPlugins, err := infoutil.GetSnapshotterNames(ctx, client)
+	snapshotterPlugins, err := infoutil.GetSnapshotterNames(ctx, cli)
 	if err != nil {
 		return nil, cobra.ShellCompDirectiveError
 	}

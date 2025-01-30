@@ -26,7 +26,7 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
 
-	containerd "github.com/containerd/containerd/v2/client"
+	"github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/runtime/restart"
 	"github.com/containerd/errdefs"
 	"github.com/containerd/go-cni"
@@ -119,7 +119,7 @@ func composePsAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
+	cli, ctx, cancel, err := clientutil.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
 	if err != nil {
 		return err
 	}
@@ -128,7 +128,7 @@ func composePsAction(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	c, err := compose.New(client, globalOptions, options, cmd.OutOrStdout(), cmd.ErrOrStderr())
+	c, err := compose.New(cli, globalOptions, options, cmd.OutOrStdout(), cmd.ErrOrStderr())
 	if err != nil {
 		return err
 	}
@@ -142,14 +142,14 @@ func composePsAction(cmd *cobra.Command, args []string) error {
 	}
 
 	if !all {
-		var upContainers []containerd.Container
+		var upContainers []client.Container
 		for _, container := range containers {
 			// cStatus := formatter.ContainerStatus(ctx, c)
 			cStatus, err := containerutil.ContainerStatus(ctx, container)
 			if err != nil {
 				continue
 			}
-			if cStatus.Status == containerd.Running {
+			if cStatus.Status == client.Running {
 				upContainers = append(upContainers, container)
 			}
 		}
@@ -157,7 +157,7 @@ func composePsAction(cmd *cobra.Command, args []string) error {
 	}
 
 	if len(status) != 0 {
-		var filterdContainers []containerd.Container
+		var filterdContainers []client.Container
 		for _, container := range containers {
 			cStatus := statusForFilter(ctx, container)
 			for _, s := range status {
@@ -235,8 +235,8 @@ func composePsAction(cmd *cobra.Command, args []string) error {
 
 // composeContainerPrintableTab constructs composeContainerPrintable with fields
 // only for console output.
-func composeContainerPrintableTab(ctx context.Context, container containerd.Container) (composeContainerPrintable, error) {
-	info, err := container.Info(ctx, containerd.WithoutRefreshedMetadata)
+func composeContainerPrintableTab(ctx context.Context, container client.Container) (composeContainerPrintable, error) {
+	info, err := container.Info(ctx, client.WithoutRefreshedMetadata)
 	if err != nil {
 		return composeContainerPrintable{}, err
 	}
@@ -265,8 +265,8 @@ func composeContainerPrintableTab(ctx context.Context, container containerd.Cont
 
 // composeContainerPrintableJSON constructs composeContainerPrintable with fields
 // only for json output and compatible docker output.
-func composeContainerPrintableJSON(ctx context.Context, container containerd.Container) (composeContainerPrintable, error) {
-	info, err := container.Info(ctx, containerd.WithoutRefreshedMetadata)
+func composeContainerPrintableJSON(ctx context.Context, container client.Container) (composeContainerPrintable, error) {
+	info, err := container.Info(ctx, client.WithoutRefreshedMetadata)
 	if err != nil {
 		return composeContainerPrintable{}, err
 	}
@@ -282,14 +282,14 @@ func composeContainerPrintableJSON(ctx context.Context, container containerd.Con
 	status, err := containerutil.ContainerStatus(ctx, container)
 	if err == nil {
 		// show exitCode only when container is exited/stopped
-		if status.Status == containerd.Stopped {
+		if status.Status == client.Stopped {
 			state = "exited"
 			exitCode = status.ExitStatus
 		} else {
 			state = string(status.Status)
 		}
 	} else {
-		state = string(containerd.Unknown)
+		state = string(client.Unknown)
 	}
 	image, err := container.Image(ctx)
 	if err != nil {
@@ -344,7 +344,7 @@ func formatPublishers(labelMap map[string]string) []PortPublisher {
 }
 
 // statusForFilter returns the status value to be matched with the 'status' filter
-func statusForFilter(ctx context.Context, c containerd.Container) string {
+func statusForFilter(ctx context.Context, c client.Container) string {
 	// Just in case, there is something wrong in server.
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
@@ -356,23 +356,23 @@ func statusForFilter(ctx context.Context, c containerd.Container) string {
 		// when it exits. So, the status will be "created" for this
 		// case.
 		if errdefs.IsNotFound(err) {
-			return string(containerd.Created)
+			return string(client.Created)
 		}
-		return string(containerd.Unknown)
+		return string(client.Unknown)
 	}
 
 	status, err := task.Status(ctx)
 	if err != nil {
-		return string(containerd.Unknown)
+		return string(client.Unknown)
 	}
 	labels, err := c.Labels(ctx)
 	if err != nil {
-		return string(containerd.Unknown)
+		return string(client.Unknown)
 	}
 
 	switch s := status.Status; s {
-	case containerd.Stopped:
-		if labels[restart.StatusLabel] == string(containerd.Running) && restart.Reconcile(status, labels) {
+	case client.Stopped:
+		if labels[restart.StatusLabel] == string(client.Running) && restart.Reconcile(status, labels) {
 			return "restarting"
 		}
 		return "exited"

@@ -75,14 +75,14 @@ func portAction(cmd *cobra.Command, args []string) error {
 			return fmt.Errorf("failed to parse %q", portProto)
 		}
 	}
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
+	cli, ctx, cancel, err := clientutil.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
 	walker := &containerwalker.ContainerWalker{
-		Client: client,
+		Client: cli,
 		OnFound: func(ctx context.Context, found containerwalker.Found) error {
 			if found.MatchCount > 1 {
 				return fmt.Errorf("multiple IDs found with provided prefix: %s", found.Req)

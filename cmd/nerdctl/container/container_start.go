@@ -19,7 +19,7 @@ package container
 import (
 	"github.com/spf13/cobra"
 
-	containerd "github.com/containerd/containerd/v2/client"
+	"github.com/containerd/containerd/v2/client"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
@@ -74,19 +74,19 @@ func startAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	return container.Start(ctx, client, args, options)
+	return container.Start(ctx, cli, args, options)
 }
 
 func startShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 	// show non-running container names
-	statusFilterFn := func(st containerd.ProcessStatus) bool {
-		return st != containerd.Running && st != containerd.Unknown
+	statusFilterFn := func(st client.ProcessStatus) bool {
+		return st != client.Running && st != client.Unknown
 	}
 	return completion.ContainerNames(cmd, statusFilterFn)
 }

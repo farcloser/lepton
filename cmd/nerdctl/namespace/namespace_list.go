@@ -28,7 +28,7 @@ import (
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/leptonic/services/namespace"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	types "github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 	"github.com/containerd/nerdctl/v2/pkg/mountutil/volumestore"
@@ -55,7 +55,7 @@ func newNamespaceLsCommand() *cobra.Command {
 	return namespaceLsCommand
 }
 
-func processNamespaceListCommandOption(cmd *cobra.Command) (*types.GlobalCommandOptions, *namespaceListOptions, error) {
+func processNamespaceListCommandOption(cmd *cobra.Command) (*types.Global, *namespaceListOptions, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return nil, nil, err
@@ -91,14 +91,14 @@ func namespaceLsAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	client, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
 	if err != nil {
 		return err
 	}
 
 	defer cancel()
 
-	namespaces, err := namespace.ListNames(ctx, client)
+	namespaces, err := namespace.ListNames(ctx, cli)
 	if err != nil {
 		return err
 	}
@@ -125,14 +125,14 @@ func namespaceLsAction(cmd *cobra.Command, args []string) error {
 
 		nsCtx := namespace.NamespacedContext(ctx, ns)
 
-		containers, err := client.Containers(nsCtx)
+		containers, err := cli.Containers(nsCtx)
 		if err != nil {
 			log.L.Warn(err)
 		}
 
 		entry.Containers = len(containers)
 
-		images, err := client.ImageService().List(nsCtx)
+		images, err := cli.ImageService().List(nsCtx)
 		if err != nil {
 			log.L.Warn(err)
 		}
@@ -149,7 +149,7 @@ func namespaceLsAction(cmd *cobra.Command, args []string) error {
 			}
 		}
 
-		entry.Labels, err = client.NamespaceService().Labels(nsCtx, ns)
+		entry.Labels, err = cli.NamespaceService().Labels(nsCtx, ns)
 		if err != nil {
 			return err
 		}

@@ -425,7 +425,7 @@ func createAction(cmd *cobra.Command, args []string) error {
 	if createOpt.Platform == "windows" && !createOpt.GOptions.Experimental {
 		return fmt.Errorf("%s requires experimental mode to be enabled", createOpt.Platform)
 	}
-	client, ctx, cancel, err := clientutil.NewClientWithPlatform(cmd.Context(), createOpt.GOptions.Namespace, createOpt.GOptions.Address, createOpt.Platform)
+	cli, ctx, cancel, err := clientutil.NewClientWithPlatform(cmd.Context(), createOpt.GOptions.Namespace, createOpt.GOptions.Address, createOpt.Platform)
 	if err != nil {
 		return err
 	}
@@ -436,12 +436,12 @@ func createAction(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to load networking flags: %w", err)
 	}
 
-	netManager, err := containerutil.NewNetworkingOptionsManager(createOpt.GOptions, netFlags, client)
+	netManager, err := containerutil.NewNetworkingOptionsManager(createOpt.GOptions, netFlags, cli)
 	if err != nil {
 		return err
 	}
 
-	c, gc, err := container.Create(ctx, client, args, netManager, createOpt)
+	c, gc, err := container.Create(ctx, cli, args, netManager, createOpt)
 	if err != nil {
 		if gc != nil {
 			gc()

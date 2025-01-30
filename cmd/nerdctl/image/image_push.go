@@ -116,13 +116,13 @@ func pushAction(cmd *cobra.Command, args []string) error {
 	}
 	rawRef := args[0]
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	return image.Push(ctx, client, rawRef, options)
+	return image.Push(ctx, cli, rawRef, options)
 }
 
 func pushShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {

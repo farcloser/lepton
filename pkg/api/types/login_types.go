@@ -16,9 +16,11 @@
 
 package types
 
+import "github.com/containerd/nerdctl/v2/pkg/api/options"
+
 type LoginCommandOptions struct {
 	// GOptions is the global options.
-	GOptions GlobalCommandOptions
+	GOptions options.Global
 	// ServerAddress is the server address to log in to.
 	ServerAddress string
 	// Username is the username to log in as.

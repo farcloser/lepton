@@ -16,14 +16,18 @@
 
 package types
 
-import "io"
+import (
+	"io"
+
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
+)
 
 // SystemInfoOptions specifies options for `(system) info`.
 type SystemInfoOptions struct {
 	Stdout io.Writer
 	Stderr io.Writer
 	// GOptions is the global options
-	GOptions GlobalCommandOptions
+	GOptions options.Global
 	// Information mode, "dockercompat" for Docker-compatible output, "native" for containerd-native output
 	Mode string
 	// Format the output using the given Go template, e.g, '{{json .}}
@@ -34,7 +38,7 @@ type SystemInfoOptions struct {
 type SystemEventsOptions struct {
 	Stdout io.Writer
 	// GOptions is the global options
-	GOptions GlobalCommandOptions
+	GOptions options.Global
 	// Format the output using the given Go template, e.g, '{{json .}}
 	Format string
 	// Filter events based on given conditions
@@ -46,7 +50,7 @@ type SystemPruneOptions struct {
 	Stdout io.Writer
 	Stderr io.Writer
 	// GOptions is the global options
-	GOptions GlobalCommandOptions
+	GOptions options.Global
 	// All remove all unused images, not just dangling ones
 	All bool
 	// Volumes decide whether prune volumes or not

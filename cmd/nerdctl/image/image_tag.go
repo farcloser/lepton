@@ -51,13 +51,13 @@ func tagAction(cmd *cobra.Command, args []string) error {
 		Target:   args[1],
 	}
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	return image.Tag(ctx, client, options)
+	return image.Tag(ctx, cli, options)
 }
 
 func tagShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {

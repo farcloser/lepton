@@ -62,13 +62,13 @@ func rmAction(cmd *cobra.Command, args []string) error {
 		Stdout:   cmd.OutOrStdout(),
 	}
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	return container.Remove(ctx, client, args, options)
+	return container.Remove(ctx, cli, args, options)
 }
 
 func rmShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {

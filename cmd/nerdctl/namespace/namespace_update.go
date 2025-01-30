@@ -27,7 +27,7 @@ import (
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/leptonic/services/namespace"
 	"github.com/containerd/nerdctl/v2/leptonic/utils"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	types "github.com/containerd/nerdctl/v2/pkg/api/options"
 )
 
 type namespaceUpdateOptions namespaceCreateOptions
@@ -47,7 +47,7 @@ func newNamespacelabelUpdateCommand() *cobra.Command {
 	return namespaceLableCommand
 }
 
-func processNamespaceUpdateCommandOption(cmd *cobra.Command) (*types.GlobalCommandOptions, *namespaceUpdateOptions, error) {
+func processNamespaceUpdateCommandOption(cmd *cobra.Command) (*types.Global, *namespaceUpdateOptions, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return nil, nil, err
@@ -67,14 +67,14 @@ func labelUpdateAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	client, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
 	if err != nil {
 		return err
 	}
 
 	defer cancel()
 
-	errs := namespace.Update(ctx, client, args[0], options.Labels)
+	errs := namespace.Update(ctx, cli, args[0], options.Labels)
 	if len(errs) > 0 {
 		for _, err = range errs {
 			log.G(ctx).WithError(err).Error()

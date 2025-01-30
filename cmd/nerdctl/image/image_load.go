@@ -88,12 +88,12 @@ func loadAction(cmd *cobra.Command, _ []string) error {
 		return err
 	}
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	_, err = load.FromArchive(ctx, client, options)
+	_, err = load.FromArchive(ctx, cli, options)
 	return err
 }

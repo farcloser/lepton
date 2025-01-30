@@ -19,7 +19,7 @@ package container
 import (
 	"github.com/spf13/cobra"
 
-	containerd "github.com/containerd/containerd/v2/client"
+	"github.com/containerd/containerd/v2/client"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
@@ -83,18 +83,18 @@ func containerAttachAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	return container.Attach(ctx, client, args[0], options)
+	return container.Attach(ctx, cli, args[0], options)
 }
 
 func attachShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-	statusFilterFn := func(st containerd.ProcessStatus) bool {
-		return st == containerd.Running
+	statusFilterFn := func(st client.ProcessStatus) bool {
+		return st == client.Running
 	}
 	return completion.ContainerNames(cmd, statusFilterFn)
 }
