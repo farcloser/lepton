@@ -44,8 +44,8 @@ type TokenAuth struct {
 	CertPath string
 }
 
-// FIXME: this is specific to Docker Registry
-// Like need something else for Harbor and Gitlab
+// FIXME: this is specific to Docker Registry (likely need something else for Harbor and Gitlab)
+
 func (ta *TokenAuth) Params(data test.Data) []string {
 	return []string{
 		"--env", "REGISTRY_AUTH=token",

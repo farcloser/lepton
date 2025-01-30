@@ -59,7 +59,7 @@ CMD ["echo", "bar"]
 	base.Cmd("run", "--rm", "--entrypoint", "", imageName).AssertFail()
 	base.Cmd("run", "--rm", "--entrypoint", "", imageName, "echo", "blah").AssertOutWithFunc(func(stdout string) error {
 		if !strings.Contains(stdout, "blah") {
-			return errors.New("echo blah was not executed?")
+			return errors.New("echo blah was not executed")
 		}
 		if strings.Contains(stdout, "bar") {
 			return errors.New("echo bar should not be executed")
@@ -72,7 +72,7 @@ CMD ["echo", "bar"]
 	base.Cmd("run", "--rm", "--entrypoint", "time", imageName).AssertFail()
 	base.Cmd("run", "--rm", "--entrypoint", "time", imageName, "echo", "blah").AssertOutWithFunc(func(stdout string) error {
 		if !strings.Contains(stdout, "blah") {
-			return errors.New("echo blah was not executed?")
+			return errors.New("echo blah was not executed")
 		}
 		if strings.Contains(stdout, "bar") {
 			return errors.New("echo bar should not be executed")

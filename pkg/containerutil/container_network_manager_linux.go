@@ -38,7 +38,7 @@ import (
 type cniNetworkManagerPlatform struct {
 }
 
-// Verifies that the internal network settings are correct.
+// VerifyNetworkOptions checks that the internal network settings are correct.
 func (m *cniNetworkManager) VerifyNetworkOptions(_ context.Context) error {
 	e, err := netutil.NewCNIEnv(m.globalOptions.CNIPath, m.globalOptions.CNINetConfPath, netutil.WithNamespace(m.globalOptions.Namespace), netutil.WithDefaultNetwork(m.globalOptions.BridgeIP))
 	if err != nil {
@@ -55,7 +55,7 @@ func (m *cniNetworkManager) VerifyNetworkOptions(_ context.Context) error {
 	return validateUtsSettings(m.netOpts)
 }
 
-// Performs setup actions required for the container with the given ID.
+// SetupNetworking performs setup actions required for the container with the given ID.
 func (m *cniNetworkManager) SetupNetworking(_ context.Context, _ string) error {
 	// NOTE: on non-Windows systems which support OCI hooks, CNI networking setup
 	// is performed via createRuntime and postCreate hooks whose logic can
@@ -63,7 +63,7 @@ func (m *cniNetworkManager) SetupNetworking(_ context.Context, _ string) error {
 	return nil
 }
 
-// Performs any required cleanup actions for the given container.
+// CleanupNetworking performs any required cleanup actions for the given container.
 // Should only be called to revert any setup steps performed in setupNetworking.
 func (m *cniNetworkManager) CleanupNetworking(_ context.Context, _ containerd.Container) error {
 	// NOTE: on non-Windows systems which support OCI hooks, CNI networking setup
@@ -72,12 +72,12 @@ func (m *cniNetworkManager) CleanupNetworking(_ context.Context, _ containerd.Co
 	return nil
 }
 
-// Returns the set of NetworkingOptions which should be set as labels on the container.
+// InternalNetworkingOptionLabels returns the set of NetworkingOptions which should be set as labels on the container.
 func (m *cniNetworkManager) InternalNetworkingOptionLabels(_ context.Context) (options.ContainerNetwork, error) {
 	return m.netOpts, nil
 }
 
-// Returns a slice of `oci.SpecOpts` and `containerd.NewContainerOpts` which represent
+// ContainerNetworkingOpts returns a slice of `oci.SpecOpts` and `containerd.NewContainerOpts` which represent
 // the network specs which need to be applied to the container with the given ID.
 func (m *cniNetworkManager) ContainerNetworkingOpts(_ context.Context, containerID string) ([]oci.SpecOpts, []containerd.NewContainerOpts, error) {
 	opts := []oci.SpecOpts{}
