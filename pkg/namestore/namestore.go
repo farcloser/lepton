@@ -28,7 +28,7 @@ import (
 	"github.com/containerd/log"
 
 	"github.com/containerd/nerdctl/v2/leptonic/errs"
-	"github.com/containerd/nerdctl/v2/pkg/identifiers"
+	"github.com/containerd/nerdctl/v2/leptonic/identifiers"
 	"github.com/containerd/nerdctl/v2/pkg/store"
 )
 
@@ -52,7 +52,7 @@ func New(stateDir, namespace string) (NameStore, error) {
 }
 
 // NameStore allows acquiring, releasing and renaming.
-// "names" must abide by identifiers.ValidateDockerCompat
+// "names" must abide by identifiers.Validate
 // A container cannot release or rename a name it does not own.
 // A container cannot acquire a name that is already owned by another container.
 // Re-acquiring a name does not error and is a no-op.
@@ -79,7 +79,7 @@ func (x *nameStore) Acquire(name, id string) (err error) {
 		}
 	}()
 
-	if err = identifiers.ValidateDockerCompat(name); err != nil {
+	if err = identifiers.Validate(name); err != nil {
 		return err
 	}
 
@@ -115,7 +115,7 @@ func (x *nameStore) Release(name, id string) (err error) {
 		}
 	}()
 
-	if err = identifiers.ValidateDockerCompat(name); err != nil {
+	if err = identifiers.Validate(name); err != nil {
 		return err
 	}
 
@@ -142,7 +142,7 @@ func (x *nameStore) Rename(oldName, id, newName string) (err error) {
 		}
 	}()
 
-	if err = identifiers.ValidateDockerCompat(newName); err != nil {
+	if err = identifiers.Validate(newName); err != nil {
 		return err
 	}
 

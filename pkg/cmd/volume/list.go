@@ -28,7 +28,7 @@ import (
 	"github.com/containerd/containerd/v2/pkg/progress"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/native"
 )
@@ -43,7 +43,7 @@ type volumePrintable struct {
 	// TODO: "Links"
 }
 
-func List(options types.VolumeListOptions) error {
+func List(options *options.VolumeList) error {
 	if options.Quiet && options.Size {
 		log.L.Warn("cannot use --size and --quiet together, ignoring --size")
 		options.Size = false
@@ -90,7 +90,7 @@ func removeSizeFilters(filters []string) []string {
 	return res
 }
 
-func lsPrintOutput(vols map[string]native.Volume, options types.VolumeListOptions) error {
+func lsPrintOutput(vols map[string]native.Volume, options *options.VolumeList) error {
 	w := options.Stdout
 	var tmpl *template.Template
 	switch options.Format {

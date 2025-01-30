@@ -22,6 +22,7 @@ import (
 
 	containerd "github.com/containerd/containerd/v2/client"
 
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/builder"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
@@ -32,54 +33,54 @@ import (
 
 // Prune will remove all unused containers, networks,
 // images (dangling only or both dangling and unreferenced), and optionally, volumes.
-func Prune(ctx context.Context, client *containerd.Client, options types.SystemPruneOptions) error {
+func Prune(ctx context.Context, client *containerd.Client, opts *options.SystemPrune) error {
 	if err := container.Prune(ctx, client, types.ContainerPruneOptions{
-		GOptions: options.GOptions,
-		Stdout:   options.Stdout,
+		GOptions: opts.GOptions,
+		Stdout:   opts.Stdout,
 	}); err != nil {
 		return err
 	}
-	if err := network.Prune(ctx, client, types.NetworkPruneOptions{
-		GOptions:             options.GOptions,
-		NetworkDriversToKeep: options.NetworkDriversToKeep,
-		Stdout:               options.Stdout,
+	if err := network.Prune(ctx, client, &options.NetworkPrune{
+		GOptions:             opts.GOptions,
+		NetworkDriversToKeep: opts.NetworkDriversToKeep,
+		Stdout:               opts.Stdout,
 	}); err != nil {
 		return err
 	}
-	if options.Volumes {
-		if err := volume.Prune(ctx, client, types.VolumePruneOptions{
-			GOptions: options.GOptions,
+	if opts.Volumes {
+		if err := volume.Prune(ctx, client, &options.VolumePrune{
+			GOptions: opts.GOptions,
 			All:      false,
 			Force:    true,
-			Stdout:   options.Stdout,
+			Stdout:   opts.Stdout,
 		}); err != nil {
 			return err
 		}
 	}
 	if err := image.Prune(ctx, client, types.ImagePruneOptions{
-		Stdout:   options.Stdout,
-		GOptions: options.GOptions,
-		All:      options.All,
+		Stdout:   opts.Stdout,
+		GOptions: opts.GOptions,
+		All:      opts.All,
 	}); err != nil {
 		// ?
 		return nil //nolint:nilerr
 	}
 
-	if options.BuildKitHost != "" {
-		prunedObjects, err := builder.Prune(ctx, types.BuilderPruneOptions{
-			Stderr:       options.Stderr,
-			GOptions:     options.GOptions,
-			All:          options.All,
-			BuildKitHost: options.BuildKitHost,
+	if opts.BuildKitHost != "" {
+		prunedObjects, err := builder.Prune(ctx, &options.BuilderPrune{
+			Stderr:       opts.Stderr,
+			GOptions:     opts.GOptions,
+			All:          opts.All,
+			BuildKitHost: opts.BuildKitHost,
 		})
 		if err != nil {
 			return err
 		}
 
 		if len(prunedObjects) > 0 {
-			fmt.Fprintln(options.Stdout, "Deleted build cache objects:")
+			fmt.Fprintln(opts.Stdout, "Deleted build cache objects:")
 			for _, item := range prunedObjects {
-				fmt.Fprintln(options.Stdout, item.ID)
+				fmt.Fprintln(opts.Stdout, item.ID)
 			}
 		}
 	}

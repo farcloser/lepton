@@ -48,68 +48,68 @@ func ProcessImageVerifyOptions(cmd *cobra.Command) (opt types.ImageVerifyOptions
 	return
 }
 
-func ProcessRootCmdFlags(cmd *cobra.Command) (options.Global, error) {
+func ProcessRootCmdFlags(cmd *cobra.Command) (*options.Global, error) {
 	debug, err := cmd.Flags().GetBool("debug")
 	if err != nil {
-		return options.Global{}, err
+		return nil, err
 	}
 	debugFull, err := cmd.Flags().GetBool("debug-full")
 	if err != nil {
-		return options.Global{}, err
+		return nil, err
 	}
 	address, err := cmd.Flags().GetString("address")
 	if err != nil {
-		return options.Global{}, err
+		return nil, err
 	}
 	namespace, err := cmd.Flags().GetString("namespace")
 	if err != nil {
-		return options.Global{}, err
+		return nil, err
 	}
 	snapshotter, err := cmd.Flags().GetString("snapshotter")
 	if err != nil {
-		return options.Global{}, err
+		return nil, err
 	}
 	cniPath, err := cmd.Flags().GetString("cni-path")
 	if err != nil {
-		return options.Global{}, err
+		return nil, err
 	}
 	cniConfigPath, err := cmd.Flags().GetString("cni-netconfpath")
 	if err != nil {
-		return options.Global{}, err
+		return nil, err
 	}
 	dataRoot, err := cmd.Flags().GetString("data-root")
 	if err != nil {
-		return options.Global{}, err
+		return nil, err
 	}
 	cgroupManager, err := cmd.Flags().GetString("cgroup-manager")
 	if err != nil {
-		return options.Global{}, err
+		return nil, err
 	}
 	insecureRegistry, err := cmd.Flags().GetBool("insecure-registry")
 	if err != nil {
-		return options.Global{}, err
+		return nil, err
 	}
 	hostsDir, err := cmd.Flags().GetStringSlice("hosts-dir")
 	if err != nil {
-		return options.Global{}, err
+		return nil, err
 	}
 	experimental, err := cmd.Flags().GetBool("experimental")
 	if err != nil {
-		return options.Global{}, err
+		return nil, err
 	}
 	hostGatewayIP, err := cmd.Flags().GetString("host-gateway-ip")
 	if err != nil {
-		return options.Global{}, err
+		return nil, err
 	}
 	bridgeIP, err := cmd.Flags().GetString("bridge-ip")
 	if err != nil {
-		return options.Global{}, err
+		return nil, err
 	}
 	kubeHideDupe, err := cmd.Flags().GetBool("kube-hide-dupe")
 	if err != nil {
-		return options.Global{}, err
+		return nil, err
 	}
-	return options.Global{
+	return &options.Global{
 		Debug:            debug,
 		DebugFull:        debugFull,
 		Address:          address,

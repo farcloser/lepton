@@ -29,11 +29,11 @@ import (
 
 	"github.com/containerd/containerd/v2/defaults"
 
-	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nettestutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
+	"github.com/containerd/nerdctl/v2/pkg/testutil/various"
 )
 
 func TestCreateWithLabel(t *testing.T) {
@@ -316,7 +316,7 @@ func TestCreateFromOCIArchive(t *testing.T) {
 	dockerfile := fmt.Sprintf(`FROM %s
 	CMD ["echo", "%s"]`, testutil.CommonImage, sentinel)
 
-	buildCtx := helpers.CreateBuildContext(t, dockerfile)
+	buildCtx := various.CreateBuildContext(t, dockerfile)
 	tag := imageName + ":latest"
 	tarPath := fmt.Sprintf("%s/%s.tar", buildCtx, imageName)
 

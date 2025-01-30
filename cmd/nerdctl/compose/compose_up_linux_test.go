@@ -29,16 +29,16 @@ import (
 
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/pkg/composer/serviceparser"
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nettestutil"
+	"github.com/containerd/nerdctl/v2/pkg/testutil/various"
 )
 
 func TestComposeUp(t *testing.T) {
 	base := testutil.NewBase(t)
-	helpers.ComposeUp(t, base, fmt.Sprintf(`
+	various.ComposeUp(t, base, fmt.Sprintf(`
 version: '3.1'
 
 services:
@@ -456,7 +456,7 @@ func TestComposeUpWithBypass4netns(t *testing.T) {
 	testutil.RequireKernelVersion(t, ">= 5.9.0-0")
 	testutil.RequireSystemService(t, "bypass4netnsd")
 	base := testutil.NewBase(t)
-	helpers.ComposeUp(t, base, fmt.Sprintf(`
+	various.ComposeUp(t, base, fmt.Sprintf(`
 version: '3.1'
 
 services:

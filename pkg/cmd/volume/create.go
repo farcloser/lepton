@@ -21,13 +21,13 @@ import (
 
 	"github.com/docker/docker/pkg/stringid"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/native"
 	"github.com/containerd/nerdctl/v2/pkg/labels"
 	"github.com/containerd/nerdctl/v2/pkg/strutil"
 )
 
-func Create(name string, options types.VolumeCreateOptions) (*native.Volume, error) {
+func Create(name string, options *options.VolumeCreate) (*native.Volume, error) {
 	if name == "" {
 		name = stringid.GenerateRandomID()
 		options.Labels = append(options.Labels, labels.AnonymousVolumes+"=")

@@ -23,12 +23,12 @@ import (
 
 	containerd "github.com/containerd/containerd/v2/client"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/native"
 	"github.com/containerd/nerdctl/v2/pkg/labels"
 )
 
-func Prune(ctx context.Context, client *containerd.Client, options types.VolumePruneOptions) error {
+func Prune(ctx context.Context, client *containerd.Client, options *options.VolumePrune) error {
 	// Get the volume store and lock it until we are done.
 	// This will prevent racing new containers from being created or removed until we are done with the cleanup of volumes
 	volStore, err := Store(options.GOptions.Namespace, options.GOptions.DataRoot, options.GOptions.Address)

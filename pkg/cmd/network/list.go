@@ -25,7 +25,7 @@ import (
 	"text/tabwriter"
 	"text/template"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 	"github.com/containerd/nerdctl/v2/pkg/netutil"
 )
@@ -38,7 +38,7 @@ type networkPrintable struct {
 	file string `json:"-"`
 }
 
-func List(ctx context.Context, options types.NetworkListOptions) error {
+func List(ctx context.Context, options *options.NetworkList) error {
 	globalOptions := options.GOptions
 	quiet := options.Quiet
 	format := options.Format

@@ -22,11 +22,11 @@ import (
 
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 )
 
-func Inspect(ctx context.Context, volumes []string, options types.VolumeInspectOptions) error {
+func Inspect(ctx context.Context, volumes []string, options *options.VolumeInspect) error {
 	volStore, err := Store(options.GOptions.Namespace, options.GOptions.DataRoot, options.GOptions.Address)
 	if err != nil {
 		return err

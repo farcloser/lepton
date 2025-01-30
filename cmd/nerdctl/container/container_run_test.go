@@ -34,9 +34,9 @@ import (
 	"gotest.tools/v3/icmd"
 	"gotest.tools/v3/poll"
 
-	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
+	"github.com/containerd/nerdctl/v2/pkg/testutil/various"
 )
 
 func TestRunEntrypointWithBuild(t *testing.T) {
@@ -52,7 +52,7 @@ ENTRYPOINT ["echo", "foo"]
 CMD ["echo", "bar"]
 	`, testutil.CommonImage)
 
-	buildCtx := helpers.CreateBuildContext(t, dockerfile)
+	buildCtx := various.CreateBuildContext(t, dockerfile)
 
 	base.Cmd("build", "-t", imageName, buildCtx).AssertOK()
 	base.Cmd("run", "--rm", imageName).AssertOutExactly("foo echo bar\n")
@@ -474,7 +474,7 @@ FROM scratch
 COPY --from=builder /go/src/logger/logger /
 	`
 
-	buildCtx := helpers.CreateBuildContext(t, dockerfile)
+	buildCtx := various.CreateBuildContext(t, dockerfile)
 	tmpDir := t.TempDir()
 	base.Cmd("build", buildCtx, "--output", "type=local,src=/go/src/logger/logger,dest="+tmpDir).AssertOK()
 	defer base.Cmd("image", "rm", "-f", imageName).AssertOK()
@@ -709,7 +709,7 @@ func TestRunFromOCIArchive(t *testing.T) {
 	dockerfile := fmt.Sprintf(`FROM %s
 	CMD ["echo", "%s"]`, testutil.CommonImage, sentinel)
 
-	buildCtx := helpers.CreateBuildContext(t, dockerfile)
+	buildCtx := various.CreateBuildContext(t, dockerfile)
 	tag := imageName + ":latest"
 	tarPath := fmt.Sprintf("%s/%s.tar", buildCtx, imageName)
 

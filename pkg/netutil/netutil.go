@@ -40,7 +40,7 @@ import (
 
 	"github.com/containerd/nerdctl/v2/leptonic/errs"
 	"github.com/containerd/nerdctl/v2/leptonic/services/namespace"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/labels"
 	"github.com/containerd/nerdctl/v2/pkg/netutil/nettype"
 	subnetutil "github.com/containerd/nerdctl/v2/pkg/netutil/subnet"
@@ -314,7 +314,7 @@ type cniNetworkConfig struct {
 	Plugins    []CNIPlugin       `json:"plugins"`
 }
 
-func (e *CNIEnv) CreateNetwork(opts types.NetworkCreateOptions) (*NetworkConfig, error) {
+func (e *CNIEnv) CreateNetwork(opts *options.NetworkCreate) (*NetworkConfig, error) {
 	var netConf *NetworkConfig
 
 	fn := func() error {
@@ -437,7 +437,7 @@ func (e *CNIEnv) createDefaultNetworkConfig(bridgeIP string) error {
 		bridgeGatewayIP = bIP.String()
 		bridgeCIDR = bCIDR.String()
 	}
-	opts := types.NetworkCreateOptions{
+	opts := &options.NetworkCreate{
 		Name:       DefaultNetworkName,
 		Driver:     DefaultNetworkName,
 		Subnets:    []string{bridgeCIDR},

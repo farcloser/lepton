@@ -19,7 +19,7 @@ package image
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/containerd/nerdctl/v2/cmd/nerdctl/builder"
+	"github.com/containerd/nerdctl/v2/cmd/nerdctl/commands/builder"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 )
 

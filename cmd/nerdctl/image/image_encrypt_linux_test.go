@@ -23,18 +23,18 @@ import (
 
 	"gotest.tools/v3/assert"
 
-	testhelpers "github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/testregistry"
+	"github.com/containerd/nerdctl/v2/pkg/testutil/various"
 )
 
 func TestImageEncryptJWE(t *testing.T) {
 	nerdtest.Setup()
 
 	var registry *testregistry.RegistryServer
-	var keyPair *testhelpers.JweKeyPair
+	var keyPair *various.JweKeyPair
 
 	const remoteImageKey = "remoteImageKey"
 
@@ -56,7 +56,7 @@ func TestImageEncryptJWE(t *testing.T) {
 		Setup: func(data test.Data, helpers test.Helpers) {
 			base := testutil.NewBase(t)
 			registry = testregistry.NewWithNoAuth(base, 0, false)
-			keyPair = testhelpers.NewJWEKeyPair(t)
+			keyPair = various.NewJWEKeyPair(t)
 			helpers.Ensure("pull", "--quiet", testutil.CommonImage)
 			encryptImageRef := fmt.Sprintf("127.0.0.1:%d/%s:encrypted", registry.Port, data.Identifier())
 			helpers.Ensure("image", "encrypt", "--recipient=jwe:"+keyPair.Pub, testutil.CommonImage, encryptImageRef)

@@ -40,7 +40,7 @@ import (
 )
 
 // New returns a new *composer.Composer.
-func New(client *containerd.Client, globalOptions options.Global, options composer.Options, stdout, stderr io.Writer) (*composer.Composer, error) {
+func New(client *containerd.Client, globalOptions *options.Global, options composer.Options, stdout, stderr io.Writer) (*composer.Composer, error) {
 	if err := composer.Lock(globalOptions.DataRoot, globalOptions.Address); err != nil {
 		return nil, err
 	}
