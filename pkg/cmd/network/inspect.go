@@ -24,14 +24,14 @@ import (
 
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/native"
 	"github.com/containerd/nerdctl/v2/pkg/netutil"
 )
 
-func Inspect(ctx context.Context, options types.NetworkInspectOptions) error {
+func Inspect(ctx context.Context, options options.NetworkInspect) error {
 	if options.Mode != "native" && options.Mode != "dockercompat" {
 		return fmt.Errorf("unknown mode %q", options.Mode)
 	}

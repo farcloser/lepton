@@ -24,7 +24,7 @@ import (
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/volume"
 )
 
@@ -42,23 +42,23 @@ func newVolumePruneCommand() *cobra.Command {
 	return volumePruneCommand
 }
 
-func processVolumePruneOptions(cmd *cobra.Command) (types.VolumePruneOptions, error) {
+func processVolumePruneOptions(cmd *cobra.Command) (options.VolumePrune, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return types.VolumePruneOptions{}, err
+		return options.VolumePrune{}, err
 	}
 
 	all, err := cmd.Flags().GetBool("all")
 	if err != nil {
-		return types.VolumePruneOptions{}, err
+		return options.VolumePrune{}, err
 	}
 
 	force, err := cmd.Flags().GetBool("force")
 	if err != nil {
-		return types.VolumePruneOptions{}, err
+		return options.VolumePrune{}, err
 	}
 
-	options := types.VolumePruneOptions{
+	options := options.VolumePrune{
 		GOptions: globalOptions,
 		All:      all,
 		Force:    force,

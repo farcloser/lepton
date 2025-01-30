@@ -25,12 +25,12 @@ import (
 
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/buildkitutil"
 )
 
 // Prune will prune all build cache.
-func Prune(ctx context.Context, options types.BuilderPruneOptions) ([]buildkitutil.UsageInfo, error) {
+func Prune(ctx context.Context, options options.BuilderPrune) ([]buildkitutil.UsageInfo, error) {
 	buildctlBinary, err := buildkitutil.BuildctlBinary()
 	if err != nil {
 		return nil, err

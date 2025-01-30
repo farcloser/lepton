@@ -24,11 +24,11 @@ import (
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/netutil"
 )
 
-func Remove(ctx context.Context, client *containerd.Client, options types.NetworkRemoveOptions) error {
+func Remove(ctx context.Context, client *containerd.Client, options options.NetworkRemove) error {
 	cniEnv, err := netutil.NewCNIEnv(options.GOptions.CNIPath, options.GOptions.CNINetConfPath, netutil.WithNamespace(options.GOptions.Namespace))
 	if err != nil {
 		return err

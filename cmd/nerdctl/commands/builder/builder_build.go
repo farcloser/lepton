@@ -28,7 +28,7 @@ import (
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/buildkitutil"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/builder"
 	"github.com/containerd/nerdctl/v2/pkg/strutil"
@@ -84,132 +84,132 @@ If Dockerfile is not present and -f is not specified, it will look for Container
 	return buildCommand
 }
 
-func processBuildCommandFlag(cmd *cobra.Command, args []string) (types.BuilderBuildOptions, error) {
+func processBuildCommandFlag(cmd *cobra.Command, args []string) (options.BuilderBuild, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return types.BuilderBuildOptions{}, err
+		return options.BuilderBuild{}, err
 	}
 	buildKitHost, err := GetBuildkitHost(cmd, globalOptions.Namespace)
 	if err != nil {
-		return types.BuilderBuildOptions{}, err
+		return options.BuilderBuild{}, err
 	}
 	extraHosts, err := cmd.Flags().GetStringArray("add-host")
 	if err != nil {
-		return types.BuilderBuildOptions{}, err
+		return options.BuilderBuild{}, err
 	}
 	platform, err := cmd.Flags().GetStringSlice("platform")
 	if err != nil {
-		return types.BuilderBuildOptions{}, err
+		return options.BuilderBuild{}, err
 	}
 	platform = strutil.DedupeStrSlice(platform)
 	if len(args) < 1 {
-		return types.BuilderBuildOptions{}, errors.New("context needs to be specified")
+		return options.BuilderBuild{}, errors.New("context needs to be specified")
 	}
 	buildContext := args[0]
 	if buildContext == "-" || strings.Contains(buildContext, "://") {
-		return types.BuilderBuildOptions{}, fmt.Errorf("unsupported build context: %q", buildContext)
+		return options.BuilderBuild{}, fmt.Errorf("unsupported build context: %q", buildContext)
 	}
 	output, err := cmd.Flags().GetString("output")
 	if err != nil {
-		return types.BuilderBuildOptions{}, err
+		return options.BuilderBuild{}, err
 	}
 	tagValue, err := cmd.Flags().GetStringArray("tag")
 	if err != nil {
-		return types.BuilderBuildOptions{}, err
+		return options.BuilderBuild{}, err
 	}
 	progress, err := cmd.Flags().GetString("progress")
 	if err != nil {
-		return types.BuilderBuildOptions{}, err
+		return options.BuilderBuild{}, err
 	}
 	filename, err := cmd.Flags().GetString("file")
 	if err != nil {
-		return types.BuilderBuildOptions{}, err
+		return options.BuilderBuild{}, err
 	}
 	target, err := cmd.Flags().GetString("target")
 	if err != nil {
-		return types.BuilderBuildOptions{}, err
+		return options.BuilderBuild{}, err
 	}
 	buildArgs, err := cmd.Flags().GetStringArray("build-arg")
 	if err != nil {
-		return types.BuilderBuildOptions{}, err
+		return options.BuilderBuild{}, err
 	}
 	label, err := cmd.Flags().GetStringArray("label")
 	if err != nil {
-		return types.BuilderBuildOptions{}, err
+		return options.BuilderBuild{}, err
 	}
 	noCache, err := cmd.Flags().GetBool("no-cache")
 	if err != nil {
-		return types.BuilderBuildOptions{}, err
+		return options.BuilderBuild{}, err
 	}
 	var pull *bool
 	if cmd.Flags().Changed("pull") {
 		pullFlag, err := cmd.Flags().GetBool("pull")
 		if err != nil {
-			return types.BuilderBuildOptions{}, err
+			return options.BuilderBuild{}, err
 		}
 		pull = &pullFlag
 	}
 	secret, err := cmd.Flags().GetStringArray("secret")
 	if err != nil {
-		return types.BuilderBuildOptions{}, err
+		return options.BuilderBuild{}, err
 	}
 	allow, err := cmd.Flags().GetStringArray("allow")
 	if err != nil {
-		return types.BuilderBuildOptions{}, err
+		return options.BuilderBuild{}, err
 	}
 	ssh, err := cmd.Flags().GetStringArray("ssh")
 	if err != nil {
-		return types.BuilderBuildOptions{}, err
+		return options.BuilderBuild{}, err
 	}
 	cacheFrom, err := cmd.Flags().GetStringArray("cache-from")
 	if err != nil {
-		return types.BuilderBuildOptions{}, err
+		return options.BuilderBuild{}, err
 	}
 	cacheTo, err := cmd.Flags().GetStringArray("cache-to")
 	if err != nil {
-		return types.BuilderBuildOptions{}, err
+		return options.BuilderBuild{}, err
 	}
 	rm, err := cmd.Flags().GetBool("rm")
 	if err != nil {
-		return types.BuilderBuildOptions{}, err
+		return options.BuilderBuild{}, err
 	}
 	iidfile, err := cmd.Flags().GetString("iidfile")
 	if err != nil {
-		return types.BuilderBuildOptions{}, err
+		return options.BuilderBuild{}, err
 	}
 	quiet, err := cmd.Flags().GetBool("quiet")
 	if err != nil {
-		return types.BuilderBuildOptions{}, err
+		return options.BuilderBuild{}, err
 	}
 	network, err := cmd.Flags().GetString("network")
 	if err != nil {
-		return types.BuilderBuildOptions{}, err
+		return options.BuilderBuild{}, err
 	}
 
 	attest, err := cmd.Flags().GetStringArray("attest")
 	if err != nil {
-		return types.BuilderBuildOptions{}, err
+		return options.BuilderBuild{}, err
 	}
 	sbom, err := cmd.Flags().GetString("sbom")
 	if err != nil {
-		return types.BuilderBuildOptions{}, err
+		return options.BuilderBuild{}, err
 	}
 	if sbom != "" {
 		attest = append(attest, canonicalizeAttest("sbom", sbom))
 	}
 	provenance, err := cmd.Flags().GetString("provenance")
 	if err != nil {
-		return types.BuilderBuildOptions{}, err
+		return options.BuilderBuild{}, err
 	}
 	if provenance != "" {
 		attest = append(attest, canonicalizeAttest("provenance", provenance))
 	}
 	extendedBuildCtx, err := cmd.Flags().GetStringArray("build-context")
 	if err != nil {
-		return types.BuilderBuildOptions{}, err
+		return options.BuilderBuild{}, err
 	}
 
-	return types.BuilderBuildOptions{
+	return options.BuilderBuild{
 		GOptions:             globalOptions,
 		BuildKitHost:         buildKitHost,
 		BuildContext:         buildContext,
@@ -257,18 +257,18 @@ func GetBuildkitHost(cmd *cobra.Command, namespace string) (string, error) {
 }
 
 func buildAction(cmd *cobra.Command, args []string) error {
-	options, err := processBuildCommandFlag(cmd, args)
+	opts, err := processBuildCommandFlag(cmd, args)
 	if err != nil {
 		return err
 	}
 
-	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), opts.GOptions.Namespace, opts.GOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	return builder.Build(ctx, cli, options)
+	return builder.Build(ctx, cli, opts)
 }
 
 // canonicalizeAttest is from https://github.com/docker/buildx/blob/v0.12/util/buildflags/attests.go##L13-L21

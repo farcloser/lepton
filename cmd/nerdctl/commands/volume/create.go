@@ -23,7 +23,7 @@ import (
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/leptonic/errs"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/volume"
 )
 
@@ -40,22 +40,22 @@ func newVolumeCreateCommand() *cobra.Command {
 	return volumeCreateCommand
 }
 
-func processVolumeCreateOptions(cmd *cobra.Command) (types.VolumeCreateOptions, error) {
+func processVolumeCreateOptions(cmd *cobra.Command) (options.VolumeCreate, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return types.VolumeCreateOptions{}, err
+		return options.VolumeCreate{}, err
 	}
 	labels, err := cmd.Flags().GetStringArray("label")
 	if err != nil {
-		return types.VolumeCreateOptions{}, err
+		return options.VolumeCreate{}, err
 	}
 	for _, label := range labels {
 		if label == "" {
-			return types.VolumeCreateOptions{}, fmt.Errorf("labels cannot be empty (%w)", errs.ErrInvalidArgument)
+			return options.VolumeCreate{}, fmt.Errorf("labels cannot be empty (%w)", errs.ErrInvalidArgument)
 		}
 	}
 
-	return types.VolumeCreateOptions{
+	return options.VolumeCreate{
 		GOptions: globalOptions,
 		Labels:   labels,
 		Stdout:   cmd.OutOrStdout(),

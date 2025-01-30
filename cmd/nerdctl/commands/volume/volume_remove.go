@@ -22,7 +22,7 @@ import (
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/volume"
 )
 
@@ -42,16 +42,16 @@ func newVolumeRmCommand() *cobra.Command {
 	return volumeRmCommand
 }
 
-func processVolumeRmOptions(cmd *cobra.Command) (types.VolumeRemoveOptions, error) {
+func processVolumeRmOptions(cmd *cobra.Command) (options.VolumeRemove, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return types.VolumeRemoveOptions{}, err
+		return options.VolumeRemove{}, err
 	}
 	force, err := cmd.Flags().GetBool("force")
 	if err != nil {
-		return types.VolumeRemoveOptions{}, err
+		return options.VolumeRemove{}, err
 	}
-	return types.VolumeRemoveOptions{
+	return options.VolumeRemove{
 		GOptions: globalOptions,
 		Force:    force,
 		Stdout:   cmd.OutOrStdout(),

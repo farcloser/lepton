@@ -14,18 +14,16 @@
    limitations under the License.
 */
 
-package types
+package options
 
 import (
 	"io"
-
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
 )
 
-// NetworkCreateOptions specifies options for `network create`.
-type NetworkCreateOptions struct {
+// NetworkCreate specifies options for `network create`.
+type NetworkCreate struct {
 	// GOptions is the global options
-	GOptions options.Global
+	GOptions Global
 
 	Name        string
 	Driver      string
@@ -39,11 +37,11 @@ type NetworkCreateOptions struct {
 	IPv6        bool
 }
 
-// NetworkInspectOptions specifies options for `network inspect`.
-type NetworkInspectOptions struct {
+// NetworkInspect specifies options for `network inspect`.
+type NetworkInspect struct {
 	Stdout io.Writer
 	// GOptions is the global options
-	GOptions options.Global
+	GOptions Global
 	// Inspect mode, "dockercompat" for Docker-compatible output, "native" for containerd-native output
 	Mode string
 	// Format the output using the given Go template, e.g, '{{json .}}'
@@ -52,11 +50,11 @@ type NetworkInspectOptions struct {
 	Networks []string
 }
 
-// NetworkListOptions specifies options for `network ls`.
-type NetworkListOptions struct {
+// NetworkList specifies options for `network ls`.
+type NetworkList struct {
 	Stdout io.Writer
 	// GOptions is the global options
-	GOptions options.Global
+	GOptions Global
 	// Quiet only show numeric IDs
 	Quiet bool
 	// Format the output using the given Go template, e.g, '{{json .}}', 'wide'
@@ -65,20 +63,20 @@ type NetworkListOptions struct {
 	Filters []string
 }
 
-// NetworkPruneOptions specifies options for `network prune`.
-type NetworkPruneOptions struct {
+// NetworkPrune specifies options for `network prune`.
+type NetworkPrune struct {
 	Stdout io.Writer
 	// GOptions is the global options
-	GOptions options.Global
+	GOptions Global
 	// Network drivers to keep while pruning
 	NetworkDriversToKeep []string
 }
 
-// NetworkRemoveOptions specifies options for `network rm`.
-type NetworkRemoveOptions struct {
+// NetworkRemove specifies options for `network rm`.
+type NetworkRemove struct {
 	Stdout io.Writer
 	// GOptions is the global options
-	GOptions options.Global
+	GOptions Global
 	// Networks are the networks to be removed
 	Networks []string
 }

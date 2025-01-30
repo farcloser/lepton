@@ -20,7 +20,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/volume"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 )
@@ -46,28 +46,28 @@ func newVolumeLsCommand() *cobra.Command {
 	return volumeLsCommand
 }
 
-func processVolumeLsOptions(cmd *cobra.Command) (types.VolumeListOptions, error) {
+func processVolumeLsOptions(cmd *cobra.Command) (options.VolumeList, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return types.VolumeListOptions{}, err
+		return options.VolumeList{}, err
 	}
 	quiet, err := cmd.Flags().GetBool("quiet")
 	if err != nil {
-		return types.VolumeListOptions{}, err
+		return options.VolumeList{}, err
 	}
 	format, err := cmd.Flags().GetString("format")
 	if err != nil {
-		return types.VolumeListOptions{}, err
+		return options.VolumeList{}, err
 	}
 	size, err := cmd.Flags().GetBool("size")
 	if err != nil {
-		return types.VolumeListOptions{}, err
+		return options.VolumeList{}, err
 	}
 	filters, err := cmd.Flags().GetStringSlice("filter")
 	if err != nil {
-		return types.VolumeListOptions{}, err
+		return options.VolumeList{}, err
 	}
-	return types.VolumeListOptions{
+	return options.VolumeList{
 		GOptions: globalOptions,
 		Quiet:    quiet,
 		Format:   format,

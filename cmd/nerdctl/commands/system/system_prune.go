@@ -28,7 +28,7 @@ import (
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/commands/network"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/system"
 )
 
@@ -47,20 +47,20 @@ func newSystemPruneCommand() *cobra.Command {
 	return systemPruneCommand
 }
 
-func processSystemPruneOptions(cmd *cobra.Command) (types.SystemPruneOptions, error) {
+func processSystemPruneOptions(cmd *cobra.Command) (options.SystemPrune, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return types.SystemPruneOptions{}, err
+		return options.SystemPrune{}, err
 	}
 
 	all, err := cmd.Flags().GetBool("all")
 	if err != nil {
-		return types.SystemPruneOptions{}, err
+		return options.SystemPrune{}, err
 	}
 
 	vFlag, err := cmd.Flags().GetBool("volumes")
 	if err != nil {
-		return types.SystemPruneOptions{}, err
+		return options.SystemPrune{}, err
 	}
 
 	buildkitHost, err := builder.GetBuildkitHost(cmd, globalOptions.Namespace)
@@ -69,7 +69,7 @@ func processSystemPruneOptions(cmd *cobra.Command) (types.SystemPruneOptions, er
 		buildkitHost = ""
 	}
 
-	return types.SystemPruneOptions{
+	return options.SystemPrune{
 		Stdout:               cmd.OutOrStdout(),
 		Stderr:               cmd.ErrOrStderr(),
 		GOptions:             globalOptions,
@@ -80,7 +80,7 @@ func processSystemPruneOptions(cmd *cobra.Command) (types.SystemPruneOptions, er
 	}, nil
 }
 
-func grantSystemPrunePermission(cmd *cobra.Command, options types.SystemPruneOptions) (bool, error) {
+func grantSystemPrunePermission(cmd *cobra.Command, options options.SystemPrune) (bool, error) {
 	force, err := cmd.Flags().GetBool("force")
 	if err != nil {
 		return false, err

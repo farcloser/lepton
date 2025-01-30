@@ -27,7 +27,7 @@ import (
 	"go.farcloser.world/core/units"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/builder"
 )
 
@@ -102,28 +102,28 @@ func builderPruneAction(cmd *cobra.Command, _ []string) error {
 	return nil
 }
 
-func processBuilderPruneOptions(cmd *cobra.Command) (types.BuilderPruneOptions, error) {
+func processBuilderPruneOptions(cmd *cobra.Command) (options.BuilderPrune, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return types.BuilderPruneOptions{}, err
+		return options.BuilderPrune{}, err
 	}
 
 	buildkitHost, err := GetBuildkitHost(cmd, globalOptions.Namespace)
 	if err != nil {
-		return types.BuilderPruneOptions{}, err
+		return options.BuilderPrune{}, err
 	}
 
 	all, err := cmd.Flags().GetBool("all")
 	if err != nil {
-		return types.BuilderPruneOptions{}, err
+		return options.BuilderPrune{}, err
 	}
 
 	force, err := cmd.Flags().GetBool("force")
 	if err != nil {
-		return types.BuilderPruneOptions{}, err
+		return options.BuilderPrune{}, err
 	}
 
-	return types.BuilderPruneOptions{
+	return options.BuilderPrune{
 		Stderr:       cmd.OutOrStderr(),
 		GOptions:     globalOptions,
 		BuildKitHost: buildkitHost,

@@ -14,21 +14,19 @@
    limitations under the License.
 */
 
-package types
+package options
 
 import (
 	"io"
-
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
 )
 
-// BuilderBuildOptions specifies options for `(image/builder) build`.
-type BuilderBuildOptions struct {
+// BuilderBuild specifies options for `(image/builder) build`.
+type BuilderBuild struct {
 	Stdin  io.Reader
 	Stdout io.Writer
 	Stderr io.Writer
 	// GOptions is the global options
-	GOptions options.Global
+	GOptions Global
 	// BuildKitHost is the buildkit host
 	BuildKitHost string
 	// Tag is the tag of the image
@@ -79,11 +77,11 @@ type BuilderBuildOptions struct {
 	ExtraHosts []string
 }
 
-// BuilderPruneOptions specifies options for `builder prune`.
-type BuilderPruneOptions struct {
+// BuilderPrune specifies options for `builder prune`.
+type BuilderPrune struct {
 	Stderr io.Writer
 	// GOptions is the global options
-	GOptions options.Global
+	GOptions Global
 	// BuildKitHost is the buildkit host
 	BuildKitHost string
 	// All will remove all unused images and all build cache, not just dangling ones

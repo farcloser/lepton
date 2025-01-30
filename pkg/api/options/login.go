@@ -14,13 +14,11 @@
    limitations under the License.
 */
 
-package types
+package options
 
-import "github.com/containerd/nerdctl/v2/pkg/api/options"
-
-type LoginCommandOptions struct {
+type LoginCommand struct {
 	// GOptions is the global options.
-	GOptions options.Global
+	GOptions Global
 	// ServerAddress is the server address to log in to.
 	ServerAddress string
 	// Username is the username to log in as.

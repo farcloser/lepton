@@ -21,7 +21,7 @@ import (
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/system"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 )
@@ -49,7 +49,7 @@ func NewInfoCommand() *cobra.Command {
 	return infoCommand
 }
 
-func processInfoOptions(cmd *cobra.Command) (*types.SystemInfoOptions, error) {
+func processInfoOptions(cmd *cobra.Command) (*options.SystemInfo, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return nil, err
@@ -65,7 +65,7 @@ func processInfoOptions(cmd *cobra.Command) (*types.SystemInfoOptions, error) {
 		return nil, err
 	}
 
-	return &types.SystemInfoOptions{
+	return &options.SystemInfo{
 		GOptions: globalOptions,
 		Mode:     mode,
 		Format:   format,

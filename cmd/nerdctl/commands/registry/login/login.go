@@ -26,7 +26,7 @@ import (
 	"github.com/containerd/log"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/login"
 )
 
@@ -45,50 +45,50 @@ func NewLoginCommand() *cobra.Command {
 	return loginCommand
 }
 
-func processLoginOptions(cmd *cobra.Command) (types.LoginCommandOptions, error) {
+func processLoginOptions(cmd *cobra.Command) (options.LoginCommand, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return types.LoginCommandOptions{}, err
+		return options.LoginCommand{}, err
 	}
 
 	username, err := cmd.Flags().GetString("username")
 	if err != nil {
-		return types.LoginCommandOptions{}, err
+		return options.LoginCommand{}, err
 	}
 	password, err := cmd.Flags().GetString("password")
 	if err != nil {
-		return types.LoginCommandOptions{}, err
+		return options.LoginCommand{}, err
 	}
 	passwordStdin, err := cmd.Flags().GetBool("password-stdin")
 	if err != nil {
-		return types.LoginCommandOptions{}, err
+		return options.LoginCommand{}, err
 	}
 
 	if strings.Contains(username, ":") {
-		return types.LoginCommandOptions{}, errors.New("username cannot contain colons")
+		return options.LoginCommand{}, errors.New("username cannot contain colons")
 	}
 
 	if password != "" {
 		log.L.Warn("WARNING! Using --password via the CLI is insecure. Use --password-stdin.")
 		if passwordStdin {
-			return types.LoginCommandOptions{}, errors.New("--password and --password-stdin are mutually exclusive")
+			return options.LoginCommand{}, errors.New("--password and --password-stdin are mutually exclusive")
 		}
 	}
 
 	if passwordStdin {
 		if username == "" {
-			return types.LoginCommandOptions{}, errors.New("must provide --username with --password-stdin")
+			return options.LoginCommand{}, errors.New("must provide --username with --password-stdin")
 		}
 
 		contents, err := io.ReadAll(cmd.InOrStdin())
 		if err != nil {
-			return types.LoginCommandOptions{}, err
+			return options.LoginCommand{}, err
 		}
 
 		password = strings.TrimSuffix(string(contents), "\n")
 		password = strings.TrimSuffix(password, "\r")
 	}
-	return types.LoginCommandOptions{
+	return options.LoginCommand{
 		GOptions: globalOptions,
 		Username: username,
 		Password: password,

@@ -14,43 +14,41 @@
    limitations under the License.
 */
 
-package types
+package options
 
 import (
 	"io"
-
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
 )
 
-// SystemInfoOptions specifies options for `(system) info`.
-type SystemInfoOptions struct {
+// SystemInfo specifies options for `(system) info`.
+type SystemInfo struct {
 	Stdout io.Writer
 	Stderr io.Writer
 	// GOptions is the global options
-	GOptions options.Global
+	GOptions Global
 	// Information mode, "dockercompat" for Docker-compatible output, "native" for containerd-native output
 	Mode string
 	// Format the output using the given Go template, e.g, '{{json .}}
 	Format string
 }
 
-// SystemEventsOptions specifies options for `(system) events`.
-type SystemEventsOptions struct {
+// SystemEvents specifies options for `(system) events`.
+type SystemEvents struct {
 	Stdout io.Writer
 	// GOptions is the global options
-	GOptions options.Global
+	GOptions Global
 	// Format the output using the given Go template, e.g, '{{json .}}
 	Format string
 	// Filter events based on given conditions
 	Filters []string
 }
 
-// SystemPruneOptions specifies options for `system prune`.
-type SystemPruneOptions struct {
+// SystemPrune specifies options for `system prune`.
+type SystemPrune struct {
 	Stdout io.Writer
 	Stderr io.Writer
 	// GOptions is the global options
-	GOptions options.Global
+	GOptions Global
 	// All remove all unused images, not just dangling ones
 	All bool
 	// Volumes decide whether prune volumes or not

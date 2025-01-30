@@ -22,7 +22,7 @@ import (
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/network"
 	"github.com/containerd/nerdctl/v2/pkg/strutil"
 )
@@ -95,7 +95,7 @@ func networkCreateAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	return network.Create(types.NetworkCreateOptions{
+	return network.Create(options.NetworkCreate{
 		GOptions:    globalOptions,
 		Name:        name,
 		Driver:      driver,

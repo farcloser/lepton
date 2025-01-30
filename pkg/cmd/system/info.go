@@ -33,7 +33,6 @@ import (
 	"github.com/containerd/log"
 
 	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 	"github.com/containerd/nerdctl/v2/pkg/infoutil"
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
@@ -43,7 +42,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/strutil"
 )
 
-func Info(ctx context.Context, client *containerd.Client, options *types.SystemInfoOptions) error {
+func Info(ctx context.Context, client *containerd.Client, options *options.SystemInfo) error {
 	var (
 		tmpl *template.Template
 		err  error

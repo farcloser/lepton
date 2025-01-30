@@ -21,7 +21,7 @@ import (
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/system"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 )
@@ -46,20 +46,20 @@ func NewEventsCommand() *cobra.Command {
 	return eventsCommand
 }
 
-func processSystemEventsOptions(cmd *cobra.Command) (types.SystemEventsOptions, error) {
+func processSystemEventsOptions(cmd *cobra.Command) (options.SystemEvents, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return types.SystemEventsOptions{}, err
+		return options.SystemEvents{}, err
 	}
 	format, err := cmd.Flags().GetString("format")
 	if err != nil {
-		return types.SystemEventsOptions{}, err
+		return options.SystemEvents{}, err
 	}
 	filters, err := cmd.Flags().GetStringSlice("filter")
 	if err != nil {
-		return types.SystemEventsOptions{}, err
+		return options.SystemEvents{}, err
 	}
-	return types.SystemEventsOptions{
+	return options.SystemEvents{
 		Stdout:   cmd.OutOrStdout(),
 		GOptions: globalOptions,
 		Format:   format,

@@ -20,7 +20,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/network"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 )
@@ -61,7 +61,7 @@ func networkLsAction(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	return network.List(cmd.Context(), types.NetworkListOptions{
+	return network.List(cmd.Context(), options.NetworkList{
 		GOptions: globalOptions,
 		Quiet:    quiet,
 		Format:   format,

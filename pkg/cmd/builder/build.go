@@ -38,7 +38,7 @@ import (
 	"github.com/containerd/log"
 	"github.com/containerd/platforms"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/buildkitutil"
 	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/containerutil"
@@ -61,7 +61,7 @@ func (p platformParser) DefaultSpec() platforms.Platform {
 	return platforms.DefaultSpec()
 }
 
-func Build(ctx context.Context, client *containerd.Client, options types.BuilderBuildOptions) error {
+func Build(ctx context.Context, client *containerd.Client, options options.BuilderBuild) error {
 	buildctlBinary, buildctlArgs, needsLoading, metaFile, tags, cleanup, err := generateBuildctlArgs(ctx, client, options)
 	if err != nil {
 		return err
@@ -193,7 +193,7 @@ func loadImage(ctx context.Context, in io.Reader, namespace, address, snapshotte
 	return nil
 }
 
-func generateBuildctlArgs(ctx context.Context, client *containerd.Client, options types.BuilderBuildOptions) (buildCtlBinary string,
+func generateBuildctlArgs(ctx context.Context, client *containerd.Client, options options.BuilderBuild) (buildCtlBinary string,
 	buildctlArgs []string, needsLoading bool, metaFile string, tags []string, cleanup func(), err error) {
 
 	buildctlBinary, err := buildkitutil.BuildctlBinary()
