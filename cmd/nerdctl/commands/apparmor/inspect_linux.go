@@ -36,6 +36,6 @@ func inspectCommand() *cobra.Command {
 	}
 }
 
-func inspectAction(cmd *cobra.Command, _ []string) error {
+func inspectAction(cmd *cobra.Command, args []string) error {
 	return apparmor.Inspect(cmd.OutOrStdout())
 }

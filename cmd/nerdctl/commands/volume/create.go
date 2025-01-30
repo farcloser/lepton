@@ -40,7 +40,7 @@ func createCommand() *cobra.Command {
 	return volumeCreateCommand
 }
 
-func createOptions(cmd *cobra.Command) (*options.VolumeCreate, error) {
+func createOptions(cmd *cobra.Command, _ []string) (*options.VolumeCreate, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return nil, err
@@ -63,7 +63,7 @@ func createOptions(cmd *cobra.Command) (*options.VolumeCreate, error) {
 }
 
 func createAction(cmd *cobra.Command, args []string) error {
-	options, err := createOptions(cmd)
+	options, err := createOptions(cmd, args)
 	if err != nil {
 		return err
 	}

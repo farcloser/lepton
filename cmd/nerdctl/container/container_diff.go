@@ -56,7 +56,7 @@ func DiffCommand() *cobra.Command {
 	return diffCommand
 }
 
-func diffOptions(cmd *cobra.Command) (options.ContainerDiff, error) {
+func diffOptions(cmd *cobra.Command, _ []string) (options.ContainerDiff, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return options.ContainerDiff{}, err
@@ -69,7 +69,7 @@ func diffOptions(cmd *cobra.Command) (options.ContainerDiff, error) {
 }
 
 func diffAction(cmd *cobra.Command, args []string) error {
-	options, err := diffOptions(cmd)
+	options, err := diffOptions(cmd, args)
 	if err != nil {
 		return err
 	}

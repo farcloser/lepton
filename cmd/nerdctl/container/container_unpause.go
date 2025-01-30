@@ -41,7 +41,7 @@ func UnpauseCommand() *cobra.Command {
 	return unpauseCommand
 }
 
-func unpauseOptions(cmd *cobra.Command) (options.ContainerUnpauseOptions, error) {
+func unpauseOptions(cmd *cobra.Command, _ []string) (options.ContainerUnpauseOptions, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return options.ContainerUnpauseOptions{}, err
@@ -53,7 +53,7 @@ func unpauseOptions(cmd *cobra.Command) (options.ContainerUnpauseOptions, error)
 }
 
 func unpauseAction(cmd *cobra.Command, args []string) error {
-	options, err := unpauseOptions(cmd)
+	options, err := unpauseOptions(cmd, args)
 	if err != nil {
 		return err
 	}

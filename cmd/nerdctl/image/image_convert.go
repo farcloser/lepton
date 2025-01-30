@@ -78,7 +78,7 @@ func newImageConvertCommand() *cobra.Command {
 	return imageConvertCommand
 }
 
-func convertOptions(cmd *cobra.Command) (options.ImageConvert, error) {
+func convertOptions(cmd *cobra.Command, _ []string) (options.ImageConvert, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return options.ImageConvert{}, err
@@ -165,7 +165,7 @@ func convertOptions(cmd *cobra.Command) (options.ImageConvert, error) {
 }
 
 func convertAction(cmd *cobra.Command, args []string) error {
-	options, err := convertOptions(cmd)
+	options, err := convertOptions(cmd, args)
 	if err != nil {
 		return err
 	}

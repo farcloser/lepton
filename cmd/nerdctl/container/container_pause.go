@@ -41,7 +41,7 @@ func PauseCommand() *cobra.Command {
 	return pauseCommand
 }
 
-func pauseOptions(cmd *cobra.Command) (options.ContainerPause, error) {
+func pauseOptions(cmd *cobra.Command, _ []string) (options.ContainerPause, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return options.ContainerPause{}, err
@@ -53,7 +53,7 @@ func pauseOptions(cmd *cobra.Command) (options.ContainerPause, error) {
 }
 
 func pauseAction(cmd *cobra.Command, args []string) error {
-	options, err := pauseOptions(cmd)
+	options, err := pauseOptions(cmd, args)
 	if err != nil {
 		return err
 	}

@@ -70,7 +70,7 @@ func PullCommand() *cobra.Command {
 	return pullCommand
 }
 
-func processPullCommandFlags(cmd *cobra.Command) (options.ImagePull, error) {
+func pullOptions(cmd *cobra.Command, args []string) (options.ImagePull, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return options.ImagePull{}, err
@@ -108,7 +108,7 @@ func processPullCommandFlags(cmd *cobra.Command) (options.ImagePull, error) {
 		return options.ImagePull{}, err
 	}
 
-	verifyOptions, err := helpers.ProcessImageVerifyOptions(cmd)
+	verifyOptions, err := helpers.ProcessImageVerifyOptions(cmd, args)
 	if err != nil {
 		return options.ImagePull{}, err
 	}
@@ -129,7 +129,7 @@ func processPullCommandFlags(cmd *cobra.Command) (options.ImagePull, error) {
 }
 
 func pullAction(cmd *cobra.Command, args []string) error {
-	options, err := processPullCommandFlags(cmd)
+	options, err := pullOptions(cmd, args)
 	if err != nil {
 		return err
 	}

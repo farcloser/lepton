@@ -47,7 +47,7 @@ func StartCommand() *cobra.Command {
 	return startCommand
 }
 
-func startOptions(cmd *cobra.Command) (options.ContainerStart, error) {
+func startOptions(cmd *cobra.Command, _ []string) (options.ContainerStart, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return options.ContainerStart{}, err
@@ -69,7 +69,7 @@ func startOptions(cmd *cobra.Command) (options.ContainerStart, error) {
 }
 
 func startAction(cmd *cobra.Command, args []string) error {
-	options, err := startOptions(cmd)
+	options, err := startOptions(cmd, args)
 	if err != nil {
 		return err
 	}

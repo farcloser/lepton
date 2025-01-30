@@ -44,7 +44,7 @@ func inspectCommand() *cobra.Command {
 	return volumeInspectCommand
 }
 
-func inspectOptions(cmd *cobra.Command) (*options.VolumeInspect, error) {
+func inspectOptions(cmd *cobra.Command, _ []string) (*options.VolumeInspect, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return nil, err
@@ -66,7 +66,7 @@ func inspectOptions(cmd *cobra.Command) (*options.VolumeInspect, error) {
 }
 
 func inspectAction(cmd *cobra.Command, args []string) error {
-	options, err := inspectOptions(cmd)
+	options, err := inspectOptions(cmd, args)
 	if err != nil {
 		return err
 	}

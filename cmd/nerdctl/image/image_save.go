@@ -53,7 +53,7 @@ func SaveCommand() *cobra.Command {
 	return saveCommand
 }
 
-func saveOptions(cmd *cobra.Command) (options.ImageSave, error) {
+func saveOptions(cmd *cobra.Command, _ []string) (options.ImageSave, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return options.ImageSave{}, err
@@ -76,7 +76,7 @@ func saveOptions(cmd *cobra.Command) (options.ImageSave, error) {
 }
 
 func saveAction(cmd *cobra.Command, args []string) error {
-	options, err := saveOptions(cmd)
+	options, err := saveOptions(cmd, args)
 	if err != nil {
 		return err
 	}

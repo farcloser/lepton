@@ -46,7 +46,7 @@ func EventsCommand() *cobra.Command {
 	return eventsCommand
 }
 
-func eventsOptions(cmd *cobra.Command) (*options.SystemEvents, error) {
+func eventsOptions(cmd *cobra.Command, _ []string) (*options.SystemEvents, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return nil, err
@@ -68,7 +68,7 @@ func eventsOptions(cmd *cobra.Command) (*options.SystemEvents, error) {
 }
 
 func eventsAction(cmd *cobra.Command, args []string) error {
-	options, err := eventsOptions(cmd)
+	options, err := eventsOptions(cmd, args)
 	if err != nil {
 		return err
 	}

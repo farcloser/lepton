@@ -46,7 +46,7 @@ func listCommand() *cobra.Command {
 	return cmd
 }
 
-func listOptions(cmd *cobra.Command) (*apparmor.ListOptions, error) {
+func listOptions(cmd *cobra.Command, _ []string) (*apparmor.ListOptions, error) {
 	quiet, err := cmd.Flags().GetBool("quiet")
 	if err != nil {
 		return nil, err
@@ -68,7 +68,7 @@ func listOptions(cmd *cobra.Command) (*apparmor.ListOptions, error) {
 }
 
 func listAction(cmd *cobra.Command, args []string) error {
-	options, err := listOptions(cmd)
+	options, err := listOptions(cmd, args)
 	if err != nil {
 		return err
 	}

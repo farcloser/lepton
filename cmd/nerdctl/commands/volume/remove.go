@@ -42,7 +42,7 @@ func removeCommand() *cobra.Command {
 	return volumeRmCommand
 }
 
-func removeOptions(cmd *cobra.Command) (*options.VolumeRemove, error) {
+func removeOptions(cmd *cobra.Command, _ []string) (*options.VolumeRemove, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return nil, err
@@ -59,7 +59,7 @@ func removeOptions(cmd *cobra.Command) (*options.VolumeRemove, error) {
 }
 
 func removeAction(cmd *cobra.Command, args []string) error {
-	options, err := removeOptions(cmd)
+	options, err := removeOptions(cmd, args)
 	if err != nil {
 		return err
 	}

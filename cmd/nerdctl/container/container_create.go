@@ -52,7 +52,7 @@ func CreateCommand() *cobra.Command {
 	return createCommand
 }
 
-func createOptions(cmd *cobra.Command) (*options.ContainerCreate, error) {
+func createOptions(cmd *cobra.Command, args []string) (*options.ContainerCreate, error) {
 	var err error
 	opt := &options.ContainerCreate{
 		Stdout: cmd.OutOrStdout(),
@@ -396,7 +396,7 @@ func createOptions(cmd *cobra.Command) (*options.ContainerCreate, error) {
 	// #endregion
 
 	// #region for image pull and verify options
-	imageVerifyOpt, err := helpers.ProcessImageVerifyOptions(cmd)
+	imageVerifyOpt, err := helpers.ProcessImageVerifyOptions(cmd, args)
 	if err != nil {
 		return opt, err
 	}
@@ -417,7 +417,7 @@ func createOptions(cmd *cobra.Command) (*options.ContainerCreate, error) {
 }
 
 func createAction(cmd *cobra.Command, args []string) error {
-	createOpt, err := createOptions(cmd)
+	createOpt, err := createOptions(cmd, args)
 	if err != nil {
 		return err
 	}

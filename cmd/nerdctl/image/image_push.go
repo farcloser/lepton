@@ -68,7 +68,7 @@ func PushCommand() *cobra.Command {
 	return pushCommand
 }
 
-func pushOptions(cmd *cobra.Command) (options.ImagePush, error) {
+func pushOptions(cmd *cobra.Command, args []string) (options.ImagePush, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return options.ImagePush{}, err
@@ -89,11 +89,11 @@ func pushOptions(cmd *cobra.Command) (options.ImagePush, error) {
 	if err != nil {
 		return options.ImagePush{}, err
 	}
-	signOptions, err := signOptions(cmd)
+	signOptions, err := signOptions(cmd, args)
 	if err != nil {
 		return options.ImagePush{}, err
 	}
-	sociOptions, err := processSociOptions(cmd)
+	sociOptions, err := processSociOptions(cmd, args)
 	if err != nil {
 		return options.ImagePush{}, err
 	}
@@ -110,7 +110,7 @@ func pushOptions(cmd *cobra.Command) (options.ImagePush, error) {
 }
 
 func pushAction(cmd *cobra.Command, args []string) error {
-	options, err := pushOptions(cmd)
+	options, err := pushOptions(cmd, args)
 	if err != nil {
 		return err
 	}
@@ -130,7 +130,7 @@ func pushShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]
 	return completion.ImageNames(cmd, args, toComplete)
 }
 
-func signOptions(cmd *cobra.Command) (opt options.ImageSign, err error) {
+func signOptions(cmd *cobra.Command, _ []string) (opt options.ImageSign, err error) {
 	if opt.Provider, err = cmd.Flags().GetString("sign"); err != nil {
 		return
 	}
@@ -143,7 +143,7 @@ func signOptions(cmd *cobra.Command) (opt options.ImageSign, err error) {
 	return
 }
 
-func processSociOptions(cmd *cobra.Command) (opt options.Soci, err error) {
+func processSociOptions(cmd *cobra.Command, _ []string) (opt options.Soci, err error) {
 	if opt.SpanSize, err = cmd.Flags().GetInt64("soci-span-size"); err != nil {
 		return
 	}

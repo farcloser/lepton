@@ -43,7 +43,7 @@ func CommitCommand() *cobra.Command {
 	return commitCommand
 }
 
-func commitOptions(cmd *cobra.Command) (options.ContainerCommit, error) {
+func commitOptions(cmd *cobra.Command, _ []string) (options.ContainerCommit, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return options.ContainerCommit{}, err
@@ -78,7 +78,7 @@ func commitOptions(cmd *cobra.Command) (options.ContainerCommit, error) {
 }
 
 func commitAction(cmd *cobra.Command, args []string) error {
-	options, err := commitOptions(cmd)
+	options, err := commitOptions(cmd, args)
 	if err != nil {
 		return err
 	}

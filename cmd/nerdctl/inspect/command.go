@@ -124,7 +124,7 @@ func inspectAction(cmd *cobra.Command, args []string) error {
 		}
 	}
 	if inspectContainer {
-		containerInspectOptions, err = containerCmd.ProcessContainerInspectOptions(cmd)
+		containerInspectOptions, err = containerCmd.ProcessContainerInspectOptions(cmd, args)
 		if err != nil {
 			return err
 		}

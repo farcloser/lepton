@@ -59,7 +59,7 @@ Caveats:
 	return attachCommand
 }
 
-func attachOptions(cmd *cobra.Command) (options.ContainerAttach, error) {
+func attachOptions(cmd *cobra.Command, _ []string) (options.ContainerAttach, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return options.ContainerAttach{}, err
@@ -78,7 +78,7 @@ func attachOptions(cmd *cobra.Command) (options.ContainerAttach, error) {
 }
 
 func attachAction(cmd *cobra.Command, args []string) error {
-	options, err := attachOptions(cmd)
+	options, err := attachOptions(cmd, args)
 	if err != nil {
 		return err
 	}

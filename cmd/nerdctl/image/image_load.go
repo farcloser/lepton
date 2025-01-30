@@ -82,7 +82,7 @@ func processLoadCommandFlags(cmd *cobra.Command) (options.ImageLoad, error) {
 	}, nil
 }
 
-func loadAction(cmd *cobra.Command, _ []string) error {
+func loadAction(cmd *cobra.Command, args []string) error {
 	options, err := processLoadCommandFlags(cmd)
 	if err != nil {
 		return err

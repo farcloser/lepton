@@ -52,7 +52,7 @@ func removeCommand() *cobra.Command {
 	return namespaceRmCommand
 }
 
-func removeOptions(cmd *cobra.Command) (*options.Global, *namespaceRemoveOptions, error) {
+func removeOptions(cmd *cobra.Command, _ []string) (*options.Global, *namespaceRemoveOptions, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return nil, nil, err
@@ -69,7 +69,7 @@ func removeOptions(cmd *cobra.Command) (*options.Global, *namespaceRemoveOptions
 }
 
 func removeAction(cmd *cobra.Command, args []string) error {
-	globalOptions, options, err := removeOptions(cmd)
+	globalOptions, options, err := removeOptions(cmd, args)
 	if err != nil {
 		return err
 	}
