@@ -23,7 +23,6 @@ import (
 	containerd "github.com/containerd/containerd/v2/client"
 
 	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/builder"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/image"
@@ -34,7 +33,7 @@ import (
 // Prune will remove all unused containers, networks,
 // images (dangling only or both dangling and unreferenced), and optionally, volumes.
 func Prune(ctx context.Context, client *containerd.Client, opts *options.SystemPrune) error {
-	if err := container.Prune(ctx, client, types.ContainerPruneOptions{
+	if err := container.Prune(ctx, client, options.ContainerPrune{
 		GOptions: opts.GOptions,
 		Stdout:   opts.Stdout,
 	}); err != nil {
@@ -57,7 +56,7 @@ func Prune(ctx context.Context, client *containerd.Client, opts *options.SystemP
 			return err
 		}
 	}
-	if err := image.Prune(ctx, client, types.ImagePruneOptions{
+	if err := image.Prune(ctx, client, options.ImagePrune{
 		Stdout:   opts.Stdout,
 		GOptions: opts.GOptions,
 		All:      opts.All,

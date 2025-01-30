@@ -53,7 +53,7 @@ type Options struct {
 	Experimental     bool // enable experimental features
 }
 
-func New(o Options, client *containerd.Client) (*Composer, error) {
+func New(o *Options, client *containerd.Client) (*Composer, error) {
 	if o.CliCmd == "" {
 		return nil, errors.New("got empty nerdctl cmd")
 	}
@@ -130,7 +130,7 @@ func New(o Options, client *containerd.Client) (*Composer, error) {
 	}
 
 	c := &Composer{
-		Options: o,
+		Options: *o,
 		project: project,
 		client:  client,
 	}

@@ -22,7 +22,7 @@ import (
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/image"
 )
 
@@ -68,36 +68,36 @@ func NewPushCommand() *cobra.Command {
 	return pushCommand
 }
 
-func processImagePushOptions(cmd *cobra.Command) (types.ImagePushOptions, error) {
+func processImagePushOptions(cmd *cobra.Command) (options.ImagePush, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return types.ImagePushOptions{}, err
+		return options.ImagePush{}, err
 	}
 	platform, err := cmd.Flags().GetStringSlice("platform")
 	if err != nil {
-		return types.ImagePushOptions{}, err
+		return options.ImagePush{}, err
 	}
 	allPlatforms, err := cmd.Flags().GetBool("all-platforms")
 	if err != nil {
-		return types.ImagePushOptions{}, err
+		return options.ImagePush{}, err
 	}
 	quiet, err := cmd.Flags().GetBool("quiet")
 	if err != nil {
-		return types.ImagePushOptions{}, err
+		return options.ImagePush{}, err
 	}
 	allowNonDist, err := cmd.Flags().GetBool(allowNonDistFlag)
 	if err != nil {
-		return types.ImagePushOptions{}, err
+		return options.ImagePush{}, err
 	}
 	signOptions, err := processImageSignOptions(cmd)
 	if err != nil {
-		return types.ImagePushOptions{}, err
+		return options.ImagePush{}, err
 	}
 	sociOptions, err := processSociOptions(cmd)
 	if err != nil {
-		return types.ImagePushOptions{}, err
+		return options.ImagePush{}, err
 	}
-	return types.ImagePushOptions{
+	return options.ImagePush{
 		GOptions:                       globalOptions,
 		SignOptions:                    signOptions,
 		SociOptions:                    sociOptions,
@@ -130,7 +130,7 @@ func pushShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]
 	return completion.ImageNames(cmd, args, toComplete)
 }
 
-func processImageSignOptions(cmd *cobra.Command) (opt types.ImageSignOptions, err error) {
+func processImageSignOptions(cmd *cobra.Command) (opt options.ImageSign, err error) {
 	if opt.Provider, err = cmd.Flags().GetString("sign"); err != nil {
 		return
 	}
@@ -143,7 +143,7 @@ func processImageSignOptions(cmd *cobra.Command) (opt types.ImageSignOptions, er
 	return
 }
 
-func processSociOptions(cmd *cobra.Command) (opt types.SociOptions, err error) {
+func processSociOptions(cmd *cobra.Command) (opt options.Soci, err error) {
 	if opt.SpanSize, err = cmd.Flags().GetInt64("soci-span-size"); err != nil {
 		return
 	}

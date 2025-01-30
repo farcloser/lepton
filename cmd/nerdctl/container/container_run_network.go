@@ -23,13 +23,13 @@ import (
 
 	"github.com/containerd/go-cni"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/portutil"
 	"github.com/containerd/nerdctl/v2/pkg/strutil"
 )
 
-func loadNetworkFlags(cmd *cobra.Command) (types.NetworkOptions, error) {
-	netOpts := types.NetworkOptions{}
+func loadNetworkFlags(cmd *cobra.Command) (options.ContainerNetwork, error) {
+	netOpts := options.ContainerNetwork{}
 
 	// --net/--network=<net name> ...
 	var netSlice = []string{}

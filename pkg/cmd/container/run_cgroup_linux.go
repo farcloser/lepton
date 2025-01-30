@@ -31,7 +31,7 @@ import (
 	"github.com/containerd/containerd/v2/pkg/oci"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/infoutil"
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
 )
@@ -42,7 +42,7 @@ type customMemoryOptions struct {
 	disableOOMKiller  *bool
 }
 
-func generateCgroupOpts(id string, options types.ContainerCreateOptions) ([]oci.SpecOpts, error) {
+func generateCgroupOpts(id string, options *options.ContainerCreate) ([]oci.SpecOpts, error) {
 	if options.KernelMemory != "" {
 		log.L.Warnf("The --kernel-memory flag is no longer supported. This flag is a noop.")
 	}

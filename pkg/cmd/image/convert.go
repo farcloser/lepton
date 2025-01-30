@@ -36,13 +36,13 @@ import (
 	zstdchunkedconvert "github.com/containerd/stargz-snapshotter/nativeconverter/zstdchunked"
 	"github.com/containerd/stargz-snapshotter/recorder"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 	converterutil "github.com/containerd/nerdctl/v2/pkg/imgutil/converter"
 	"github.com/containerd/nerdctl/v2/pkg/platformutil"
 )
 
-func Convert(ctx context.Context, client *containerd.Client, srcRawRef, targetRawRef string, options types.ImageConvertOptions) error {
+func Convert(ctx context.Context, client *containerd.Client, srcRawRef, targetRawRef string, options options.ImageConvert) error {
 	var (
 		convertOpts = []converter.Opt{}
 	)
@@ -135,11 +135,11 @@ func Convert(ctx context.Context, client *containerd.Client, srcRawRef, targetRa
 	return printConvertedImage(options.Stdout, options, res)
 }
 
-func getZstdConverter(options types.ImageConvertOptions) (converter.ConvertFunc, error) {
+func getZstdConverter(options options.ImageConvert) (converter.ConvertFunc, error) {
 	return converterutil.ZstdLayerConvertFunc(options)
 }
 
-func getZstdchunkedConverter(options types.ImageConvertOptions) (converter.ConvertFunc, error) {
+func getZstdchunkedConverter(options options.ImageConvert) (converter.ConvertFunc, error) {
 
 	esgzOpts := []estargz.Option{
 		estargz.WithChunkSize(options.ZstdChunkedChunkSize),
@@ -184,7 +184,7 @@ func readPathsFromRecordFile(filename string) ([]string, error) {
 	return paths, nil
 }
 
-func printConvertedImage(stdout io.Writer, options types.ImageConvertOptions, img converterutil.ConvertedImageInfo) error {
+func printConvertedImage(stdout io.Writer, options options.ImageConvert, img converterutil.ConvertedImageInfo) error {
 	switch options.Format {
 	case formatter.FormatJSON:
 		b, err := json.MarshalIndent(img, "", "    ")

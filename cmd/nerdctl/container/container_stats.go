@@ -24,7 +24,7 @@ import (
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 )
 
@@ -50,33 +50,33 @@ func addStatsFlags(cmd *cobra.Command) {
 	cmd.Flags().Bool("no-trunc", false, "Do not truncate output")
 }
 
-func processStatsCommandFlags(cmd *cobra.Command) (types.ContainerStatsOptions, error) {
+func processStatsCommandFlags(cmd *cobra.Command) (options.ContainerStats, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return types.ContainerStatsOptions{}, err
+		return options.ContainerStats{}, err
 	}
 
 	all, err := cmd.Flags().GetBool("all")
 	if err != nil {
-		return types.ContainerStatsOptions{}, err
+		return options.ContainerStats{}, err
 	}
 
 	noStream, err := cmd.Flags().GetBool("no-stream")
 	if err != nil {
-		return types.ContainerStatsOptions{}, err
+		return options.ContainerStats{}, err
 	}
 
 	format, err := cmd.Flags().GetString("format")
 	if err != nil {
-		return types.ContainerStatsOptions{}, err
+		return options.ContainerStats{}, err
 	}
 
 	noTrunc, err := cmd.Flags().GetBool("no-trunc")
 	if err != nil {
-		return types.ContainerStatsOptions{}, err
+		return options.ContainerStats{}, err
 	}
 
-	return types.ContainerStatsOptions{
+	return options.ContainerStats{
 		Stdout:   cmd.OutOrStdout(),
 		Stderr:   cmd.ErrOrStderr(),
 		GOptions: globalOptions,

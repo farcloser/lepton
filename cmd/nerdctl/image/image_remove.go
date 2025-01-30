@@ -22,7 +22,7 @@ import (
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/image"
 )
 
@@ -42,22 +42,22 @@ func NewRmiCommand() *cobra.Command {
 	return rmiCommand
 }
 
-func processImageRemoveOptions(cmd *cobra.Command) (types.ImageRemoveOptions, error) {
+func processImageRemoveOptions(cmd *cobra.Command) (options.ImageRemove, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return types.ImageRemoveOptions{}, err
+		return options.ImageRemove{}, err
 	}
 
 	force, err := cmd.Flags().GetBool("force")
 	if err != nil {
-		return types.ImageRemoveOptions{}, err
+		return options.ImageRemove{}, err
 	}
 	async, err := cmd.Flags().GetBool("async")
 	if err != nil {
-		return types.ImageRemoveOptions{}, err
+		return options.ImageRemove{}, err
 	}
 
-	return types.ImageRemoveOptions{
+	return options.ImageRemove{
 		Stdout:   cmd.OutOrStdout(),
 		GOptions: globalOptions,
 		Force:    force,

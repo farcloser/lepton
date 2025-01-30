@@ -32,7 +32,7 @@ import (
 	"github.com/containerd/containerd/v2/pkg/oci"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/bypass4netnsutil"
 	"github.com/containerd/nerdctl/v2/pkg/containerutil"
 	"github.com/containerd/nerdctl/v2/pkg/idutil/containerwalker"
@@ -46,7 +46,7 @@ func WithoutRunMount() func(ctx context.Context, client oci.Client, c *container
 	return oci.WithoutRunMount
 }
 
-func setPlatformOptions(ctx context.Context, client *containerd.Client, id, uts string, internalLabels *internalLabels, options types.ContainerCreateOptions) ([]oci.SpecOpts, error) {
+func setPlatformOptions(ctx context.Context, client *containerd.Client, id, uts string, internalLabels *internalLabels, options *options.ContainerCreate) ([]oci.SpecOpts, error) {
 	var opts []oci.SpecOpts
 	opts = append(opts,
 		oci.WithDefaultUnixDevices,
@@ -128,7 +128,7 @@ func generateNamespaceOpts(
 	client *containerd.Client,
 	uts string,
 	internalLabels *internalLabels,
-	options types.ContainerCreateOptions,
+	options *options.ContainerCreate,
 ) ([]oci.SpecOpts, error) {
 	var opts []oci.SpecOpts
 

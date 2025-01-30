@@ -23,14 +23,14 @@ import (
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/images/archive"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/idutil/imagewalker"
 	"github.com/containerd/nerdctl/v2/pkg/platformutil"
 	"github.com/containerd/nerdctl/v2/pkg/strutil"
 )
 
 // Save exports `images` to a `io.Writer` (e.g., a file writer, or os.Stdout) specified by `options.Stdout`.
-func Save(ctx context.Context, client *containerd.Client, images []string, options types.ImageSaveOptions, exportOpts ...archive.ExportOpt) error {
+func Save(ctx context.Context, client *containerd.Client, images []string, options options.ImageSave, exportOpts ...archive.ExportOpt) error {
 	images = strutil.DedupeStrSlice(images)
 
 	platMC, err := platformutil.NewMatchComparer(options.AllPlatforms, options.Platform)

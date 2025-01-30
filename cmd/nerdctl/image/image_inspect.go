@@ -21,7 +21,7 @@ import (
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/image"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
@@ -56,31 +56,31 @@ func newImageInspectCommand() *cobra.Command {
 	return imageInspectCommand
 }
 
-func ProcessImageInspectOptions(cmd *cobra.Command, platform *string) (types.ImageInspectOptions, error) {
+func ProcessImageInspectOptions(cmd *cobra.Command, platform *string) (options.ImageInspect, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return types.ImageInspectOptions{}, err
+		return options.ImageInspect{}, err
 	}
 
 	mode, err := cmd.Flags().GetString("mode")
 	if err != nil {
-		return types.ImageInspectOptions{}, err
+		return options.ImageInspect{}, err
 	}
 
 	format, err := cmd.Flags().GetString("format")
 	if err != nil {
-		return types.ImageInspectOptions{}, err
+		return options.ImageInspect{}, err
 	}
 
 	if platform == nil {
 		tempPlatform, err := cmd.Flags().GetString("platform")
 		if err != nil {
-			return types.ImageInspectOptions{}, err
+			return options.ImageInspect{}, err
 		}
 		platform = &tempPlatform
 	}
 
-	return types.ImageInspectOptions{
+	return options.ImageInspect{
 		GOptions: globalOptions,
 		Mode:     mode,
 		Format:   format,

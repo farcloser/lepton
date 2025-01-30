@@ -25,7 +25,7 @@ import (
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/compose"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 	"github.com/containerd/nerdctl/v2/pkg/containerutil"
@@ -55,11 +55,11 @@ func composeTopAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	defer cancel()
-	options, err := getComposeOptions(cmd, globalOptions.DebugFull, globalOptions.Experimental)
+	opts, err := getComposeOptions(cmd, globalOptions.DebugFull, globalOptions.Experimental)
 	if err != nil {
 		return err
 	}
-	c, err := compose.New(cli, globalOptions, options, cmd.OutOrStdout(), cmd.ErrOrStderr())
+	c, err := compose.New(cli, globalOptions, opts, cmd.OutOrStdout(), cmd.ErrOrStderr())
 	if err != nil {
 		return err
 	}
@@ -87,7 +87,7 @@ func composeTopAction(cmd *cobra.Command, args []string) error {
 		}
 		fmt.Fprintln(stdout, info.Labels[labels.Name])
 		// `compose ps` uses empty ps args
-		err = container.Top(ctx, cli, []string{c.ID()}, types.ContainerTopOptions{
+		err = container.Top(ctx, cli, []string{c.ID()}, options.ContainerTop{
 			Stdout:   cmd.OutOrStdout(),
 			GOptions: globalOptions,
 		})

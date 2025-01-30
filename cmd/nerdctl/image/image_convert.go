@@ -22,7 +22,7 @@ import (
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/image"
 )
 
@@ -78,68 +78,68 @@ func newImageConvertCommand() *cobra.Command {
 	return imageConvertCommand
 }
 
-func processImageConvertOptions(cmd *cobra.Command) (types.ImageConvertOptions, error) {
+func processImageConvertOptions(cmd *cobra.Command) (options.ImageConvert, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return types.ImageConvertOptions{}, err
+		return options.ImageConvert{}, err
 	}
 	format, err := cmd.Flags().GetString("format")
 	if err != nil {
-		return types.ImageConvertOptions{}, err
+		return options.ImageConvert{}, err
 	}
 
 	// #region zstd flags
 	zstd, err := cmd.Flags().GetBool("zstd")
 	if err != nil {
-		return types.ImageConvertOptions{}, err
+		return options.ImageConvert{}, err
 	}
 	zstdCompressionLevel, err := cmd.Flags().GetInt("zstd-compression-level")
 	if err != nil {
-		return types.ImageConvertOptions{}, err
+		return options.ImageConvert{}, err
 	}
 	// #endregion
 
 	// #region zstd:chunked flags
 	zstdchunked, err := cmd.Flags().GetBool("zstdchunked")
 	if err != nil {
-		return types.ImageConvertOptions{}, err
+		return options.ImageConvert{}, err
 	}
 	zstdChunkedCompressionLevel, err := cmd.Flags().GetInt("zstdchunked-compression-level")
 	if err != nil {
-		return types.ImageConvertOptions{}, err
+		return options.ImageConvert{}, err
 	}
 	zstdChunkedChunkSize, err := cmd.Flags().GetInt("zstdchunked-chunk-size")
 	if err != nil {
-		return types.ImageConvertOptions{}, err
+		return options.ImageConvert{}, err
 	}
 	zstdChunkedRecordIn, err := cmd.Flags().GetString("zstdchunked-record-in")
 	if err != nil {
-		return types.ImageConvertOptions{}, err
+		return options.ImageConvert{}, err
 	}
 	// #endregion
 
 	// #region generic flags
 	uncompress, err := cmd.Flags().GetBool("uncompress")
 	if err != nil {
-		return types.ImageConvertOptions{}, err
+		return options.ImageConvert{}, err
 	}
 	oci, err := cmd.Flags().GetBool("oci")
 	if err != nil {
-		return types.ImageConvertOptions{}, err
+		return options.ImageConvert{}, err
 	}
 	// #endregion
 
 	// #region platform flags
 	platforms, err := cmd.Flags().GetStringSlice("platform")
 	if err != nil {
-		return types.ImageConvertOptions{}, err
+		return options.ImageConvert{}, err
 	}
 	allPlatforms, err := cmd.Flags().GetBool("all-platforms")
 	if err != nil {
-		return types.ImageConvertOptions{}, err
+		return options.ImageConvert{}, err
 	}
 	// #endregion
-	return types.ImageConvertOptions{
+	return options.ImageConvert{
 		GOptions: globalOptions,
 		Format:   format,
 		// #region zstd flags

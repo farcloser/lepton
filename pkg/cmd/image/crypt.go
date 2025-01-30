@@ -32,7 +32,7 @@ import (
 	"github.com/containerd/imgcrypt/v2/images/encryption/parsehelpers"
 	"github.com/containerd/platforms"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/platformutil"
 )
 
@@ -47,7 +47,7 @@ func layerDescs(ctx context.Context, provider content.Provider, imageTarget spec
 	return descs, err
 }
 
-func Crypt(ctx context.Context, client *containerd.Client, srcRawRef, targetRawRef string, encrypt bool, options types.ImageCryptOptions) error {
+func Crypt(ctx context.Context, client *containerd.Client, srcRawRef, targetRawRef string, encrypt bool, options options.ImageCrypt) error {
 	var convertOpts = []converter.Opt{}
 	if srcRawRef == "" || targetRawRef == "" {
 		return errors.New("src and target image need to be specified")
@@ -115,7 +115,7 @@ func Crypt(ctx context.Context, client *containerd.Client, srcRawRef, targetRawR
 }
 
 // parseImgcryptFlags corresponds to https://github.com/containerd/imgcrypt/blob/v1.1.2/cmd/ctr/commands/images/crypt_utils.go#L244-L252
-func parseImgcryptFlags(options types.ImageCryptOptions, encrypt bool) (parsehelpers.EncArgs, error) {
+func parseImgcryptFlags(options options.ImageCrypt, encrypt bool) (parsehelpers.EncArgs, error) {
 	var a parsehelpers.EncArgs
 
 	a.GPGHomedir = options.GpgHomeDir

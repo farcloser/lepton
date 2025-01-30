@@ -27,13 +27,13 @@ import (
 	"github.com/containerd/log"
 	"github.com/containerd/platforms"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/containerutil"
 	"github.com/containerd/nerdctl/v2/pkg/idutil/imagewalker"
 )
 
 // Remove removes a list of `images`.
-func Remove(ctx context.Context, client *containerd.Client, args []string, options types.ImageRemoveOptions) error {
+func Remove(ctx context.Context, client *containerd.Client, args []string, options options.ImageRemove) error {
 	var delOpts []images.DeleteOpt
 	if !options.Async {
 		delOpts = append(delOpts, images.SynchronousDelete())

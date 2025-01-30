@@ -26,7 +26,7 @@ import (
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/image"
 )
 
@@ -53,22 +53,22 @@ func NewSaveCommand() *cobra.Command {
 	return saveCommand
 }
 
-func processImageSaveOptions(cmd *cobra.Command) (types.ImageSaveOptions, error) {
+func processImageSaveOptions(cmd *cobra.Command) (options.ImageSave, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return types.ImageSaveOptions{}, err
+		return options.ImageSave{}, err
 	}
 
 	allPlatforms, err := cmd.Flags().GetBool("all-platforms")
 	if err != nil {
-		return types.ImageSaveOptions{}, err
+		return options.ImageSave{}, err
 	}
 	platform, err := cmd.Flags().GetStringSlice("platform")
 	if err != nil {
-		return types.ImageSaveOptions{}, err
+		return options.ImageSave{}, err
 	}
 
-	return types.ImageSaveOptions{
+	return options.ImageSave{
 		GOptions:     globalOptions,
 		AllPlatforms: allPlatforms,
 		Platform:     platform,

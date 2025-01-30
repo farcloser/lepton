@@ -38,7 +38,7 @@ import (
 	"github.com/containerd/platforms"
 
 	"github.com/containerd/nerdctl/v2/leptonic/errs"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/errutil"
 	"github.com/containerd/nerdctl/v2/pkg/idutil/imagewalker"
 	"github.com/containerd/nerdctl/v2/pkg/imgutil/dockerconfigresolver"
@@ -104,7 +104,7 @@ func GetExistingImage(ctx context.Context, client *containerd.Client, snapshotte
 // EnsureImage ensures the image.
 //
 // # When insecure is set, skips verifying certs, and also falls back to HTTP when the registry does not speak HTTPS
-func EnsureImage(ctx context.Context, client *containerd.Client, rawRef string, options types.ImagePullOptions) (*EnsuredImage, error) {
+func EnsureImage(ctx context.Context, client *containerd.Client, rawRef string, options options.ImagePull) (*EnsuredImage, error) {
 	switch options.Mode {
 	case "always", "missing", "never":
 		// NOP
@@ -191,7 +191,7 @@ func ResolveDigest(ctx context.Context, rawRef string, insecure bool, hostsDirs 
 }
 
 // PullImage pulls an image using the specified resolver.
-func PullImage(ctx context.Context, client *containerd.Client, resolver remotes.Resolver, ref string, options types.ImagePullOptions) (*EnsuredImage, error) {
+func PullImage(ctx context.Context, client *containerd.Client, resolver remotes.Resolver, ref string, options options.ImagePull) (*EnsuredImage, error) {
 	ctx, done, err := client.WithLease(ctx)
 	if err != nil {
 		return nil, err

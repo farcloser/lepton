@@ -21,13 +21,13 @@ import (
 
 	containerd "github.com/containerd/containerd/v2/client"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/imgutil"
 	"github.com/containerd/nerdctl/v2/pkg/signutil"
 )
 
 // Pull pulls an image specified by `rawRef`.
-func Pull(ctx context.Context, client *containerd.Client, rawRef string, options types.ImagePullOptions) error {
+func Pull(ctx context.Context, client *containerd.Client, rawRef string, options options.ImagePull) error {
 	_, err := EnsureImage(ctx, client, rawRef, options)
 	if err != nil {
 		return err
@@ -37,7 +37,7 @@ func Pull(ctx context.Context, client *containerd.Client, rawRef string, options
 }
 
 // EnsureImage pulls an image from registry.
-func EnsureImage(ctx context.Context, client *containerd.Client, rawRef string, options types.ImagePullOptions) (*imgutil.EnsuredImage, error) {
+func EnsureImage(ctx context.Context, client *containerd.Client, rawRef string, options options.ImagePull) (*imgutil.EnsuredImage, error) {
 	var ensured *imgutil.EnsuredImage
 
 	ref, err := signutil.Verify(ctx, rawRef, options.GOptions.HostsDir, options.GOptions.Experimental, options.VerifyOptions)

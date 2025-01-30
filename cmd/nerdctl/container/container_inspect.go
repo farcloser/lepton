@@ -24,7 +24,7 @@ import (
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 )
@@ -58,7 +58,7 @@ var validModeType = map[string]bool{
 	"dockercompat": true,
 }
 
-func ProcessContainerInspectOptions(cmd *cobra.Command) (opt types.ContainerInspectOptions, err error) {
+func ProcessContainerInspectOptions(cmd *cobra.Command) (opt options.ContainerInspect, err error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return
@@ -81,7 +81,7 @@ func ProcessContainerInspectOptions(cmd *cobra.Command) (opt types.ContainerInsp
 		return
 	}
 
-	return types.ContainerInspectOptions{
+	return options.ContainerInspect{
 		GOptions: globalOptions,
 		Format:   format,
 		Mode:     mode,

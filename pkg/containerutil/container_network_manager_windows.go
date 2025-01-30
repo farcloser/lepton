@@ -25,7 +25,7 @@ import (
 	"github.com/containerd/containerd/v2/pkg/oci"
 	"github.com/containerd/go-cni"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/netutil"
 	"github.com/containerd/nerdctl/v2/pkg/ocihook"
 )
@@ -127,7 +127,7 @@ func (m *cniNetworkManager) CleanupNetworking(ctx context.Context, container con
 }
 
 // Returns the set of NetworkingOptions which should be set as labels on the container.
-func (m *cniNetworkManager) InternalNetworkingOptionLabels(_ context.Context) (types.NetworkOptions, error) {
+func (m *cniNetworkManager) InternalNetworkingOptionLabels(_ context.Context) (options.ContainerNetwork, error) {
 	return m.netOpts, nil
 }
 

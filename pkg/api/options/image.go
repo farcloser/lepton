@@ -14,21 +14,19 @@
    limitations under the License.
 */
 
-package types
+package options
 
 import (
 	"io"
 
 	"go.farcloser.world/containers/specs"
-
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
 )
 
-// ImageListOptions specifies options for `image list`.
-type ImageListOptions struct {
+// ImageList specifies options for `image list`.
+type ImageList struct {
 	Stdout io.Writer
 	// GOptions is the global options
-	GOptions *options.Global
+	GOptions *Global
 	// Quiet only show numeric IDs
 	Quiet bool
 	// NoTrunc don't truncate output
@@ -47,10 +45,10 @@ type ImageListOptions struct {
 	All bool
 }
 
-// ImageConvertOptions specifies options for `image convert`.
-type ImageConvertOptions struct {
+// ImageConvert specifies options for `image convert`.
+type ImageConvert struct {
 	Stdout   io.Writer
-	GOptions *options.Global
+	GOptions *Global
 
 	// #region generic flags
 	// Uncompress convert tar.gz layers to uncompressed tar layers
@@ -88,10 +86,10 @@ type ImageConvertOptions struct {
 	// #endregion
 }
 
-// ImageCryptOptions specifies options for `image encrypt` and `image decrypt`.
-type ImageCryptOptions struct {
+// ImageCrypt specifies options for `image encrypt` and `image decrypt`.
+type ImageCrypt struct {
 	Stdout   io.Writer
-	GOptions *options.Global
+	GOptions *Global
 	// Platforms convert content for a specific platform
 	Platforms []string
 	// AllPlatforms convert content for all platforms
@@ -108,10 +106,10 @@ type ImageCryptOptions struct {
 	Recipients []string
 }
 
-// ImageInspectOptions specifies options for `image inspect`.
-type ImageInspectOptions struct {
+// ImageInspect specifies options for `image inspect`.
+type ImageInspect struct {
 	Stdout   io.Writer
-	GOptions *options.Global
+	GOptions *Global
 	// Mode Inspect mode, "dockercompat" for Docker-compatible output, "native" for containerd-native output
 	Mode string
 	// Format the output using the given Go template, e.g, 'json'
@@ -120,12 +118,12 @@ type ImageInspectOptions struct {
 	Platform string
 }
 
-// ImagePushOptions specifies options for `(image) push`.
-type ImagePushOptions struct {
+// ImagePush specifies options for `(image) push`.
+type ImagePush struct {
 	Stdout      io.Writer
-	GOptions    *options.Global
-	SignOptions ImageSignOptions
-	SociOptions SociOptions
+	GOptions    *Global
+	SignOptions ImageSign
+	SociOptions Soci
 	// Platforms convert content for a specific platform
 	Platforms []string
 	// AllPlatforms convert content for all platforms
@@ -143,15 +141,15 @@ type RemoteSnapshotterFlags struct {
 	SociIndexDigest string
 }
 
-// ImagePullOptions specifies options for `(image) pull`.
-type ImagePullOptions struct {
+// ImagePull specifies options for `(image) pull`.
+type ImagePull struct {
 	Stdout io.Writer
 	Stderr io.Writer
 	// ProgressOutputToStdout directs progress output to stdout instead of stderr
 	ProgressOutputToStdout bool
 
-	GOptions      *options.Global
-	VerifyOptions ImageVerifyOptions
+	GOptions      *Global
+	VerifyOptions ImageVerify
 	// Unpack the image for the current single platform.
 	// If nil, it will unpack automatically if only 1 platform is specified.
 	Unpack *bool
@@ -165,32 +163,32 @@ type ImagePullOptions struct {
 	RFlags RemoteSnapshotterFlags
 }
 
-// ImageTagOptions specifies options for `(image) tag`.
-type ImageTagOptions struct {
+// ImageTag specifies options for `(image) tag`.
+type ImageTag struct {
 	// GOptions is the global options
-	GOptions *options.Global
+	GOptions *Global
 	// Source is the image to be referenced.
 	Source string
 	// Target is the image to be created.
 	Target string
 }
 
-// ImageRemoveOptions specifies options for `rmi` and `image rm`.
-type ImageRemoveOptions struct {
+// ImageRemove specifies options for `rmi` and `image rm`.
+type ImageRemove struct {
 	Stdout io.Writer
 	// GOptions is the global options
-	GOptions *options.Global
+	GOptions *Global
 	// Force removal of the image
 	Force bool
 	// Async asynchronous mode or not
 	Async bool
 }
 
-// ImagePruneOptions specifies options for `image prune` and `image rm`.
-type ImagePruneOptions struct {
+// ImagePrune specifies options for `image prune` and `image rm`.
+type ImagePrune struct {
 	Stdout io.Writer
 	// GOptions is the global options.
-	GOptions *options.Global
+	GOptions *Global
 	// All Remove all unused images, not just dangling ones.
 	All bool
 	// Filters output based on conditions provided for the --filter argument
@@ -199,19 +197,19 @@ type ImagePruneOptions struct {
 	Force bool
 }
 
-// ImageSaveOptions specifies options for `(image) save`.
-type ImageSaveOptions struct {
+// ImageSave specifies options for `(image) save`.
+type ImageSave struct {
 	Stdout   io.Writer
-	GOptions *options.Global
+	GOptions *Global
 	// Export content for all platforms
 	AllPlatforms bool
 	// Export content for a specific platform
 	Platform []string
 }
 
-// ImageSignOptions contains options for signing an image. It contains options from
+// ImageSign contains options for signing an image. It contains options from
 // all providers. The `provider` field determines which provider is used.
-type ImageSignOptions struct {
+type ImageSign struct {
 	// Provider used to sign the image (none|cosign|notation)
 	Provider string
 	// CosignKey Path to the private key file, KMS URI or Kubernetes Secret for --sign=cosign
@@ -220,9 +218,9 @@ type ImageSignOptions struct {
 	NotationKeyName string
 }
 
-// ImageVerifyOptions contains options for verifying an image. It contains options from
+// ImageVerify contains options for verifying an image. It contains options from
 // all providers. The `provider` field determines which provider is used.
-type ImageVerifyOptions struct {
+type ImageVerify struct {
 	// Provider used to verify the image (none|cosign|notation)
 	Provider string
 	// CosignKey Path to the public key file, KMS URI or Kubernetes Secret for --verify=cosign
@@ -237,10 +235,25 @@ type ImageVerifyOptions struct {
 	CosignCertificateOidcIssuerRegexp string
 }
 
-// SociOptions contains options for SOCI.
-type SociOptions struct {
+// Soci contains options for SOCI.
+type Soci struct {
 	// Span size that soci index uses to segment layer data. Default is 4 MiB.
 	SpanSize int64
 	// Minimum layer size to build zTOC for. Smaller layers won't have zTOC and not lazy pulled. Default is 10 MiB.
 	MinLayerSize int64
+}
+
+// ImageLoad specifies options for `(image) load`.
+type ImageLoad struct {
+	Stdout   io.Writer
+	Stdin    io.Reader
+	GOptions *Global
+	// Input read from tar archive file, instead of STDIN
+	Input string
+	// Platform import content for a specific platform
+	Platform []string
+	// AllPlatforms import content for all platforms
+	AllPlatforms bool
+	// Quiet suppresses the load output.
+	Quiet bool
 }

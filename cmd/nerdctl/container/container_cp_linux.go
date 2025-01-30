@@ -25,7 +25,7 @@ import (
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
 )
@@ -80,37 +80,37 @@ func cpAction(cmd *cobra.Command, args []string) error {
 	return container.Cp(ctx, cli, options)
 }
 
-func processCpOptions(cmd *cobra.Command, args []string) (types.ContainerCpOptions, error) {
+func processCpOptions(cmd *cobra.Command, args []string) (options.ContainerCp, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return types.ContainerCpOptions{}, err
+		return options.ContainerCp{}, err
 	}
 	flagL, err := cmd.Flags().GetBool("follow-link")
 	if err != nil {
-		return types.ContainerCpOptions{}, err
+		return options.ContainerCp{}, err
 	}
 
 	srcSpec, err := parseCpFileSpec(args[0])
 	if err != nil {
-		return types.ContainerCpOptions{}, err
+		return options.ContainerCp{}, err
 	}
 
 	destSpec, err := parseCpFileSpec(args[1])
 	if err != nil {
-		return types.ContainerCpOptions{}, err
+		return options.ContainerCp{}, err
 	}
 
 	if (srcSpec.Container != nil && destSpec.Container != nil) || (len(srcSpec.Path) == 0 && len(destSpec.Path) == 0) {
-		return types.ContainerCpOptions{}, errors.New("one of src or dest must be a local file specification")
+		return options.ContainerCp{}, errors.New("one of src or dest must be a local file specification")
 	}
 	if srcSpec.Container == nil && destSpec.Container == nil {
-		return types.ContainerCpOptions{}, errors.New("one of src or dest must be a container file specification")
+		return options.ContainerCp{}, errors.New("one of src or dest must be a container file specification")
 	}
 	if srcSpec.Path == "-" {
-		return types.ContainerCpOptions{}, errors.New("support for reading a tar archive from stdin is not implemented yet")
+		return options.ContainerCp{}, errors.New("support for reading a tar archive from stdin is not implemented yet")
 	}
 	if destSpec.Path == "-" {
-		return types.ContainerCpOptions{}, errors.New("support for writing a tar archive to stdout is not implemented yet")
+		return options.ContainerCp{}, errors.New("support for writing a tar archive to stdout is not implemented yet")
 	}
 
 	container2host := srcSpec.Container != nil
@@ -120,7 +120,7 @@ func processCpOptions(cmd *cobra.Command, args []string) (types.ContainerCpOptio
 	} else {
 		containerReq = *destSpec.Container
 	}
-	return types.ContainerCpOptions{
+	return options.ContainerCp{
 		GOptions:       globalOptions,
 		Container2Host: container2host,
 		ContainerReq:   containerReq,

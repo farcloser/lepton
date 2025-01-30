@@ -25,7 +25,7 @@ import (
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 )
 
@@ -56,39 +56,39 @@ The following containers are supported:
 	return logsCommand
 }
 
-func processContainerLogsOptions(cmd *cobra.Command) (types.ContainerLogsOptions, error) {
+func processContainerLogsOptions(cmd *cobra.Command) (options.ContainerLogs, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return types.ContainerLogsOptions{}, err
+		return options.ContainerLogs{}, err
 	}
 	follow, err := cmd.Flags().GetBool("follow")
 	if err != nil {
-		return types.ContainerLogsOptions{}, err
+		return options.ContainerLogs{}, err
 	}
 	tailArg, err := cmd.Flags().GetString("tail")
 	if err != nil {
-		return types.ContainerLogsOptions{}, err
+		return options.ContainerLogs{}, err
 	}
 	var tail uint
 	if tailArg != "" {
 		tail, err = getTailArgAsUint(tailArg)
 		if err != nil {
-			return types.ContainerLogsOptions{}, err
+			return options.ContainerLogs{}, err
 		}
 	}
 	timestamps, err := cmd.Flags().GetBool("timestamps")
 	if err != nil {
-		return types.ContainerLogsOptions{}, err
+		return options.ContainerLogs{}, err
 	}
 	since, err := cmd.Flags().GetString("since")
 	if err != nil {
-		return types.ContainerLogsOptions{}, err
+		return options.ContainerLogs{}, err
 	}
 	until, err := cmd.Flags().GetString("until")
 	if err != nil {
-		return types.ContainerLogsOptions{}, err
+		return options.ContainerLogs{}, err
 	}
-	return types.ContainerLogsOptions{
+	return options.ContainerLogs{
 		Stdout:     cmd.OutOrStdout(),
 		Stderr:     cmd.OutOrStderr(),
 		GOptions:   globalOptions,

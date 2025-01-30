@@ -24,7 +24,7 @@ import (
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 	"github.com/containerd/nerdctl/v2/pkg/consoleutil"
 )
@@ -59,16 +59,16 @@ Caveats:
 	return attachCommand
 }
 
-func processContainerAttachOptions(cmd *cobra.Command) (types.ContainerAttachOptions, error) {
+func processContainerAttachOptions(cmd *cobra.Command) (options.ContainerAttach, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return types.ContainerAttachOptions{}, err
+		return options.ContainerAttach{}, err
 	}
 	detachKeys, err := cmd.Flags().GetString("detach-keys")
 	if err != nil {
-		return types.ContainerAttachOptions{}, err
+		return options.ContainerAttach{}, err
 	}
-	return types.ContainerAttachOptions{
+	return options.ContainerAttach{
 		GOptions:   globalOptions,
 		Stdin:      cmd.InOrStdin(),
 		Stdout:     cmd.OutOrStdout(),

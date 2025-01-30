@@ -29,7 +29,6 @@ import (
 	"github.com/containerd/platforms"
 
 	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/volume"
 	"github.com/containerd/nerdctl/v2/pkg/composer"
 	"github.com/containerd/nerdctl/v2/pkg/composer/serviceparser"
@@ -40,7 +39,7 @@ import (
 )
 
 // New returns a new *composer.Composer.
-func New(client *containerd.Client, globalOptions *options.Global, options composer.Options, stdout, stderr io.Writer) (*composer.Composer, error) {
+func New(client *containerd.Client, globalOptions *options.Global, opts *composer.Options, stdout, stderr io.Writer) (*composer.Composer, error) {
 	if err := composer.Lock(globalOptions.DataRoot, globalOptions.Address); err != nil {
 		return nil, err
 	}
@@ -53,7 +52,7 @@ func New(client *containerd.Client, globalOptions *options.Global, options compo
 	if err != nil {
 		return nil, err
 	}
-	options.NetworkExists = func(netName string) (bool, error) {
+	opts.NetworkExists = func(netName string) (bool, error) {
 		for _, f := range networkConfigs {
 			if f.Name == netName {
 				return true, nil
@@ -62,7 +61,7 @@ func New(client *containerd.Client, globalOptions *options.Global, options compo
 		return false, nil
 	}
 
-	options.NetworkInUse = func(ctx context.Context, netName string) (bool, error) {
+	opts.NetworkInUse = func(ctx context.Context, netName string) (bool, error) {
 		networkUsedByNsMap, err := netutil.UsedNetworks(ctx, client)
 		if err != nil {
 			return false, err
@@ -80,9 +79,9 @@ func New(client *containerd.Client, globalOptions *options.Global, options compo
 		return nil, err
 	}
 	// FIXME: this is racy. See note in up_volume.go
-	options.VolumeExists = volStore.Exists
+	opts.VolumeExists = volStore.Exists
 
-	options.ImageExists = func(ctx context.Context, rawRef string) (bool, error) {
+	opts.ImageExists = func(ctx context.Context, rawRef string) (bool, error) {
 		parsedReference, err := reference.Parse(rawRef)
 		if err != nil {
 			return false, err
@@ -97,7 +96,7 @@ func New(client *containerd.Client, globalOptions *options.Global, options compo
 		return true, nil
 	}
 
-	options.EnsureImage = func(ctx context.Context, imageName, pullMode, platform string, ps *serviceparser.Service, quiet bool) error {
+	opts.EnsureImage = func(ctx context.Context, imageName, pullMode, platform string, ps *serviceparser.Service, quiet bool) error {
 		ocispecPlatforms := []specs.Platform{platforms.DefaultSpec()}
 		if platform != "" {
 			parsed, err := platforms.Parse(platform)
@@ -107,13 +106,13 @@ func New(client *containerd.Client, globalOptions *options.Global, options compo
 			ocispecPlatforms = []specs.Platform{parsed} // no append
 		}
 
-		imgPullOpts := types.ImagePullOptions{
+		imgPullOpts := options.ImagePull{
 			GOptions:        globalOptions,
 			OCISpecPlatform: ocispecPlatforms,
 			Unpack:          nil,
 			Mode:            pullMode,
 			Quiet:           quiet,
-			RFlags:          types.RemoteSnapshotterFlags{},
+			RFlags:          options.RemoteSnapshotterFlags{},
 			Stdout:          stdout,
 			Stderr:          stderr,
 		}
@@ -128,11 +127,11 @@ func New(client *containerd.Client, globalOptions *options.Global, options compo
 		return err
 	}
 
-	return composer.New(options, client)
+	return composer.New(opts, client)
 }
 
-func imageVerifyOptionsFromCompose(ps *serviceparser.Service) types.ImageVerifyOptions {
-	var opt types.ImageVerifyOptions
+func imageVerifyOptionsFromCompose(ps *serviceparser.Service) options.ImageVerify {
+	var opt options.ImageVerify
 	if verifier, ok := ps.Unparsed.Extensions[serviceparser.ComposeVerify]; ok {
 		opt.Provider = verifier.(string)
 	} else {

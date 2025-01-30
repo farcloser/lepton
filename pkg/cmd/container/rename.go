@@ -24,7 +24,7 @@ import (
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/dnsutil/hostsstore"
 	"github.com/containerd/nerdctl/v2/pkg/idutil/containerwalker"
@@ -35,7 +35,7 @@ import (
 // Rename change container name to a new name
 // containerID is container name, short ID, or long ID
 func Rename(ctx context.Context, client *containerd.Client, containerID, newContainerName string,
-	options types.ContainerRenameOptions) error {
+	options options.ContainerRename) error {
 	dataStore, err := clientutil.DataStore(options.GOptions.DataRoot, options.GOptions.Address)
 	if err != nil {
 		return err

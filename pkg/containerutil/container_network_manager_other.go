@@ -26,7 +26,7 @@ import (
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/pkg/oci"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 )
 
 type cniNetworkManagerPlatform struct {
@@ -49,7 +49,7 @@ func (m *cniNetworkManager) CleanupNetworking(_ context.Context, _ containerd.Co
 }
 
 // Returns the set of NetworkingOptions which should be set as labels on the container.
-func (m *cniNetworkManager) InternalNetworkingOptionLabels(_ context.Context) (types.NetworkOptions, error) {
+func (m *cniNetworkManager) InternalNetworkingOptionLabels(_ context.Context) (options.ContainerNetwork, error) {
 	return m.netOpts, fmt.Errorf("CNI networking currently unsupported on %s", runtime.GOOS)
 }
 

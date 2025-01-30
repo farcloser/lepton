@@ -14,14 +14,14 @@
    limitations under the License.
 */
 
-package types
+package options
 
 import (
 	"github.com/containerd/go-cni"
 )
 
-// NetworkOptions struct defining networking-related options.
-type NetworkOptions struct {
+// ContainerNetwork struct defining networking-related options.
+type ContainerNetwork struct {
 	// NetworkSlice specifies the networking mode for the container, default is "bridge"
 	NetworkSlice []string
 	// MACAddress set container MAC address (e.g., 92:d0:c6:0a:29:33)

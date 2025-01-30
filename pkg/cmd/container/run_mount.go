@@ -41,7 +41,7 @@ import (
 	"github.com/containerd/errdefs"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/idgen"
 	"github.com/containerd/nerdctl/v2/pkg/imgutil"
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
@@ -91,7 +91,7 @@ func withMounts(mounts []specs.Mount) oci.SpecOpts {
 }
 
 // parseMountFlags parses --volume, --mount and --tmpfs.
-func parseMountFlags(volStore volumestore.VolumeStore, options types.ContainerCreateOptions) ([]*mountutil.Processed, error) {
+func parseMountFlags(volStore volumestore.VolumeStore, options *options.ContainerCreate) ([]*mountutil.Processed, error) {
 	var parsed []*mountutil.Processed //nolint:prealloc
 	for _, v := range strutil.DedupeStrSlice(options.Volume) {
 		// createDir=true for -v option to allow creation of directory on host if not found.
@@ -124,7 +124,7 @@ func parseMountFlags(volStore volumestore.VolumeStore, options types.ContainerCr
 // generateMountOpts generates volume-related mount opts.
 // Other mounts such as procfs mount are not handled here.
 func generateMountOpts(ctx context.Context, client *containerd.Client, ensuredImage *imgutil.EnsuredImage,
-	volStore volumestore.VolumeStore, options types.ContainerCreateOptions) ([]oci.SpecOpts, []string, []*mountutil.Processed, error) {
+	volStore volumestore.VolumeStore, options *options.ContainerCreate) ([]oci.SpecOpts, []string, []*mountutil.Processed, error) {
 	//nolint:golint,prealloc
 	var (
 		opts        []oci.SpecOpts

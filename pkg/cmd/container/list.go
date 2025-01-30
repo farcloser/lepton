@@ -32,7 +32,7 @@ import (
 	"github.com/containerd/errdefs"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/containerdutil"
 	"github.com/containerd/nerdctl/v2/pkg/containerutil"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
@@ -41,7 +41,7 @@ import (
 )
 
 // List prints containers according to `options`.
-func List(ctx context.Context, client *containerd.Client, options types.ContainerListOptions) ([]ListItem, error) {
+func List(ctx context.Context, client *containerd.Client, options options.ContainerList) ([]ListItem, error) {
 	containers, cMap, err := filterContainers(ctx, client, options.Filters, options.LastN, options.All)
 	if err != nil {
 		return nil, err
@@ -133,7 +133,7 @@ func (x *ListItem) Label(s string) string {
 	return x.LabelsMap[s]
 }
 
-func prepareContainers(ctx context.Context, client *containerd.Client, containers []containerd.Container, statusPerContainer map[string]string, options types.ContainerListOptions) ([]ListItem, error) {
+func prepareContainers(ctx context.Context, client *containerd.Client, containers []containerd.Container, statusPerContainer map[string]string, options options.ContainerList) ([]ListItem, error) {
 	listItems := make([]ListItem, len(containers))
 	snapshottersCache := map[string]snapshots.Snapshotter{}
 	for i, c := range containers {

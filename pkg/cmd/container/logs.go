@@ -27,7 +27,7 @@ import (
 	"github.com/containerd/errdefs"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/api/types/cri"
 	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/idutil/containerwalker"
@@ -36,7 +36,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/logging"
 )
 
-func Logs(ctx context.Context, client *containerd.Client, container string, options types.ContainerLogsOptions) error {
+func Logs(ctx context.Context, client *containerd.Client, container string, options options.ContainerLogs) error {
 	dataStore, err := clientutil.DataStore(options.GOptions.DataRoot, options.GOptions.Address)
 	if err != nil {
 		return err

@@ -30,7 +30,7 @@ import (
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/pkg/annotations"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/clientutil"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 	"github.com/containerd/nerdctl/v2/pkg/consoleutil"
@@ -282,7 +282,7 @@ func setCreateFlags(cmd *cobra.Command) {
 
 }
 
-func processCreateCommandFlagsInRun(cmd *cobra.Command) (types.ContainerCreateOptions, error) {
+func processCreateCommandFlagsInRun(cmd *cobra.Command) (*options.ContainerCreate, error) {
 	opt, err := processContainerCreateOptions(cmd)
 	if err != nil {
 		return opt, err

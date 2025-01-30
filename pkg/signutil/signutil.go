@@ -23,11 +23,11 @@ import (
 
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 )
 
 // Sign signs an image using a signer and options provided in options.
-func Sign(rawRef string, experimental bool, options types.ImageSignOptions) error {
+func Sign(rawRef string, experimental bool, options options.ImageSign) error {
 	switch options.Provider {
 	case "cosign":
 		if !experimental {
@@ -54,7 +54,7 @@ func Sign(rawRef string, experimental bool, options types.ImageSignOptions) erro
 }
 
 // Verify verifies an image using a verifier and options provided in options.
-func Verify(ctx context.Context, rawRef string, hostsDirs []string, experimental bool, options types.ImageVerifyOptions) (ref string, err error) {
+func Verify(ctx context.Context, rawRef string, hostsDirs []string, experimental bool, options options.ImageVerify) (ref string, err error) {
 	switch options.Provider {
 	case "cosign":
 		if !experimental {

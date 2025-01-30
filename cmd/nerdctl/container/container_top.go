@@ -27,7 +27,7 @@ import (
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
 )
@@ -63,7 +63,7 @@ func topAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	defer cancel()
-	return container.Top(ctx, cli, args, types.ContainerTopOptions{
+	return container.Top(ctx, cli, args, options.ContainerTop{
 		Stdout:   cmd.OutOrStdout(),
 		GOptions: globalOptions,
 	})

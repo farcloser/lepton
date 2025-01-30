@@ -33,7 +33,7 @@ import (
 	"github.com/containerd/errdefs"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
 	"github.com/containerd/nerdctl/v2/pkg/tarutil"
 )
@@ -84,7 +84,7 @@ func getRoot(ctx context.Context, container containerd.Container) (string, int, 
 // - tar binary exists on the system
 // - nsenter binary exists on the system
 // - if rootless, the container is running (aka: /proc/pid/root)
-func CopyFiles(ctx context.Context, client *containerd.Client, container containerd.Container, options types.ContainerCpOptions) (err error) {
+func CopyFiles(ctx context.Context, client *containerd.Client, container containerd.Container, options options.ContainerCp) (err error) {
 	// We do rely on the tar binary as a shortcut - could also be replaced by archive/tar, though that would mean
 	// we need to replace nsenter calls with re-exec
 	tarBinary, isGNUTar, err := tarutil.FindTarBinary()

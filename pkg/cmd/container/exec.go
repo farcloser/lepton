@@ -29,7 +29,7 @@ import (
 	"github.com/containerd/containerd/v2/pkg/cio"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/consoleutil"
 	"github.com/containerd/nerdctl/v2/pkg/flagutil"
 	"github.com/containerd/nerdctl/v2/pkg/idgen"
@@ -39,7 +39,7 @@ import (
 )
 
 // Exec will find the right running container to run a new command.
-func Exec(ctx context.Context, client *containerd.Client, args []string, options types.ContainerExecOptions) error {
+func Exec(ctx context.Context, client *containerd.Client, args []string, options options.ContainerExec) error {
 	walker := &containerwalker.ContainerWalker{
 		Client: client,
 		OnFound: func(ctx context.Context, found containerwalker.Found) error {
@@ -59,7 +59,7 @@ func Exec(ctx context.Context, client *containerd.Client, args []string, options
 	return nil
 }
 
-func execActionWithContainer(ctx context.Context, client *containerd.Client, container containerd.Container, args []string, options types.ContainerExecOptions) error {
+func execActionWithContainer(ctx context.Context, client *containerd.Client, container containerd.Container, args []string, options options.ContainerExec) error {
 	pspec, err := generateExecProcessSpec(ctx, client, container, args, options)
 	if err != nil {
 		return err
@@ -143,7 +143,7 @@ func execActionWithContainer(ctx context.Context, client *containerd.Client, con
 	return nil
 }
 
-func generateExecProcessSpec(ctx context.Context, client *containerd.Client, container containerd.Container, args []string, options types.ContainerExecOptions) (*specs.Process, error) {
+func generateExecProcessSpec(ctx context.Context, client *containerd.Client, container containerd.Container, args []string, options options.ContainerExec) (*specs.Process, error) {
 	spec, err := container.Spec(ctx)
 	if err != nil {
 		return nil, err
