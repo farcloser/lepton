@@ -58,12 +58,12 @@ func topAction(cmd *cobra.Command, args []string) error {
 	if globalOptions.CgroupManager == cgroups.NoneManager {
 		return errors.New("cgroup manager must not be \"none\"")
 	}
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
+	cli, ctx, cancel, err := clientutil.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
-	return container.Top(ctx, client, args, types.ContainerTopOptions{
+	return container.Top(ctx, cli, args, types.ContainerTopOptions{
 		Stdout:   cmd.OutOrStdout(),
 		GOptions: globalOptions,
 	})

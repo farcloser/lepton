@@ -135,13 +135,13 @@ func execAction(cmd *cobra.Command, args []string) error {
 		args = newArg
 	}
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	return container.Exec(ctx, client, args, options)
+	return container.Exec(ctx, cli, args, options)
 }
 
 func execShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {

@@ -95,11 +95,11 @@ func imageInspectAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	client, ctx, cancel, err := clientutil.NewClientWithPlatform(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address, options.Platform)
+	cli, ctx, cancel, err := clientutil.NewClientWithPlatform(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address, options.Platform)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	return image.Inspect(ctx, client, args, options)
+	return image.Inspect(ctx, cli, args, options)
 }

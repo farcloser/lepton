@@ -262,13 +262,13 @@ func buildAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	return builder.Build(ctx, client, options)
+	return builder.Build(ctx, cli, options)
 }
 
 // canonicalizeAttest is from https://github.com/docker/buildx/blob/v0.12/util/buildflags/attests.go##L13-L21

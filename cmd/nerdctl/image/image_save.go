@@ -97,13 +97,13 @@ func saveAction(cmd *cobra.Command, args []string) error {
 	}
 	options.Stdout = output
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	if err = image.Save(ctx, client, args, options); err != nil && outputPath != "" {
+	if err = image.Save(ctx, cli, args, options); err != nil && outputPath != "" {
 		os.Remove(outputPath)
 	}
 	return err

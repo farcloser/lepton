@@ -96,7 +96,7 @@ func updateAction(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
+	cli, ctx, cancel, err := clientutil.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
 	if err != nil {
 		return err
 	}
@@ -106,12 +106,12 @@ func updateAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	walker := &containerwalker.ContainerWalker{
-		Client: client,
+		Client: cli,
 		OnFound: func(ctx context.Context, found containerwalker.Found) error {
 			if found.MatchCount > 1 {
 				return fmt.Errorf("multiple IDs found with provided prefix: %s", found.Req)
 			}
-			err = updateContainer(ctx, client, found.Container.ID(), options, cmd)
+			err = updateContainer(ctx, cli, found.Container.ID(), options, cmd)
 			return err
 		},
 	}
@@ -242,8 +242,8 @@ func getUpdateOption(cmd *cobra.Command, globalOptions types.Global) (updateReso
 	return options, nil
 }
 
-func updateContainer(ctx context.Context, client *containerd.Client, id string, opts updateResourceOptions, cmd *cobra.Command) (retErr error) {
-	container, err := client.LoadContainer(ctx, id)
+func updateContainer(ctx context.Context, cli *containerd.Client, id string, opts updateResourceOptions, cmd *cobra.Command) (retErr error) {
+	container, err := cli.LoadContainer(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -358,7 +358,7 @@ func updateContainer(ctx context.Context, client *containerd.Client, id string, 
 		return err
 	}
 	if cmd.Flags().Changed("restart") && restart != "" {
-		if err := nerdctlContainer.UpdateContainerRestartPolicyLabel(ctx, client, container, restart); err != nil {
+		if err := nerdctlContainer.UpdateContainerRestartPolicyLabel(ctx, cli, container, restart); err != nil {
 			return err
 		}
 	}
@@ -380,7 +380,7 @@ func updateContainer(ctx context.Context, client *containerd.Client, id string, 
 }
 
 func updateContainerSpec(ctx context.Context, container containerd.Container, spec *specs.Spec) error {
-	if err := container.Update(ctx, func(ctx context.Context, client *containerd.Client, c *containers.Container) error {
+	if err := container.Update(ctx, func(ctx context.Context, cli *containerd.Client, c *containers.Container) error {
 		a, err := typeurl.MarshalAny(spec)
 		if err != nil {
 			return fmt.Errorf("failed to marshal spec %+v:%w", spec, err)

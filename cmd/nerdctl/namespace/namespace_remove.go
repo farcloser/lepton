@@ -74,14 +74,14 @@ func namespaceRmAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	client, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
 	if err != nil {
 		return err
 	}
 
 	defer cancel()
 
-	errs := namespace.Remove(ctx, client, args, options.CGroup)
+	errs := namespace.Remove(ctx, cli, args, options.CGroup)
 
 	if len(errs) > 0 {
 		for _, err = range errs {

@@ -89,23 +89,23 @@ func inspectAction(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("%q is not a valid value for --type", inspectType)
 	}
 
-	// container and image inspect can share the same client, since no `platform`
+	// container and image inspect can share the same cli, since no `platform`
 	// flag will be passed for image inspect.
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), namespace, address)
+	cli, ctx, cancel, err := clientutil.NewClient(cmd.Context(), namespace, address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
 	imagewalker := &imagewalker.ImageWalker{
-		Client: client,
+		Client: cli,
 		OnFound: func(ctx context.Context, found imagewalker.Found) error {
 			return nil
 		},
 	}
 
 	containerwalker := &containerwalker.ContainerWalker{
-		Client: client,
+		Client: cli,
 		OnFound: func(ctx context.Context, found containerwalker.Found) error {
 			return nil
 		},
@@ -151,11 +151,11 @@ func inspectAction(cmd *cobra.Command, args []string) error {
 		if ni == 0 && nc == 0 {
 			errs = append(errs, fmt.Errorf("no such object %s", req))
 		} else if ni > 0 {
-			if err := image.Inspect(ctx, client, []string{req}, imageInspectOptions); err != nil {
+			if err := image.Inspect(ctx, cli, []string{req}, imageInspectOptions); err != nil {
 				errs = append(errs, err)
 			}
 		} else if nc > 0 {
-			if err := container.Inspect(ctx, client, []string{req}, containerInspectOptions); err != nil {
+			if err := container.Inspect(ctx, cli, []string{req}, containerInspectOptions); err != nil {
 				errs = append(errs, err)
 			}
 		}

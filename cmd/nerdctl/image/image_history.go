@@ -84,21 +84,21 @@ func historyAction(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
+	cli, ctx, cancel, err := clientutil.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
 	walker := &imagewalker.ImageWalker{
-		Client: client,
+		Client: cli,
 		OnFound: func(ctx context.Context, found imagewalker.Found) error {
 			if found.MatchCount > 1 {
 				return fmt.Errorf("multiple IDs found with provided prefix: %s", found.Req)
 			}
 			ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 			defer cancel()
-			img := containerd.NewImage(client, found.Image)
+			img := containerd.NewImage(cli, found.Image)
 			imageConfig, _, err := imgutil.ReadImageConfig(ctx, img)
 			if err != nil {
 				return fmt.Errorf("failed to ReadImageConfig: %w", err)
@@ -120,7 +120,7 @@ func historyAction(cmd *cobra.Command, args []string) error {
 					diffIDs := diffIDs[0 : layerCounter+1]
 					chainID := specs.ChainID(diffIDs).String()
 
-					s := client.SnapshotService(globalOptions.Snapshotter)
+					s := cli.SnapshotService(globalOptions.Snapshotter)
 					stat, err := s.Stat(ctx, chainID)
 					if err != nil {
 						return fmt.Errorf("failed to get stat: %w", err)

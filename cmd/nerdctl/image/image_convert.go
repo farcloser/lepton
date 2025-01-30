@@ -172,13 +172,13 @@ func imageConvertAction(cmd *cobra.Command, args []string) error {
 	srcRawRef := args[0]
 	destRawRef := args[1]
 
-	client, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := clientutil.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	return image.Convert(ctx, client, srcRawRef, destRawRef, options)
+	return image.Convert(ctx, cli, srcRawRef, destRawRef, options)
 }
 
 func imageConvertShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {

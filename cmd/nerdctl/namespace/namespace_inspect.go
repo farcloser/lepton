@@ -93,14 +93,14 @@ func inspectAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	client, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
 	if err != nil {
 		return err
 	}
 
 	defer cancel()
 
-	namespaces, errs := namespace.Inspect(ctx, client, args)
+	namespaces, errs := namespace.Inspect(ctx, cli, args)
 	if len(errs) > 0 {
 		for _, err = range errs {
 			log.G(ctx).WithError(err).Error()
@@ -121,14 +121,14 @@ func inspectAction(cmd *cobra.Command, args []string) error {
 
 		nsCtx := namespace.NamespacedContext(ctx, ns.Name)
 
-		cntnrs, err := client.Containers(nsCtx)
+		cntnrs, err := cli.Containers(nsCtx)
 		if err != nil {
 			log.L.Warn(err)
 		}
 
 		entry.Containers = cntnrs
 
-		images, err := client.ImageService().List(nsCtx)
+		images, err := cli.ImageService().List(nsCtx)
 		if err != nil {
 			log.L.Warn(err)
 		}

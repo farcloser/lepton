@@ -336,7 +336,7 @@ func runAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	client, ctx, cancel, err := clientutil.NewClientWithPlatform(cmd.Context(), createOpt.GOptions.Namespace, createOpt.GOptions.Address, createOpt.Platform)
+	cli, ctx, cancel, err := clientutil.NewClientWithPlatform(cmd.Context(), createOpt.GOptions.Namespace, createOpt.GOptions.Address, createOpt.Platform)
 	if err != nil {
 		return err
 	}
@@ -355,12 +355,12 @@ func runAction(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to load networking flags: %w", err)
 	}
 
-	netManager, err := containerutil.NewNetworkingOptionsManager(createOpt.GOptions, netFlags, client)
+	netManager, err := containerutil.NewNetworkingOptionsManager(createOpt.GOptions, netFlags, cli)
 	if err != nil {
 		return err
 	}
 
-	c, gc, err := container.Create(ctx, client, args, netManager, createOpt)
+	c, gc, err := container.Create(ctx, cli, args, netManager, createOpt)
 	if err != nil {
 		if gc != nil {
 			defer gc()
@@ -383,7 +383,7 @@ func runAction(cmd *cobra.Command, args []string) error {
 			if err := netManager.CleanupNetworking(ctx, c); err != nil {
 				log.L.WithError(err).Warnf("failed to clean up container networking")
 			}
-			if err := container.RemoveContainer(ctx, c, createOpt.GOptions, true, true, client); err != nil {
+			if err := container.RemoveContainer(ctx, c, createOpt.GOptions, true, true, cli); err != nil {
 				log.L.WithError(err).Warnf("failed to remove container %s", id)
 			}
 		}()
@@ -407,7 +407,7 @@ func runAction(cmd *cobra.Command, args []string) error {
 	}
 	logURI := lab[labels.LogURI]
 	detachC := make(chan struct{})
-	task, err := taskutil.NewTask(ctx, client, c, createOpt.Attach, createOpt.Interactive, createOpt.TTY, createOpt.Detach,
+	task, err := taskutil.NewTask(ctx, cli, c, createOpt.Attach, createOpt.Interactive, createOpt.TTY, createOpt.Detach,
 		con, logURI, createOpt.DetachKeys, createOpt.GOptions.Namespace, detachC)
 	if err != nil {
 		return err
