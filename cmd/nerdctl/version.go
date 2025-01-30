@@ -28,7 +28,7 @@ import (
 	"github.com/containerd/log"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
+	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 	"github.com/containerd/nerdctl/v2/pkg/infoutil"
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
@@ -125,7 +125,7 @@ func versionInfo(cmd *cobra.Command, ns, address string) (dockercompat.VersionIn
 	if address == "" {
 		return v, nil
 	}
-	cli, ctx, cancel, err := clientutil.NewClient(cmd.Context(), ns, address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), ns, address)
 	if err != nil {
 		return v, err
 	}
