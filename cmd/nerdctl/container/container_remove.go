@@ -26,12 +26,12 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 )
 
-func NewRmCommand() *cobra.Command {
+func RmCommand() *cobra.Command {
 	var rmCommand = &cobra.Command{
 		Use:               "rm [flags] CONTAINER [CONTAINER, ...]",
 		Args:              cobra.MinimumNArgs(1),
 		Short:             "Remove one or more containers",
-		RunE:              rmAction,
+		RunE:              removeAction,
 		ValidArgsFunction: rmShellComplete,
 		SilenceUsage:      true,
 		SilenceErrors:     true,
@@ -42,7 +42,7 @@ func NewRmCommand() *cobra.Command {
 	return rmCommand
 }
 
-func rmAction(cmd *cobra.Command, args []string) error {
+func removeAction(cmd *cobra.Command, args []string) error {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return err

@@ -29,7 +29,7 @@ func newComposeLogsCommand() *cobra.Command {
 	var composeLogsCommand = &cobra.Command{
 		Use:           "logs [flags] [SERVICE...]",
 		Short:         "Show logs of running containers",
-		RunE:          composeLogsAction,
+		RunE:          logsAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
@@ -41,7 +41,7 @@ func newComposeLogsCommand() *cobra.Command {
 	return composeLogsCommand
 }
 
-func composeLogsAction(cmd *cobra.Command, args []string) error {
+func logsAction(cmd *cobra.Command, args []string) error {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return err

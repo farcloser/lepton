@@ -22,7 +22,7 @@ import (
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 )
 
-func NewApparmorCommand() *cobra.Command {
+func Command() *cobra.Command {
 	cmd := &cobra.Command{
 		Annotations:   map[string]string{helpers.Category: helpers.Management},
 		Use:           "apparmor",
@@ -33,10 +33,10 @@ func NewApparmorCommand() *cobra.Command {
 	}
 
 	cmd.AddCommand(
-		newApparmorListCommand(),
-		newApparmorInspectCommand(),
-		newApparmorLoadCommand(),
-		newApparmorUnloadCommand(),
+		listCommand(),
+		inspectCommand(),
+		loadCommand(),
+		unloadCommand(),
 	)
 
 	return cmd

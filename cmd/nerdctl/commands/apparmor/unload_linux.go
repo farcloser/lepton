@@ -26,19 +26,19 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/defaults"
 )
 
-func newApparmorUnloadCommand() *cobra.Command {
+func unloadCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:               "unload [PROFILE]",
 		Short:             fmt.Sprintf("Unload an AppArmor profile. The target profile name defaults to %q. Requires root.", defaults.AppArmorProfileName),
 		Args:              cobra.MaximumNArgs(1),
-		RunE:              apparmorUnloadAction,
+		RunE:              unloadAction,
 		ValidArgsFunction: completion.ApparmorProfiles,
 		SilenceUsage:      true,
 		SilenceErrors:     true,
 	}
 }
 
-func apparmorUnloadAction(_ *cobra.Command, args []string) error {
+func unloadAction(_ *cobra.Command, args []string) error {
 	target := ""
 	if len(args) > 0 {
 		target = args[0]

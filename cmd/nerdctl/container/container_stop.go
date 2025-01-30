@@ -30,7 +30,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 )
 
-func NewStopCommand() *cobra.Command {
+func StopCommand() *cobra.Command {
 	var stopCommand = &cobra.Command{
 		Use:               "stop [flags] CONTAINER [CONTAINER, ...]",
 		Args:              cobra.MinimumNArgs(1),
@@ -44,7 +44,7 @@ func NewStopCommand() *cobra.Command {
 	return stopCommand
 }
 
-func processContainerStopOptions(cmd *cobra.Command) (options.ContainerStop, error) {
+func stopOptions(cmd *cobra.Command) (options.ContainerStop, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return options.ContainerStop{}, err
@@ -67,7 +67,7 @@ func processContainerStopOptions(cmd *cobra.Command) (options.ContainerStop, err
 }
 
 func stopAction(cmd *cobra.Command, args []string) error {
-	options, err := processContainerStopOptions(cmd)
+	options, err := stopOptions(cmd)
 	if err != nil {
 		return err
 	}

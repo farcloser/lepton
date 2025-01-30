@@ -28,7 +28,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 )
 
-func NewImagesCommand() *cobra.Command {
+func ImagesCommand() *cobra.Command {
 	shortHelp := "List images"
 	longHelp := shortHelp + `
 
@@ -69,7 +69,7 @@ Properties:
 	return imagesCommand
 }
 
-func processImageListOptions(cmd *cobra.Command, args []string) (*options.ImageList, error) {
+func listOptions(cmd *cobra.Command, args []string) (*options.ImageList, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return nil, err
@@ -125,7 +125,7 @@ func processImageListOptions(cmd *cobra.Command, args []string) (*options.ImageL
 }
 
 func imagesAction(cmd *cobra.Command, args []string) error {
-	options, err := processImageListOptions(cmd, args)
+	options, err := listOptions(cmd, args)
 	if err != nil {
 		return err
 	}

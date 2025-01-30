@@ -31,7 +31,7 @@ func newComposeConfigCommand() *cobra.Command {
 	var composeConfigCommand = &cobra.Command{
 		Use:           "config",
 		Short:         "Validate and view the Compose file",
-		RunE:          composeConfigAction,
+		RunE:          configAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
@@ -45,7 +45,7 @@ func newComposeConfigCommand() *cobra.Command {
 	return composeConfigCommand
 }
 
-func composeConfigAction(cmd *cobra.Command, args []string) error {
+func configAction(cmd *cobra.Command, args []string) error {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return err

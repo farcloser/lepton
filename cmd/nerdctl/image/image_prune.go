@@ -32,7 +32,7 @@ func newImagePruneCommand() *cobra.Command {
 		Use:           "prune [flags]",
 		Short:         "Remove unused images",
 		Args:          cobra.NoArgs,
-		RunE:          imagePruneAction,
+		RunE:          pruneAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
@@ -43,7 +43,7 @@ func newImagePruneCommand() *cobra.Command {
 	return imagePruneCommand
 }
 
-func processImagePruneOptions(cmd *cobra.Command) (options.ImagePrune, error) {
+func pruneOptions(cmd *cobra.Command) (options.ImagePrune, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return options.ImagePrune{}, err
@@ -75,8 +75,8 @@ func processImagePruneOptions(cmd *cobra.Command) (options.ImagePrune, error) {
 	}, err
 }
 
-func imagePruneAction(cmd *cobra.Command, _ []string) error {
-	options, err := processImagePruneOptions(cmd)
+func pruneAction(cmd *cobra.Command, _ []string) error {
+	options, err := pruneOptions(cmd)
 	if err != nil {
 		return err
 	}

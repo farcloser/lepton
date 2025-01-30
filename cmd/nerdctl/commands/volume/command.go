@@ -22,7 +22,7 @@ import (
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 )
 
-func NewVolumeCommand() *cobra.Command {
+func Command() *cobra.Command {
 	volumeCommand := &cobra.Command{
 		Annotations:   map[string]string{helpers.Category: helpers.Management},
 		Use:           "volume",
@@ -32,11 +32,11 @@ func NewVolumeCommand() *cobra.Command {
 		SilenceErrors: true,
 	}
 	volumeCommand.AddCommand(
-		newVolumeLsCommand(),
-		newVolumeInspectCommand(),
-		newVolumeCreateCommand(),
-		newVolumeRmCommand(),
-		newVolumePruneCommand(),
+		listCommand(),
+		inspectCommand(),
+		createCommand(),
+		removeCommand(),
+		pruneCommand(),
 	)
 	return volumeCommand
 }

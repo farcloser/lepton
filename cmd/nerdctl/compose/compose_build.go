@@ -29,7 +29,7 @@ func newComposeBuildCommand() *cobra.Command {
 	var composeBuildCommand = &cobra.Command{
 		Use:           "build [flags] [SERVICE...]",
 		Short:         "Build or rebuild services",
-		RunE:          composeBuildAction,
+		RunE:          buildAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
@@ -40,7 +40,7 @@ func newComposeBuildCommand() *cobra.Command {
 	return composeBuildCommand
 }
 
-func composeBuildAction(cmd *cobra.Command, args []string) error {
+func buildAction(cmd *cobra.Command, args []string) error {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return err

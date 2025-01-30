@@ -29,7 +29,7 @@ func newComposePullCommand() *cobra.Command {
 	var composePullCommand = &cobra.Command{
 		Use:           "pull [flags] [SERVICE...]",
 		Short:         "Pull service images",
-		RunE:          composePullAction,
+		RunE:          pullAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
@@ -37,7 +37,7 @@ func newComposePullCommand() *cobra.Command {
 	return composePullCommand
 }
 
-func composePullAction(cmd *cobra.Command, args []string) error {
+func pullAction(cmd *cobra.Command, args []string) error {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return err

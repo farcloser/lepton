@@ -48,7 +48,7 @@ const (
 	tiniInitBinary = "tini"
 )
 
-func NewRunCommand() *cobra.Command {
+func RunCommand() *cobra.Command {
 	shortHelp := "Run a command in a new container."
 	longHelp := shortHelp
 	if runtime.GOOS == "windows" {
@@ -283,7 +283,7 @@ func setCreateFlags(cmd *cobra.Command) {
 }
 
 func processCreateCommandFlagsInRun(cmd *cobra.Command) (*options.ContainerCreate, error) {
-	opt, err := processContainerCreateOptions(cmd)
+	opt, err := createOptions(cmd)
 	if err != nil {
 		return opt, err
 	}

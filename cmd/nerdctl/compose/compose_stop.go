@@ -29,7 +29,7 @@ func newComposeStopCommand() *cobra.Command {
 	var composeStopCommand = &cobra.Command{
 		Use:           "stop [flags] [SERVICE...]",
 		Short:         "Stop running containers without removing them.",
-		RunE:          composeStopAction,
+		RunE:          stopAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
@@ -37,7 +37,7 @@ func newComposeStopCommand() *cobra.Command {
 	return composeStopCommand
 }
 
-func composeStopAction(cmd *cobra.Command, args []string) error {
+func stopAction(cmd *cobra.Command, args []string) error {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return err

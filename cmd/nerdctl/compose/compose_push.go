@@ -29,14 +29,14 @@ func newComposePushCommand() *cobra.Command {
 	var composePushCommand = &cobra.Command{
 		Use:           "push [flags] [SERVICE...]",
 		Short:         "Push service images",
-		RunE:          composePushAction,
+		RunE:          pushAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
 	return composePushCommand
 }
 
-func composePushAction(cmd *cobra.Command, args []string) error {
+func pushAction(cmd *cobra.Command, args []string) error {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return err

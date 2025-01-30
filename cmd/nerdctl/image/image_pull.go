@@ -28,7 +28,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/strutil"
 )
 
-func NewPullCommand() *cobra.Command {
+func PullCommand() *cobra.Command {
 	var pullCommand = &cobra.Command{
 		Use:           "pull [flags] NAME[:TAG]",
 		Short:         "Pull an image from a registry.",

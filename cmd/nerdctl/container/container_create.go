@@ -30,7 +30,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/containerutil"
 )
 
-func NewCreateCommand() *cobra.Command {
+func CreateCommand() *cobra.Command {
 	shortHelp := "Create a new container."
 	longHelp := shortHelp
 	if runtime.GOOS == "windows" {
@@ -52,7 +52,7 @@ func NewCreateCommand() *cobra.Command {
 	return createCommand
 }
 
-func processContainerCreateOptions(cmd *cobra.Command) (*options.ContainerCreate, error) {
+func createOptions(cmd *cobra.Command) (*options.ContainerCreate, error) {
 	var err error
 	opt := &options.ContainerCreate{
 		Stdout: cmd.OutOrStdout(),
@@ -417,7 +417,7 @@ func processContainerCreateOptions(cmd *cobra.Command) (*options.ContainerCreate
 }
 
 func createAction(cmd *cobra.Command, args []string) error {
-	createOpt, err := processContainerCreateOptions(cmd)
+	createOpt, err := createOptions(cmd)
 	if err != nil {
 		return err
 	}

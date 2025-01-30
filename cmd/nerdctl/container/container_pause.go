@@ -28,7 +28,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 )
 
-func NewPauseCommand() *cobra.Command {
+func PauseCommand() *cobra.Command {
 	var pauseCommand = &cobra.Command{
 		Use:               "pause [flags] CONTAINER [CONTAINER, ...]",
 		Args:              cobra.MinimumNArgs(1),
@@ -41,7 +41,7 @@ func NewPauseCommand() *cobra.Command {
 	return pauseCommand
 }
 
-func processContainerPauseOptions(cmd *cobra.Command) (options.ContainerPause, error) {
+func pauseOptions(cmd *cobra.Command) (options.ContainerPause, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return options.ContainerPause{}, err
@@ -53,7 +53,7 @@ func processContainerPauseOptions(cmd *cobra.Command) (options.ContainerPause, e
 }
 
 func pauseAction(cmd *cobra.Command, args []string) error {
-	options, err := processContainerPauseOptions(cmd)
+	options, err := pauseOptions(cmd)
 	if err != nil {
 		return err
 	}

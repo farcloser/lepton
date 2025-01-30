@@ -43,7 +43,7 @@ func newComposeImagesCommand() *cobra.Command {
 	var composeImagesCommand = &cobra.Command{
 		Use:           "images [flags] [SERVICE...]",
 		Short:         "List images used by created containers in services",
-		RunE:          composeImagesAction,
+		RunE:          imagesAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
@@ -52,7 +52,7 @@ func newComposeImagesCommand() *cobra.Command {
 	return composeImagesCommand
 }
 
-func composeImagesAction(cmd *cobra.Command, args []string) error {
+func imagesAction(cmd *cobra.Command, args []string) error {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return err

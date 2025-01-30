@@ -30,7 +30,7 @@ func newComposeDownCommand() *cobra.Command {
 		Use:           "down",
 		Short:         "Remove containers and associated resources",
 		Args:          cobra.NoArgs,
-		RunE:          composeDownAction,
+		RunE:          downAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
@@ -39,7 +39,7 @@ func newComposeDownCommand() *cobra.Command {
 	return composeDownCommand
 }
 
-func composeDownAction(cmd *cobra.Command, args []string) error {
+func downAction(cmd *cobra.Command, args []string) error {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return err

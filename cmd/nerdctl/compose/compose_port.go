@@ -33,7 +33,7 @@ func newComposePortCommand() *cobra.Command {
 		Use:           "port [flags] SERVICE PRIVATE_PORT",
 		Short:         "Print the public port for a port binding",
 		Args:          cobra.ExactArgs(2),
-		RunE:          composePortAction,
+		RunE:          portAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
@@ -43,7 +43,7 @@ func newComposePortCommand() *cobra.Command {
 	return composePortCommand
 }
 
-func composePortAction(cmd *cobra.Command, args []string) error {
+func portAction(cmd *cobra.Command, args []string) error {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return err

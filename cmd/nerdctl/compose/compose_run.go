@@ -32,7 +32,7 @@ func newComposeRunCommand() *cobra.Command {
 		Use:                   "run [flags] SERVICE [COMMAND] [ARGS...]",
 		Short:                 "Run a one-off command on a service",
 		Args:                  cobra.MinimumNArgs(1),
-		RunE:                  composeRunAction,
+		RunE:                  runAction,
 		SilenceUsage:          true,
 		SilenceErrors:         true,
 		DisableFlagsInUseLine: true,
@@ -68,7 +68,7 @@ func newComposeRunCommand() *cobra.Command {
 	return composeRunCommand
 }
 
-func composeRunAction(cmd *cobra.Command, args []string) error {
+func runAction(cmd *cobra.Command, args []string) error {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return err

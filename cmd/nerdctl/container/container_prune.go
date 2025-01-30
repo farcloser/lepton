@@ -30,7 +30,7 @@ func newContainerPruneCommand() *cobra.Command {
 		Use:           "prune [flags]",
 		Short:         "Remove all stopped containers",
 		Args:          cobra.NoArgs,
-		RunE:          containerPruneAction,
+		RunE:          pruneAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
@@ -38,7 +38,7 @@ func newContainerPruneCommand() *cobra.Command {
 	return containerPruneCommand
 }
 
-func processContainerPruneOptions(cmd *cobra.Command) (options.ContainerPrune, error) {
+func pruneOptions(cmd *cobra.Command) (options.ContainerPrune, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return options.ContainerPrune{}, err
@@ -62,8 +62,8 @@ func grantPrunePermission(cmd *cobra.Command) (bool, error) {
 	return true, nil
 }
 
-func containerPruneAction(cmd *cobra.Command, _ []string) error {
-	options, err := processContainerPruneOptions(cmd)
+func pruneAction(cmd *cobra.Command, _ []string) error {
+	options, err := pruneOptions(cmd)
 	if err != nil {
 		return err
 	}

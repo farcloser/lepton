@@ -30,7 +30,7 @@ const (
 	allowNonDistFlag = "allow-nondistributable-artifacts"
 )
 
-func NewPushCommand() *cobra.Command {
+func PushCommand() *cobra.Command {
 	var pushCommand = &cobra.Command{
 		Use:               "push [flags] NAME[:TAG]",
 		Short:             "Push an image or a repository to a registry.",
@@ -68,7 +68,7 @@ func NewPushCommand() *cobra.Command {
 	return pushCommand
 }
 
-func processImagePushOptions(cmd *cobra.Command) (options.ImagePush, error) {
+func pushOptions(cmd *cobra.Command) (options.ImagePush, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return options.ImagePush{}, err
@@ -89,7 +89,7 @@ func processImagePushOptions(cmd *cobra.Command) (options.ImagePush, error) {
 	if err != nil {
 		return options.ImagePush{}, err
 	}
-	signOptions, err := processImageSignOptions(cmd)
+	signOptions, err := signOptions(cmd)
 	if err != nil {
 		return options.ImagePush{}, err
 	}
@@ -110,7 +110,7 @@ func processImagePushOptions(cmd *cobra.Command) (options.ImagePush, error) {
 }
 
 func pushAction(cmd *cobra.Command, args []string) error {
-	options, err := processImagePushOptions(cmd)
+	options, err := pushOptions(cmd)
 	if err != nil {
 		return err
 	}
@@ -130,7 +130,7 @@ func pushShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]
 	return completion.ImageNames(cmd, args, toComplete)
 }
 
-func processImageSignOptions(cmd *cobra.Command) (opt options.ImageSign, err error) {
+func signOptions(cmd *cobra.Command) (opt options.ImageSign, err error) {
 	if opt.Provider, err = cmd.Flags().GetString("sign"); err != nil {
 		return
 	}

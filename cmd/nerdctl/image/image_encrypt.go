@@ -51,7 +51,7 @@ func newImageEncryptCommand() *cobra.Command {
 		Short:             "encrypt image layers",
 		Long:              imageEncryptHelp,
 		Args:              cobra.MinimumNArgs(2),
-		RunE:              getImgcryptAction(true),
+		RunE:              imgcryptAction(true),
 		ValidArgsFunction: imgcryptShellComplete,
 		SilenceUsage:      true,
 		SilenceErrors:     true,
