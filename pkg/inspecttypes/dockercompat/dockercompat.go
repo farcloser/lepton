@@ -66,8 +66,7 @@ type Image struct {
 
 	// TODO: OsVersion     string `json:",omitempty"`
 
-	Size        int64 // Size is the unpacked size of the image
-	VirtualSize int64 `json:"VirtualSize,omitempty"` // Deprecated
+	Size int64 // Size is the unpacked size of the image
 
 	// TODO: GraphDriver	GraphDriverData
 
@@ -333,7 +332,6 @@ func ImageFromNative(nativeImage *native.Image) (*Image, error) {
 		Variant:      imgOCI.Platform.Variant,
 		Os:           imgOCI.OS,
 		Size:         nativeImage.Size,
-		VirtualSize:  nativeImage.Size,
 		RepoTags:     []string{fmt.Sprintf("%s:%s", repository, tag)},
 		RepoDigests:  []string{fmt.Sprintf("%s@%s", repository, nativeImage.Image.Target.Digest.String())},
 	}
