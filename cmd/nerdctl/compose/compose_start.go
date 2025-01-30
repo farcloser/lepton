@@ -24,7 +24,7 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
 
-	containerd "github.com/containerd/containerd/v2/client"
+	"github.com/containerd/containerd/v2/client"
 	"github.com/containerd/errdefs"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
@@ -94,7 +94,7 @@ func composeStartAction(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func startContainers(ctx context.Context, cli *containerd.Client, containers []containerd.Container) error {
+func startContainers(ctx context.Context, cli *client.Client, containers []client.Container) error {
 	eg, ctx := errgroup.WithContext(ctx)
 	for _, c := range containers {
 		c := c
@@ -107,7 +107,7 @@ func startContainers(ctx context.Context, cli *containerd.Client, containers []c
 				if !errdefs.IsNotFound(err) {
 					return err
 				}
-			} else if cStatus.Status == containerd.Running {
+			} else if cStatus.Status == client.Running {
 				return nil
 			}
 
@@ -115,7 +115,7 @@ func startContainers(ctx context.Context, cli *containerd.Client, containers []c
 			if err := containerutil.Start(ctx, c, false, cli, ""); err != nil {
 				return err
 			}
-			info, err := c.Info(ctx, containerd.WithoutRefreshedMetadata)
+			info, err := c.Info(ctx, client.WithoutRefreshedMetadata)
 			if err != nil {
 				return err
 			}

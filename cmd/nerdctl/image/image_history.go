@@ -32,7 +32,7 @@ import (
 	"go.farcloser.world/containers/specs"
 	"go.farcloser.world/core/units"
 
-	containerd "github.com/containerd/containerd/v2/client"
+	"github.com/containerd/containerd/v2/client"
 	"github.com/containerd/log"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
@@ -98,7 +98,7 @@ func historyAction(cmd *cobra.Command, args []string) error {
 			}
 			ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 			defer cancel()
-			img := containerd.NewImage(cli, found.Image)
+			img := client.NewImage(cli, found.Image)
 			imageConfig, _, err := imgutil.ReadImageConfig(ctx, img)
 			if err != nil {
 				return fmt.Errorf("failed to ReadImageConfig: %w", err)

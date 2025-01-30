@@ -26,7 +26,7 @@ import (
 	"github.com/spf13/cobra"
 	"go.farcloser.world/containers/specs"
 
-	containerd "github.com/containerd/containerd/v2/client"
+	"github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/leases"
 	"github.com/containerd/containerd/v2/core/mount"
 	"github.com/containerd/continuity/fs"
@@ -118,7 +118,7 @@ func diffAction(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func getChanges(ctx context.Context, cli *containerd.Client, container containerd.Container) ([]fs.Change, error) {
+func getChanges(ctx context.Context, cli *client.Client, container client.Container) ([]fs.Change, error) {
 	id := container.ID()
 	info, err := container.Info(ctx)
 	if err != nil {
@@ -152,7 +152,7 @@ func getChanges(ctx context.Context, cli *containerd.Client, container container
 	}
 	log.G(ctx).Debugf("ocispecPlatform=%q", platforms.Format(ocispecPlatform))
 	platformMC := platforms.Only(ocispecPlatform)
-	baseImg := containerd.NewImageWithPlatform(cli, baseImgWithoutPlatform, platformMC)
+	baseImg := client.NewImageWithPlatform(cli, baseImgWithoutPlatform, platformMC)
 
 	baseImgConfig, _, err := imgutil.ReadImageConfig(ctx, baseImg)
 	if err != nil {

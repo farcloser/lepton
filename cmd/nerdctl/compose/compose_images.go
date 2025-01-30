@@ -26,7 +26,7 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
 
-	containerd "github.com/containerd/containerd/v2/client"
+	"github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/snapshots"
 	"github.com/containerd/containerd/v2/pkg/progress"
 
@@ -104,7 +104,7 @@ func composeImagesAction(cmd *cobra.Command, args []string) error {
 	return printComposeImages(ctx, cmd, containers, sn, format)
 }
 
-func printComposeImageIDs(ctx context.Context, containers []containerd.Container) error {
+func printComposeImageIDs(ctx context.Context, containers []client.Container) error {
 	ids := []string{}
 	for _, c := range containers {
 		image, err := c.Image(ctx)
@@ -125,7 +125,7 @@ func printComposeImageIDs(ctx context.Context, containers []containerd.Container
 	return nil
 }
 
-func printComposeImages(ctx context.Context, cmd *cobra.Command, containers []containerd.Container, sn snapshots.Snapshotter, format string) error {
+func printComposeImages(ctx context.Context, cmd *cobra.Command, containers []client.Container, sn snapshots.Snapshotter, format string) error {
 	type composeImagePrintable struct {
 		ContainerName string
 		Repository    string
@@ -139,7 +139,7 @@ func printComposeImages(ctx context.Context, cmd *cobra.Command, containers []co
 	for i, c := range containers {
 		i, c := i, c
 		eg.Go(func() error {
-			info, err := c.Info(ctx, containerd.WithoutRefreshedMetadata)
+			info, err := c.Info(ctx, client.WithoutRefreshedMetadata)
 			if err != nil {
 				return err
 			}

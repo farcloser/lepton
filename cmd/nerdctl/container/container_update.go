@@ -28,7 +28,7 @@ import (
 	"go.farcloser.world/containers/specs"
 	"go.farcloser.world/core/units"
 
-	containerd "github.com/containerd/containerd/v2/client"
+	"github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/containers"
 	"github.com/containerd/errdefs"
 	"github.com/containerd/log"
@@ -242,7 +242,7 @@ func getUpdateOption(cmd *cobra.Command, globalOptions types.Global) (updateReso
 	return options, nil
 }
 
-func updateContainer(ctx context.Context, cli *containerd.Client, id string, opts updateResourceOptions, cmd *cobra.Command) (retErr error) {
+func updateContainer(ctx context.Context, cli *client.Client, id string, opts updateResourceOptions, cmd *cobra.Command) (retErr error) {
 	container, err := cli.LoadContainer(ctx, id)
 	if err != nil {
 		return err
@@ -376,11 +376,11 @@ func updateContainer(ctx context.Context, cli *containerd.Client, id string, opt
 		}
 		return fmt.Errorf("failed to get task:%w", err)
 	}
-	return task.Update(ctx, containerd.WithResources(spec.Linux.Resources))
+	return task.Update(ctx, client.WithResources(spec.Linux.Resources))
 }
 
-func updateContainerSpec(ctx context.Context, container containerd.Container, spec *specs.Spec) error {
-	if err := container.Update(ctx, func(ctx context.Context, cli *containerd.Client, c *containers.Container) error {
+func updateContainerSpec(ctx context.Context, container client.Container, spec *specs.Spec) error {
+	if err := container.Update(ctx, func(ctx context.Context, cli *client.Client, c *containers.Container) error {
 		a, err := typeurl.MarshalAny(spec)
 		if err != nil {
 			return fmt.Errorf("failed to marshal spec %+v:%w", spec, err)

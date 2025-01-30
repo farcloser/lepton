@@ -21,7 +21,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	containerd "github.com/containerd/containerd/v2/client"
+	"github.com/containerd/containerd/v2/client"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/pkg/api/types"
@@ -77,11 +77,11 @@ func composeTopAction(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return err
 		}
-		if cStatus.Status != containerd.Running {
+		if cStatus.Status != client.Running {
 			continue
 		}
 
-		info, err := c.Info(ctx, containerd.WithoutRefreshedMetadata)
+		info, err := c.Info(ctx, client.WithoutRefreshedMetadata)
 		if err != nil {
 			return err
 		}

@@ -21,7 +21,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	containerd "github.com/containerd/containerd/v2/client"
+	"github.com/containerd/containerd/v2/client"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
@@ -147,8 +147,8 @@ func execAction(cmd *cobra.Command, args []string) error {
 func execShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 	if len(args) == 0 {
 		// show running container names
-		statusFilterFn := func(st containerd.ProcessStatus) bool {
-			return st == containerd.Running
+		statusFilterFn := func(st client.ProcessStatus) bool {
+			return st == client.Running
 		}
 		return completion.ContainerNames(cmd, statusFilterFn)
 	}
