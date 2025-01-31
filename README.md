@@ -10,29 +10,33 @@ Requires:
 
 ## Project goals
 
+1. provide a ready-to-use library to easily build cli and applications communicating with containerd
+2. provide a reference cli implementation, comparable to the docker cli or to nerdctl
+3. primary focus is on stability and code quality, not on features
+
+## Detailed relationship with nerdctl, and current status
+
 Nerdctl objective is to provide a fully docker compatible experience with many advanced
 or experimental additional features.
 As a mature project, it is also conservatively (and rightfully) focused on backward compatibility.
 
 Lepton departs from this in a few important ways:
-- lepton is removing support for unstable or otherwise experimental, or lesser used features
-  - this is meant to reduce maintenance burden, simplify code and increase quality
 - docker cli compatibility is best-effort, and will be broken where it makes sense
 - before 1.0, there should be no expectation of backward compatibility - API will change,
-and only the latest versions of dependencies will be supported
+  and only the latest versions of dependencies will be supported
 - lepton is departing from the way nerdctl is storing data
   - the current filesystem layout of nerdctl needs a rehaul
+- lepton is removing support for unstable or otherwise experimental, or lesser used features
+  - this is meant to reduce maintenance burden, simplify code and increase quality
 
 Furthermore, lepton overarching priority is to provide a clean SDK for people who want to author their
-own cli, specifically with more expressive and cleaner error management, better storage abstractions,
-better performance.
-
-## Detailed relationship with nerdctl, and current status
+own stuff, specifically with more expressive and cleaner error management, better storage abstractions,
+better performance, and better concurrency management.
 
 Lepton started in 2024 as a private project, and was reset as a friendly fork of nerdctl, 14th of December 2024, from
 https://github.com/containerd/nerdctl/commit/7e97f0618ceb160b044e95810e17fccf21fea3df
 
-As such, a large fraction of its codebase is coming from https://github.com/containerd/nerdctl
+As such, a large fraction of its codebase is indeed coming from https://github.com/containerd/nerdctl
 (copyright The Containerd Authors, licensed under the Apache License, see NOTICE).
 
 Lepton is regularly cherry-picking changes from nerdctl, and conversely, so far, about 100k lines of code
@@ -52,7 +56,7 @@ Also, lepton does not explicitly support and does not test anymore (might still 
 - ubuntu 22.04 and earlier
 
 So far, besides removal of unsupported code, lepton has been focused on cleanup, reviewing and moving "library"
-packages up into https://github.com/farcloser/go-containers
+packages up into https://github.com/farcloser/go-containers, and UX review and sanity.
 
 <!--
 [[⬇️ **Download]**](https://github.com/containerd/nerdctl/releases)
