@@ -28,7 +28,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/composer"
 )
 
-func newComposePortCommand() *cobra.Command {
+func portCommand() *cobra.Command {
 	var composePortCommand = &cobra.Command{
 		Use:           "port [flags] SERVICE PRIVATE_PORT",
 		Short:         "Print the public port for a port binding",

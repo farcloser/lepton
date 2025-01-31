@@ -21,7 +21,7 @@ import (
 )
 
 func Command() *cobra.Command {
-	var internalCommand = &cobra.Command{
+	var cmd = &cobra.Command{
 		Use:           "internal",
 		Short:         "DO NOT EXECUTE MANUALLY",
 		Hidden:        true,
@@ -29,9 +29,9 @@ func Command() *cobra.Command {
 		SilenceErrors: true,
 	}
 
-	internalCommand.AddCommand(
+	cmd.AddCommand(
 		ociHookCommand(),
 	)
 
-	return internalCommand
+	return cmd
 }

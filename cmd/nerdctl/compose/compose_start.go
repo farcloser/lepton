@@ -34,7 +34,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/labels"
 )
 
-func newComposeStartCommand() *cobra.Command {
+func startCommand() *cobra.Command {
 	var composeRestartCommand = &cobra.Command{
 		Use:                   "start [SERVICE...]",
 		Short:                 "Start existing containers for service(s)",

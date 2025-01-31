@@ -27,7 +27,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 )
 
-func newImageInspectCommand() *cobra.Command {
+func inspectCommand() *cobra.Command {
 	var imageInspectCommand = &cobra.Command{
 		Use:               "inspect [flags] IMAGE [IMAGE...]",
 		Args:              cobra.MinimumNArgs(1),

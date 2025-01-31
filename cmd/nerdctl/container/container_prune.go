@@ -25,7 +25,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
 )
 
-func newContainerPruneCommand() *cobra.Command {
+func pruneCommand() *cobra.Command {
 	containerPruneCommand := &cobra.Command{
 		Use:           "prune [flags]",
 		Short:         "Remove all stopped containers",

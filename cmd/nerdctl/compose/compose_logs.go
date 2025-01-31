@@ -25,7 +25,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/composer"
 )
 
-func newComposeLogsCommand() *cobra.Command {
+func logsCommand() *cobra.Command {
 	var composeLogsCommand = &cobra.Command{
 		Use:           "logs [flags] [SERVICE...]",
 		Short:         "Show logs of running containers",

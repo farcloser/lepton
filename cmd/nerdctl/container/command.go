@@ -36,8 +36,8 @@ func Command() *cobra.Command {
 		RunCommand(),
 		UpdateCommand(),
 		ExecCommand(),
-		containerLsCommand(),
-		newContainerInspectCommand(),
+		listCommand(),
+		inspectCommand(),
 		LogsCommand(),
 		PortCommand(),
 		RmCommand(),
@@ -51,7 +51,7 @@ func Command() *cobra.Command {
 		UnpauseCommand(),
 		CommitCommand(),
 		RenameCommand(),
-		newContainerPruneCommand(),
+		pruneCommand(),
 		StatsCommand(),
 		AttachCommand(),
 	)
@@ -59,7 +59,7 @@ func Command() *cobra.Command {
 	return containerCommand
 }
 
-func containerLsCommand() *cobra.Command {
+func listCommand() *cobra.Command {
 	x := PsCommand()
 	x.Use = "ls"
 	x.Aliases = []string{"list"}

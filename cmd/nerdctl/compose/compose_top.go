@@ -32,7 +32,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/labels"
 )
 
-func newComposeTopCommand() *cobra.Command {
+func topCommand() *cobra.Command {
 	var composeTopCommand = &cobra.Command{
 		Use:                   "top [SERVICE...]",
 		Short:                 "Display the running processes of service containers",

@@ -27,7 +27,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/cmd/image"
 )
 
-func newImagePruneCommand() *cobra.Command {
+func pruneCommand() *cobra.Command {
 	imagePruneCommand := &cobra.Command{
 		Use:           "prune [flags]",
 		Short:         "Remove unused images",

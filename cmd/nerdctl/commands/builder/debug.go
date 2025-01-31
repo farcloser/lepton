@@ -33,7 +33,7 @@ func debugCommand() *cobra.Command {
 	var buildDebugCommand = &cobra.Command{
 		Use:           "debug",
 		Short:         shortHelp,
-		PreRunE:       helpers.CheckExperimental("`builder debug`"),
+		PreRunE:       helpers.RequireExperimental("`builder debug`"),
 		RunE:          debugAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,

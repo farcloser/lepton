@@ -25,7 +25,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/composer"
 )
 
-func newComposePushCommand() *cobra.Command {
+func pushCommand() *cobra.Command {
 	var composePushCommand = &cobra.Command{
 		Use:           "push [flags] [SERVICE...]",
 		Short:         "Push service images",

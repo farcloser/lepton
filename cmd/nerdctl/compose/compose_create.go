@@ -27,7 +27,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/composer"
 )
 
-func newComposeCreateCommand() *cobra.Command {
+func createCommand() *cobra.Command {
 	var composeCreateCommand = &cobra.Command{
 		Use:           "create [flags] [SERVICE...]",
 		Short:         "Creates containers for one or more services",

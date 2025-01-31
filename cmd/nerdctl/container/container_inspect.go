@@ -29,7 +29,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 )
 
-func newContainerInspectCommand() *cobra.Command {
+func inspectCommand() *cobra.Command {
 	var containerInspectCommand = &cobra.Command{
 		Use:               "inspect [flags] CONTAINER [CONTAINER, ...]",
 		Short:             "Display detailed information on one or more containers.",

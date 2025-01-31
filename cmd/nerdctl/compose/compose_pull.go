@@ -25,7 +25,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/composer"
 )
 
-func newComposePullCommand() *cobra.Command {
+func pullCommand() *cobra.Command {
 	var composePullCommand = &cobra.Command{
 		Use:           "pull [flags] [SERVICE...]",
 		Short:         "Pull service images",

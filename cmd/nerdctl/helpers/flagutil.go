@@ -127,7 +127,7 @@ func ProcessRootCmdFlags(cmd *cobra.Command) (*options.Global, error) {
 	}, nil
 }
 
-func CheckExperimental(feature string) func(cmd *cobra.Command, args []string) error {
+func RequireExperimental(feature string) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
 		globalOptions, err := ProcessRootCmdFlags(cmd)
 		if err != nil {
