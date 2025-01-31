@@ -24,13 +24,13 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/defaults"
 )
 
-func Inspect(out io.Writer) error {
-	b, err := apparmor.Inspect(defaults.AppArmorProfileName)
+func Inspect(output io.Writer) error {
+	profile, err := apparmor.Inspect(defaults.AppArmorProfileName)
 	if err != nil {
 		return err
 	}
 
-	_, err = fmt.Fprint(out, b)
+	_, err = fmt.Fprint(output, profile)
 
 	return err
 }

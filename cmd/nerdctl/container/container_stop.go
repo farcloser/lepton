@@ -44,7 +44,7 @@ func StopCommand() *cobra.Command {
 	return stopCommand
 }
 
-func stopOptions(cmd *cobra.Command) (options.ContainerStop, error) {
+func stopOptions(cmd *cobra.Command, _ []string) (options.ContainerStop, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return options.ContainerStop{}, err
@@ -67,7 +67,7 @@ func stopOptions(cmd *cobra.Command) (options.ContainerStop, error) {
 }
 
 func stopAction(cmd *cobra.Command, args []string) error {
-	options, err := stopOptions(cmd)
+	options, err := stopOptions(cmd, args)
 	if err != nil {
 		return err
 	}

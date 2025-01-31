@@ -28,7 +28,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
 )
 
-func newComposeCopyCommand() *cobra.Command {
+func copyCommand() *cobra.Command {
 	usage := `cp [OPTIONS] SERVICE:SRC_PATH DEST_PATH|-
        nerdctl compose cp [OPTIONS] SRC_PATH|- SERVICE:DEST_PATH`
 	var composeCpCommand = &cobra.Command{

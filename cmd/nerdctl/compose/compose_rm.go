@@ -28,7 +28,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/composer"
 )
 
-func newComposeRemoveCommand() *cobra.Command {
+func removeCommand() *cobra.Command {
 	var composeRemoveCommand = &cobra.Command{
 		Use:           "rm [flags] [SERVICE...]",
 		Short:         "Remove stopped service containers",

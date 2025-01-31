@@ -282,8 +282,8 @@ func setCreateFlags(cmd *cobra.Command) {
 
 }
 
-func processCreateCommandFlagsInRun(cmd *cobra.Command) (*options.ContainerCreate, error) {
-	opt, err := createOptions(cmd)
+func runOptions(cmd *cobra.Command, args []string) (*options.ContainerCreate, error) {
+	opt, err := createOptions(cmd, args)
 	if err != nil {
 		return opt, err
 	}
@@ -331,7 +331,7 @@ func processCreateCommandFlagsInRun(cmd *cobra.Command) (*options.ContainerCreat
 func runAction(cmd *cobra.Command, args []string) error {
 	var isDetached bool
 
-	createOpt, err := processCreateCommandFlagsInRun(cmd)
+	createOpt, err := runOptions(cmd, args)
 	if err != nil {
 		return err
 	}

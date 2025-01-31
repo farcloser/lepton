@@ -25,7 +25,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/composer"
 )
 
-func newComposeStopCommand() *cobra.Command {
+func stopCommand() *cobra.Command {
 	var composeStopCommand = &cobra.Command{
 		Use:           "stop [flags] [SERVICE...]",
 		Short:         "Stop running containers without removing them.",

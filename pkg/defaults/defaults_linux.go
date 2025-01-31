@@ -43,10 +43,12 @@ func DataRoot() string {
 	if !rootlessutil.IsRootless() {
 		return "/var/lib/" + version.RootName
 	}
+
 	xdh, err := rootlesskit.XDGDataHome()
 	if err != nil {
 		panic(err)
 	}
+
 	return filepath.Join(xdh, version.RootName)
 }
 

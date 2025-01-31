@@ -29,7 +29,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 )
 
-func newContainerInspectCommand() *cobra.Command {
+func inspectCommand() *cobra.Command {
 	var containerInspectCommand = &cobra.Command{
 		Use:               "inspect [flags] CONTAINER [CONTAINER, ...]",
 		Short:             "Display detailed information on one or more containers.",
@@ -58,7 +58,7 @@ var validModeType = map[string]bool{
 	"dockercompat": true,
 }
 
-func ProcessContainerInspectOptions(cmd *cobra.Command) (opt options.ContainerInspect, err error) {
+func ProcessContainerInspectOptions(cmd *cobra.Command, _ []string) (opt options.ContainerInspect, err error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return
@@ -91,7 +91,7 @@ func ProcessContainerInspectOptions(cmd *cobra.Command) (opt options.ContainerIn
 }
 
 func inspectAction(cmd *cobra.Command, args []string) error {
-	opt, err := ProcessContainerInspectOptions(cmd)
+	opt, err := ProcessContainerInspectOptions(cmd, args)
 	if err != nil {
 		return err
 	}

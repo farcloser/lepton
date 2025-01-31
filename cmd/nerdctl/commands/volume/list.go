@@ -46,7 +46,7 @@ func listCommand() *cobra.Command {
 	return volumeLsCommand
 }
 
-func listOptions(cmd *cobra.Command) (*options.VolumeList, error) {
+func listOptions(cmd *cobra.Command, _ []string) (*options.VolumeList, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return nil, err
@@ -78,7 +78,7 @@ func listOptions(cmd *cobra.Command) (*options.VolumeList, error) {
 }
 
 func listAction(cmd *cobra.Command, args []string) error {
-	options, err := listOptions(cmd)
+	options, err := listOptions(cmd, args)
 	if err != nil {
 		return err
 	}

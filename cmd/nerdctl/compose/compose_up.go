@@ -30,7 +30,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/composer"
 )
 
-func newComposeUpCommand() *cobra.Command {
+func upCommand() *cobra.Command {
 	var composeUpCommand = &cobra.Command{
 		Use:           "up [flags] [SERVICE...]",
 		Short:         "Create and start containers",

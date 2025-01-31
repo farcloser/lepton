@@ -43,7 +43,7 @@ func pruneCommand() *cobra.Command {
 	return networkPruneCommand
 }
 
-func pruneAction(cmd *cobra.Command, _ []string) error {
+func pruneAction(cmd *cobra.Command, args []string) error {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return err

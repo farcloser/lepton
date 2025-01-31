@@ -27,7 +27,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/cmd/image"
 )
 
-func newImagePruneCommand() *cobra.Command {
+func pruneCommand() *cobra.Command {
 	imagePruneCommand := &cobra.Command{
 		Use:           "prune [flags]",
 		Short:         "Remove unused images",
@@ -43,7 +43,7 @@ func newImagePruneCommand() *cobra.Command {
 	return imagePruneCommand
 }
 
-func pruneOptions(cmd *cobra.Command) (options.ImagePrune, error) {
+func pruneOptions(cmd *cobra.Command, _ []string) (options.ImagePrune, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return options.ImagePrune{}, err
@@ -75,8 +75,8 @@ func pruneOptions(cmd *cobra.Command) (options.ImagePrune, error) {
 	}, err
 }
 
-func pruneAction(cmd *cobra.Command, _ []string) error {
-	options, err := pruneOptions(cmd)
+func pruneAction(cmd *cobra.Command, args []string) error {
+	options, err := pruneOptions(cmd, args)
 	if err != nil {
 		return err
 	}

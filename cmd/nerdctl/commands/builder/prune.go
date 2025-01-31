@@ -45,8 +45,8 @@ func pruneCommand() *cobra.Command {
 	return buildPruneCommand
 }
 
-func pruneAction(cmd *cobra.Command, _ []string) error {
-	opts, err := pruneOptions(cmd)
+func pruneAction(cmd *cobra.Command, args []string) error {
+	opts, err := pruneOptions(cmd, args)
 	if err != nil {
 		return err
 	}
@@ -81,7 +81,7 @@ func pruneAction(cmd *cobra.Command, _ []string) error {
 	return err
 }
 
-func pruneOptions(cmd *cobra.Command) (*options.BuilderPrune, error) {
+func pruneOptions(cmd *cobra.Command, _ []string) (*options.BuilderPrune, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return nil, err

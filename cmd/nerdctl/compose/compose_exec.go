@@ -29,7 +29,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/composer"
 )
 
-func newComposeExecCommand() *cobra.Command {
+func execCommand() *cobra.Command {
 	var composeExecCommand = &cobra.Command{
 		Use:           "exec [flags] SERVICE COMMAND [ARGS...]",
 		Short:         "Execute a command in a running container of the service",

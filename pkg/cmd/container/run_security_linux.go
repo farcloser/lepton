@@ -22,7 +22,6 @@ import (
 	"strings"
 	"sync"
 
-	"go.farcloser.world/containers/security/apparmor"
 	"go.farcloser.world/containers/security/seccomp"
 	"go.farcloser.world/containers/specs"
 
@@ -31,6 +30,7 @@ import (
 	"github.com/containerd/containerd/v2/pkg/oci"
 	"github.com/containerd/log"
 
+	"github.com/containerd/nerdctl/v2/leptonic/services/apparmor"
 	"github.com/containerd/nerdctl/v2/pkg/defaults"
 	"github.com/containerd/nerdctl/v2/pkg/maputil"
 	"github.com/containerd/nerdctl/v2/pkg/strutil"
@@ -86,29 +86,23 @@ func generateSecurityOpts(privileged bool, securityOptsMap map[string]string) ([
 		opts = append(opts, seccompWithDefaultProfile())
 	}
 
-	// FIXME: remove this tagliatelle
-	canLoadNewAppArmor := apparmor.CanLoadNewProfile()
-	canApplyExistingProfile := apparmor.CanApplyExistingProfile()
-	if aaProfile, ok := securityOptsMap["apparmor"]; ok {
-		if aaProfile == "" {
-			return nil, errors.New("invalid security-opt \"apparmor\"")
+	profile := defaults.AppArmorProfileName
+	explicitProfile := false
+	if aProfile, ok := securityOptsMap["apparmor"]; ok {
+		profile = aProfile
+		explicitProfile = true
+	}
+
+	appArmorSpecs, err := apparmor.GetSpecOptions(profile)
+	// If we failed with an explicit --security-opt, hard error
+	if errors.Is(err, apparmor.ErrUnsupported) || errors.Is(err, apparmor.ErrCannotApply) {
+		if explicitProfile {
+			return nil, err
 		}
-		if aaProfile != "unconfined" {
-			if !canApplyExistingProfile {
-				log.L.Warnf("the host does not support AppArmor. Ignoring profile %q", aaProfile)
-			} else {
-				opts = append(opts, apparmor.WithProfile(aaProfile))
-			}
-		}
-	} else {
-		if canLoadNewAppArmor {
-			if err := apparmor.LoadDefaultProfile(defaults.AppArmorProfileName); err != nil {
-				return nil, err
-			}
-		}
-		if apparmor.CanApplySpecificExistingProfile(defaults.AppArmorProfileName) {
-			opts = append(opts, apparmor.WithProfile(defaults.AppArmorProfileName))
-		}
+	} else if err != nil {
+		return nil, err
+	} else if appArmorSpecs != nil {
+		opts = append(opts, appArmorSpecs)
 	}
 
 	nnp, err := maputil.MapBoolValueAsOpt(securityOptsMap, "no-new-privileges")

@@ -41,7 +41,7 @@ func WaitCommand() *cobra.Command {
 	return waitCommand
 }
 
-func waitOptions(cmd *cobra.Command) (options.ContainerWait, error) {
+func waitOptions(cmd *cobra.Command, _ []string) (options.ContainerWait, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return options.ContainerWait{}, err
@@ -53,7 +53,7 @@ func waitOptions(cmd *cobra.Command) (options.ContainerWait, error) {
 }
 
 func waitAction(cmd *cobra.Command, args []string) error {
-	options, err := waitOptions(cmd)
+	options, err := waitOptions(cmd, args)
 	if err != nil {
 		return err
 	}

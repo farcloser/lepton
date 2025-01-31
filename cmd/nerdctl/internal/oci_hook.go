@@ -28,14 +28,13 @@ import (
 )
 
 func ociHookCommand() *cobra.Command {
-	var internalOCIHookCommand = &cobra.Command{
+	return &cobra.Command{
 		Use:           "oci-hook",
 		Short:         "OCI hook",
 		RunE:          internalOCIHookAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
-	return internalOCIHookCommand
 }
 
 func internalOCIHookAction(cmd *cobra.Command, args []string) error {
@@ -43,24 +42,25 @@ func internalOCIHookAction(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+
 	event := ""
 	if len(args) > 0 {
 		event = args[0]
 	}
+
 	if event == "" {
 		return errors.New("event type needs to be passed")
 	}
+
 	dataStore, err := clientutil.DataStore(globalOptions.DataRoot, globalOptions.Address)
 	if err != nil {
 		return err
 	}
-	cniPath := globalOptions.CNIPath
-	cniNetconfpath := globalOptions.CNINetConfPath
-	bridgeIP := globalOptions.BridgeIP
+
 	return ocihook.Run(os.Stdin, os.Stderr, event,
 		dataStore,
-		cniPath,
-		cniNetconfpath,
-		bridgeIP,
+		globalOptions.CNIPath,
+		globalOptions.CNINetConfPath,
+		globalOptions.BridgeIP,
 	)
 }

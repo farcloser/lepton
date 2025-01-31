@@ -25,7 +25,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/composer"
 )
 
-func newComposeKillCommand() *cobra.Command {
+func killCommand() *cobra.Command {
 	var composeKillCommand = &cobra.Command{
 		Use:           "kill [flags] [SERVICE...]",
 		Short:         "Force stop service containers",

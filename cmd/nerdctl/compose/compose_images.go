@@ -39,7 +39,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/strutil"
 )
 
-func newComposeImagesCommand() *cobra.Command {
+func imagesCommand() *cobra.Command {
 	var composeImagesCommand = &cobra.Command{
 		Use:           "images [flags] [SERVICE...]",
 		Short:         "List images used by created containers in services",

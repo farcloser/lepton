@@ -39,7 +39,7 @@ func RenameCommand() *cobra.Command {
 	return renameCommand
 }
 
-func renameOptions(cmd *cobra.Command) (options.ContainerRename, error) {
+func renameOptions(cmd *cobra.Command, _ []string) (options.ContainerRename, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return options.ContainerRename{}, err
@@ -51,7 +51,7 @@ func renameOptions(cmd *cobra.Command) (options.ContainerRename, error) {
 }
 
 func renameAction(cmd *cobra.Command, args []string) error {
-	options, err := renameOptions(cmd)
+	options, err := renameOptions(cmd, args)
 	if err != nil {
 		return err
 	}

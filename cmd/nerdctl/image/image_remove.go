@@ -42,7 +42,7 @@ func RmiCommand() *cobra.Command {
 	return rmiCommand
 }
 
-func removeOptions(cmd *cobra.Command) (options.ImageRemove, error) {
+func removeOptions(cmd *cobra.Command, _ []string) (options.ImageRemove, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return options.ImageRemove{}, err
@@ -66,7 +66,7 @@ func removeOptions(cmd *cobra.Command) (options.ImageRemove, error) {
 }
 
 func rmiAction(cmd *cobra.Command, args []string) error {
-	options, err := removeOptions(cmd)
+	options, err := removeOptions(cmd, args)
 	if err != nil {
 		return err
 	}

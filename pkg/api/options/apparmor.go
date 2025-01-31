@@ -14,10 +14,10 @@
    limitations under the License.
 */
 
-package apparmor
+package options
 
-// ListOptions specifies options for `apparmor ls`.
-type ListOptions struct {
+// AppArmorList specifies options for `apparmor ls`.
+type AppArmorList struct {
 	// Only display profile names
 	Quiet bool
 	// Format the output using the given go template

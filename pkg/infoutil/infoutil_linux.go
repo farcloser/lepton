@@ -22,10 +22,10 @@ import (
 	"strings"
 
 	"github.com/docker/docker/pkg/meminfo"
-	"go.farcloser.world/containers/security/apparmor"
 	"go.farcloser.world/containers/security/cgroups"
 	"go.farcloser.world/containers/sysinfo"
 
+	"github.com/containerd/nerdctl/v2/leptonic/services/apparmor"
 	"github.com/containerd/nerdctl/v2/pkg/defaults"
 	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
@@ -34,16 +34,17 @@ import (
 const UnameO = "GNU/Linux"
 
 func fulfillSecurityOptions(info *dockercompat.Info) {
-	// FIXME: what is this even reporting?
-	if apparmor.CanApplyExistingProfile() {
+	enabled, err := apparmor.GetInfo(defaults.AppArmorProfileName)
+	if enabled {
 		info.SecurityOptions = append(info.SecurityOptions, "name=apparmor")
-		if rootlessutil.IsRootless() && !apparmor.CanApplySpecificExistingProfile(defaults.AppArmorProfileName) {
-			info.Warnings = append(info.Warnings, fmt.Sprintf(strings.TrimSpace(`
-WARNING: AppArmor profile %q is not loaded.
-         Use 'sudo nerdctl apparmor load' if you prefer to use AppArmor with rootless mode.
-         This warning is negligible if you do not intend to use AppArmor.`), defaults.AppArmorProfileName))
-		}
 	}
+	if err != nil {
+		info.Warnings = append(info.Warnings, fmt.Sprintf(strings.TrimSpace(`
+WARNING: AppArmor profile %q is not loaded.
+         Use 'sudo nerdctl apparmor load' if you want to use AppArmor with rootless mode.
+         This warning is negligible if you do not intend to use AppArmor.`), defaults.AppArmorProfileName))
+	}
+
 	info.SecurityOptions = append(info.SecurityOptions, "name=seccomp,profile="+defaults.SeccompProfileName)
 	if cgroups.DefaultMode() == cgroups.PrivateNsMode {
 		info.SecurityOptions = append(info.SecurityOptions, "name=cgroupns")

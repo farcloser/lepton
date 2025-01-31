@@ -17,18 +17,15 @@
 package apparmor
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 
 	"github.com/containerd/nerdctl/v2/pkg/cmd/apparmor"
-	"github.com/containerd/nerdctl/v2/pkg/defaults"
 )
 
 func inspectCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:           "inspect",
-		Short:         fmt.Sprintf("Display the default AppArmor profile %q. Other profiles cannot be displayed with this command.", defaults.AppArmorProfileName),
+		Short:         "Display the AppArmor profile.",
 		Args:          cobra.NoArgs,
 		RunE:          inspectAction,
 		SilenceUsage:  true,

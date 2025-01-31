@@ -41,7 +41,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/portutil"
 )
 
-func newComposePsCommand() *cobra.Command {
+func psCommand() *cobra.Command {
 	var composePsCommand = &cobra.Command{
 		Use:           "ps [flags] [SERVICE...]",
 		Short:         "List containers of services",

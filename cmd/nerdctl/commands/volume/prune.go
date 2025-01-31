@@ -42,7 +42,7 @@ func pruneCommand() *cobra.Command {
 	return volumePruneCommand
 }
 
-func pruneOptions(cmd *cobra.Command) (*options.VolumePrune, error) {
+func pruneOptions(cmd *cobra.Command, _ []string) (*options.VolumePrune, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return nil, err
@@ -67,8 +67,8 @@ func pruneOptions(cmd *cobra.Command) (*options.VolumePrune, error) {
 	return options, nil
 }
 
-func pruneAction(cmd *cobra.Command, _ []string) error {
-	options, err := pruneOptions(cmd)
+func pruneAction(cmd *cobra.Command, args []string) error {
+	options, err := pruneOptions(cmd, args)
 	if err != nil {
 		return err
 	}

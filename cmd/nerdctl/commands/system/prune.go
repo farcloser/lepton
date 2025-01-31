@@ -47,7 +47,7 @@ func pruneCommand() *cobra.Command {
 	return systemPruneCommand
 }
 
-func pruneOptions(cmd *cobra.Command) (*options.SystemPrune, error) {
+func pruneOptions(cmd *cobra.Command, _ []string) (*options.SystemPrune, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return nil, err
@@ -117,8 +117,8 @@ func grantSystemPrunePermission(cmd *cobra.Command, options *options.SystemPrune
 	return true, nil
 }
 
-func pruneAction(cmd *cobra.Command, _ []string) error {
-	options, err := pruneOptions(cmd)
+func pruneAction(cmd *cobra.Command, args []string) error {
+	options, err := pruneOptions(cmd, args)
 	if err != nil {
 		return err
 	}

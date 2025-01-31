@@ -27,7 +27,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/composer"
 )
 
-func newComposeRunCommand() *cobra.Command {
+func runCommand() *cobra.Command {
 	var composeRunCommand = &cobra.Command{
 		Use:                   "run [flags] SERVICE [COMMAND] [ARGS...]",
 		Short:                 "Run a one-off command on a service",

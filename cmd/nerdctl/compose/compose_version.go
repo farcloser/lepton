@@ -26,7 +26,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/version"
 )
 
-func newComposeVersionCommand() *cobra.Command {
+func versionCommand() *cobra.Command {
 	var composeVersionCommand = &cobra.Command{
 		Use:           "version",
 		Short:         "Show the Compose version information",

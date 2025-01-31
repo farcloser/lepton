@@ -49,7 +49,7 @@ func InfoCommand() *cobra.Command {
 	return infoCommand
 }
 
-func processInfoOptions(cmd *cobra.Command) (*options.SystemInfo, error) {
+func processInfoOptions(cmd *cobra.Command, _ []string) (*options.SystemInfo, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return nil, err
@@ -75,7 +75,7 @@ func processInfoOptions(cmd *cobra.Command) (*options.SystemInfo, error) {
 }
 
 func infoAction(cmd *cobra.Command, args []string) error {
-	options, err := processInfoOptions(cmd)
+	options, err := processInfoOptions(cmd, args)
 	if err != nil {
 		return err
 	}

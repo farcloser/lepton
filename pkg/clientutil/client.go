@@ -25,6 +25,7 @@ import (
 	"strings"
 
 	"go.farcloser.world/containers/digest"
+	"go.farcloser.world/core/filesystem"
 
 	ctdcli "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/log"
@@ -70,17 +71,16 @@ func NewClientWithPlatform(ctx context.Context, namespace, address, platform str
 // "1935db9" is from `$(echo -n "/run/containerd/containerd.sock" | sha256sum | cut -c1-8)`
 // on Windows it will return "%PROGRAMFILES%/nerdctl/1935db59"
 func DataStore(dataRoot, address string) (string, error) {
-	if err := os.MkdirAll(dataRoot, 0o700); err != nil {
-		return "", err
-	}
 	addrHash, err := getAddrHash(address)
 	if err != nil {
 		return "", err
 	}
+
 	dataStore := filepath.Join(dataRoot, addrHash)
-	if err := os.MkdirAll(dataStore, 0o700); err != nil {
+	if err = os.MkdirAll(dataStore, filesystem.DirPermissionsPrivate); err != nil {
 		return "", err
 	}
+
 	return dataStore, nil
 }
 
@@ -88,16 +88,12 @@ func getAddrHash(addr string) (string, error) {
 	const addrHashLen = 8
 
 	if runtime.GOOS != "windows" {
-		addr = strings.TrimPrefix(addr, "unix://")
-
 		var err error
-		addr, err = filepath.EvalSymlinks(addr)
+		addr, err = filepath.EvalSymlinks(strings.TrimPrefix(addr, "unix://"))
 		if err != nil {
 			return "", err
 		}
 	}
 
-	d := digest.FromString(addr)
-	h := d.Encoded()[0:addrHashLen]
-	return h, nil
+	return digest.FromString(addr).Encoded()[0:addrHashLen], nil
 }

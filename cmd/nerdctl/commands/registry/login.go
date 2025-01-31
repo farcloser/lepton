@@ -45,7 +45,7 @@ func LoginCommand() *cobra.Command {
 	return loginCommand
 }
 
-func processLoginOptions(cmd *cobra.Command) (*options.LoginCommand, error) {
+func processLoginOptions(cmd *cobra.Command, _ []string) (*options.LoginCommand, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return nil, err
@@ -96,7 +96,7 @@ func processLoginOptions(cmd *cobra.Command) (*options.LoginCommand, error) {
 }
 
 func loginAction(cmd *cobra.Command, args []string) error {
-	options, err := processLoginOptions(cmd)
+	options, err := processLoginOptions(cmd, args)
 	if err != nil {
 		return err
 	}

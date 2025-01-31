@@ -58,7 +58,7 @@ func PsCommand() *cobra.Command {
 	return psCommand
 }
 
-func processOptions(cmd *cobra.Command) (options.ContainerList, FormattingAndPrintingOptions, error) {
+func processOptions(cmd *cobra.Command, _ []string) (options.ContainerList, FormattingAndPrintingOptions, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return options.ContainerList{}, FormattingAndPrintingOptions{}, err
@@ -124,7 +124,7 @@ func processOptions(cmd *cobra.Command) (options.ContainerList, FormattingAndPri
 }
 
 func psAction(cmd *cobra.Command, args []string) error {
-	clOpts, fpOpts, err := processOptions(cmd)
+	clOpts, fpOpts, err := processOptions(cmd, args)
 	if err != nil {
 		return err
 	}

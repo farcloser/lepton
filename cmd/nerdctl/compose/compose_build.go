@@ -25,7 +25,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/composer"
 )
 
-func newComposeBuildCommand() *cobra.Command {
+func buildCommand() *cobra.Command {
 	var composeBuildCommand = &cobra.Command{
 		Use:           "build [flags] [SERVICE...]",
 		Short:         "Build or rebuild services",

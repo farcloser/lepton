@@ -27,7 +27,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/composer"
 )
 
-func newComposeConfigCommand() *cobra.Command {
+func configCommand() *cobra.Command {
 	var composeConfigCommand = &cobra.Command{
 		Use:           "config",
 		Short:         "Validate and view the Compose file",
