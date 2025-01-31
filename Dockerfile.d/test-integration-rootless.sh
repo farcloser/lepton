@@ -16,6 +16,8 @@
 
 set -eux -o pipefail
 if [[ "$(id -u)" = "0" ]]; then
+  # Ensure securityfs is mounted for apparmor to work
+  mount -tsecurityfs securityfs /sys/kernel/security
 	if [ -e /sys/kernel/security/apparmor/profiles ]; then
 		# Load the "prefix-default" profile for TestRunApparmor
 		nerdctl apparmor load
