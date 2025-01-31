@@ -33,7 +33,7 @@ func Command() *cobra.Command {
 	}
 
 	cmd.AddCommand(
-		listCommand(),
+		// listCommand(),
 		inspectCommand(),
 		loadCommand(),
 		unloadCommand(),

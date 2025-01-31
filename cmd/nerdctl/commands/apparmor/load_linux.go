@@ -17,18 +17,15 @@
 package apparmor
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 
 	"github.com/containerd/nerdctl/v2/pkg/cmd/apparmor"
-	"github.com/containerd/nerdctl/v2/pkg/defaults"
 )
 
 func loadCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:           "load",
-		Short:         fmt.Sprintf("Load the default AppArmor profile %q. Requires root.", defaults.AppArmorProfileName),
+		Short:         "Load the AppArmor profile. Requires root.",
 		Args:          cobra.NoArgs,
 		RunE:          loadAction,
 		SilenceUsage:  true,

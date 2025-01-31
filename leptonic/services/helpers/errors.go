@@ -26,6 +26,10 @@ import (
 )
 
 func ErrConvert(err error) error {
+	if err == nil {
+		return nil
+	}
+
 	if errdefs.IsNotFound(err) {
 		return errors.Join(errs.ErrNotFound, err)
 	}

@@ -21,18 +21,29 @@ import (
 
 	"go.farcloser.world/containers/security/apparmor"
 
+	"github.com/containerd/containerd/v2/pkg/oci"
+
+	"github.com/containerd/nerdctl/v2/leptonic/errs"
 	"github.com/containerd/nerdctl/v2/leptonic/services/helpers"
+	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
+)
+
+const (
+	Empty      = ""
+	Unconfined = "unconfined"
 )
 
 var (
-	ErrServiceAppArmor           = errors.New("apparmor error")
-	ErrServiceAppArmorCannotLoad = errors.New("unable to load apparmor profile - try with sudo")
+	ErrServiceAppArmor    = errors.New("apparmor service error")
+	ErrUnsupported        = errors.New("it does not seem like apparmor is enabled on the host")
+	ErrCannotLoadOrUnload = errors.New("not enough permissions to load or unload profiles")
+	ErrCannotApply        = errors.New("requested profile cannot be applied (you should check if it is loaded)")
 )
 
 func ListNames() ([]string, error) {
 	profiles, err := apparmor.Profiles()
 	if err != nil {
-		return nil, errWrap(helpers.ErrConvert(err))
+		return nil, errWrap(helpers.ErrConvert(err), ErrServiceAppArmor, errs.ErrSystemFailure)
 	}
 
 	res := []string{}
@@ -43,44 +54,80 @@ func ListNames() ([]string, error) {
 	return res, nil
 }
 
-func List() ([]apparmor.Profile, error) {
+func List() ([]*apparmor.Profile, error) {
 	res, err := apparmor.Profiles()
-	if err != nil {
-		return nil, errWrap(helpers.ErrConvert(err))
-	}
 
-	return res, nil
+	return res, errWrap(helpers.ErrConvert(err), ErrServiceAppArmor, errs.ErrSystemFailure)
 }
 
-func Inspect(profile string) (string, error) {
-	res, err := apparmor.DumpDefaultProfile(profile)
-	if err != nil {
-		return "", errWrap(helpers.ErrConvert(err))
-	}
+func Inspect(asName string) (string, error) {
+	res, err := apparmor.DumpCurrentProfileAs(asName)
 
-	return res, nil
+	return res, errWrap(helpers.ErrConvert(err), ErrServiceAppArmor, errs.ErrSystemFailure)
 }
 
-func Load(profile string) error {
-	if !apparmor.CanLoadNewProfile() {
-		return ErrServiceAppArmorCannotLoad
+func Load(asName string) error {
+	if !apparmor.CanLoadProfile() {
+		return errWrap(ErrCannotLoadOrUnload, ErrServiceAppArmor)
 	}
 
-	if err := apparmor.LoadDefaultProfile(profile); err != nil {
-		return errWrap(helpers.ErrConvert(err))
+	return errWrap(helpers.ErrConvert(apparmor.LoadDefaultProfileAs(asName)), ErrServiceAppArmor, errs.ErrSystemFailure)
+}
+
+func Unload(profileName string) error {
+	if !apparmor.CanLoadProfile() {
+		return errWrap(ErrCannotLoadOrUnload, ErrServiceAppArmor)
+	}
+
+	return errWrap(helpers.ErrConvert(apparmor.UnloadProfile(profileName)), ErrServiceAppArmor)
+}
+
+func GetSpecOptions(securityOpt string) (oci.SpecOpts, error) {
+	// If opt is the empty string, that is an error
+	if securityOpt == Empty {
+		return nil, errWrap(errors.New("security-opt \"apparmor\" can't be set to the empty string"), ErrServiceAppArmor, errs.ErrInvalidArgument)
+	}
+
+	// If unconfined, just return
+	if securityOpt == Unconfined {
+		return nil, nil
+	}
+
+	if !apparmor.Enabled() {
+		return nil, errWrap(ErrUnsupported, ErrServiceAppArmor)
+	}
+
+	// Otherwise, if we can load, go for it
+	if apparmor.CanLoadProfile() {
+		if err := apparmor.LoadDefaultProfileAs(securityOpt); err != nil {
+			return nil, errWrap(helpers.ErrConvert(err), ErrServiceAppArmor)
+		}
+	}
+
+	// Either way, if we can, pass it along, and hard error otherwise
+	if !apparmor.CanApplyProfile(securityOpt) {
+		return nil, errWrap(ErrCannotApply, ErrServiceAppArmor)
+	}
+
+	return apparmor.WithProfile(securityOpt), nil
+}
+
+func GetInfo(withName string) (bool, error) {
+	enabled := false
+	if apparmor.Enabled() {
+		enabled = true
+		if rootlessutil.IsRootless() && !apparmor.CanApplyProfile(withName) {
+			return enabled, ErrUnsupported
+		}
+	}
+
+	return enabled, nil
+}
+
+func errWrap(err error, wrappers ...error) error {
+	if err != nil {
+		return errors.Join(append(wrappers, err)...)
 	}
 
 	return nil
-}
-
-func Unload(profile string) error {
-	if err := apparmor.Unload(profile); err != nil {
-		return errWrap(helpers.ErrConvert(err))
-	}
-
-	return nil
-}
-
-func errWrap(err error) error {
-	return errors.Join(ErrServiceAppArmor, err)
 }

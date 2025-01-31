@@ -16,6 +16,9 @@
 
 package apparmor
 
+// NOTE: none of this makes sense in our context. Other apps' AppArmor profiles are irrelevant,
+// and cannot be loaded currently anyhow.
+/*
 import (
 	"bytes"
 	"fmt"
@@ -23,36 +26,34 @@ import (
 	"text/tabwriter"
 
 	"github.com/containerd/nerdctl/v2/leptonic/services/apparmor"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 )
 
-func List(out io.Writer, options *ListOptions) error {
+func List(output io.Writer, options *options.AppArmorList) error {
 	profiles, err := apparmor.List()
 	if err != nil {
 		return err
 	}
 
-	quiet := options.Quiet
-	format := options.Format
-
-	switch format {
+	switch options.Format {
 	case formatter.FormatNone, formatter.FormatTable, formatter.FormatWide:
-		out = tabwriter.NewWriter(out, 4, 8, 4, ' ', 0)
-		if !quiet {
-			if _, err = fmt.Fprintln(out, "NAME\tMODE"); err != nil {
+		output = tabwriter.NewWriter(output, 4, 8, 4, ' ', 0)
+		if !options.Quiet {
+			if _, err = fmt.Fprintln(output, "NAME\tMODE"); err != nil {
 				return err
 			}
 		}
 
-		for _, f := range profiles {
-			if quiet {
-				_, _ = fmt.Fprintln(out, f.Name)
+		for _, profile := range profiles {
+			if options.Quiet {
+				_, _ = fmt.Fprintln(output, profile.Name)
 			} else {
-				_, _ = fmt.Fprintf(out, "%s\t%s\n", f.Name, f.Mode)
+				_, _ = fmt.Fprintf(output, "%s\t%s\n", profile.Name, profile.Mode)
 			}
 		}
 
-		if f, ok := out.(formatter.Flusher); ok {
+		if f, ok := output.(formatter.Flusher); ok {
 			return f.Flush()
 		}
 
@@ -62,23 +63,23 @@ func List(out io.Writer, options *ListOptions) error {
 			return err
 		}
 
-		if _, err = fmt.Fprint(out, toPrint); err != nil {
+		if _, err = fmt.Fprint(output, toPrint); err != nil {
 			return err
 		}
 
 	default:
-		tmpl, err := formatter.ParseTemplate(format)
+		tmpl, err := formatter.ParseTemplate(options.Format)
 		if err != nil {
 			return err
 		}
 
 		for _, f := range profiles {
-			var b bytes.Buffer
-			if err := tmpl.Execute(&b, f); err != nil {
+			var buff bytes.Buffer
+			if err := tmpl.Execute(&buff, f); err != nil {
 				return err
 			}
 
-			if _, err = fmt.Fprintln(out, b.String()); err != nil {
+			if _, err = fmt.Fprintln(output, buff.String()); err != nil {
 				return err
 			}
 		}
@@ -86,3 +87,4 @@ func List(out io.Writer, options *ListOptions) error {
 
 	return nil
 }
+*/

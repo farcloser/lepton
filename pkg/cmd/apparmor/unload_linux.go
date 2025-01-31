@@ -21,10 +21,6 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/defaults"
 )
 
-func Unload(target string) error {
-	if target == "" {
-		target = defaults.AppArmorProfileName
-	}
-
-	return apparmor.Unload(target)
+func Unload() error {
+	return apparmor.Unload(defaults.AppArmorProfileName)
 }

@@ -16,11 +16,15 @@
 
 package apparmor
 
+// See note in pkg/cmd/apparmor
+/*
 import (
 	"errors"
 
 	"github.com/spf13/cobra"
 
+	"github.com/containerd/nerdctl/v2/leptonic/errs"
+	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/apparmor"
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 )
@@ -46,7 +50,7 @@ func listCommand() *cobra.Command {
 	return cmd
 }
 
-func listOptions(cmd *cobra.Command, _ []string) (*apparmor.ListOptions, error) {
+func listOptions(cmd *cobra.Command, _ []string) (*options.AppArmorList, error) {
 	quiet, err := cmd.Flags().GetBool("quiet")
 	if err != nil {
 		return nil, err
@@ -61,17 +65,19 @@ func listOptions(cmd *cobra.Command, _ []string) (*apparmor.ListOptions, error) 
 		return nil, errors.New("custom or json format, and 'quiet', cannot be specified together")
 	}
 
-	return &apparmor.ListOptions{
+	return &options.AppArmorList{
 		Quiet:  quiet,
 		Format: format,
 	}, nil
 }
 
 func listAction(cmd *cobra.Command, args []string) error {
-	options, err := listOptions(cmd, args)
+	opts, err := listOptions(cmd, args)
 	if err != nil {
-		return err
+		return errors.Join(errs.ErrInvalidArgument, err)
 	}
 
-	return apparmor.List(cmd.OutOrStdout(), options)
+	return apparmor.List(cmd.OutOrStdout(), opts)
 }
+
+*/

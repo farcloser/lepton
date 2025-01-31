@@ -172,9 +172,10 @@ func TestRunSecurityOptSeccomp(t *testing.T) {
 func TestRunApparmor(t *testing.T) {
 	base := testutil.NewBase(t)
 	defaultProfile := base.Target + "-default"
-	if !apparmor.CanLoadNewProfile() && !apparmor.CanApplySpecificExistingProfile(defaultProfile) {
+	if !apparmor.Enabled() {
 		t.Skipf("needs to be able to apply %q profile", defaultProfile)
 	}
+
 	attrCurrentPath := "/proc/self/attr/apparmor/current"
 	if _, err := os.Stat(attrCurrentPath); err != nil {
 		attrCurrentPath = "/proc/self/attr/current"
