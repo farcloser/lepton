@@ -42,12 +42,14 @@ import (
 
 var (
 	// Generic and system errors
+
 	ErrFilesystem             = errors.New("filesystem error") // lstat hard errors, etc
 	ErrContainerVanished      = errors.New("the container you are trying to copy to/from has been deleted")
 	ErrRootlessCannotCp       = errors.New("cannot use cp with stopped containers in rootless mode") // rootless cp with a stopped container
 	ErrFailedMountingSnapshot = errors.New("failed mounting snapshot")                               // failure to mount a stopped container snapshot
 
 	// CP specific errors
+
 	ErrTargetIsReadOnly           = errors.New("cannot copy into read-only location")                            // ...
 	ErrSourceIsNotADir            = errors.New("source is not a directory")                                      // cp SOMEFILE/ foo:/
 	ErrDestinationIsNotADir       = errors.New("destination is not a directory")                                 // * cp ./ foo:/etc/issue/bah

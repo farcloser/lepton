@@ -49,7 +49,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/ocihook/state"
 )
 
-// From https://github.com/moby/moby/blob/v26.1.2/api/types/types.go#L34-L140
+// Image is from https://github.com/moby/moby/blob/v26.1.2/api/types/types.go#L34-L140
 type Image struct {
 	ID            string `json:"Id"`
 	RepoTags      []string
@@ -77,7 +77,7 @@ type Image struct {
 	// Deprecated: TODO: ContainerConfig *container.Config
 }
 
-// From: https://github.com/moby/moby/blob/v26.1.2/api/types/graph_driver_data.go
+// GraphDriverData is from: https://github.com/moby/moby/blob/v26.1.2/api/types/graph_driver_data.go
 type GraphDriverData struct {
 	Data map[string]string `json:"Data"`
 	Name string            `json:"Name"`
@@ -125,7 +125,7 @@ type Container struct {
 	NetworkSettings *NetworkSettings
 }
 
-// From https://github.com/moby/moby/blob/v20.10.1/api/types/types.go#L416-L427
+// MountPoint is from https://github.com/moby/moby/blob/v20.10.1/api/types/types.go#L416-L427
 // MountPoint represents a mount point configuration inside the container.
 // This is used for reporting the mountpoints in use by a container.
 type MountPoint struct {
@@ -139,7 +139,7 @@ type MountPoint struct {
 	Propagation string
 }
 
-// config is from https://github.com/moby/moby/blob/8dbd90ec00daa26dc45d7da2431c965dec99e8b4/api/types/container/config.go#L37-L69
+// Config is from https://github.com/moby/moby/blob/8dbd90ec00daa26dc45d7da2431c965dec99e8b4/api/types/container/config.go#L37-L69
 type Config struct {
 	Hostname string `json:",omitempty"` // Hostname
 	// TODO: Domainname   string      // Domainname

@@ -31,11 +31,12 @@ import (
 // Type alias for functions which write out logs to the provided stdout/stderr Writers.
 // Depending on the provided `LogViewOptions.Follow` option, the function may block
 // indefinitely until something is sent through the `stopChannel`.
+
 type LogViewerFunc func(lvopts LogViewOptions, stdout, stderr io.Writer, stopChannel chan os.Signal) error
 
 var logViewers = make(map[string]LogViewerFunc)
 
-// Registers a LogViewerFunc for the
+// RegisterLogViewer does register a LogViewerFunc
 func RegisterLogViewer(driverName string, lvfn LogViewerFunc) {
 	if v, ok := logViewers[driverName]; ok {
 		log.L.Warnf("A LogViewerFunc with name %q has already been registered: %#v, overriding with %#v either way", driverName, v, lvfn)

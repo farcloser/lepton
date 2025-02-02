@@ -29,7 +29,7 @@ import (
 	"github.com/containerd/containerd/v2/core/content"
 )
 
-// ContentStore should be called to get a Provider with caching
+// NewProvider should be called to get a Provider with caching
 func NewProvider(client *containerd.Client) content.Provider {
 	return &providerWithCache{
 		client.ContentStore(),

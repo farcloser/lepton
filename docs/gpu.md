@@ -1,8 +1,5 @@
 # Using GPUs inside containers
 
-| :zap: Requirement | nerdctl >= 0.9 |
-|-------------------|----------------|
-
 nerdctl provides docker-compatible NVIDIA GPU support.
 
 ## Prerequisites

@@ -21,16 +21,16 @@ package labels
 import "github.com/containerd/nerdctl/v2/pkg/version"
 
 const (
-	// Compose Project Name
+	// ComposeProject Name
 	ComposeProject = "com.docker.compose.project"
 
-	// Compose Service Name
+	// ComposeService Name
 	ComposeService = "com.docker.compose.service"
 
-	// Compose Network Name
+	// ComposeNetwork Name
 	ComposeNetwork = "com.docker.compose.network"
 
-	// Compose Volume Name
+	// ComposeVolume Name
 	ComposeVolume = "com.docker.compose.volume"
 )
 
@@ -45,7 +45,6 @@ var (
 	// WARNING: multiple containers may have same the name label
 	Name = Prefix + "name"
 
-	// Hostname
 	Hostname = Prefix + "hostname"
 
 	// ExtraHosts are HostIPs to appended to /etc/hosts

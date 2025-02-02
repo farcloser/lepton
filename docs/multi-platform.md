@@ -1,8 +1,5 @@
 # Multi-platform
 
-| :zap: Requirement | nerdctl >= 0.13 |
-|-------------------|-----------------|
-
 nerdctl can execute non-native container images using QEMU.
 e.g., ARM on Intel, and vice versa.
 
