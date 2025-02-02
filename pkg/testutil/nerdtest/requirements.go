@@ -27,6 +27,7 @@ import (
 	"gotest.tools/v3/assert"
 
 	"go.farcloser.world/containers/security/cgroups"
+	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/pkg/buildkitutil"
@@ -168,7 +169,7 @@ var Rootless = &test.Requirement{
 }
 
 // Rootful marks a test as suitable only for rootful env
-var Rootful = test.Not(Rootless)
+var Rootful = require.Not(Rootless)
 
 // CGroup requires that cgroup is enabled
 var CGroup = &test.Requirement{
@@ -188,7 +189,7 @@ var CGroup = &test.Requirement{
 	},
 }
 
-var CgroupsAccessible = test.Require(
+var CgroupsAccessible = require.All(
 	CGroup,
 	&test.Requirement{
 		Check: func(data test.Data, helpers test.Helpers) (ret bool, mess string) {
@@ -225,9 +226,9 @@ var Soci = &test.Requirement{
 }
 
 // Registry marks a test as requiring a registry to be deployed
-var Registry = test.Require(
+var Registry = require.All(
 	// Registry requires Linux currently
-	test.Linux,
+	require.Linux,
 	(func() *test.Requirement {
 		// Provisional: see note in cleanup
 		// var reg *registry.Server

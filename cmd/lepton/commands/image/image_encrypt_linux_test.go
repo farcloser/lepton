@@ -23,6 +23,7 @@ import (
 
 	"gotest.tools/v3/assert"
 
+	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/pkg/testutil"
@@ -40,10 +41,10 @@ func TestImageEncryptJWE(t *testing.T) {
 	const remoteImageKey = "remoteImageKey"
 
 	testCase := &test.Case{
-		Require: test.Require(
+		Require: require.All(
 			nerdtest.NerdishctlNeedsFixing("https://github.com/containerd/nerdctl/pull/3792"),
-			test.Linux,
-			test.Not(nerdtest.Docker),
+			require.Linux,
+			require.Not(nerdtest.Docker),
 			// This test needs to rmi the common image
 			nerdtest.Private,
 		),

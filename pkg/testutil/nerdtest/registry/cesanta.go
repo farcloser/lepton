@@ -29,6 +29,7 @@ import (
 	"gopkg.in/yaml.v3"
 	"gotest.tools/v3/assert"
 
+	"go.farcloser.world/tigron/expect"
 	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/pkg/inspecttypes/dockercompat"
@@ -93,7 +94,7 @@ func ensureContainerStarted(helpers test.Helpers, con string) {
 	for i := 0; i < 5 && !started; i++ {
 		helpers.Command("container", "inspect", con).
 			Run(&test.Expected{
-				ExitCode: test.ExitCodeNoCheck,
+				ExitCode: expect.ExitCodeNoCheck,
 				Output: func(stdout string, info string, t *testing.T) {
 					var dc []dockercompat.Container
 					err := json.Unmarshal([]byte(stdout), &dc)

@@ -35,6 +35,8 @@ import (
 	"gotest.tools/v3/assert"
 	"gotest.tools/v3/icmd"
 
+	"go.farcloser.world/tigron/expect"
+	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/pkg/rootlessutil"
@@ -530,8 +532,8 @@ func TestIssue3568(t *testing.T) {
 			Description: "Issue #3568 - Detaching from a container started by using --rm option causes the container to be deleted.",
 			// When detaching from a container, for a session started with 'docker attach', it prints 'read escape sequence', but for one started with 'docker (run|start)', it prints nothing.
 			// However, the flag is called '--detach-keys' in all cases, so nerdctl prints 'read detach keys' for all cases, and that's why this test is skipped for Docker.
-			Require: test.Require(
-				test.Not(nerdtest.Docker),
+			Require: require.All(
+				require.Not(nerdtest.Docker),
 			),
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				cmd := helpers.Command("run", "--rm", "-it", "--detach-keys=ctrl-a,ctrl-b", "--name", data.Identifier(), testutil.CommonImage)
@@ -553,8 +555,8 @@ func TestIssue3568(t *testing.T) {
 				return &test.Expected{
 					ExitCode: 0,
 					Errors:   []error{},
-					Output: test.All(
-						test.Contains("read detach keys"),
+					Output: expect.All(
+						expect.Contains("read detach keys"),
 						func(stdout string, info string, t *testing.T) {
 							assert.Assert(t, strings.Contains(helpers.Capture("ps"), data.Identifier()))
 						},

@@ -23,6 +23,8 @@ import (
 
 	"gotest.tools/v3/assert"
 
+	"go.farcloser.world/tigron/expect"
+	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/pkg/formatter"
@@ -55,22 +57,22 @@ func TestInfo(t *testing.T) {
 		},
 		{
 			Description: "info with namespace",
-			Require:     test.Not(nerdtest.Docker),
+			Require:     require.Not(nerdtest.Docker),
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Custom(nerdtest.Binary(), "info")
 			},
-			Expected: test.Expects(0, nil, test.Contains("Namespace:	default")),
+			Expected: test.Expects(0, nil, expect.Contains("Namespace:	default")),
 		},
 		{
 			Description: "info with namespace env var",
 			Env: map[string]string{
 				"CONTAINERD_NAMESPACE": "test",
 			},
-			Require: test.Not(nerdtest.Docker),
+			Require: require.Not(nerdtest.Docker),
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Custom(nerdtest.Binary(), "info")
 			},
-			Expected: test.Expects(0, nil, test.Contains("Namespace:	test")),
+			Expected: test.Expects(0, nil, expect.Contains("Namespace:	test")),
 		},
 	}
 

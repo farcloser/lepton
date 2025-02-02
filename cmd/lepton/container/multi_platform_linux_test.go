@@ -24,6 +24,7 @@ import (
 
 	"gotest.tools/v3/assert"
 
+	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/pkg/testutil"
@@ -59,8 +60,8 @@ func TestMultiPlatformBuildPush(t *testing.T) {
 	testCase := nerdtest.Setup()
 
 	// non-buildx version of `docker build` lacks multi-platform. Also, `docker push` lacks --platform.
-	testCase.Require = test.Require(
-		test.Not(nerdtest.Docker),
+	testCase.Require = require.All(
+		require.Not(nerdtest.Docker),
 		nerdtest.Build,
 		nerdtest.IsFlaky("mixed tests using both legacy and non-legacy are considered flaky"),
 	)
@@ -103,8 +104,8 @@ func TestMultiPlatformBuildPushNoRun(t *testing.T) {
 	testCase := nerdtest.Setup()
 
 	// non-buildx version of `docker build` lacks multi-platform. Also, `docker push` lacks --platform.
-	testCase.Require = test.Require(
-		test.Not(nerdtest.Docker),
+	testCase.Require = require.All(
+		require.Not(nerdtest.Docker),
 		nerdtest.Build,
 		nerdtest.IsFlaky("mixed tests using both legacy and non-legacy are considered flaky"),
 	)
@@ -137,8 +138,8 @@ func TestMultiPlatformPullPushAllPlatforms(t *testing.T) {
 	testCase := nerdtest.Setup()
 
 	// non-buildx version of `docker build` lacks multi-platform. Also, `docker push` lacks --platform.
-	testCase.Require = test.Require(
-		test.Not(nerdtest.Docker),
+	testCase.Require = require.All(
+		require.Not(nerdtest.Docker),
 		nerdtest.IsFlaky("mixed tests using both legacy and non-legacy are considered flaky"),
 	)
 

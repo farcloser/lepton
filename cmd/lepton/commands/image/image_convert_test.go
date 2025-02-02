@@ -19,6 +19,7 @@ package image
 import (
 	"testing"
 
+	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/pkg/testutil"
@@ -29,8 +30,8 @@ func TestImageConvert(t *testing.T) {
 	nerdtest.Setup()
 
 	testCase := &test.Case{
-		Require: test.Require(
-			test.Not(nerdtest.Docker),
+		Require: require.All(
+			require.Not(nerdtest.Docker),
 		),
 		Setup: func(data test.Data, helpers test.Helpers) {
 			helpers.Ensure("pull", "--quiet", testutil.CommonImage)

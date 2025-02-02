@@ -23,6 +23,8 @@ import (
 
 	"gotest.tools/v3/assert"
 
+	"go.farcloser.world/tigron/expect"
+	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/pkg/testutil"
@@ -117,8 +119,8 @@ func TestDetachAttachKeysForAutoRemovedContainer(t *testing.T) {
 			Description: "Issue #3568 - A container should be deleted when detaching and attaching a container started with the --rm option.",
 			// In nerdctl the detach return code from the container is 0, but in docker the return code is 1.
 			// This behaviour is reported in https://github.com/containerd/nerdctl/issues/3571 so this test is skipped for Docker.
-			Require: test.Require(
-				test.Not(nerdtest.Docker),
+			Require: require.All(
+				require.Not(nerdtest.Docker),
 			),
 			Setup: func(data test.Data, helpers test.Helpers) {
 				cmd := helpers.Command("run", "--rm", "-it", "--detach-keys=ctrl-a,ctrl-b", "--name", data.Identifier(), testutil.CommonImage)
@@ -148,7 +150,7 @@ func TestDetachAttachKeysForAutoRemovedContainer(t *testing.T) {
 				return &test.Expected{
 					ExitCode: 0,
 					Errors:   []error{},
-					Output: test.All(
+					Output: expect.All(
 						func(stdout string, info string, t *testing.T) {
 							assert.Assert(t, !strings.Contains(helpers.Capture("ps", "-a"), data.Identifier()))
 						},

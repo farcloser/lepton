@@ -300,12 +300,12 @@ github.com/yuchanns/srslog v1.1.0/go.mod h1:HsLjdv3XV02C3kgBW2bTyW6i88OQE+VYJZIx
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
-go.farcloser.world/containers v0.0.0-20250130235254-5b3644b7a42d h1:ymGDZ1GVQUg36LmN5yXrz2F1p2REMABtOy92AeCWECk=
-go.farcloser.world/containers v0.0.0-20250130235254-5b3644b7a42d/go.mod h1:jFz5slK6RADTAdnil77V7+6nC9NXuBqatq4ccyevoh0=
+go.farcloser.world/containers v0.0.0-20250202050720-eb26437fa9d1 h1:ZYMxpcrZWLdtl9zzmJSaZNJU1DxIIR01hpW8hTj2CqY=
+go.farcloser.world/containers v0.0.0-20250202050720-eb26437fa9d1/go.mod h1:LTLGrO7dN6Lh4oNI4IeeYiaZHted1O2Q1q8KdKfMF2A=
 go.farcloser.world/core v0.0.0-20250202045807-ac4264f8ecf9 h1:CRPKHsdEoQwxbUBNrWZ+Ft8V8A5XwdHgRGu6tI1ZdO8=
 go.farcloser.world/core v0.0.0-20250202045807-ac4264f8ecf9/go.mod h1:gXbQVptSmDlD5SijiQM0QzpCDE4rK8EjXdYKaKNs1Sg=
-go.farcloser.world/tigron v0.0.0-20250201231533-d31754e8a8fa h1:6+ZnjU+IP+PtyTYzE2klIaAjgki/qv0P5ns4ULJHZ8M=
-go.farcloser.world/tigron v0.0.0-20250201231533-d31754e8a8fa/go.mod h1:vVhfkzWpZw/CF9MwxHcRd0/0zV/Ymgc2k7ZIzDYAS+Y=
+go.farcloser.world/tigron v0.1.1-0.20250202101647-57d4973c9532 h1:65bqttBSwA9am/EpnsvzoQosLMFyfHZV4iDadWYrOeo=
+go.farcloser.world/tigron v0.1.1-0.20250202101647-57d4973c9532/go.mod h1:vVhfkzWpZw/CF9MwxHcRd0/0zV/Ymgc2k7ZIzDYAS+Y=
 go.opencensus.io v0.24.0 h1:y73uSU6J157QMP2kn2r30vwW1A2W2WFwSCGnAVxeaD0=
 go.opencensus.io v0.24.0/go.mod h1:vNK8G9p7aAivkbmorf4v+7Hgx+Zs0yY+0fOtgBfjQKo=
 go.opentelemetry.io/auto/sdk v1.1.0 h1:cH53jehLUN6UFLY71z+NDOiNJqDdPRaXzTel0sJySYA=

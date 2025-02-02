@@ -20,6 +20,8 @@ import (
 	"testing"
 	"time"
 
+	"go.farcloser.world/tigron/expect"
+	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/pkg/formatter"
@@ -40,11 +42,11 @@ func TestEventFilters(t *testing.T) {
 	testCase.SubTests = []*test.Case{
 		{
 			Description: "CapitalizedFilter",
-			Require:     test.Not(nerdtest.Docker),
+			Require:     require.Not(nerdtest.Docker),
 			Command:     testEventFilterExecutor,
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 				return &test.Expected{
-					Output: test.Contains(data.Get("output")),
+					Output: expect.Contains(data.Get("output")),
 				}
 			},
 			Data: test.WithData("filter", "event=START").
@@ -55,7 +57,7 @@ func TestEventFilters(t *testing.T) {
 			Command:     testEventFilterExecutor,
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 				return &test.Expected{
-					Output: test.Contains(data.Get("output")),
+					Output: expect.Contains(data.Get("output")),
 				}
 			},
 			Data: test.WithData("filter", "event=start").
@@ -63,11 +65,11 @@ func TestEventFilters(t *testing.T) {
 		},
 		{
 			Description: "UnsupportedEventFilter",
-			Require:     test.Not(nerdtest.Docker),
+			Require:     require.Not(nerdtest.Docker),
 			Command:     testEventFilterExecutor,
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 				return &test.Expected{
-					Output: test.Contains(data.Get("output")),
+					Output: expect.Contains(data.Get("output")),
 				}
 			},
 			Data: test.WithData("filter", "event=unknown").
@@ -78,7 +80,7 @@ func TestEventFilters(t *testing.T) {
 			Command:     testEventFilterExecutor,
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 				return &test.Expected{
-					Output: test.Contains(data.Get("output")),
+					Output: expect.Contains(data.Get("output")),
 				}
 			},
 			Data: test.WithData("filter", "status=start").
@@ -86,11 +88,11 @@ func TestEventFilters(t *testing.T) {
 		},
 		{
 			Description: "UnsupportedStatusFilter",
-			Require:     test.Not(nerdtest.Docker),
+			Require:     require.Not(nerdtest.Docker),
 			Command:     testEventFilterExecutor,
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 				return &test.Expected{
-					Output: test.Contains(data.Get("output")),
+					Output: expect.Contains(data.Get("output")),
 				}
 			},
 			Data: test.WithData("filter", "status=unknown").

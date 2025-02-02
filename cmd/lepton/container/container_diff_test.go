@@ -19,6 +19,8 @@ package container
 import (
 	"testing"
 
+	"go.farcloser.world/tigron/expect"
+	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/pkg/testutil"
@@ -34,7 +36,7 @@ func TestDiff(t *testing.T) {
 		testCase.NoParallel = true
 	}
 
-	testCase.Require = test.Not(test.Windows)
+	testCase.Require = require.Not(require.Windows)
 
 	testCase.Setup = func(data test.Data, helpers test.Helpers) {
 		helpers.Ensure("run", "-d", "--name", data.Identifier(), testutil.CommonImage,
@@ -49,11 +51,11 @@ func TestDiff(t *testing.T) {
 		return helpers.Command("diff", data.Identifier())
 	}
 
-	testCase.Expected = test.Expects(0, nil, test.All(
-		test.Contains("A /a"),
-		test.Contains("C /bin"),
-		test.Contains("A /bin/b"),
-		test.Contains("D /bin/base64"),
+	testCase.Expected = test.Expects(0, nil, expect.All(
+		expect.Contains("A /a"),
+		expect.Contains("C /bin"),
+		expect.Contains("A /bin/b"),
+		expect.Contains("D /bin/base64"),
 	))
 
 	testCase.Run(t)

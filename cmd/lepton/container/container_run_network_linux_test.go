@@ -37,6 +37,7 @@ import (
 	"gotest.tools/v3/icmd"
 
 	"go.farcloser.world/containers/digest"
+	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/leptonic/errs"
@@ -357,7 +358,7 @@ func TestRunPort(t *testing.T) {
 func TestRunWithInvalidPortThenCleanUp(t *testing.T) {
 	testCase := nerdtest.Setup()
 	// docker does not set label restriction to 4096 bytes
-	testCase.Require = test.Not(nerdtest.Docker)
+	testCase.Require = require.Not(nerdtest.Docker)
 
 	testCase.SubTests = []*test.Case{
 		{

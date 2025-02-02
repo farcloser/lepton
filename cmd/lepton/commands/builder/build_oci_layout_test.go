@@ -25,6 +25,7 @@ import (
 
 	"gotest.tools/v3/assert"
 
+	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/pkg/testutil"
@@ -37,9 +38,9 @@ func TestBuildContextWithOCILayout(t *testing.T) {
 	var dockerBuilderArgs []string
 
 	testCase := &test.Case{
-		Require: test.Require(
+		Require: require.All(
 			nerdtest.Build,
-			test.Not(test.Windows),
+			require.Not(require.Windows),
 		),
 		Cleanup: func(data test.Data, helpers test.Helpers) {
 			if nerdtest.IsDocker() {

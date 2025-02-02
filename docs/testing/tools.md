@@ -33,7 +33,7 @@ func TestMyThing(t *testing.T) {
 	// This is going to run `nerdctl info` (or `docker info`)
 	myTest.Command = test.Command("info")
     // Verify the command exits with 0, and stdout contains the word `Kernel`
-    myTest.Expected = test.Expects(0, nil, test.Contains("Kernel"))
+    myTest.Expected = test.Expects(0, nil, expect.Contains("Kernel"))
 	// Run it
 	myTest.Run(t)
 }
@@ -63,11 +63,11 @@ Secondly, `test.Contains` - which is a `Comparator`.
 
 ### Comparators
 
-Besides `test.Contains(string)`, there are a few more:
-- `test.DoesNotContain(string)`
-- `test.Equals(string)`
-- `test.Match(*regexp.Regexp)`
-- `test.All(comparators ...Comparator)`, which allows you to bundle together a bunch of other comparators
+Besides `expect.Contains(string)`, there are a few more:
+- `expect.DoesNotContain(string)`
+- `expect.Equals(string)`
+- `expect.Match(*regexp.Regexp)`
+- `expect.All(comparators ...Comparator)`, which allows you to bundle together a bunch of other comparators
 
 The following example shows how to implement your own custom `Comparator`
 (this is actually the `Equals` comparator).

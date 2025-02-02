@@ -20,6 +20,8 @@ import (
 	"runtime"
 	"testing"
 
+	"go.farcloser.world/tigron/expect"
+	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/pkg/testutil"
@@ -30,12 +32,12 @@ func TestStats(t *testing.T) {
 	testCase := nerdtest.Setup()
 
 	// FIXME: does not seem to work on windows
-	testCase.Require = test.Not(test.Windows)
+	testCase.Require = require.Not(require.Windows)
 
 	if runtime.GOOS == "linux" {
 		// this comment is for `ps` but it also valid for `stats` :
 		// https://github.com/containerd/nerdctl/pull/223#issuecomment-851395178
-		testCase.Require = test.Require(
+		testCase.Require = require.All(
 			testCase.Require,
 			nerdtest.CgroupsAccessible,
 		)
@@ -60,7 +62,7 @@ func TestStats(t *testing.T) {
 			Command:     test.Command("stats", "--no-stream", "--no-trunc"),
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 				return &test.Expected{
-					Output: test.Contains(data.Get("id")),
+					Output: expect.Contains(data.Get("id")),
 				}
 			},
 		},
@@ -69,7 +71,7 @@ func TestStats(t *testing.T) {
 			Command:     test.Command("container", "stats", "--no-stream", "--no-trunc"),
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 				return &test.Expected{
-					Output: test.Contains(data.Get("id")),
+					Output: expect.Contains(data.Get("id")),
 				}
 			},
 		},
@@ -94,14 +96,14 @@ func TestStats(t *testing.T) {
 			},
 			// https://github.com/containerd/nerdctl/issues/1240
 			// used to print UINT64_MAX as the memory limit, so, ensure it does no more
-			Expected: test.Expects(0, nil, test.DoesNotContain("16EiB")),
+			Expected: test.Expects(0, nil, expect.DoesNotContain("16EiB")),
 		},
 		{
 			Description: "mem limit set",
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("stats", "--no-stream")
 			},
-			Expected: test.Expects(0, nil, test.Contains("1GiB")),
+			Expected: test.Expects(0, nil, expect.Contains("1GiB")),
 		},
 	}
 

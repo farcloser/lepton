@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"testing"
 
+	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/pkg/testutil"
@@ -106,10 +107,10 @@ func TestIssue3425(t *testing.T) {
 			},
 			{
 				Description: "with convert",
-				Require: test.Require(
+				Require: require.All(
 					nerdtest.Private,
-					test.Not(test.Windows),
-					test.Not(nerdtest.Docker),
+					require.Not(require.Windows),
+					require.Not(nerdtest.Docker),
 				),
 				Setup: func(data test.Data, helpers test.Helpers) {
 					helpers.Ensure("image", "pull", testutil.CommonImage)

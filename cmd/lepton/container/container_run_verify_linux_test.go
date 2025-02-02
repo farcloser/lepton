@@ -21,6 +21,7 @@ import (
 	"os/exec"
 	"testing"
 
+	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/pkg/testutil"
@@ -32,8 +33,8 @@ import (
 func TestRunVerifyCosign(t *testing.T) {
 	testCase := nerdtest.Setup()
 
-	testCase.Require = test.Require(
-		test.Not(nerdtest.Docker),
+	testCase.Require = require.All(
+		require.Not(nerdtest.Docker),
 		nerdtest.Build,
 		&test.Requirement{
 			Check: func(data test.Data, helpers test.Helpers) (ret bool, mess string) {

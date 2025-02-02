@@ -27,6 +27,7 @@ import (
 
 	"gotest.tools/v3/assert"
 
+	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/pkg/testutil"
@@ -41,7 +42,7 @@ func TestPush(t *testing.T) {
 	var registryNoAuthHTTPRandom, registryNoAuthHTTPDefault, registryTokenAuthHTTPSRandom *testregistry.RegistryServer
 
 	testCase := &test.Case{
-		Require: test.Linux,
+		Require: require.Linux,
 
 		Setup: func(data test.Data, helpers test.Helpers) {
 			registryNoAuthHTTPRandom = testregistry.NewWithNoAuth(data, helpers, 0, false)
@@ -83,7 +84,7 @@ func TestPush(t *testing.T) {
 			},
 			{
 				Description: "plain http with insecure",
-				Require:     test.Not(nerdtest.Docker),
+				Require:     require.Not(nerdtest.Docker),
 				Setup: func(data test.Data, helpers test.Helpers) {
 					helpers.Ensure("pull", "--quiet", testutil.CommonImage)
 					testImageRef := fmt.Sprintf("%s:%d/%s:%s",
@@ -117,7 +118,7 @@ func TestPush(t *testing.T) {
 			},
 			{
 				Description: "plain http with insecure, default port",
-				Require:     test.Not(nerdtest.Docker),
+				Require:     require.Not(nerdtest.Docker),
 				Setup: func(data test.Data, helpers test.Helpers) {
 					helpers.Ensure("pull", "--quiet", testutil.CommonImage)
 					testImageRef := fmt.Sprintf("%s/%s:%s",
@@ -137,7 +138,7 @@ func TestPush(t *testing.T) {
 			},
 			{
 				Description: "with insecure, with login",
-				Require:     test.Not(nerdtest.Docker),
+				Require:     require.Not(nerdtest.Docker),
 				Setup: func(data test.Data, helpers test.Helpers) {
 					helpers.Ensure("pull", "--quiet", testutil.CommonImage)
 					testImageRef := fmt.Sprintf("%s:%d/%s:%s",
@@ -160,7 +161,7 @@ func TestPush(t *testing.T) {
 			},
 			{
 				Description: "with hosts dir, with login",
-				Require:     test.Not(nerdtest.Docker),
+				Require:     require.Not(nerdtest.Docker),
 				Setup: func(data test.Data, helpers test.Helpers) {
 					helpers.Ensure("pull", "--quiet", testutil.CommonImage)
 					testImageRef := fmt.Sprintf("%s:%d/%s:%s",
@@ -183,7 +184,7 @@ func TestPush(t *testing.T) {
 			},
 			{
 				Description: "non distributable artifacts",
-				Require:     test.Not(nerdtest.Docker),
+				Require:     require.Not(nerdtest.Docker),
 				Setup: func(data test.Data, helpers test.Helpers) {
 					helpers.Ensure("pull", "--quiet", testutil.NonDistBlobImage)
 					testImageRef := fmt.Sprintf("%s:%d/%s:%s",
@@ -215,7 +216,7 @@ func TestPush(t *testing.T) {
 			},
 			{
 				Description: "non distributable artifacts (with)",
-				Require:     test.Not(nerdtest.Docker),
+				Require:     require.Not(nerdtest.Docker),
 				Setup: func(data test.Data, helpers test.Helpers) {
 					helpers.Ensure("pull", "--quiet", testutil.NonDistBlobImage)
 					testImageRef := fmt.Sprintf("%s:%d/%s:%s",
@@ -247,9 +248,9 @@ func TestPush(t *testing.T) {
 			},
 			{
 				Description: "soci",
-				Require: test.Require(
+				Require: require.All(
 					nerdtest.Soci,
-					test.Not(nerdtest.Docker),
+					require.Not(nerdtest.Docker),
 				),
 				Setup: func(data test.Data, helpers test.Helpers) {
 					helpers.Ensure("pull", "--quiet", testutil.UbuntuImage)

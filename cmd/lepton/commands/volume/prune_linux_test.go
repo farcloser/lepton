@@ -20,6 +20,7 @@ import (
 	"strings"
 	"testing"
 
+	"go.farcloser.world/tigron/expect"
 	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/pkg/testutil"
@@ -67,11 +68,11 @@ func TestVolumePrune(t *testing.T) {
 			Command:     test.Command("volume", "prune", "-f"),
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 				return &test.Expected{
-					Output: test.All(
-						test.DoesNotContain(data.Get("anonIDBusy")),
-						test.Contains(data.Get("anonIDDangling")),
-						test.DoesNotContain(data.Get("namedBusy")),
-						test.DoesNotContain(data.Get("namedDangling")),
+					Output: expect.All(
+						expect.DoesNotContain(data.Get("anonIDBusy")),
+						expect.Contains(data.Get("anonIDDangling")),
+						expect.DoesNotContain(data.Get("namedBusy")),
+						expect.DoesNotContain(data.Get("namedDangling")),
 						func(stdout string, info string, t *testing.T) {
 							helpers.Ensure("volume", "inspect", data.Get("anonIDBusy"))
 							helpers.Fail("volume", "inspect", data.Get("anonIDDangling"))
@@ -90,11 +91,11 @@ func TestVolumePrune(t *testing.T) {
 			Command:     test.Command("volume", "prune", "-f", "--all"),
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 				return &test.Expected{
-					Output: test.All(
-						test.DoesNotContain(data.Get("anonIDBusy")),
-						test.Contains(data.Get("anonIDDangling")),
-						test.DoesNotContain(data.Get("namedBusy")),
-						test.Contains(data.Get("namedDangling")),
+					Output: expect.All(
+						expect.DoesNotContain(data.Get("anonIDBusy")),
+						expect.Contains(data.Get("anonIDDangling")),
+						expect.DoesNotContain(data.Get("namedBusy")),
+						expect.Contains(data.Get("namedDangling")),
 						func(stdout string, info string, t *testing.T) {
 							helpers.Ensure("volume", "inspect", data.Get("anonIDBusy"))
 							helpers.Fail("volume", "inspect", data.Get("anonIDDangling"))

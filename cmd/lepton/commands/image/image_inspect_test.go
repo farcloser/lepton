@@ -26,6 +26,7 @@ import (
 
 	"gotest.tools/v3/assert"
 
+	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/pkg/inspecttypes/dockercompat"
@@ -96,10 +97,10 @@ func TestImageInspectDifferentValidReferencesForTheSameImage(t *testing.T) {
 	}
 
 	testCase := &test.Case{
-		Require: test.Require(
-			test.Not(nerdtest.Docker),
+		Require: require.All(
+			require.Not(nerdtest.Docker),
 			// FIXME: this test depends on hub images that do not have windows versions
-			test.Not(test.Windows),
+			require.Not(require.Windows),
 			// We need a clean slate
 			nerdtest.Private,
 		),
