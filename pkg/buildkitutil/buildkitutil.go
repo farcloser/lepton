@@ -39,11 +39,11 @@ import (
 
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
+	"go.farcloser.world/lepton/pkg/rootlessutil"
 )
 
 const (
-	// DefaultDockerfileName is the Default filename, read by nerdctl build
+	// DefaultDockerfileName is the Default filename, read by build
 	DefaultDockerfileName string = "Dockerfile"
 	ContainerfileName     string = "Containerfile"
 

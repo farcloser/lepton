@@ -27,10 +27,10 @@ import (
 	"time"
 
 	"github.com/Microsoft/hcsshim/cmd/containerd-shim-runhcs-v1/options"
-	"go.farcloser.world/core/units"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/typeurl/v2"
+
+	"go.farcloser.world/core/units"
 )
 
 // containerTop was inspired from https://github.com/moby/moby/blob/master/daemon/top_windows.go

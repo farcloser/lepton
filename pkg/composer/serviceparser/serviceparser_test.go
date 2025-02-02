@@ -27,8 +27,8 @@ import (
 	"github.com/compose-spec/compose-go/v2/types"
 	"gotest.tools/v3/assert"
 
-	"github.com/containerd/nerdctl/v2/pkg/strutil"
-	"github.com/containerd/nerdctl/v2/pkg/testutil"
+	"go.farcloser.world/lepton/pkg/strutil"
+	"go.farcloser.world/lepton/pkg/testutil"
 )
 
 func TestServicePortConfigToFlagP(t *testing.T) {

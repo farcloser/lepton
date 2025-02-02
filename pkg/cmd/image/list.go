@@ -29,11 +29,6 @@ import (
 	"text/template"
 	"time"
 
-	"go.farcloser.world/containers/digest"
-	"go.farcloser.world/containers/reference"
-	"go.farcloser.world/containers/specs"
-	"go.farcloser.world/core/units"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/content"
 	"github.com/containerd/containerd/v2/core/images"
@@ -41,10 +36,15 @@ import (
 	"github.com/containerd/log"
 	"github.com/containerd/platforms"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/containerdutil"
-	"github.com/containerd/nerdctl/v2/pkg/formatter"
-	"github.com/containerd/nerdctl/v2/pkg/imgutil"
+	"go.farcloser.world/containers/digest"
+	"go.farcloser.world/containers/reference"
+	"go.farcloser.world/containers/specs"
+	"go.farcloser.world/core/units"
+
+	"go.farcloser.world/lepton/pkg/api/options"
+	"go.farcloser.world/lepton/pkg/containerdutil"
+	"go.farcloser.world/lepton/pkg/formatter"
+	"go.farcloser.world/lepton/pkg/imgutil"
 )
 
 // ListCommandHandler `List` and print images matching filters in `options`.
@@ -122,7 +122,7 @@ type imagePrintable struct {
 	Tag          string // "<none>" or tag
 	Name         string // image name
 	Size         string // the size of the unpacked snapshots.
-	BlobSize     string // the size of the blobs in the content store (nerdctl extension)
+	BlobSize     string // the size of the blobs in the content store (this is an extension)
 	// TODO: "SharedSize", "UniqueSize"
 	Platform string // extension
 }
@@ -134,13 +134,13 @@ func printImages(ctx context.Context, client *containerd.Client, imageList []ima
 		the same imageId under k8s.io is showing multiple results: repo:tag, repo:digest, configID.
 		We expect to display only repo:tag, consistent with other namespaces and CRI
 		e.g.
-		nerdctl -n k8s.io images
+		 -n k8s.io images
 		REPOSITORY    TAG       IMAGE ID        CREATED        PLATFORM       SIZE         BLOB SIZE
 		centos        7         be65f488b776    3 hours ago    linux/amd64    211.5 MiB    72.6 MiB
 		centos        <none>    be65f488b776    3 hours ago    linux/amd64    211.5 MiB    72.6 MiB
 		<none>        <none>    be65f488b776    3 hours ago    linux/amd64    211.5 MiB    72.6 MiB
 		expect:
-		nerdctl --kube-hide-dupe -n k8s.io images
+		 --kube-hide-dupe -n k8s.io images
 		REPOSITORY    TAG       IMAGE ID        CREATED        PLATFORM       SIZE         BLOB SIZE
 		centos        7         be65f488b776    3 hours ago    linux/amd64    211.5 MiB    72.6 MiB
 	*/

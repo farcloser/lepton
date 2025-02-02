@@ -19,7 +19,7 @@ package nerdtest
 import (
 	"go.farcloser.world/tigron/test"
 
-	"github.com/containerd/nerdctl/v2/leptonic/testtooling"
+	"go.farcloser.world/lepton/leptonic/testtooling"
 )
 
 var HyperV = &test.Requirement{

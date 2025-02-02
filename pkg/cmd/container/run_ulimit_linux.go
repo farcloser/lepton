@@ -20,13 +20,13 @@ import (
 	"context"
 	"strings"
 
-	"github.com/docker/go-units"
-	"go.farcloser.world/containers/specs"
-
 	"github.com/containerd/containerd/v2/core/containers"
 	"github.com/containerd/containerd/v2/pkg/oci"
+	"github.com/docker/go-units"
 
-	"github.com/containerd/nerdctl/v2/pkg/strutil"
+	"go.farcloser.world/containers/specs"
+
+	"go.farcloser.world/lepton/pkg/strutil"
 )
 
 func generateUlimitsOpts(ulimits []string) ([]oci.SpecOpts, error) {

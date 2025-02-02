@@ -25,10 +25,10 @@ cat <<-EOX
 (To be documented)
 
 ## Compatible containerd versions
-This release of nerdctl is expected to be used with containerd v1.6, v1.7, or v2.0.
+This release is expected to be used with containerd v2.0 or more recent.
 
 ## About the binaries
-- Minimal (\`${minimal_amd64tgz_basename}\`): nerdctl only
+- Minimal (\`${minimal_amd64tgz_basename}\`): cli binary only
 - Full (\`${full_amd64tgz_basename}\`):    Includes dependencies such as containerd, runc, and CNI
 
 ### Minimal
@@ -57,9 +57,9 @@ $(tar tzvf "${full_amd64tgz}")
 <details><summary>Included components</summary>
 <p>
 
-See \`share/doc/nerdctl-full/README.md\`:
+See \`share/doc/lepton-full/README.md\`:
 \`\`\`markdown
-$(tar xOzf "${full_amd64tgz}" share/doc/nerdctl-full/README.md)
+$(tar xOzf "${full_amd64tgz}" share/doc/lepton-full/README.md)
 \`\`\`
 </p>
 </details>
@@ -68,13 +68,13 @@ $(tar xOzf "${full_amd64tgz}" share/doc/nerdctl-full/README.md)
 ### Rootful
 \`\`\`console
 $ sudo systemctl enable --now containerd
-$ sudo nerdctl run -d --name nginx -p 80:80 nginx:alpine
+$ sudo lepton run -d --name nginx -p 80:80 nginx:alpine
 \`\`\`
 
 ### Rootless
 \`\`\`console
 $ containerd-rootless-setuptool.sh install
-$ nerdctl run -d --name nginx -p 8080:80 nginx:alpine
+$ lepton run -d --name nginx -p 8080:80 nginx:alpine
 \`\`\`
 
 Enabling cgroup v2 is highly recommended for rootless mode, see https://rootlesscontaine.rs/getting-started/common/cgroup2/ .

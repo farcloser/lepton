@@ -35,12 +35,11 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/containerd/log"
 	types100 "github.com/containernetworking/cni/pkg/types/100"
 
-	"github.com/containerd/log"
-
-	"github.com/containerd/nerdctl/v2/leptonic/errs"
-	"github.com/containerd/nerdctl/v2/pkg/store"
+	"go.farcloser.world/lepton/leptonic/errs"
+	"go.farcloser.world/lepton/pkg/store"
 )
 
 const (

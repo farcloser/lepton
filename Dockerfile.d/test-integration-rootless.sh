@@ -20,7 +20,7 @@ if [[ "$(id -u)" = "0" ]]; then
   mount -tsecurityfs securityfs /sys/kernel/security
 	if [ -e /sys/kernel/security/apparmor/profiles ]; then
 		# Load the "prefix-default" profile for TestRunApparmor
-		nerdctl apparmor load
+		lepton apparmor load
 	fi
 
 	: "${WORKAROUND_ISSUE_622:=}"
@@ -40,15 +40,15 @@ else
 	if [[ -e /workaround-issue-622 ]]; then
 		echo "WORKAROUND_ISSUE_622: Not enabling BuildKit (https://github.com/containerd/nerdctl/issues/622)" >&2
 	else
-		CONTAINERD_NAMESPACE="nerdctl-test" containerd-rootless-setuptool.sh install-buildkit-containerd
+		CONTAINERD_NAMESPACE="cli-test" containerd-rootless-setuptool.sh install-buildkit-containerd
 	fi
 	if [ ! -f "/home/rootless/.config/containerd/config.toml" ] ; then
 		echo "version = 2" > /home/rootless/.config/containerd/config.toml
 	fi
 	systemctl --user restart containerd.service
 	containerd-rootless-setuptool.sh install-bypass4netnsd
-	# Once ssh-ed, we lost the Dockerfile working dir, so, get back in the nerdctl checkout
-	cd /go/src/github.com/containerd/nerdctl
+	# Once ssh-ed, we lost the Dockerfile working dir, so, get back in the checkout
+	cd /go/src/go.farcloser.world/lepton
 	# We also lose the PATH (and SendEnv=PATH would require sshd config changes)
 	exec env PATH="/usr/local/go/bin:$PATH" "$@"
 fi

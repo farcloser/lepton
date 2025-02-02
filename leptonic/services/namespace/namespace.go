@@ -24,10 +24,10 @@ import (
 	"github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/pkg/namespaces"
 
-	"github.com/containerd/nerdctl/v2/leptonic/api"
-	"github.com/containerd/nerdctl/v2/leptonic/errs"
-	"github.com/containerd/nerdctl/v2/leptonic/identifiers"
-	"github.com/containerd/nerdctl/v2/leptonic/services/helpers"
+	"go.farcloser.world/lepton/leptonic/api"
+	"go.farcloser.world/lepton/leptonic/errs"
+	"go.farcloser.world/lepton/leptonic/identifiers"
+	"go.farcloser.world/lepton/leptonic/services/helpers"
 )
 
 /*

@@ -24,7 +24,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/containerd/nerdctl/v2/leptonic/errs"
+	"go.farcloser.world/lepton/leptonic/errs"
 )
 
 func HTTPGet(urlStr string, attempts int, insecure bool) (*http.Response, error) {

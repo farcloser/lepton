@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package time // import "github.com/containerd/nerdctl/v2/leptonic/time"
+package time // import "go.farcloser.world/lepton/leptonic/time"
 
 import (
 	"fmt"
@@ -23,7 +23,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/containerd/nerdctl/v2/leptonic/errs"
+	"go.farcloser.world/lepton/leptonic/errs"
 )
 
 // These are additional predefined layouts for use in Time.Format and Time.Parse

@@ -34,11 +34,10 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/containerd/log"
 	"github.com/fsnotify/fsnotify"
 
-	"github.com/containerd/log"
-
-	"github.com/containerd/nerdctl/v2/pkg/logging/tail"
+	"go.farcloser.world/lepton/pkg/logging/tail"
 )
 
 // LogStreamType is the type of the stream in CRI container log.

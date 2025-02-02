@@ -23,14 +23,14 @@ import (
 	"strconv"
 	"strings"
 
-	"go.farcloser.world/containers/specs"
-	"go.farcloser.world/core/units"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/containers"
 	"github.com/containerd/containerd/v2/pkg/oci"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
+	"go.farcloser.world/containers/specs"
+	"go.farcloser.world/core/units"
+
+	"go.farcloser.world/lepton/pkg/api/options"
 )
 
 const (

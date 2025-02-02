@@ -25,16 +25,15 @@ import (
 
 	composecli "github.com/compose-spec/compose-go/v2/cli"
 	compose "github.com/compose-spec/compose-go/v2/types"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/leptonic/identifiers"
-	"github.com/containerd/nerdctl/v2/pkg/composer/serviceparser"
-	"github.com/containerd/nerdctl/v2/pkg/reflectutil"
+	"go.farcloser.world/lepton/leptonic/identifiers"
+	"go.farcloser.world/lepton/pkg/composer/serviceparser"
+	"go.farcloser.world/lepton/pkg/reflectutil"
 )
 
-// Options groups the command line options recommended for a Compose implementation (ProjectOptions) and extra options for nerdctl
+// Options groups the command line options recommended for a Compose implementation (ProjectOptions) and extra options for the cli
 type Options struct {
 	Project          string // empty for default
 	ProjectDirectory string
@@ -55,7 +54,7 @@ type Options struct {
 
 func New(o *Options, client *containerd.Client) (*Composer, error) {
 	if o.CliCmd == "" {
-		return nil, errors.New("got empty nerdctl cmd")
+		return nil, errors.New("got empty cmd")
 	}
 	if o.NetworkExists == nil || o.VolumeExists == nil || o.EnsureImage == nil {
 		return nil, errors.New("got empty functions")

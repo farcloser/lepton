@@ -30,14 +30,13 @@ import (
 	"sync"
 	"time"
 
+	"github.com/containerd/containerd/v2/core/runtime/v2/logging"
+	"github.com/containerd/log"
 	"github.com/fsnotify/fsnotify"
 	"github.com/muesli/cancelreader"
 
-	"github.com/containerd/containerd/v2/core/runtime/v2/logging"
-	"github.com/containerd/log"
-
-	"github.com/containerd/nerdctl/v2/leptonic/errs"
-	"github.com/containerd/nerdctl/v2/pkg/version"
+	"go.farcloser.world/lepton/leptonic/errs"
+	"go.farcloser.world/lepton/pkg/version"
 )
 
 const (

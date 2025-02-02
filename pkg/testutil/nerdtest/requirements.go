@@ -24,14 +24,15 @@ import (
 	"strconv"
 	"strings"
 
-	"go.farcloser.world/containers/security/cgroups"
-	"go.farcloser.world/tigron/test"
 	"gotest.tools/v3/assert"
 
-	"github.com/containerd/nerdctl/v2/pkg/buildkitutil"
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
-	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
-	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest/platform"
+	"go.farcloser.world/containers/security/cgroups"
+	"go.farcloser.world/tigron/test"
+
+	"go.farcloser.world/lepton/pkg/buildkitutil"
+	"go.farcloser.world/lepton/pkg/inspecttypes/dockercompat"
+	"go.farcloser.world/lepton/pkg/rootlessutil"
+	"go.farcloser.world/lepton/pkg/testutil/nerdtest/platform"
 )
 
 var (

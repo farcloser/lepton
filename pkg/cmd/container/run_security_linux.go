@@ -22,18 +22,18 @@ import (
 	"strings"
 	"sync"
 
-	"go.farcloser.world/containers/security/seccomp"
-	"go.farcloser.world/containers/specs"
-
 	"github.com/containerd/containerd/v2/core/containers"
 	"github.com/containerd/containerd/v2/pkg/cap"
 	"github.com/containerd/containerd/v2/pkg/oci"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/leptonic/services/apparmor"
-	"github.com/containerd/nerdctl/v2/pkg/defaults"
-	"github.com/containerd/nerdctl/v2/pkg/maputil"
-	"github.com/containerd/nerdctl/v2/pkg/strutil"
+	"go.farcloser.world/containers/security/seccomp"
+	"go.farcloser.world/containers/specs"
+
+	"go.farcloser.world/lepton/leptonic/services/apparmor"
+	"go.farcloser.world/lepton/pkg/defaults"
+	"go.farcloser.world/lepton/pkg/maputil"
+	"go.farcloser.world/lepton/pkg/strutil"
 )
 
 var privilegedOpts = []oci.SpecOpts{

@@ -28,17 +28,17 @@ import (
 	"sync"
 	"syscall"
 
-	"go.farcloser.world/core/version/semver"
-	"golang.org/x/term"
-
 	"github.com/containerd/console"
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/pkg/cio"
 	"github.com/containerd/log"
+	"golang.org/x/term"
 
-	cio2 "github.com/containerd/nerdctl/v2/leptonic/cio"
-	"github.com/containerd/nerdctl/v2/pkg/consoleutil"
-	"github.com/containerd/nerdctl/v2/pkg/infoutil"
+	"go.farcloser.world/core/version/semver"
+
+	cio2 "go.farcloser.world/lepton/leptonic/cio"
+	"go.farcloser.world/lepton/pkg/consoleutil"
+	"go.farcloser.world/lepton/pkg/infoutil"
 )
 
 // NewTask is from https://github.com/containerd/containerd/blob/v1.4.3/cmd/ctr/commands/tasks/tasks_unix.go#L70-L108
@@ -92,7 +92,7 @@ func NewTask(ctx context.Context, client *containerd.Client, container container
 		}
 
 		// args[0]: _PREFIX_INTERNAL_LOGGING
-		// args[1]: /var/lib/nerdctl/1935db59
+		// args[1]: /var/lib/<ROOT_NAME>/1935db59
 		if len(args) != 2 {
 			return nil, errors.New("parse logging path error")
 		}

@@ -26,8 +26,8 @@ import (
 
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/leptonic/rootlesskit"
-	"github.com/containerd/nerdctl/v2/pkg/version"
+	"go.farcloser.world/lepton/leptonic/rootlesskit"
+	"go.farcloser.world/lepton/pkg/version"
 )
 
 func IsRootlessParent() bool {

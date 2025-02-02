@@ -22,10 +22,9 @@ import (
 	"os"
 
 	"github.com/compose-spec/compose-go/v2/types"
-
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/composer/serviceparser"
+	"go.farcloser.world/lepton/pkg/composer/serviceparser"
 )
 
 type PushOptions struct {

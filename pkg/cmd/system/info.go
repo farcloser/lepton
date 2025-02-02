@@ -24,22 +24,22 @@ import (
 	"strings"
 	"text/template"
 
-	"go.farcloser.world/core/units"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
-
 	"github.com/containerd/containerd/api/services/introspection/v1"
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/log"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/formatter"
-	"github.com/containerd/nerdctl/v2/pkg/infoutil"
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/native"
-	"github.com/containerd/nerdctl/v2/pkg/logging"
-	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
-	"github.com/containerd/nerdctl/v2/pkg/strutil"
+	"go.farcloser.world/core/units"
+
+	"go.farcloser.world/lepton/pkg/api/options"
+	"go.farcloser.world/lepton/pkg/formatter"
+	"go.farcloser.world/lepton/pkg/infoutil"
+	"go.farcloser.world/lepton/pkg/inspecttypes/dockercompat"
+	"go.farcloser.world/lepton/pkg/inspecttypes/native"
+	"go.farcloser.world/lepton/pkg/logging"
+	"go.farcloser.world/lepton/pkg/rootlessutil"
+	"go.farcloser.world/lepton/pkg/strutil"
 )
 
 func Info(ctx context.Context, client *containerd.Client, globalOptions *options.Global, opts *options.SystemInfo) error {
@@ -150,7 +150,7 @@ func prettyPrintInfoDockerCompat(stdout io.Writer, stderr io.Writer, info *docke
 	fmt.Fprintln(w)
 	fmt.Fprintf(w, "Server:\n")
 	fmt.Fprintf(w, " Server Version: %s\n", info.ServerVersion)
-	// Storage Driver is not really Server concept for nerdctl, but mimics `docker info` output
+	// Storage Driver is not really Server concept, but mimics `docker info` output
 	fmt.Fprintf(w, " Storage Driver: %s\n", info.Driver)
 	fmt.Fprintf(w, " Logging Driver: %s\n", info.LoggingDriver)
 	printF(w, " Cgroup Driver: ", string(info.CgroupDriver))

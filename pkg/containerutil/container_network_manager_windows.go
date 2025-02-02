@@ -25,9 +25,9 @@ import (
 	"github.com/containerd/containerd/v2/pkg/oci"
 	"github.com/containerd/go-cni"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/netutil"
-	"github.com/containerd/nerdctl/v2/pkg/ocihook"
+	"go.farcloser.world/lepton/pkg/api/options"
+	"go.farcloser.world/lepton/pkg/netutil"
+	"go.farcloser.world/lepton/pkg/ocihook"
 )
 
 type cniNetworkManagerPlatform struct {

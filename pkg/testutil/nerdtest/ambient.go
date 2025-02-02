@@ -16,7 +16,7 @@
 
 package nerdtest
 
-import "github.com/containerd/nerdctl/v2/pkg/testutil"
+import "go.farcloser.world/lepton/pkg/testutil"
 
 func environmentHasIPv6() bool {
 	return testutil.GetEnableIPv6()

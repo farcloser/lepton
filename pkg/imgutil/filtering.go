@@ -24,11 +24,11 @@ import (
 	"strings"
 	"time"
 
-	"go.farcloser.world/containers/reference"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/images"
 	"github.com/containerd/log"
+
+	"go.farcloser.world/containers/reference"
 )
 
 // Filter types supported to filter images.

@@ -23,9 +23,10 @@ import (
 	"runtime"
 	"testing"
 
-	"go.farcloser.world/containers/specs"
 	"go.uber.org/mock/gomock"
 	"gotest.tools/v3/assert"
+
+	"go.farcloser.world/containers/specs"
 )
 
 type MockParse struct {

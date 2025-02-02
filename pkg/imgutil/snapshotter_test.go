@@ -21,15 +21,15 @@ import (
 	"reflect"
 	"testing"
 
-	"go.farcloser.world/containers/digest"
-	"go.farcloser.world/containers/specs"
-	"gotest.tools/v3/assert"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	ctdsnapshotters "github.com/containerd/containerd/v2/pkg/snapshotters"
+	"gotest.tools/v3/assert"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/imgutil/pull"
+	"go.farcloser.world/containers/digest"
+	"go.farcloser.world/containers/specs"
+
+	"go.farcloser.world/lepton/pkg/api/options"
+	"go.farcloser.world/lepton/pkg/imgutil/pull"
 )
 
 const (

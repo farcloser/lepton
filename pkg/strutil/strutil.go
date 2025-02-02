@@ -35,7 +35,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/containerd/nerdctl/v2/leptonic/errs"
+	"go.farcloser.world/lepton/leptonic/errs"
 )
 
 // InStringSlice checks whether a string is inside a string slice.

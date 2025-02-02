@@ -21,9 +21,6 @@ import (
 	"errors"
 	"fmt"
 
-	"go.farcloser.world/containers/reference"
-	"go.farcloser.world/containers/specs"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/content"
 	"github.com/containerd/containerd/v2/core/images"
@@ -32,8 +29,11 @@ import (
 	"github.com/containerd/imgcrypt/v2/images/encryption/parsehelpers"
 	"github.com/containerd/platforms"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/platformutil"
+	"go.farcloser.world/containers/reference"
+	"go.farcloser.world/containers/specs"
+
+	"go.farcloser.world/lepton/pkg/api/options"
+	"go.farcloser.world/lepton/pkg/platformutil"
 )
 
 func layerDescs(ctx context.Context, provider content.Provider, imageTarget specs.Descriptor, platform platforms.MatchComparer) ([]specs.Descriptor, error) {

@@ -20,7 +20,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/containerd/nerdctl/v2/leptonic/loggers/fluentd"
+	"go.farcloser.world/lepton/leptonic/loggers/fluentd"
 )
 
 func TestParseFluentdConfig(t *testing.T) {

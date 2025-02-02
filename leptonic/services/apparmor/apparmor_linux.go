@@ -19,13 +19,13 @@ package apparmor
 import (
 	"errors"
 
-	"go.farcloser.world/containers/security/apparmor"
-
 	"github.com/containerd/containerd/v2/pkg/oci"
 
-	"github.com/containerd/nerdctl/v2/leptonic/errs"
-	"github.com/containerd/nerdctl/v2/leptonic/services/helpers"
-	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
+	"go.farcloser.world/containers/security/apparmor"
+
+	"go.farcloser.world/lepton/leptonic/errs"
+	"go.farcloser.world/lepton/leptonic/services/helpers"
+	"go.farcloser.world/lepton/pkg/rootlessutil"
 )
 
 const (

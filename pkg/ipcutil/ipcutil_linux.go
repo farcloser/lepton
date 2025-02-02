@@ -20,8 +20,9 @@ import (
 	"fmt"
 	"os"
 
-	"go.farcloser.world/core/units"
 	"golang.org/x/sys/unix"
+
+	"go.farcloser.world/core/units"
 )
 
 // makeShareableDevshm returns devshm directory path on host when there is no error.

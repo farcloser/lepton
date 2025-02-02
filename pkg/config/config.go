@@ -17,15 +17,15 @@
 package config
 
 import (
-	"go.farcloser.world/containers/security/cgroups"
-
 	"github.com/containerd/containerd/v2/defaults"
 
-	"github.com/containerd/nerdctl/v2/leptonic/services/namespace"
-	ncdefaults "github.com/containerd/nerdctl/v2/pkg/defaults"
+	"go.farcloser.world/containers/security/cgroups"
+
+	"go.farcloser.world/lepton/leptonic/services/namespace"
+	ncdefaults "go.farcloser.world/lepton/pkg/defaults"
 )
 
-// Config corresponds to nerdctl.toml .
+// Config corresponds to the cli toml file.
 // See docs/config.md .
 type Config struct {
 	Debug            bool            `toml:"debug"`

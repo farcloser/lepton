@@ -20,8 +20,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/containerd/nerdctl/v2/leptonic/rootlesskit"
-	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
+	"go.farcloser.world/lepton/leptonic/rootlesskit"
+	"go.farcloser.world/lepton/pkg/rootlessutil"
 )
 
 func getRuntimeVariableDataDir() (string, error) {

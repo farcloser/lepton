@@ -23,15 +23,16 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"go.farcloser.world/tigron/test"
 	"golang.org/x/crypto/bcrypt"
 	"gotest.tools/v3/assert"
 
-	"github.com/containerd/nerdctl/v2/pkg/testutil"
-	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest/platform"
-	"github.com/containerd/nerdctl/v2/pkg/testutil/nettestutil"
-	"github.com/containerd/nerdctl/v2/pkg/testutil/portlock"
-	"github.com/containerd/nerdctl/v2/pkg/testutil/testca"
+	"go.farcloser.world/tigron/test"
+
+	"go.farcloser.world/lepton/pkg/testutil"
+	"go.farcloser.world/lepton/pkg/testutil/nerdtest/platform"
+	"go.farcloser.world/lepton/pkg/testutil/nettestutil"
+	"go.farcloser.world/lepton/pkg/testutil/portlock"
+	"go.farcloser.world/lepton/pkg/testutil/testca"
 )
 
 type RegistryServer struct {

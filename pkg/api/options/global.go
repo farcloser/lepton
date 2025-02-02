@@ -16,6 +16,6 @@
 
 package options
 
-import "github.com/containerd/nerdctl/v2/pkg/config"
+import "go.farcloser.world/lepton/pkg/config"
 
 type Global config.Config

@@ -25,16 +25,17 @@ import (
 	"testing"
 	"time"
 
-	"go.farcloser.world/tigron/test"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/yaml.v3"
 	"gotest.tools/v3/assert"
 
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
-	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest/ca"
-	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest/platform"
-	"github.com/containerd/nerdctl/v2/pkg/testutil/nettestutil"
-	"github.com/containerd/nerdctl/v2/pkg/testutil/portlock"
+	"go.farcloser.world/tigron/test"
+
+	"go.farcloser.world/lepton/pkg/inspecttypes/dockercompat"
+	"go.farcloser.world/lepton/pkg/testutil/nerdtest/ca"
+	"go.farcloser.world/lepton/pkg/testutil/nerdtest/platform"
+	"go.farcloser.world/lepton/pkg/testutil/nettestutil"
+	"go.farcloser.world/lepton/pkg/testutil/portlock"
 )
 
 type CesantaConfigServer struct {

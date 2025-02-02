@@ -19,11 +19,10 @@ package ocihook
 import (
 	"context"
 
+	"github.com/containerd/go-cni"
 	rlkclient "github.com/rootless-containers/rootlesskit/v2/pkg/api/client"
 
-	"github.com/containerd/go-cni"
-
-	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
+	"go.farcloser.world/lepton/pkg/rootlessutil"
 )
 
 func exposePortsRootless(ctx context.Context, rlkClient rlkclient.Client, ports []cni.PortMapping) error {

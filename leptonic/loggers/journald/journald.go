@@ -28,8 +28,8 @@ import (
 
 	"github.com/coreos/go-systemd/v22/journal"
 
-	"github.com/containerd/nerdctl/v2/leptonic/errs"
-	timetypes "github.com/containerd/nerdctl/v2/leptonic/time"
+	"go.farcloser.world/lepton/leptonic/errs"
+	timetypes "go.farcloser.world/lepton/leptonic/time"
 )
 
 const (

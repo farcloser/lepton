@@ -22,8 +22,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"go.farcloser.world/containers/reference"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/images"
 	"github.com/containerd/containerd/v2/core/images/converter"
@@ -32,13 +30,15 @@ import (
 	dockerconfig "github.com/containerd/containerd/v2/core/remotes/docker/config"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/errutil"
-	"github.com/containerd/nerdctl/v2/pkg/imgutil/dockerconfigresolver"
-	"github.com/containerd/nerdctl/v2/pkg/imgutil/push"
-	"github.com/containerd/nerdctl/v2/pkg/platformutil"
-	"github.com/containerd/nerdctl/v2/pkg/signutil"
-	"github.com/containerd/nerdctl/v2/pkg/snapshotterutil"
+	"go.farcloser.world/containers/reference"
+
+	"go.farcloser.world/lepton/pkg/api/options"
+	"go.farcloser.world/lepton/pkg/errutil"
+	"go.farcloser.world/lepton/pkg/imgutil/dockerconfigresolver"
+	"go.farcloser.world/lepton/pkg/imgutil/push"
+	"go.farcloser.world/lepton/pkg/platformutil"
+	"go.farcloser.world/lepton/pkg/signutil"
+	"go.farcloser.world/lepton/pkg/snapshotterutil"
 )
 
 // Push pushes an image specified by `rawRef`.

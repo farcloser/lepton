@@ -26,7 +26,7 @@ import (
 
 	"go.farcloser.world/core/filesystem"
 
-	"github.com/containerd/nerdctl/v2/leptonic/errs"
+	"go.farcloser.world/lepton/leptonic/errs"
 )
 
 const (

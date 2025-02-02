@@ -173,7 +173,7 @@ manipulate it further using `helpers.Read` and`helpers.Write`.
 
 Currently, the following keys are defined:
 - `DockerConfig` allowing to set custom content for the `$DOCKER_CONFIG/config.json` file
-- `Namespace` (default to `nerdctl-test` if unspecified, but see "mode private")
+- `Namespace` (default to `cli-test` if unspecified, but see "mode private")
 - `NerdishctlToml` to set custom content for the `$NERDCTL_TOML` file
 - `HostsDir` to specify the value of the arg `--hosts-dir`
 - `DataRoot` to specify the value of the arg `--data-root`

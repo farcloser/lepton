@@ -17,7 +17,7 @@
 package platform
 
 import (
-	"github.com/containerd/nerdctl/v2/pkg/testutil"
+	"go.farcloser.world/lepton/pkg/testutil"
 )
 
 var (

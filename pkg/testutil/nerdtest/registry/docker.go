@@ -22,14 +22,15 @@ import (
 	"os"
 	"strconv"
 
-	"go.farcloser.world/tigron/test"
 	"gotest.tools/v3/assert"
 
-	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest/ca"
-	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest/hoststoml"
-	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest/platform"
-	"github.com/containerd/nerdctl/v2/pkg/testutil/nettestutil"
-	"github.com/containerd/nerdctl/v2/pkg/testutil/portlock"
+	"go.farcloser.world/tigron/test"
+
+	"go.farcloser.world/lepton/pkg/testutil/nerdtest/ca"
+	"go.farcloser.world/lepton/pkg/testutil/nerdtest/hoststoml"
+	"go.farcloser.world/lepton/pkg/testutil/nerdtest/platform"
+	"go.farcloser.world/lepton/pkg/testutil/nettestutil"
+	"go.farcloser.world/lepton/pkg/testutil/portlock"
 )
 
 func NewDockerRegistry(data test.Data, helpers test.Helpers, currentCA *ca.CA, port int, auth Auth) *Server {

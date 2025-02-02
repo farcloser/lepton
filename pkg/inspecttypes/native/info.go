@@ -17,10 +17,10 @@
 package native
 
 import (
-	"go.farcloser.world/containers/security/cgroups"
-
 	"github.com/containerd/containerd/api/services/introspection/v1"
 	"github.com/containerd/containerd/api/services/version/v1"
+
+	"go.farcloser.world/containers/security/cgroups"
 )
 
 type Info struct {

@@ -24,8 +24,8 @@ import (
 
 	containerd "github.com/containerd/containerd/v2/client"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/idutil/containerwalker"
+	"go.farcloser.world/lepton/pkg/api/options"
+	"go.farcloser.world/lepton/pkg/idutil/containerwalker"
 )
 
 // Wait blocks until all the containers specified by reqs have stopped, then print their exit codes.

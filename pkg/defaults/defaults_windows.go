@@ -20,7 +20,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/containerd/nerdctl/v2/pkg/version"
+	"go.farcloser.world/lepton/pkg/version"
 )
 
 const (

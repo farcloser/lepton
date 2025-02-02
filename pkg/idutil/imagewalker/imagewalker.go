@@ -22,11 +22,11 @@ import (
 	"regexp"
 	"strings"
 
-	"go.farcloser.world/containers/digest"
-	"go.farcloser.world/containers/reference"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/images"
+
+	"go.farcloser.world/containers/digest"
+	"go.farcloser.world/containers/reference"
 )
 
 type Found struct {

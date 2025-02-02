@@ -24,7 +24,7 @@ import (
 	"golang.org/x/sys/windows/registry"
 	"gotest.tools/v3/assert"
 
-	mocks "github.com/containerd/nerdctl/v2/pkg/infoutil/infoutilmock"
+	mocks "go.farcloser.world/lepton/pkg/infoutil/infoutilmock"
 )
 
 func setUpMocks(t *testing.T) *mocks.MockWindowsInfoUtil {

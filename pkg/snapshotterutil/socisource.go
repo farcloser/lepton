@@ -41,11 +41,11 @@ import (
 	"strconv"
 	"strings"
 
-	"go.farcloser.world/containers/specs"
-
 	"github.com/containerd/containerd/v2/core/images"
 	"github.com/containerd/containerd/v2/pkg/labels"
 	ctdsnapshotters "github.com/containerd/containerd/v2/pkg/snapshotters"
+
+	"go.farcloser.world/containers/specs"
 )
 
 const (

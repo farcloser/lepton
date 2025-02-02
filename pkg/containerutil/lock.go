@@ -19,7 +19,7 @@ package containerutil
 import (
 	"path/filepath"
 
-	"github.com/containerd/nerdctl/v2/pkg/store"
+	"go.farcloser.world/lepton/pkg/store"
 )
 
 func Lock(stateDir string) (store.Store, error) {

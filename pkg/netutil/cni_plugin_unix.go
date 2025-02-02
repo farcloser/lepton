@@ -18,7 +18,7 @@
 
 package netutil
 
-import "github.com/containerd/nerdctl/v2/pkg/rootlessutil"
+import "go.farcloser.world/lepton/pkg/rootlessutil"
 
 // bridgeConfig describes the bridge plugin
 type bridgeConfig struct {

@@ -20,8 +20,8 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/containerd/nerdctl/v2/leptonic/services/apparmor"
-	"github.com/containerd/nerdctl/v2/pkg/defaults"
+	"go.farcloser.world/lepton/leptonic/services/apparmor"
+	"go.farcloser.world/lepton/pkg/defaults"
 )
 
 func Inspect(output io.Writer) error {

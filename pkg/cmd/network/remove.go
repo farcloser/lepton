@@ -24,8 +24,8 @@ import (
 	"github.com/containerd/containerd/v2/client"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/netutil"
+	"go.farcloser.world/lepton/pkg/api/options"
+	"go.farcloser.world/lepton/pkg/netutil"
 )
 
 func Remove(ctx context.Context, cli *client.Client, globalOptions *options.Global, opts *options.NetworkRemove) error {
@@ -65,7 +65,7 @@ func Remove(ctx context.Context, cli *client.Client, globalOptions *options.Glob
 			continue
 		}
 		if network.CliID == nil {
-			errs = append(errs, fmt.Errorf("%s is managed outside nerdctl and cannot be removed", req))
+			errs = append(errs, fmt.Errorf("%s is unmanaged nerdctl and cannot be removed", req))
 			continue
 		}
 		if err := cniEnv.RemoveNetwork(network); err != nil {

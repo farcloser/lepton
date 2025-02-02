@@ -23,15 +23,15 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/docker/go-connections/nat"
-	"go.farcloser.world/containers/specs"
-	"gotest.tools/v3/assert"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/containers"
+	"github.com/docker/go-connections/nat"
+	"gotest.tools/v3/assert"
 
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/native"
-	"github.com/containerd/nerdctl/v2/pkg/labels"
+	"go.farcloser.world/containers/specs"
+
+	"go.farcloser.world/lepton/pkg/inspecttypes/native"
+	"go.farcloser.world/lepton/pkg/labels"
 )
 
 func TestContainerFromNative(t *testing.T) {
@@ -49,7 +49,7 @@ func TestContainerFromNative(t *testing.T) {
 	}{
 		// container, mount /mnt/foo:/mnt/foo:rw,rslave; ResolvConfPath; hostname
 		{
-			name: "container from nerdctl",
+			name: "container from cli",
 			n: &native.Container{
 				Container: containers.Container{
 					Labels: map[string]string{

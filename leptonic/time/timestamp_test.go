@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package time // import "github.com/containerd/nerdctl/v2/leptonic/time"
+package time // import "go.farcloser.world/lepton/leptonic/time"
 
 import (
 	"strconv"

@@ -24,11 +24,12 @@ import (
 	"testing"
 	"time"
 
-	"go.farcloser.world/tigron/test"
 	"gotest.tools/v3/assert"
 
-	"github.com/containerd/nerdctl/v2/pkg/testutil"
-	"github.com/containerd/nerdctl/v2/pkg/version"
+	"go.farcloser.world/tigron/test"
+
+	"go.farcloser.world/lepton/pkg/testutil"
+	"go.farcloser.world/lepton/pkg/version"
 )
 
 var defaultNamespace = testutil.Namespace

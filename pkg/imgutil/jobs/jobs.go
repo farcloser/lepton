@@ -24,14 +24,14 @@ import (
 	"text/tabwriter"
 	"time"
 
-	"go.farcloser.world/containers/digest"
-	"go.farcloser.world/containers/specs"
-
 	"github.com/containerd/containerd/v2/core/content"
 	"github.com/containerd/containerd/v2/core/remotes"
 	"github.com/containerd/containerd/v2/pkg/progress"
 	"github.com/containerd/errdefs"
 	"github.com/containerd/log"
+
+	"go.farcloser.world/containers/digest"
+	"go.farcloser.world/containers/specs"
 )
 
 // ShowProgress continuously updates the output with job progress

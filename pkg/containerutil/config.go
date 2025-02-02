@@ -24,14 +24,14 @@ import (
 	"runtime"
 	"strings"
 
-	"go.farcloser.world/containers/specs"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/pkg/oci"
 
-	"github.com/containerd/nerdctl/v2/pkg/ipcutil"
-	"github.com/containerd/nerdctl/v2/pkg/labels"
-	"github.com/containerd/nerdctl/v2/pkg/netutil/nettype"
+	"go.farcloser.world/containers/specs"
+
+	"go.farcloser.world/lepton/pkg/ipcutil"
+	"go.farcloser.world/lepton/pkg/labels"
+	"go.farcloser.world/lepton/pkg/netutil/nettype"
 )
 
 // ReconfigNetContainer reconfigures the container's network namespace path.

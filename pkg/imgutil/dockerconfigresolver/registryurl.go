@@ -44,7 +44,7 @@ func Parse(address string) (*RegistryURL, error) {
 	// Scheme is entirely disregarded anyhow, so, just drop it all and set to https
 	if sch == schemeHTTP {
 		u.Scheme = string(schemeHTTPS)
-	} else if sch != schemeHTTPS && sch != schemeNerdctlExperimental {
+	} else if sch != schemeHTTPS && sch != schemeExperimental {
 		// Docker is wildly buggy when it comes to non-http schemes. Being more defensive.
 		return nil, ErrUnsupportedScheme
 	}
@@ -82,7 +82,7 @@ func (rn *RegistryURL) CanonicalIdentifier() string {
 	identifier := rn.Host
 	// If this is a namespaced entry, wrap it, and slap the path as well, as hosts are allowed to be non-compliant
 	if rn.Namespace != nil {
-		identifier = fmt.Sprintf("%s://%s/host/%s%s", schemeNerdctlExperimental, rn.Namespace.CanonicalIdentifier(), identifier, rn.Path)
+		identifier = fmt.Sprintf("%s://%s/host/%s%s", schemeExperimental, rn.Namespace.CanonicalIdentifier(), identifier, rn.Path)
 	}
 	return identifier
 }

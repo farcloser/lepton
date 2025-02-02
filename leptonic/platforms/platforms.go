@@ -17,9 +17,8 @@
 package platforms
 
 import (
-	specs "github.com/opencontainers/image-spec/specs-go/v1"
-
 	ctdplatforms "github.com/containerd/platforms"
+	specs "github.com/opencontainers/image-spec/specs-go/v1"
 )
 
 func Parse(specifier string) (specs.Platform, error) {

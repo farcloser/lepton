@@ -22,20 +22,20 @@ import (
 	"io"
 	"os"
 
-	"go.farcloser.world/containers/specs"
-
 	"github.com/containerd/console"
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/pkg/cio"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/consoleutil"
-	"github.com/containerd/nerdctl/v2/pkg/flagutil"
-	"github.com/containerd/nerdctl/v2/pkg/idgen"
-	"github.com/containerd/nerdctl/v2/pkg/idutil/containerwalker"
-	"github.com/containerd/nerdctl/v2/pkg/signalutil"
-	"github.com/containerd/nerdctl/v2/pkg/taskutil"
+	"go.farcloser.world/containers/specs"
+
+	"go.farcloser.world/lepton/pkg/api/options"
+	"go.farcloser.world/lepton/pkg/consoleutil"
+	"go.farcloser.world/lepton/pkg/flagutil"
+	"go.farcloser.world/lepton/pkg/idgen"
+	"go.farcloser.world/lepton/pkg/idutil/containerwalker"
+	"go.farcloser.world/lepton/pkg/signalutil"
+	"go.farcloser.world/lepton/pkg/taskutil"
 )
 
 // Exec will find the right running container to run a new command.

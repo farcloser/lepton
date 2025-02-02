@@ -8,6 +8,8 @@ run:
   modules-download-mode: readonly
   allow-parallel-runners: true
   allow-serial-runners: true
+  # FIXME @apostasie: it does not seem to read go.mod... so, for now, duplicating here
+  go: '1.23'
 
 linters:
   disable-all: false
@@ -106,7 +108,7 @@ linters-settings:
         deny:
           - pkg: "github.com/spf13"
             desc: "pkg must not depend on cobra or pflag"
-          - pkg: "github.com/containerd/nerdctl/v2/cmd"
+          - pkg: "github.com/farcloser/lepton/cmd"
             desc: "pkg must not depend on cmd files"
 
 issues:

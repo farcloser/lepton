@@ -25,9 +25,9 @@ import (
 	"github.com/containerd/containerd/v2/plugins"
 	"github.com/containerd/go-cni"
 
-	"github.com/containerd/nerdctl/v2/leptonic/rootlesskit"
-	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
-	"github.com/containerd/nerdctl/v2/pkg/version"
+	"go.farcloser.world/lepton/leptonic/rootlesskit"
+	"go.farcloser.world/lepton/pkg/rootlessutil"
+	"go.farcloser.world/lepton/pkg/version"
 )
 
 const (

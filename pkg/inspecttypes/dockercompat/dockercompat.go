@@ -35,18 +35,18 @@ import (
 	"strings"
 	"time"
 
-	"github.com/docker/go-connections/nat"
-	"go.farcloser.world/containers/specs"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/runtime/restart"
 	"github.com/containerd/go-cni"
 	"github.com/containerd/log"
+	"github.com/docker/go-connections/nat"
 
-	"github.com/containerd/nerdctl/v2/pkg/imgutil"
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/native"
-	"github.com/containerd/nerdctl/v2/pkg/labels"
-	"github.com/containerd/nerdctl/v2/pkg/ocihook/state"
+	"go.farcloser.world/containers/specs"
+
+	"go.farcloser.world/lepton/pkg/imgutil"
+	"go.farcloser.world/lepton/pkg/inspecttypes/native"
+	"go.farcloser.world/lepton/pkg/labels"
+	"go.farcloser.world/lepton/pkg/ocihook/state"
 )
 
 // Image is from https://github.com/moby/moby/blob/v26.1.2/api/types/types.go#L34-L140

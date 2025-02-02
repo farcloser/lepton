@@ -20,9 +20,6 @@ import (
 	"context"
 	"io"
 
-	"go.farcloser.world/containers/specs"
-	"go.farcloser.world/core/compression/zstd"
-
 	"github.com/containerd/containerd/v2/core/content"
 	"github.com/containerd/containerd/v2/core/images"
 	"github.com/containerd/containerd/v2/core/images/converter"
@@ -30,7 +27,10 @@ import (
 	"github.com/containerd/containerd/v2/pkg/archive/compression"
 	"github.com/containerd/errdefs"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
+	"go.farcloser.world/containers/specs"
+	"go.farcloser.world/core/compression/zstd"
+
+	"go.farcloser.world/lepton/pkg/api/options"
 )
 
 // ZstdLayerConvertFunc converts legacy tar.gz layers into zstd layers with

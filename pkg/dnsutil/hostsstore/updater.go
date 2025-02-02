@@ -17,7 +17,7 @@
 package hostsstore
 
 import (
-	"github.com/containerd/nerdctl/v2/pkg/netutil"
+	"go.farcloser.world/lepton/pkg/netutil"
 )
 
 // createLine returns a line string slice.

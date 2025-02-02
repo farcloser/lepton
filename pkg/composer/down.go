@@ -22,7 +22,7 @@ import (
 
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/strutil"
+	"go.farcloser.world/lepton/pkg/strutil"
 )
 
 type DownOptions struct {

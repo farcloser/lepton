@@ -1,4 +1,4 @@
-# See https://github.com/containerd/nerdctl/blob/main/MAINTAINERS_GUIDE.md for how to make a release.
+# See https://github.com/farcloser/lepton/blob/main/MAINTAINERS_GUIDE.md for how to make a release.
 name: Release
 on:
   push:

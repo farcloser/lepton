@@ -16,11 +16,11 @@
 
 [Unit]
 After=network.target local-fs.target
-Description=buildkit daemon for integration test (namespace: nerdctl-test)
+Description=buildkit daemon for integration test (namespace: cli-test)
 
 [Service]
 ExecStartPre=-/sbin/modprobe overlay
-ExecStart=/usr/local/bin/buildkitd --oci-worker=false --containerd-worker=true --addr="unix:///run/buildkit-nerdctl-test/buildkitd.sock" --root=/var/lib/buildkit-nerdctl-test --containerd-worker-namespace=nerdctl-test
+ExecStart=/usr/local/bin/buildkitd --oci-worker=false --containerd-worker=true --addr="unix:///run/buildkit-cli-test/buildkitd.sock" --root=/var/lib/buildkit-cli-test --containerd-worker-namespace=cli-test
 
 Type=notify
 Delegate=yes

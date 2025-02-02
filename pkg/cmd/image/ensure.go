@@ -22,19 +22,19 @@ import (
 	"net/http"
 	"os"
 
-	"go.farcloser.world/containers/reference"
-	"go.farcloser.world/containers/specs"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/images"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/containerdutil"
-	"github.com/containerd/nerdctl/v2/pkg/errutil"
-	"github.com/containerd/nerdctl/v2/pkg/imgutil/dockerconfigresolver"
-	"github.com/containerd/nerdctl/v2/pkg/imgutil/fetch"
-	"github.com/containerd/nerdctl/v2/pkg/platformutil"
+	"go.farcloser.world/containers/reference"
+	"go.farcloser.world/containers/specs"
+
+	"go.farcloser.world/lepton/pkg/api/options"
+	"go.farcloser.world/lepton/pkg/containerdutil"
+	"go.farcloser.world/lepton/pkg/errutil"
+	"go.farcloser.world/lepton/pkg/imgutil/dockerconfigresolver"
+	"go.farcloser.world/lepton/pkg/imgutil/fetch"
+	"go.farcloser.world/lepton/pkg/platformutil"
 )
 
 func EnsureAllContent(ctx context.Context, client *containerd.Client, srcName string, options *options.Global) error {

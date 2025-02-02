@@ -24,7 +24,7 @@ import (
 	"github.com/containerd/log"
 	"github.com/containerd/typeurl/v2"
 
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/native"
+	"go.farcloser.world/lepton/pkg/inspecttypes/native"
 )
 
 func Inspect(ctx context.Context, container containerd.Container) (*native.Container, error) {

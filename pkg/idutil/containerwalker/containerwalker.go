@@ -24,7 +24,7 @@ import (
 
 	containerd "github.com/containerd/containerd/v2/client"
 
-	"github.com/containerd/nerdctl/v2/pkg/labels"
+	"go.farcloser.world/lepton/pkg/labels"
 )
 
 type Found struct {

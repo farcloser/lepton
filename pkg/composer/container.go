@@ -23,7 +23,7 @@ import (
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/labels"
+	"go.farcloser.world/lepton/pkg/labels"
 )
 
 func (c *Composer) Containers(ctx context.Context, services ...string) ([]containerd.Container, error) {

@@ -19,9 +19,9 @@ package container
 import (
 	"context"
 
-	"go.farcloser.world/containers/stats"
-
 	"github.com/containerd/containerd/v2/client"
+
+	"go.farcloser.world/containers/stats"
 )
 
 func setContainerStatsAndRenderStatsEntry(ctx context.Context, container client.Container, previousStats *stats.ContainerStats) (statsEntry stats.Entry, err error) {

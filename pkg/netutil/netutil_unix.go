@@ -29,17 +29,17 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/containerd/log"
 	"github.com/go-viper/mapstructure/v2"
+
 	"go.farcloser.world/containers/netlink"
 	"go.farcloser.world/core/version/semver"
 
-	"github.com/containerd/log"
-
-	"github.com/containerd/nerdctl/v2/leptonic/socket"
-	"github.com/containerd/nerdctl/v2/pkg/defaults"
-	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
-	"github.com/containerd/nerdctl/v2/pkg/strutil"
-	"github.com/containerd/nerdctl/v2/pkg/version"
+	"go.farcloser.world/lepton/leptonic/socket"
+	"go.farcloser.world/lepton/pkg/defaults"
+	"go.farcloser.world/lepton/pkg/rootlessutil"
+	"go.farcloser.world/lepton/pkg/strutil"
+	"go.farcloser.world/lepton/pkg/version"
 )
 
 const (

@@ -22,9 +22,8 @@ import (
 	"testing"
 	"time"
 
-	"gotest.tools/v3/assert"
-
 	"github.com/containerd/containerd/v2/core/runtime/v2/logging"
+	"gotest.tools/v3/assert"
 )
 
 func TestNoneLogger(t *testing.T) {
