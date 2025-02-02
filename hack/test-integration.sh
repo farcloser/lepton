@@ -21,7 +21,9 @@ readonly root
 
 if [[ "$(id -u)" = "0" ]]; then
   # Ensure securityfs is mounted for apparmor to work
-  mount -tsecurityfs securityfs /sys/kernel/security
+  if ! mountpoint -q /sys/kernel/security; then
+    mount -tsecurityfs securityfs /sys/kernel/security
+  fi
 fi
 
 readonly timeout="60m"
