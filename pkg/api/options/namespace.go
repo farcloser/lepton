@@ -14,23 +14,30 @@
    limitations under the License.
 */
 
-package test
+package options
 
-import (
-	"crypto/rand"
-	"encoding/base64"
-	"fmt"
-)
-
-// RandomStringBase64 generates a base64 encoded random string
-func RandomStringBase64(n int) string {
-	b := make([]byte, n)
-	l, err := rand.Read(b)
-	if err != nil {
-		panic(err)
-	}
-	if l != n {
-		panic(fmt.Errorf("expected %d bytes, got %d bytes", n, l))
-	}
-	return base64.URLEncoding.EncodeToString(b)
+// ListOptions specifies options for `apparmor ls`.
+type NamespaceList struct {
+	Quiet  bool
+	Format string
 }
+
+type NamespaceCreate struct {
+	Name string
+	// Labels are the namespace labels
+	Labels map[string]string
+}
+
+type NamespaceInspect struct {
+	NamesList []string
+	// Format the output using the given Go template, e.g, '{{json .}}'
+	Format string
+}
+
+type NamespaceRemove struct {
+	NamesList []string
+	// CGroup delete the namespace's cgroup
+	CGroup bool
+}
+
+type NamespaceUpdate NamespaceCreate

@@ -21,11 +21,11 @@ import (
 	"testing"
 
 	"github.com/vishvananda/netlink"
+	"go.farcloser.world/tigron/test"
 	"gotest.tools/v3/assert"
 
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
-	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
 )
 
 func TestNetworkRemove(t *testing.T) {
@@ -43,7 +43,7 @@ func TestNetworkRemove(t *testing.T) {
 				helpers.Ensure("run", "--rm", "--net", identifier, "--name", identifier, testutil.CommonImage)
 				// Verity the network is here
 				_, err := netlink.LinkByName("br-" + data.Get("netID")[:12])
-				assert.NilError(t, err, "failed to find network br-"+data.Get("netID")[:12], "%v")
+				assert.NilError(t, err, "failed to find network br-"+data.Get("netID")[:12])
 			},
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("network", "rm", data.Identifier())

@@ -32,7 +32,6 @@ package strutil
 import (
 	"encoding/csv"
 	"fmt"
-	"reflect"
 	"strconv"
 	"strings"
 
@@ -100,15 +99,6 @@ func ParseCSVMap(s string) (map[string]string, error) {
 		}
 	}
 	return m, nil
-}
-
-func TrimStrSliceRight(base, extra []string) []string {
-	for i := 0; i < len(base); i++ {
-		if reflect.DeepEqual(base[i:], extra) {
-			return base[:i]
-		}
-	}
-	return base
 }
 
 func ReverseStrSlice(in []string) []string {

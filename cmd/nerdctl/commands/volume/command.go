@@ -23,7 +23,7 @@ import (
 )
 
 func Command() *cobra.Command {
-	volumeCommand := &cobra.Command{
+	cmd := &cobra.Command{
 		Annotations:   map[string]string{helpers.Category: helpers.Management},
 		Use:           "volume",
 		Short:         "Manage volumes",
@@ -31,12 +31,14 @@ func Command() *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
-	volumeCommand.AddCommand(
+
+	cmd.AddCommand(
 		listCommand(),
 		inspectCommand(),
 		createCommand(),
 		removeCommand(),
 		pruneCommand(),
 	)
-	return volumeCommand
+
+	return cmd
 }

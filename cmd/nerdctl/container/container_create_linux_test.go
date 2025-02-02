@@ -25,6 +25,7 @@ import (
 	"testing"
 
 	"go.farcloser.world/containers/digest"
+	"go.farcloser.world/tigron/test"
 	"gotest.tools/v3/assert"
 
 	"github.com/containerd/containerd/v2/defaults"
@@ -32,7 +33,6 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nettestutil"
-	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/various"
 )
 

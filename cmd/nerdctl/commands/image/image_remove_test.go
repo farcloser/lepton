@@ -21,12 +21,12 @@ import (
 	"strings"
 	"testing"
 
+	"go.farcloser.world/tigron/test"
 	"gotest.tools/v3/assert"
 
 	"github.com/containerd/nerdctl/v2/pkg/imgutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
-	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
 )
 
 func TestRemove(t *testing.T) {
@@ -318,8 +318,8 @@ func TestIssue3016(t *testing.T) {
 		{
 			Description: "Issue #3016 - Tags created using the short digest ids of container images cannot be deleted using the nerdctl rmi command.",
 			Setup: func(data test.Data, helpers test.Helpers) {
-				helpers.Ensure("pull", testutil.CommonImage)
-				helpers.Ensure("pull", testutil.NginxAlpineImage)
+				helpers.Ensure("pull", "--quiet", testutil.CommonImage)
+				helpers.Ensure("pull", "--quiet", testutil.NginxAlpineImage)
 
 				img := nerdtest.InspectImage(helpers, testutil.NginxAlpineImage)
 				repoName, _ := imgutil.ParseRepoTag(testutil.NginxAlpineImage)
@@ -371,7 +371,7 @@ func TestRemoveKubeWithKubeHideDupe(t *testing.T) {
 			Description: "After removing the tag without kube-hide-dupe, repodigest is shown as <none>",
 			NoParallel:  true,
 			Setup: func(data test.Data, helpers test.Helpers) {
-				helpers.Ensure("pull", testutil.BusyboxImage)
+				helpers.Ensure("pull", "--quiet", testutil.BusyboxImage)
 			},
 			Command: test.Command("rmi", "-f", testutil.BusyboxImage),
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
@@ -402,7 +402,7 @@ func TestRemoveKubeWithKubeHideDupe(t *testing.T) {
 				helpers.Anyhow("--kube-hide-dupe", "rmi", data.Identifier())
 			},
 			Setup: func(data test.Data, helpers test.Helpers) {
-				helpers.Ensure("pull", testutil.BusyboxImage)
+				helpers.Ensure("pull", "--quiet", testutil.BusyboxImage)
 				helpers.Ensure("tag", testutil.BusyboxImage, data.Identifier())
 			},
 			Command: test.Command("--kube-hide-dupe", "rmi", testutil.BusyboxImage),
@@ -431,7 +431,7 @@ func TestRemoveKubeWithKubeHideDupe(t *testing.T) {
 			Description: "After deleting all repo:tag entries, all repodigests will be cleaned up",
 			NoParallel:  true,
 			Setup: func(data test.Data, helpers test.Helpers) {
-				helpers.Ensure("pull", testutil.BusyboxImage)
+				helpers.Ensure("pull", "--quiet", testutil.BusyboxImage)
 				helpers.Ensure("tag", testutil.BusyboxImage, data.Identifier())
 			},
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
@@ -461,7 +461,7 @@ func TestRemoveKubeWithKubeHideDupe(t *testing.T) {
 			Description: "Test multiple IDs found with provided prefix and force with shortID",
 			NoParallel:  true,
 			Setup: func(data test.Data, helpers test.Helpers) {
-				helpers.Ensure("pull", testutil.BusyboxImage)
+				helpers.Ensure("pull", "--quiet", testutil.BusyboxImage)
 				helpers.Ensure("tag", testutil.BusyboxImage, data.Identifier())
 			},
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
@@ -491,7 +491,7 @@ func TestRemoveKubeWithKubeHideDupe(t *testing.T) {
 			Description: "Test remove image with digestID",
 			NoParallel:  true,
 			Setup: func(data test.Data, helpers test.Helpers) {
-				helpers.Ensure("pull", testutil.BusyboxImage)
+				helpers.Ensure("pull", "--quiet", testutil.BusyboxImage)
 				helpers.Ensure("tag", testutil.BusyboxImage, data.Identifier())
 			},
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {

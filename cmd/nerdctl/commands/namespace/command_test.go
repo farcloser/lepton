@@ -21,6 +21,7 @@ import (
 	"errors"
 	"testing"
 
+	"go.farcloser.world/tigron/test"
 	"gotest.tools/v3/assert"
 
 	"github.com/containerd/nerdctl/v2/leptonic/api"
@@ -29,7 +30,6 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/formatter"
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
-	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
 )
 
 func TestMain(m *testing.M) {
@@ -48,7 +48,7 @@ func TestCreateFail(t *testing.T) {
 		{
 			Description: "missing namespace name",
 			Command:     test.Command("namespace", "create"),
-			Expected:    test.Expects(1, []error{errors.New("requires at least 1 arg")}, nil),
+			Expected:    test.Expects(1, []error{errors.New("accepts 1 arg(s), received 0")}, nil),
 		},
 		{
 			Description: "empty namespace name",
@@ -142,7 +142,7 @@ func TestUpdateFail(t *testing.T) {
 		{
 			Description: "missing namespace name",
 			Command:     test.Command("namespace", "update", "--label", "key=value"),
-			Expected:    test.Expects(1, []error{errors.New("requires at least 1 arg")}, test.Equals("")),
+			Expected:    test.Expects(1, []error{errors.New("accepts 1 arg(s), received 0")}, test.Equals("")),
 		},
 		{
 			Description: "empty namespace name",
@@ -302,4 +302,5 @@ func TestCreateWithLabelsSuccess(t *testing.T) {
 		helpers.Anyhow("namespace", "remove", data.Identifier())
 	}
 
+	testCase.Run(t)
 }

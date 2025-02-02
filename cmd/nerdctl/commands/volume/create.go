@@ -41,14 +41,11 @@ func createCommand() *cobra.Command {
 }
 
 func createOptions(cmd *cobra.Command, _ []string) (*options.VolumeCreate, error) {
-	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
-	if err != nil {
-		return nil, err
-	}
 	labels, err := cmd.Flags().GetStringArray("label")
 	if err != nil {
 		return nil, err
 	}
+
 	for _, label := range labels {
 		if label == "" {
 			return &options.VolumeCreate{}, fmt.Errorf("labels cannot be empty (%w)", errs.ErrInvalidArgument)
@@ -56,22 +53,28 @@ func createOptions(cmd *cobra.Command, _ []string) (*options.VolumeCreate, error
 	}
 
 	return &options.VolumeCreate{
-		GOptions: globalOptions,
-		Labels:   labels,
-		Stdout:   cmd.OutOrStdout(),
+		Labels: labels,
+		Stdout: cmd.OutOrStdout(),
 	}, nil
 }
 
 func createAction(cmd *cobra.Command, args []string) error {
-	options, err := createOptions(cmd, args)
+	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return err
 	}
+
+	opts, err := createOptions(cmd, args)
+	if err != nil {
+		return err
+	}
+
 	volumeName := ""
 	if len(args) > 0 {
 		volumeName = args[0]
 	}
-	_, err = volume.Create(volumeName, options)
+
+	_, err = volume.Create(volumeName, globalOptions, opts)
 
 	return err
 }

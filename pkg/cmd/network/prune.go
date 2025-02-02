@@ -28,8 +28,8 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/strutil"
 )
 
-func Prune(ctx context.Context, client *containerd.Client, options *options.NetworkPrune) error {
-	e, err := netutil.NewCNIEnv(options.GOptions.CNIPath, options.GOptions.CNINetConfPath, netutil.WithNamespace(options.GOptions.Namespace))
+func Prune(ctx context.Context, client *containerd.Client, globalOptions *options.Global, opts *options.NetworkPrune) error {
+	e, err := netutil.NewCNIEnv(globalOptions.CNIPath, globalOptions.CNINetConfPath, netutil.WithNamespace(globalOptions.Namespace))
 	if err != nil {
 		return err
 	}
@@ -46,7 +46,7 @@ func Prune(ctx context.Context, client *containerd.Client, options *options.Netw
 
 	var removedNetworks []string //nolint:prealloc
 	for _, net := range networkConfigs {
-		if strutil.InStringSlice(options.NetworkDriversToKeep, net.Name) {
+		if strutil.InStringSlice(opts.NetworkDriversToKeep, net.Name) {
 			continue
 		}
 		if net.CliID == nil || net.File == "" {
@@ -63,11 +63,11 @@ func Prune(ctx context.Context, client *containerd.Client, options *options.Netw
 	}
 
 	if len(removedNetworks) > 0 {
-		fmt.Fprintln(options.Stdout, "Deleted Networks:")
+		fmt.Fprintln(opts.Stdout, "Deleted Networks:")
 		for _, name := range removedNetworks {
-			fmt.Fprintln(options.Stdout, name)
+			fmt.Fprintln(opts.Stdout, name)
 		}
-		fmt.Fprintln(options.Stdout, "")
+		fmt.Fprintln(opts.Stdout, "")
 	}
 	return nil
 }

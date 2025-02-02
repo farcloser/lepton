@@ -22,11 +22,11 @@ import (
 	"strings"
 	"testing"
 
+	"go.farcloser.world/tigron/test"
 	"gotest.tools/v3/assert"
 
 	"github.com/containerd/nerdctl/v2/pkg/tabutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
-	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
 )
 
 func TestVolumeLsSize(t *testing.T) {
@@ -281,7 +281,7 @@ func TestVolumeLsFilter(t *testing.T) {
 		{
 			Description: "Retrieving name=volume1 and name=volume2",
 			// Nerdctl filter behavior is broken
-			Require: nerdtest.NerdishctlNeedsFixing("https://github.com/containerd/nerdctl/issues/3452"),
+			// Require: nerdtest.NerdishctlNeedsFixing("https://github.com/containerd/nerdctl/issues/3452"),
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("volume", "ls", "--quiet", "--filter", "name="+data.Get("vol1"), "--filter", "name="+data.Get("vol2"))
 			},

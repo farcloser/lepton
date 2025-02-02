@@ -46,19 +46,16 @@ func LoginCommand() *cobra.Command {
 }
 
 func processLoginOptions(cmd *cobra.Command, _ []string) (*options.LoginCommand, error) {
-	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
-	if err != nil {
-		return nil, err
-	}
-
 	username, err := cmd.Flags().GetString("username")
 	if err != nil {
 		return nil, err
 	}
+
 	password, err := cmd.Flags().GetString("password")
 	if err != nil {
 		return nil, err
 	}
+
 	passwordStdin, err := cmd.Flags().GetBool("password-stdin")
 	if err != nil {
 		return nil, err
@@ -88,22 +85,27 @@ func processLoginOptions(cmd *cobra.Command, _ []string) (*options.LoginCommand,
 		password = strings.TrimSuffix(string(contents), "\n")
 		password = strings.TrimSuffix(password, "\r")
 	}
+
 	return &options.LoginCommand{
-		GOptions: globalOptions,
 		Username: username,
 		Password: password,
 	}, nil
 }
 
 func loginAction(cmd *cobra.Command, args []string) error {
-	options, err := processLoginOptions(cmd, args)
+	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
+	if err != nil {
+		return err
+	}
+
+	opts, err := processLoginOptions(cmd, args)
 	if err != nil {
 		return err
 	}
 
 	if len(args) == 1 {
-		options.ServerAddress = args[0]
+		opts.ServerAddress = args[0]
 	}
 
-	return login.Login(cmd.Context(), options, cmd.OutOrStdout())
+	return login.Login(cmd.Context(), cmd.OutOrStdout(), globalOptions, opts)
 }

@@ -43,32 +43,32 @@ type volumePrintable struct {
 	// TODO: "Links"
 }
 
-func List(options *options.VolumeList) error {
-	if options.Quiet && options.Size {
+func List(globalOptions *options.Global, opts *options.VolumeList) error {
+	if opts.Quiet && opts.Size {
 		log.L.Warn("cannot use --size and --quiet together, ignoring --size")
-		options.Size = false
+		opts.Size = false
 	}
-	sizeFilter := hasSizeFilter(options.Filters)
-	if sizeFilter && options.Quiet {
+	sizeFilter := hasSizeFilter(opts.Filters)
+	if sizeFilter && opts.Quiet {
 		log.L.Warn("cannot use --filter=size and --quiet together, ignoring --filter=size")
-		options.Filters = removeSizeFilters(options.Filters)
+		opts.Filters = removeSizeFilters(opts.Filters)
 	}
-	if sizeFilter && !options.Size {
+	if sizeFilter && !opts.Size {
 		log.L.Warn("should use --filter=size and --size together")
-		options.Size = true
+		opts.Size = true
 	}
 
 	vols, err := Volumes(
-		options.GOptions.Namespace,
-		options.GOptions.DataRoot,
-		options.GOptions.Address,
-		options.Size,
-		options.Filters,
+		globalOptions.Namespace,
+		globalOptions.DataRoot,
+		globalOptions.Address,
+		opts.Size,
+		opts.Filters,
 	)
 	if err != nil {
 		return err
 	}
-	return lsPrintOutput(vols, options)
+	return lsPrintOutput(vols, opts)
 }
 
 func hasSizeFilter(filters []string) bool {

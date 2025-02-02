@@ -48,11 +48,6 @@ func pruneCommand() *cobra.Command {
 }
 
 func pruneOptions(cmd *cobra.Command, _ []string) (*options.SystemPrune, error) {
-	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
-	if err != nil {
-		return nil, err
-	}
-
 	all, err := cmd.Flags().GetBool("all")
 	if err != nil {
 		return nil, err
@@ -63,19 +58,11 @@ func pruneOptions(cmd *cobra.Command, _ []string) (*options.SystemPrune, error) 
 		return nil, err
 	}
 
-	buildkitHost, err := builder.GetBuildkitHost(cmd, globalOptions.Namespace)
-	if err != nil {
-		log.L.WithError(err).Warn("BuildKit is not running. Build caches will not be pruned.")
-		buildkitHost = ""
-	}
-
 	return &options.SystemPrune{
 		Stdout:               cmd.OutOrStdout(),
 		Stderr:               cmd.ErrOrStderr(),
-		GOptions:             globalOptions,
 		All:                  all,
 		Volumes:              vFlag,
-		BuildKitHost:         buildkitHost,
 		NetworkDriversToKeep: network.NetworkDriversToKeep,
 	}, nil
 }
@@ -118,22 +105,35 @@ func grantSystemPrunePermission(cmd *cobra.Command, options *options.SystemPrune
 }
 
 func pruneAction(cmd *cobra.Command, args []string) error {
-	options, err := pruneOptions(cmd, args)
+	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return err
 	}
 
-	if ok, err := grantSystemPrunePermission(cmd, options); err != nil {
+	opts, err := pruneOptions(cmd, args)
+	if err != nil {
+		return err
+	}
+
+	buildkitHost, err := builder.GetBuildkitHostOption(cmd, globalOptions.Namespace)
+	if err != nil {
+		log.L.WithError(err).Warn("BuildKit is not running. Build caches will not be pruned.")
+		buildkitHost = ""
+	}
+
+	opts.BuildKitHost = buildkitHost
+
+	if ok, err := grantSystemPrunePermission(cmd, opts); err != nil {
 		return err
 	} else if !ok {
 		return nil
 	}
 
-	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	return system.Prune(ctx, cli, options)
+	return system.Prune(ctx, cli, globalOptions, opts)
 }

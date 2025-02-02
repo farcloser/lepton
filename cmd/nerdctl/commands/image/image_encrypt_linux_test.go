@@ -21,11 +21,11 @@ import (
 	"strings"
 	"testing"
 
+	"go.farcloser.world/tigron/test"
 	"gotest.tools/v3/assert"
 
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
-	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/testregistry"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/various"
 )
@@ -40,6 +40,7 @@ func TestImageEncryptJWE(t *testing.T) {
 
 	testCase := &test.Case{
 		Require: test.Require(
+			nerdtest.NerdctlNeedsFixing("https://github.com/containerd/nerdctl/pull/3792"),
 			test.Linux,
 			test.Not(nerdtest.Docker),
 			// This test needs to rmi the common image
@@ -54,8 +55,7 @@ func TestImageEncryptJWE(t *testing.T) {
 			helpers.Anyhow("rmi", "-f", data.Identifier("decrypted"))
 		},
 		Setup: func(data test.Data, helpers test.Helpers) {
-			base := testutil.NewBase(t)
-			registry = testregistry.NewWithNoAuth(base, 0, false)
+			registry = testregistry.NewWithNoAuth(data, helpers, 0, false)
 			keyPair = various.NewJWEKeyPair(t)
 			helpers.Ensure("pull", "--quiet", testutil.CommonImage)
 			encryptImageRef := fmt.Sprintf("127.0.0.1:%d/%s:encrypted", registry.Port, data.Identifier())

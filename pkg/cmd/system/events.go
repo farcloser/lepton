@@ -145,23 +145,23 @@ func generateEventFilters(filters []string) (map[string][]EventFilter, error) {
 }
 
 // Events is from https://github.com/containerd/containerd/blob/v1.4.3/cmd/ctr/commands/events/events.go
-func Events(ctx context.Context, client *containerd.Client, options *options.SystemEvents) error {
+func Events(ctx context.Context, client *containerd.Client, _ *options.Global, opts *options.SystemEvents) error {
 	eventsClient := client.EventService()
 	eventsCh, errCh := eventsClient.Subscribe(ctx)
 	var tmpl *template.Template
-	switch options.Format {
+	switch opts.Format {
 	case formatter.FormatNone:
 		tmpl = nil
 	case formatter.FormatTable, formatter.FormatWide:
 		return errors.New("unsupported format: \"table\", and \"wide\"")
 	default:
 		var err error
-		tmpl, err = formatter.ParseTemplate(options.Format)
+		tmpl, err = formatter.ParseTemplate(opts.Format)
 		if err != nil {
 			return err
 		}
 	}
-	filterMap, err := generateEventFilters(options.Filters)
+	filterMap, err := generateEventFilters(opts.Filters)
 	if err != nil {
 		return err
 	}
@@ -206,12 +206,12 @@ func Events(ctx context.Context, client *containerd.Client, options *options.Sys
 					if err := tmpl.Execute(&b, eOut); err != nil {
 						return err
 					}
-					if _, err := fmt.Fprintln(options.Stdout, b.String()+"\n"); err != nil {
+					if _, err := fmt.Fprintln(opts.Stdout, b.String()+"\n"); err != nil {
 						return err
 					}
 				} else {
 					if _, err := fmt.Fprintln(
-						options.Stdout,
+						opts.Stdout,
 						e.Timestamp,
 						e.Namespace,
 						e.Topic,

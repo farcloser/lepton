@@ -21,8 +21,9 @@ import (
 	"log"
 	"testing"
 
+	"go.farcloser.world/tigron/test"
+
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
-	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
 )
 
 // TestTest is testing the test tooling itself

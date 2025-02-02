@@ -30,14 +30,25 @@ import (
 	"testing"
 	"time"
 
+	"go.farcloser.world/tigron/test"
 	"gotest.tools/v3/assert"
 )
+
+type Cert struct {
+	KeyPath  string
+	CertPath string
+	closeF   func() error
+}
+
+func (c *Cert) Close() error {
+	return c.closeF()
+}
 
 type CA struct {
 	KeyPath  string
 	CertPath string
 
-	t      testing.TB
+	t      *testing.T
 	key    *rsa.PrivateKey
 	cert   *x509.Certificate
 	closeF func() error
@@ -49,15 +60,15 @@ func (ca *CA) Close() error {
 
 const keyLength = 4096
 
-func New(t testing.TB) *CA {
+func New(data test.Data, helpers test.Helpers) *CA {
 	key, err := rsa.GenerateKey(rand.Reader, keyLength)
-	assert.NilError(t, err)
+	assert.NilError(helpers.T(), err)
 
 	cert := &x509.Certificate{
-		SerialNumber: serialNumber(t),
+		SerialNumber: serialNumber(helpers.T()),
 		Subject: pkix.Name{
 			Organization: []string{"test organization"},
-			CommonName:   fmt.Sprintf("CA (%s)", t.Name()),
+			CommonName:   fmt.Sprintf("CA (%s)", helpers.T().Name()),
 		},
 		NotBefore:             time.Now(),
 		NotAfter:              time.Now().Add(24 * time.Hour),
@@ -67,32 +78,22 @@ func New(t testing.TB) *CA {
 		BasicConstraintsValid: true,
 	}
 
-	dir, err := os.MkdirTemp(t.TempDir(), "ca")
-	assert.NilError(t, err)
+	dir, err := os.MkdirTemp(data.TempDir(), "ca")
+	assert.NilError(helpers.T(), err)
 	keyPath := filepath.Join(dir, "ca.key")
 	certPath := filepath.Join(dir, "ca.cert")
-	writePair(t, keyPath, certPath, cert, cert, key, key)
+	writePair(helpers.T(), keyPath, certPath, cert, cert, key, key)
 
 	return &CA{
 		KeyPath:  keyPath,
 		CertPath: certPath,
-		t:        t,
+		t:        helpers.T(),
 		key:      key,
 		cert:     cert,
 		closeF: func() error {
 			return os.RemoveAll(dir)
 		},
 	}
-}
-
-type Cert struct {
-	KeyPath  string
-	CertPath string
-	closeF   func() error
-}
-
-func (c *Cert) Close() error {
-	return c.closeF()
 }
 
 func (ca *CA) NewCert(host string, additional ...string) *Cert {
@@ -136,7 +137,7 @@ func (ca *CA) NewCert(host string, additional ...string) *Cert {
 	}
 }
 
-func writePair(t testing.TB, keyPath, certPath string, cert, caCert *x509.Certificate, key, caKey *rsa.PrivateKey) {
+func writePair(t *testing.T, keyPath, certPath string, cert, caCert *x509.Certificate, key, caKey *rsa.PrivateKey) {
 	keyF, err := os.Create(keyPath)
 	assert.NilError(t, err)
 	defer keyF.Close()
@@ -152,7 +153,7 @@ func writePair(t testing.TB, keyPath, certPath string, cert, caCert *x509.Certif
 	assert.NilError(t, certF.Close())
 }
 
-func serialNumber(t testing.TB) *big.Int {
+func serialNumber(t *testing.T) *big.Int {
 	serialNumberLimit := new(big.Int).Lsh(big.NewInt(1), 60)
 	serialNumber, err := rand.Int(rand.Reader, serialNumberLimit)
 	assert.NilError(t, err)

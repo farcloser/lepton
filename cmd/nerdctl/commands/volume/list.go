@@ -26,7 +26,7 @@ import (
 )
 
 func listCommand() *cobra.Command {
-	volumeLsCommand := &cobra.Command{
+	cmd := &cobra.Command{
 		Use:           "ls",
 		Aliases:       []string{"list"},
 		Short:         "List volumes",
@@ -35,52 +35,59 @@ func listCommand() *cobra.Command {
 		SilenceErrors: true,
 	}
 
-	volumeLsCommand.Flags().BoolP("quiet", "q", false, "Only display volume names")
+	cmd.Flags().BoolP("quiet", "q", false, "Only display volume names")
 	// Alias "-f" is reserved for "--filter"
-	volumeLsCommand.Flags().String("format", "", "Format the output using the given go template")
-	volumeLsCommand.Flags().BoolP("size", "s", false, "Display the disk usage of volumes. Can be slow with volumes having loads of directories.")
-	volumeLsCommand.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	cmd.Flags().String("format", "", "Format the output using the given go template")
+	cmd.Flags().BoolP("size", "s", false, "Display the disk usage of volumes. Can be slow with volumes having loads of directories.")
+	cmd.Flags().StringSliceP("filter", "f", []string{}, "Filter matches volumes based on given conditions")
+
+	_ = cmd.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return []string{formatter.FormatJSON, formatter.FormatTable, formatter.FormatWide}, cobra.ShellCompDirectiveNoFileComp
 	})
-	volumeLsCommand.Flags().StringSliceP("filter", "f", []string{}, "Filter matches volumes based on given conditions")
-	return volumeLsCommand
+
+	return cmd
 }
 
 func listOptions(cmd *cobra.Command, _ []string) (*options.VolumeList, error) {
-	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
-	if err != nil {
-		return nil, err
-	}
 	quiet, err := cmd.Flags().GetBool("quiet")
 	if err != nil {
 		return nil, err
 	}
+
 	format, err := cmd.Flags().GetString("format")
 	if err != nil {
 		return nil, err
 	}
+
 	size, err := cmd.Flags().GetBool("size")
 	if err != nil {
 		return nil, err
 	}
+
 	filters, err := cmd.Flags().GetStringSlice("filter")
 	if err != nil {
 		return nil, err
 	}
+
 	return &options.VolumeList{
-		GOptions: globalOptions,
-		Quiet:    quiet,
-		Format:   format,
-		Size:     size,
-		Filters:  filters,
-		Stdout:   cmd.OutOrStdout(),
+		Quiet:   quiet,
+		Format:  format,
+		Size:    size,
+		Filters: filters,
+		Stdout:  cmd.OutOrStdout(),
 	}, nil
 }
 
 func listAction(cmd *cobra.Command, args []string) error {
-	options, err := listOptions(cmd, args)
+	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return err
 	}
-	return volume.List(options)
+
+	opts, err := listOptions(cmd, args)
+	if err != nil {
+		return err
+	}
+
+	return volume.List(globalOptions, opts)
 }

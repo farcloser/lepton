@@ -28,7 +28,7 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/netutil"
 )
 
-func Create(options *options.NetworkCreate, stdout io.Writer) error {
+func Create(output io.Writer, globalOption *options.Global, options *options.NetworkCreate) error {
 	if err := identifiers.Validate(options.Name); err != nil {
 		return fmt.Errorf("invalid network name: %w", err)
 	}
@@ -40,7 +40,7 @@ func Create(options *options.NetworkCreate, stdout io.Writer) error {
 		options.Subnets = []string{""}
 	}
 
-	e, err := netutil.NewCNIEnv(options.GOptions.CNIPath, options.GOptions.CNINetConfPath, netutil.WithNamespace(options.GOptions.Namespace))
+	e, err := netutil.NewCNIEnv(globalOption.CNIPath, globalOption.CNINetConfPath, netutil.WithNamespace(globalOption.Namespace))
 	if err != nil {
 		return err
 	}
@@ -51,6 +51,6 @@ func Create(options *options.NetworkCreate, stdout io.Writer) error {
 		}
 		return err
 	}
-	_, err = fmt.Fprintln(stdout, *net.CliID)
+	_, err = fmt.Fprintln(output, *net.CliID)
 	return err
 }

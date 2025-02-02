@@ -25,6 +25,7 @@ import (
 	"strings"
 	"testing"
 
+	"go.farcloser.world/tigron/test"
 	"gotest.tools/v3/assert"
 
 	"github.com/containerd/platforms"
@@ -32,7 +33,6 @@ import (
 	"github.com/containerd/nerdctl/v2/leptonic/emulation"
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
-	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
 )
 
 func TestBuildBasics(t *testing.T) {

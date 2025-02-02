@@ -45,28 +45,6 @@ func TestSliceToSet(t *testing.T) {
 
 }
 
-func TestTrimStrSliceRight(t *testing.T) {
-	assert.DeepEqual(t,
-		[]string{"foo", "bar", "baz"},
-		TrimStrSliceRight([]string{"foo", "bar", "baz", "qux", "quux"}, []string{"qux", "quux"}))
-	assert.DeepEqual(t,
-		[]string{"foo", "bar", "baz", "qux", "quux"},
-		TrimStrSliceRight([]string{"foo", "bar", "baz", "qux", "quux"}, []string{"bar", "baz"}))
-	assert.DeepEqual(t,
-		[]string{},
-		TrimStrSliceRight([]string{"foo", "bar", "baz", "qux", "quux"}, []string{"foo", "bar", "baz", "qux", "quux"}))
-	assert.DeepEqual(t,
-		[]string{"foo", "bar", "baz", "qux", "quux"},
-		TrimStrSliceRight([]string{"foo", "bar", "baz", "qux", "quux"}, []string{}))
-	assert.DeepEqual(t,
-		[]string{"foo", "bar", "baz", "qux", "quux"},
-		TrimStrSliceRight([]string{"foo", "bar", "baz", "qux", "quux"}, []string{"aaa"}))
-	assert.DeepEqual(t,
-		[]string{"foo", "bar", "baz", "qux"},
-		TrimStrSliceRight([]string{"foo", "bar", "baz", "qux", "quux"}, []string{"quux"}))
-
-}
-
 func TestReverseStrSlice(t *testing.T) {
 	assert.DeepEqual(t,
 		[]string{"foo", "bar", "baz"},

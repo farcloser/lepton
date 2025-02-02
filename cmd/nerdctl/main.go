@@ -33,6 +33,7 @@ import (
 	"github.com/containerd/log"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/commands/builder"
+	image2 "github.com/containerd/nerdctl/v2/cmd/nerdctl/commands/image"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/commands/namespace"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/commands/network"
 	login2 "github.com/containerd/nerdctl/v2/cmd/nerdctl/commands/registry"
@@ -42,7 +43,6 @@ import (
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/compose"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/container"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
-	"github.com/containerd/nerdctl/v2/cmd/nerdctl/image"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/inspect"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/internal"
 	"github.com/containerd/nerdctl/v2/pkg/config"
@@ -291,14 +291,14 @@ Config file ($%s_TOML): %s
 		builder.BuildCommand(),
 
 		// #region Image management
-		image.ImagesCommand(),
-		image.PullCommand(),
-		image.PushCommand(),
-		image.LoadCommand(),
-		image.SaveCommand(),
-		image.TagCommand(),
-		image.RmiCommand(),
-		image.HistoryCommand(),
+		image2.ImagesCommand(),
+		image2.PullCommand(),
+		image2.PushCommand(),
+		image2.LoadCommand(),
+		image2.SaveCommand(),
+		image2.TagCommand(),
+		image2.RmiCommand(),
+		image2.HistoryCommand(),
 		// #endregion
 
 		// #region System
@@ -316,7 +316,7 @@ Config file ($%s_TOML): %s
 
 		// #region helpers.Management
 		container.Command(),
-		image.Command(),
+		image2.Command(),
 		network.Command(),
 		volume.Command(),
 		system.Command(),

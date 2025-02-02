@@ -25,12 +25,12 @@ import (
 	"strings"
 	"testing"
 
+	"go.farcloser.world/tigron/test"
 	"gotest.tools/v3/assert"
 
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nettestutil"
-	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/testregistry"
 )
 
@@ -43,10 +43,9 @@ func TestPush(t *testing.T) {
 		Require: test.Linux,
 
 		Setup: func(data test.Data, helpers test.Helpers) {
-			base := testutil.NewBase(t)
-			registryNoAuthHTTPRandom = testregistry.NewWithNoAuth(base, 0, false)
-			registryNoAuthHTTPDefault = testregistry.NewWithNoAuth(base, 80, false)
-			registryTokenAuthHTTPSRandom = testregistry.NewWithTokenAuth(base, "admin", "badmin", 0, true)
+			registryNoAuthHTTPRandom = testregistry.NewWithNoAuth(data, helpers, 0, false)
+			registryNoAuthHTTPDefault = testregistry.NewWithNoAuth(data, helpers, 80, false)
+			registryTokenAuthHTTPSRandom = testregistry.NewWithTokenAuth(data, helpers, "admin", "badmin", 0, true)
 		},
 
 		Cleanup: func(data test.Data, helpers test.Helpers) {

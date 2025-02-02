@@ -23,7 +23,7 @@ import (
 )
 
 func Command() *cobra.Command {
-	namespaceCommand := &cobra.Command{
+	cmd := &cobra.Command{
 		Annotations:   map[string]string{helpers.Category: helpers.Management},
 		Use:           "namespace",
 		Aliases:       []string{"ns"},
@@ -34,11 +34,11 @@ func Command() *cobra.Command {
 		SilenceErrors: true,
 	}
 
-	namespaceCommand.AddCommand(listCommand())
-	namespaceCommand.AddCommand(removeCommand())
-	namespaceCommand.AddCommand(createCommand())
-	namespaceCommand.AddCommand(updateCommand())
-	namespaceCommand.AddCommand(inspectCommand())
+	cmd.AddCommand(listCommand())
+	cmd.AddCommand(removeCommand())
+	cmd.AddCommand(createCommand())
+	cmd.AddCommand(updateCommand())
+	cmd.AddCommand(inspectCommand())
 
-	return namespaceCommand
+	return cmd
 }

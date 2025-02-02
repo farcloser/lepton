@@ -23,7 +23,7 @@ import (
 )
 
 func Command() *cobra.Command {
-	networkCommand := &cobra.Command{
+	cmd := &cobra.Command{
 		Annotations:   map[string]string{helpers.Category: helpers.Management},
 		Use:           "network",
 		Short:         "Manage networks",
@@ -31,12 +31,14 @@ func Command() *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
-	networkCommand.AddCommand(
+
+	cmd.AddCommand(
 		listCommand(),
 		inspectCommand(),
 		createCommand(),
 		removeCommand(),
 		pruneCommand(),
 	)
-	return networkCommand
+
+	return cmd
 }

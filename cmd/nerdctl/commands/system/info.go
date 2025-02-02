@@ -50,11 +50,6 @@ func InfoCommand() *cobra.Command {
 }
 
 func processInfoOptions(cmd *cobra.Command, _ []string) (*options.SystemInfo, error) {
-	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
-	if err != nil {
-		return nil, err
-	}
-
 	mode, err := cmd.Flags().GetString("mode")
 	if err != nil {
 		return nil, err
@@ -66,25 +61,30 @@ func processInfoOptions(cmd *cobra.Command, _ []string) (*options.SystemInfo, er
 	}
 
 	return &options.SystemInfo{
-		GOptions: globalOptions,
-		Mode:     mode,
-		Format:   format,
-		Stdout:   cmd.OutOrStdout(),
-		Stderr:   cmd.OutOrStderr(),
+		Mode:   mode,
+		Format: format,
+		Stdout: cmd.OutOrStdout(),
+		Stderr: cmd.OutOrStderr(),
 	}, nil
 }
 
 func infoAction(cmd *cobra.Command, args []string) error {
+	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
+	if err != nil {
+		return err
+	}
+
 	opts, err := processInfoOptions(cmd, args)
 	if err != nil {
 		return err
 	}
 
-	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), opts.GOptions.Namespace, opts.GOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
 	if err != nil {
 		return err
 	}
+
 	defer cancel()
 
-	return system.Info(ctx, cli, opts)
+	return system.Info(ctx, cli, globalOptions, opts)
 }

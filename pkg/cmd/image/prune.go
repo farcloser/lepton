@@ -32,7 +32,7 @@ import (
 )
 
 // Prune will remove all dangling images. If all is specified, will also remove all images not referenced by any container.
-func Prune(ctx context.Context, client *containerd.Client, options options.ImagePrune) error {
+func Prune(ctx context.Context, client *containerd.Client, globalOptions *options.Global, opts options.ImagePrune) error {
 	var (
 		imageStore   = client.ImageService()
 		contentStore = client.ContentStore()
@@ -44,8 +44,8 @@ func Prune(ctx context.Context, client *containerd.Client, options options.Image
 	)
 
 	filters := []imgutil.Filter{}
-	if len(options.Filters) > 0 {
-		parsedFilters, err := imgutil.ParseFilters(options.Filters)
+	if len(opts.Filters) > 0 {
+		parsedFilters, err := imgutil.ParseFilters(opts.Filters)
 		if err != nil {
 			return err
 		}
@@ -57,7 +57,7 @@ func Prune(ctx context.Context, client *containerd.Client, options options.Image
 		}
 	}
 
-	if options.All {
+	if opts.All {
 		// Remove all unused images; not just dangling ones
 		imagesToBeRemoved, err = imgutil.GetUnusedImages(ctx, client, filters...)
 	} else {
@@ -83,14 +83,14 @@ func Prune(ctx context.Context, client *containerd.Client, options options.Image
 	}
 
 	if len(removedImages) > 0 {
-		fmt.Fprintln(options.Stdout, "Deleted Images:")
+		fmt.Fprintln(opts.Stdout, "Deleted Images:")
 		for image, digests := range removedImages {
-			fmt.Fprintf(options.Stdout, "Untagged: %s\n", image)
+			fmt.Fprintf(opts.Stdout, "Untagged: %s\n", image)
 			for _, digest := range digests {
-				fmt.Fprintf(options.Stdout, "deleted: %s\n", digest)
+				fmt.Fprintf(opts.Stdout, "deleted: %s\n", digest)
 			}
 		}
-		fmt.Fprintln(options.Stdout, "")
+		fmt.Fprintln(opts.Stdout, "")
 	}
 	return nil
 }

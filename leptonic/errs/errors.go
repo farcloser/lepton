@@ -38,6 +38,8 @@ var (
 	// For example, if a certain abstraction expects to be first initialized before being used
 	ErrFaultyImplementation = errors.New("code needs to be fixed")
 
+	ErrCancelled = errors.New("operation cancelled")
+
 	// ErrNetworkCondition is meant to wrap network level errors - DNS, TCP, TLS errors
 	// but NOT http server level errors
 	ErrNetworkCondition = errors.New("network communication failed")

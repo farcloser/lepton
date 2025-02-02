@@ -23,7 +23,7 @@ import (
 )
 
 func Command() *cobra.Command {
-	var builderCommand = &cobra.Command{
+	var cmd = &cobra.Command{
 		Annotations:   map[string]string{helpers.Category: helpers.Management},
 		Use:           "builder",
 		Short:         "Manage builds",
@@ -32,11 +32,11 @@ func Command() *cobra.Command {
 		SilenceErrors: true,
 	}
 
-	builderCommand.AddCommand(
+	cmd.AddCommand(
 		BuildCommand(),
 		pruneCommand(),
 		debugCommand(),
 	)
 
-	return builderCommand
+	return cmd
 }

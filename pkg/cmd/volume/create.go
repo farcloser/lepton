@@ -27,20 +27,20 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/strutil"
 )
 
-func Create(name string, options *options.VolumeCreate) (*native.Volume, error) {
+func Create(name string, globalOptions *options.Global, opts *options.VolumeCreate) (*native.Volume, error) {
 	if name == "" {
 		name = stringid.GenerateRandomID()
-		options.Labels = append(options.Labels, labels.AnonymousVolumes+"=")
+		opts.Labels = append(opts.Labels, labels.AnonymousVolumes+"=")
 	}
-	volStore, err := Store(options.GOptions.Namespace, options.GOptions.DataRoot, options.GOptions.Address)
+	volStore, err := Store(globalOptions.Namespace, globalOptions.DataRoot, globalOptions.Address)
 	if err != nil {
 		return nil, err
 	}
-	labels := strutil.DedupeStrSlice(options.Labels)
+	labels := strutil.DedupeStrSlice(opts.Labels)
 	vol, err := volStore.Create(name, labels)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Fprintln(options.Stdout, name)
+	fmt.Fprintln(opts.Stdout, name)
 	return vol, nil
 }

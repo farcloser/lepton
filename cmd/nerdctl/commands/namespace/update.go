@@ -17,52 +17,46 @@
 package namespace
 
 import (
-	"errors"
-
 	"github.com/spf13/cobra"
-
-	"github.com/containerd/log"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
-	"github.com/containerd/nerdctl/v2/leptonic/services/namespace"
 	"github.com/containerd/nerdctl/v2/leptonic/utils"
 	"github.com/containerd/nerdctl/v2/pkg/api/options"
+	"github.com/containerd/nerdctl/v2/pkg/cmd/namespace"
 )
 
-type namespaceUpdateOptions namespaceCreateOptions
-
 func updateCommand() *cobra.Command {
-	namespaceLableCommand := &cobra.Command{
+	cmd := &cobra.Command{
 		Use:           "update [flags] NAMESPACE",
 		Short:         "Update labels for a namespace",
 		RunE:          updateAction,
-		Args:          cobra.MinimumNArgs(1),
+		Args:          cobra.ExactArgs(1),
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
 
-	namespaceLableCommand.Flags().StringArrayP("label", "l", nil, "Set labels for a namespace")
+	cmd.Flags().StringArrayP("label", "l", nil, "Set labels for a namespace")
 
-	return namespaceLableCommand
+	return cmd
 }
 
-func processNamespaceUpdateCommandOption(cmd *cobra.Command) (*options.Global, *namespaceUpdateOptions, error) {
-	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
-	if err != nil {
-		return nil, nil, err
-	}
-
+func updateOption(cmd *cobra.Command, args []string) (*options.NamespaceUpdate, error) {
 	labels, err := cmd.Flags().GetStringArray("label")
 	if err != nil {
-		return globalOptions, nil, err
+		return nil, err
 	}
 
-	return globalOptions, &namespaceUpdateOptions{Labels: utils.StringSlice2KVMap(labels, "=")}, nil
+	return &options.NamespaceUpdate{Name: args[0], Labels: utils.StringSlice2KVMap(labels, "=")}, nil
 }
 
 func updateAction(cmd *cobra.Command, args []string) error {
-	globalOptions, options, err := processNamespaceUpdateCommandOption(cmd)
+	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
+	if err != nil {
+		return err
+	}
+
+	opts, err := updateOption(cmd, args)
 	if err != nil {
 		return err
 	}
@@ -74,14 +68,5 @@ func updateAction(cmd *cobra.Command, args []string) error {
 
 	defer cancel()
 
-	errs := namespace.Update(ctx, cli, args[0], options.Labels)
-	if len(errs) > 0 {
-		for _, err = range errs {
-			log.G(ctx).WithError(err).Error()
-		}
-
-		return errors.New("an error occurred")
-	}
-
-	return nil
+	return namespace.Update(ctx, cli, globalOptions, opts)
 }

@@ -27,7 +27,7 @@ import (
 )
 
 func inspectCommand() *cobra.Command {
-	networkInspectCommand := &cobra.Command{
+	cmd := &cobra.Command{
 		Use:               "inspect [flags] NETWORK [NETWORK, ...]",
 		Short:             "Display detailed information on one or more networks",
 		Args:              cobra.MinimumNArgs(1),
@@ -36,15 +36,18 @@ func inspectCommand() *cobra.Command {
 		SilenceUsage:      true,
 		SilenceErrors:     true,
 	}
-	networkInspectCommand.Flags().String("mode", "dockercompat", `Inspect mode, "dockercompat" for Docker-compatible output, "native" for containerd-native output`)
-	networkInspectCommand.RegisterFlagCompletionFunc("mode", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+
+	cmd.Flags().String("mode", "dockercompat", `Inspect mode, "dockercompat" for Docker-compatible output, "native" for containerd-native output`)
+	cmd.Flags().StringP("format", "f", "", "Format the output using the given Go template, e.g, '{{json .}}'")
+
+	_ = cmd.RegisterFlagCompletionFunc("mode", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return []string{"dockercompat", "native"}, cobra.ShellCompDirectiveNoFileComp
 	})
-	networkInspectCommand.Flags().StringP("format", "f", "", "Format the output using the given Go template, e.g, '{{json .}}'")
-	networkInspectCommand.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	_ = cmd.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return []string{formatter.FormatJSON}, cobra.ShellCompDirectiveNoFileComp
 	})
-	return networkInspectCommand
+
+	return cmd
 }
 
 func inspectAction(cmd *cobra.Command, args []string) error {
@@ -52,16 +55,18 @@ func inspectAction(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+
 	mode, err := cmd.Flags().GetString("mode")
 	if err != nil {
 		return err
 	}
+
 	format, err := cmd.Flags().GetString("format")
 	if err != nil {
 		return err
 	}
-	return network.Inspect(cmd.Context(), &options.NetworkInspect{
-		GOptions: globalOptions,
+
+	return network.Inspect(cmd.Context(), globalOptions, &options.NetworkInspect{
 		Mode:     mode,
 		Format:   format,
 		Networks: args,
