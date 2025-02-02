@@ -29,10 +29,10 @@ import (
 
 	"go.farcloser.world/containers/specs"
 
+	"go.farcloser.world/lepton/leptonic/utils"
 	"go.farcloser.world/lepton/pkg/api/options"
 	"go.farcloser.world/lepton/pkg/consoleutil"
 	"go.farcloser.world/lepton/pkg/flagutil"
-	"go.farcloser.world/lepton/pkg/idgen"
 	"go.farcloser.world/lepton/pkg/idutil/containerwalker"
 	"go.farcloser.world/lepton/pkg/signalutil"
 	"go.farcloser.world/lepton/pkg/taskutil"
@@ -86,7 +86,7 @@ func execActionWithContainer(ctx context.Context, client *containerd.Client, con
 	}
 	ioCreator = cio.NewCreator(cioOpts...)
 
-	execID := "exec-" + idgen.GenerateID()
+	execID := "exec-" + utils.GenerateID(utils.ID32)
 	process, err := task.Exec(ctx, execID, pspec, ioCreator)
 	if err != nil {
 		return err

@@ -19,19 +19,19 @@ package mountutil
 import (
 	"runtime"
 
-	"go.farcloser.world/lepton/pkg/inspecttypes/native"
+	"go.farcloser.world/lepton/leptonic/api"
 	"go.farcloser.world/lepton/pkg/mountutil/volumestore"
 )
 
 type MockVolumeStore struct {
-	volumestore.VolumeStore
+	volumestore.VolumeService
 }
 
-func (mv *MockVolumeStore) CreateWithoutLock(name string, labels []string) (*native.Volume, error) {
+func (mv *MockVolumeStore) CreateWithoutLock(name string, labels map[string]string) (*api.Volume, error) {
 	if runtime.GOOS == "windows" {
-		return &native.Volume{Name: "test_volume", Mountpoint: "C:\\test\\directory"}, nil
+		return &api.Volume{Name: "test_volume", Mountpoint: "C:\\test\\directory"}, nil
 	}
-	return &native.Volume{Name: "test_volume", Mountpoint: "/test/volume"}, nil
+	return &api.Volume{Name: "test_volume", Mountpoint: "/test/volume"}, nil
 }
 
 var mockVolumeStore = &MockVolumeStore{}

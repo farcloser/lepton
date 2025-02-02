@@ -29,8 +29,8 @@ import (
 
 	"go.farcloser.world/lepton/pkg/testutil"
 	"go.farcloser.world/lepton/pkg/testutil/nerdtest"
+	"go.farcloser.world/lepton/pkg/testutil/nerdtest/registry"
 	"go.farcloser.world/lepton/pkg/testutil/nettestutil"
-	"go.farcloser.world/lepton/pkg/testutil/testregistry"
 	"go.farcloser.world/lepton/pkg/testutil/various"
 )
 
@@ -62,17 +62,19 @@ func TestMultiPlatformBuildPush(t *testing.T) {
 	// non-buildx version of `docker build` lacks multi-platform. Also, `docker push` lacks --platform.
 	testCase.Require = require.All(
 		require.Not(nerdtest.Docker),
+		nerdtest.Registry,
 		nerdtest.Build,
 		nerdtest.IsFlaky("mixed tests using both legacy and non-legacy are considered flaky"),
 	)
 
-	var reg *testregistry.RegistryServer
+	var reg *registry.Server
 
 	testCase.Setup = func(data test.Data, helpers test.Helpers) {
 		testutil.RequireExecPlatform(t, "linux/amd64", "linux/arm64", "linux/arm/v7")
 		base := testutil.NewBase(t)
 		tID := data.Identifier()
-		reg = testregistry.NewWithNoAuth(data, helpers, 0, false)
+		reg = nerdtest.RegistryWithNoAuth(data, helpers, 0, false)
+		reg.Setup(data, helpers)
 
 		data.Set("imageName", fmt.Sprintf("localhost:%d/%s:latest", reg.Port, tID))
 
@@ -90,7 +92,7 @@ RUN echo dummy
 	testCase.Cleanup = func(data test.Data, helpers test.Helpers) {
 		helpers.Anyhow("rmi", data.Get("imageName"))
 		if reg != nil {
-			reg.Cleanup(nil)
+			reg.Cleanup(data, helpers)
 		}
 	}
 
@@ -106,16 +108,20 @@ func TestMultiPlatformBuildPushNoRun(t *testing.T) {
 	// non-buildx version of `docker build` lacks multi-platform. Also, `docker push` lacks --platform.
 	testCase.Require = require.All(
 		require.Not(nerdtest.Docker),
+		nerdtest.Registry,
 		nerdtest.Build,
 		nerdtest.IsFlaky("mixed tests using both legacy and non-legacy are considered flaky"),
 	)
 
+	var reg *registry.Server
+
 	testCase.Setup = func(data test.Data, helpers test.Helpers) {
+		reg = nerdtest.RegistryWithNoAuth(data, helpers, 0, false)
+		reg.Setup(data, helpers)
+
 		testutil.RequireExecPlatform(t, "linux/amd64", "linux/arm64", "linux/arm/v7")
 		base := testutil.NewBase(t)
 		tID := data.Identifier()
-		reg := testregistry.NewWithNoAuth(data, helpers, 0, false)
-		defer reg.Cleanup(nil)
 
 		imageName := fmt.Sprintf("localhost:%d/%s:latest", reg.Port, tID)
 		defer base.Cmd("rmi", imageName).Run()
@@ -131,23 +137,33 @@ CMD echo dummy
 		base.Cmd("push", "--platform=amd64,arm64,linux/arm/v7", imageName).AssertOK()
 	}
 
+	testCase.Cleanup = func(data test.Data, helpers test.Helpers) {
+		if reg != nil {
+			reg.Cleanup(data, helpers)
+		}
+	}
+
 	testCase.Run(t)
 }
 
 func TestMultiPlatformPullPushAllPlatforms(t *testing.T) {
 	testCase := nerdtest.Setup()
 
+	var reg *registry.Server
+
 	// non-buildx version of `docker build` lacks multi-platform. Also, `docker push` lacks --platform.
 	testCase.Require = require.All(
+		nerdtest.Registry,
 		require.Not(nerdtest.Docker),
 		nerdtest.IsFlaky("mixed tests using both legacy and non-legacy are considered flaky"),
 	)
 
 	testCase.Setup = func(data test.Data, helpers test.Helpers) {
+		reg = nerdtest.RegistryWithNoAuth(data, helpers, 0, false)
+		reg.Setup(data, helpers)
+
 		base := testutil.NewBase(t)
 		tID := data.Identifier()
-		reg := testregistry.NewWithNoAuth(data, helpers, 0, false)
-		defer reg.Cleanup(nil)
 
 		pushImageName := fmt.Sprintf("localhost:%d/%s:latest", reg.Port, tID)
 		defer base.Cmd("rmi", pushImageName).Run()
@@ -156,6 +172,12 @@ func TestMultiPlatformPullPushAllPlatforms(t *testing.T) {
 		base.Cmd("tag", testutil.AlpineImage, pushImageName).AssertOK()
 		base.Cmd("push", "--all-platforms", pushImageName).AssertOK()
 		testMultiPlatformRun(base, pushImageName)
+	}
+
+	testCase.Cleanup = func(data test.Data, helpers test.Helpers) {
+		if reg != nil {
+			reg.Cleanup(data, helpers)
+		}
 	}
 
 	testCase.Run(t)

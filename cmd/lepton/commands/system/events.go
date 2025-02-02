@@ -58,7 +58,6 @@ func eventsOptions(cmd *cobra.Command, _ []string) (*options.SystemEvents, error
 	}
 
 	return &options.SystemEvents{
-		Stdout:  cmd.OutOrStdout(),
 		Format:  format,
 		Filters: filters,
 	}, nil
@@ -82,5 +81,5 @@ func eventsAction(cmd *cobra.Command, args []string) error {
 
 	defer cancel()
 
-	return system.Events(ctx, cli, globalOptions, opts)
+	return system.Events(ctx, cli, cmd.OutOrStdout(), globalOptions, opts)
 }

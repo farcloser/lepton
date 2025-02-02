@@ -27,8 +27,8 @@ import (
 	"github.com/containerd/log"
 	"golang.org/x/sync/errgroup"
 
+	"go.farcloser.world/lepton/leptonic/utils"
 	"go.farcloser.world/lepton/pkg/composer/serviceparser"
-	"go.farcloser.world/lepton/pkg/idgen"
 )
 
 type RunOptions struct {
@@ -116,7 +116,7 @@ func (c *Composer) Run(ctx context.Context, ro RunOptions) error {
 
 	for i := range svcs {
 		// FYI: https://github.com/docker/compose/blob/v2.18.1/pkg/compose/run.go#L65
-		svcs[i].ContainerName = fmt.Sprintf("%[1]s%[4]s%[2]s%[4]srun%[4]s%[3]s", c.project.Name, svcs[i].Name, idgen.TruncateID(idgen.GenerateID()), serviceparser.Separator)
+		svcs[i].ContainerName = fmt.Sprintf("%[1]s%[4]s%[2]s%[4]srun%[4]s%[3]s", c.project.Name, svcs[i].Name, utils.GenerateID(utils.ID12), serviceparser.Separator)
 	}
 
 	targetSvc.Tty = ro.Tty

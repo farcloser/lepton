@@ -19,6 +19,7 @@ package system
 import (
 	"context"
 	"fmt"
+	"io"
 
 	containerd "github.com/containerd/containerd/v2/client"
 
@@ -32,30 +33,29 @@ import (
 
 // Prune will remove all unused containers, networks,
 // images (dangling only or both dangling and unreferenced), and optionally, volumes.
-func Prune(ctx context.Context, client *containerd.Client, globalOptions *options.Global, opts *options.SystemPrune) error {
+func Prune(ctx context.Context, client *containerd.Client, output io.Writer, globalOptions *options.Global, opts *options.SystemPrune) error {
 	if err := container.Prune(ctx, client, options.ContainerPrune{
 		GOptions: globalOptions,
-		Stdout:   opts.Stdout,
+		Stdout:   output,
 	}); err != nil {
 		return err
 	}
 	if err := network.Prune(ctx, client, globalOptions, &options.NetworkPrune{
 		NetworkDriversToKeep: opts.NetworkDriversToKeep,
-		Stdout:               opts.Stdout,
+		Stdout:               output,
 	}); err != nil {
 		return err
 	}
 	if opts.Volumes {
-		if err := volume.Prune(ctx, client, globalOptions, &options.VolumePrune{
-			All:    false,
-			Force:  true,
-			Stdout: opts.Stdout,
+		if err := volume.Prune(ctx, client, output, globalOptions, &options.VolumePrune{
+			All:   false,
+			Force: true,
 		}); err != nil {
 			return err
 		}
 	}
 	if err := image.Prune(ctx, client, globalOptions, options.ImagePrune{
-		Stdout: opts.Stdout,
+		Stdout: output,
 		All:    opts.All,
 	}); err != nil {
 		// ?
@@ -73,9 +73,9 @@ func Prune(ctx context.Context, client *containerd.Client, globalOptions *option
 		}
 
 		if len(prunedObjects) > 0 {
-			fmt.Fprintln(opts.Stdout, "Deleted build cache objects:")
+			fmt.Fprintln(output, "Deleted build cache objects:")
 			for _, item := range prunedObjects {
-				fmt.Fprintln(opts.Stdout, item.ID)
+				fmt.Fprintln(output, item.ID)
 			}
 		}
 	}

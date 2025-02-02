@@ -22,6 +22,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"strings"
 	"text/template"
 	"time"
@@ -145,7 +146,7 @@ func generateEventFilters(filters []string) (map[string][]EventFilter, error) {
 }
 
 // Events is from https://github.com/containerd/containerd/blob/v1.4.3/cmd/ctr/commands/events/events.go
-func Events(ctx context.Context, client *containerd.Client, _ *options.Global, opts *options.SystemEvents) error {
+func Events(ctx context.Context, client *containerd.Client, output io.Writer, _ *options.Global, opts *options.SystemEvents) error {
 	eventsClient := client.EventService()
 	eventsCh, errCh := eventsClient.Subscribe(ctx)
 	var tmpl *template.Template
@@ -206,12 +207,12 @@ func Events(ctx context.Context, client *containerd.Client, _ *options.Global, o
 					if err := tmpl.Execute(&b, eOut); err != nil {
 						return err
 					}
-					if _, err := fmt.Fprintln(opts.Stdout, b.String()+"\n"); err != nil {
+					if _, err := fmt.Fprintln(output, b.String()+"\n"); err != nil {
 						return err
 					}
 				} else {
 					if _, err := fmt.Fprintln(
-						opts.Stdout,
+						output,
 						e.Timestamp,
 						e.Namespace,
 						e.Topic,

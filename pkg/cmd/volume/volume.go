@@ -23,7 +23,7 @@ import (
 
 // Store returns a volume store
 // that corresponds to a directory like `/var/lib/<ROOT_NAME>/1935db59/volumes/default`
-func Store(ns string, dataRoot string, address string) (volumestore.VolumeStore, error) {
+func Store(ns string, dataRoot string, address string) (volumestore.VolumeService, error) {
 	dataStore, err := clientutil.DataStore(dataRoot, address)
 	if err != nil {
 		return nil, err

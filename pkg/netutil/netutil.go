@@ -36,7 +36,6 @@ import (
 	"github.com/containernetworking/cni/libcni"
 
 	"go.farcloser.world/core/filesystem"
-	"go.farcloser.world/core/utils"
 
 	"go.farcloser.world/lepton/leptonic/errs"
 	"go.farcloser.world/lepton/leptonic/services/namespace"
@@ -44,6 +43,7 @@ import (
 	"go.farcloser.world/lepton/pkg/labels"
 	"go.farcloser.world/lepton/pkg/netutil/nettype"
 	subnetutil "go.farcloser.world/lepton/pkg/netutil/subnet"
+	"go.farcloser.world/lepton/pkg/utils"
 	"go.farcloser.world/lepton/pkg/version"
 )
 

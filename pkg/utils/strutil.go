@@ -14,35 +14,17 @@
    limitations under the License.
 */
 
-package idgen
+package utils
 
-import (
-	"crypto/rand"
-	"encoding/hex"
-	"fmt"
-)
+import "strings"
 
-const (
-	IDLength      = 64
-	ShortIDLength = 12
-)
+func KeyValueStringsToMap(values []string) map[string]string {
+	result := make(map[string]string, len(values))
 
-func GenerateID() string {
-	bytesLength := IDLength / 2
-	b := make([]byte, bytesLength)
-	n, err := rand.Read(b)
-	if err != nil {
-		panic(err)
+	for _, value := range values {
+		k, v, _ := strings.Cut(value, "=")
+		result[k] = v
 	}
-	if n != bytesLength {
-		panic(fmt.Errorf("expected %d bytes, got %d bytes", bytesLength, n))
-	}
-	return hex.EncodeToString(b)
-}
 
-func TruncateID(id string) string {
-	if len(id) < ShortIDLength {
-		return id
-	}
-	return id[:ShortIDLength]
+	return result
 }

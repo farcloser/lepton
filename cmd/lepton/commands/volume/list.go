@@ -74,7 +74,6 @@ func listOptions(cmd *cobra.Command, _ []string) (*options.VolumeList, error) {
 		Format:  format,
 		Size:    size,
 		Filters: filters,
-		Stdout:  cmd.OutOrStdout(),
 	}, nil
 }
 
@@ -89,5 +88,5 @@ func listAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	return volume.List(globalOptions, opts)
+	return volume.List(cmd.OutOrStdout(), globalOptions, opts)
 }

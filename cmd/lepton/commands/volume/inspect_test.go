@@ -31,8 +31,8 @@ import (
 	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
+	"go.farcloser.world/lepton/leptonic/api"
 	"go.farcloser.world/lepton/leptonic/errs"
-	"go.farcloser.world/lepton/pkg/inspecttypes/native"
 	"go.farcloser.world/lepton/pkg/testutil/nerdtest"
 )
 
@@ -103,7 +103,7 @@ func TestVolumeInspect(t *testing.T) {
 					Output: expect.All(
 						expect.Contains(data.Get("vol1")),
 						func(stdout string, info string, t *testing.T) {
-							var dc []native.Volume
+							var dc []api.Volume
 							if err := json.Unmarshal([]byte(stdout), &dc); err != nil {
 								t.Fatal(err)
 							}
@@ -125,11 +125,11 @@ func TestVolumeInspect(t *testing.T) {
 					Output: expect.All(
 						expect.Contains(data.Get("vol2")),
 						func(stdout string, info string, t *testing.T) {
-							var dc []native.Volume
+							var dc []api.Volume
 							if err := json.Unmarshal([]byte(stdout), &dc); err != nil {
 								t.Fatal(err)
 							}
-							labels := *dc[0].Labels
+							labels := dc[0].Labels
 							assert.Assert(t, len(labels) == 2, fmt.Sprintf("two results, not %d", len(labels)))
 							assert.Assert(t, labels["foo"] == "fooval", "label foo should be fooval, not "+labels["foo"])
 							assert.Assert(t, labels["bar"] == "barval", "label bar should be barval, not "+labels["bar"])
@@ -149,7 +149,7 @@ func TestVolumeInspect(t *testing.T) {
 					Output: expect.All(
 						expect.Contains(data.Get("vol1")),
 						func(stdout string, info string, t *testing.T) {
-							var dc []native.Volume
+							var dc []api.Volume
 							if err := json.Unmarshal([]byte(stdout), &dc); err != nil {
 								t.Fatal(err)
 							}
@@ -170,7 +170,7 @@ func TestVolumeInspect(t *testing.T) {
 						expect.Contains(data.Get("vol1")),
 						expect.Contains(data.Get("vol2")),
 						func(stdout string, info string, t *testing.T) {
-							var dc []native.Volume
+							var dc []api.Volume
 							if err := json.Unmarshal([]byte(stdout), &dc); err != nil {
 								t.Fatal(err)
 							}
@@ -194,7 +194,7 @@ func TestVolumeInspect(t *testing.T) {
 					Output: expect.All(
 						expect.Contains(data.Get("vol1")),
 						func(stdout string, info string, t *testing.T) {
-							var dc []native.Volume
+							var dc []api.Volume
 							if err := json.Unmarshal([]byte(stdout), &dc); err != nil {
 								t.Fatal(err)
 							}

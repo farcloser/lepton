@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/errdefs"
@@ -32,7 +33,7 @@ import (
 	"go.farcloser.world/lepton/pkg/mountutil"
 )
 
-func Remove(ctx context.Context, client *containerd.Client, volumes []string, globalOptions *options.Global, options *options.VolumeRemove) error {
+func Remove(ctx context.Context, client *containerd.Client, output io.Writer, volumes []string, globalOptions *options.Global, options *options.VolumeRemove) error {
 	volStore, err := Store(globalOptions.Namespace, globalOptions.DataRoot, globalOptions.Address)
 	if err != nil {
 		return err
@@ -67,7 +68,7 @@ func Remove(ctx context.Context, client *containerd.Client, volumes []string, gl
 	}
 	// Otherwise, output on stdout whatever was successful
 	for _, name := range removedNames {
-		fmt.Fprintln(options.Stdout, name)
+		fmt.Fprintln(output, name)
 	}
 	// Log the rest
 	for _, volErr := range cannotRemove {

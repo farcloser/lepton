@@ -32,6 +32,7 @@ import (
 
 	"go.farcloser.world/lepton/pkg/testutil"
 	"go.farcloser.world/lepton/pkg/testutil/nerdtest"
+	"go.farcloser.world/lepton/pkg/testutil/nerdtest/registry"
 	"go.farcloser.world/lepton/pkg/testutil/testregistry"
 	"go.farcloser.world/lepton/pkg/testutil/various"
 )
@@ -39,13 +40,14 @@ import (
 func TestImagePullWithCosign(t *testing.T) {
 	nerdtest.Setup()
 
-	var registry *testregistry.RegistryServer
+	var reg *registry.Server
 	var keyPair *various.CosignKeyPair
 
 	testCase := &test.Case{
 		Require: require.All(
 			require.Linux,
 			nerdtest.Build,
+			nerdtest.Registry,
 			require.Binary("cosign"),
 			require.Not(nerdtest.Docker),
 		),
@@ -53,9 +55,11 @@ func TestImagePullWithCosign(t *testing.T) {
 			"COSIGN_PASSWORD": "1",
 		},
 		Setup: func(data test.Data, helpers test.Helpers) {
+			reg = nerdtest.RegistryWithNoAuth(data, helpers, 0, false)
+			reg.Setup(data, helpers)
+
 			keyPair = various.NewCosignKeyPair(t, "cosign-key-pair", "1")
-			registry = testregistry.NewWithNoAuth(data, helpers, 0, false)
-			testImageRef := fmt.Sprintf("%s:%d/%s", "127.0.0.1", registry.Port, data.Identifier())
+			testImageRef := fmt.Sprintf("%s:%d/%s", "127.0.0.1", reg.Port, data.Identifier())
 			dockerfile := fmt.Sprintf(`FROM %s
 CMD ["echo", "build-test-string"]
 	`, testutil.CommonImage)
@@ -74,9 +78,9 @@ CMD ["echo", "build-test-string"]
 			if keyPair != nil {
 				keyPair.Cleanup()
 			}
-			if registry != nil {
-				registry.Cleanup(nil)
-				testImageRef := fmt.Sprintf("%s:%d/%s", "127.0.0.1", registry.Port, data.Identifier())
+			if reg != nil {
+				reg.Cleanup(data, helpers)
+				testImageRef := fmt.Sprintf("%s:%d/%s", "127.0.0.1", reg.Port, data.Identifier())
 				helpers.Anyhow("rmi", "-f", testImageRef+":one")
 				helpers.Anyhow("rmi", "-f", testImageRef+":two")
 			}

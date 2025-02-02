@@ -29,7 +29,7 @@ import (
 	"go.farcloser.world/containers/specs"
 
 	"go.farcloser.world/lepton/leptonic/identifiers"
-	"go.farcloser.world/lepton/pkg/idgen"
+	"go.farcloser.world/lepton/leptonic/utils"
 	"go.farcloser.world/lepton/pkg/mountutil/volumestore"
 	"go.farcloser.world/lepton/pkg/strutil"
 )
@@ -58,7 +58,7 @@ type volumeSpec struct {
 	AnonymousVolume string
 }
 
-func ProcessFlagV(s string, volStore volumestore.VolumeStore, createDir bool) (*Processed, error) {
+func ProcessFlagV(s string, volStore volumestore.VolumeService, createDir bool) (*Processed, error) {
 	var (
 		res      *Processed
 		volSpec  volumeSpec
@@ -182,12 +182,12 @@ func handleBindMounts(source string, createDir bool) (volumeSpec, error) {
 	return res, nil
 }
 
-func handleAnonymousVolumes(s string, volStore volumestore.VolumeStore) (volumeSpec, error) {
+func handleAnonymousVolumes(s string, volStore volumestore.VolumeService) (volumeSpec, error) {
 	var res volumeSpec
-	res.AnonymousVolume = idgen.GenerateID()
+	res.AnonymousVolume = utils.GenerateID(utils.ID32)
 
 	log.L.Debugf("creating anonymous volume %q, for %q", res.AnonymousVolume, s)
-	anonVol, err := volStore.CreateWithoutLock(res.AnonymousVolume, []string{})
+	anonVol, err := volStore.CreateWithoutLock(res.AnonymousVolume, nil)
 	if err != nil {
 		return res, fmt.Errorf("failed to create an anonymous volume %q: %w", res.AnonymousVolume, err)
 	}
@@ -197,7 +197,7 @@ func handleAnonymousVolumes(s string, volStore volumestore.VolumeStore) (volumeS
 	return res, nil
 }
 
-func handleNamedVolumes(source string, volStore volumestore.VolumeStore) (volumeSpec, error) {
+func handleNamedVolumes(source string, volStore volumestore.VolumeService) (volumeSpec, error) {
 	var res volumeSpec
 	res.Name = source
 

@@ -39,9 +39,9 @@ import (
 
 	"go.farcloser.world/containers/reference"
 	"go.farcloser.world/containers/specs"
-	"go.farcloser.world/core/utils"
 
 	"go.farcloser.world/lepton/leptonic/errs"
+	utils2 "go.farcloser.world/lepton/leptonic/utils"
 	"go.farcloser.world/lepton/pkg/annotations"
 	"go.farcloser.world/lepton/pkg/api/options"
 	"go.farcloser.world/lepton/pkg/clientutil"
@@ -50,7 +50,6 @@ import (
 	"go.farcloser.world/lepton/pkg/containerutil"
 	"go.farcloser.world/lepton/pkg/dnsutil/hostsstore"
 	"go.farcloser.world/lepton/pkg/flagutil"
-	"go.farcloser.world/lepton/pkg/idgen"
 	"go.farcloser.world/lepton/pkg/imgutil"
 	"go.farcloser.world/lepton/pkg/imgutil/load"
 	"go.farcloser.world/lepton/pkg/inspecttypes/dockercompat"
@@ -63,6 +62,7 @@ import (
 	"go.farcloser.world/lepton/pkg/platformutil"
 	"go.farcloser.world/lepton/pkg/rootlessutil"
 	"go.farcloser.world/lepton/pkg/strutil"
+	"go.farcloser.world/lepton/pkg/utils"
 )
 
 // Create will create a container.
@@ -91,7 +91,7 @@ func Create(ctx context.Context, client *containerd.Client, args []string, netMa
 	internalLabels.namespace = opts.GOptions.Namespace
 
 	var (
-		id       = idgen.GenerateID()
+		id       = utils2.GenerateID(utils2.ID32)
 		specOpts []oci.SpecOpts
 		cOpts    []containerd.NewContainerOpts
 	)

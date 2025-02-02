@@ -41,6 +41,7 @@ import (
 	"go.farcloser.world/core/filesystem"
 	"go.farcloser.world/core/version/semver"
 
+	"go.farcloser.world/lepton/leptonic/api"
 	"go.farcloser.world/lepton/leptonic/emulation"
 	"go.farcloser.world/lepton/leptonic/platforms"
 	"go.farcloser.world/lepton/leptonic/rootlesskit"
@@ -249,12 +250,12 @@ func (b *Base) InspectNetwork(name string) dockercompat.Network {
 	return dc[0]
 }
 
-func (b *Base) InspectVolume(name string, args ...string) native.Volume {
+func (b *Base) InspectVolume(name string, args ...string) api.Volume {
 	cmd := append([]string{"volume", "inspect"}, args...)
 	cmd = append(cmd, name)
 	cmdResult := b.Cmd(cmd...).Run()
 	assert.Equal(b.T, cmdResult.ExitCode, 0)
-	var dc []native.Volume
+	var dc []api.Volume
 	if err := json.Unmarshal([]byte(cmdResult.Stdout()), &dc); err != nil {
 		b.T.Fatal(err)
 	}

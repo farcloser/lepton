@@ -24,12 +24,12 @@ import (
 	"github.com/spf13/cobra"
 
 	"go.farcloser.world/lepton/cmd/lepton/helpers"
+	"go.farcloser.world/lepton/leptonic/api"
 	"go.farcloser.world/lepton/leptonic/services/containerd"
 	"go.farcloser.world/lepton/leptonic/services/image"
 	"go.farcloser.world/lepton/leptonic/services/namespace"
 	"go.farcloser.world/lepton/pkg/api/options"
 	"go.farcloser.world/lepton/pkg/cmd/volume"
-	"go.farcloser.world/lepton/pkg/inspecttypes/native"
 	"go.farcloser.world/lepton/pkg/labels"
 	"go.farcloser.world/lepton/pkg/netutil"
 )
@@ -197,7 +197,7 @@ func Platforms(cmd *cobra.Command, args []string, toComplete string) ([]string, 
 	return candidates, cobra.ShellCompDirectiveNoFileComp
 }
 
-func getVolumes(cmd *cobra.Command, globalOptions *options.Global) (map[string]native.Volume, error) {
+func getVolumes(cmd *cobra.Command, globalOptions *options.Global) (map[string]api.Volume, error) {
 	volumeSize, err := cmd.Flags().GetBool("size")
 	if err != nil {
 		// The `volume rm` does not have the flag `size`, so set it to false as the default value.

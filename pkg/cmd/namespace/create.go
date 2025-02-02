@@ -14,29 +14,17 @@
    limitations under the License.
 */
 
-package volume
+package namespace
 
 import (
 	"context"
-	"fmt"
-	"io"
 
-	"go.farcloser.world/lepton/leptonic/api"
+	"github.com/containerd/containerd/v2/client"
+
+	"go.farcloser.world/lepton/leptonic/services/namespace"
 	"go.farcloser.world/lepton/pkg/api/options"
 )
 
-func Create(ctx context.Context, output io.Writer, globalOptions *options.Global, opts *options.VolumeCreate) (*api.Volume, error) {
-	volStore, err := Store(globalOptions.Namespace, globalOptions.DataRoot, globalOptions.Address)
-	if err != nil {
-		return nil, err
-	}
-
-	vol, err := volStore.Create(opts.Name, opts.Labels)
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = fmt.Fprintln(output, vol.Name)
-
-	return vol, err
+func Create(ctx context.Context, cli *client.Client, _ *options.Global, opts *options.NamespaceCreate) error {
+	return namespace.Create(ctx, cli, opts.Name, opts.Labels)
 }

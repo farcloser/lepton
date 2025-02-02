@@ -19,13 +19,12 @@ package network
 import (
 	"github.com/spf13/cobra"
 
-	"go.farcloser.world/core/utils"
-
 	"go.farcloser.world/lepton/cmd/lepton/completion"
 	"go.farcloser.world/lepton/cmd/lepton/helpers"
 	"go.farcloser.world/lepton/pkg/api/options"
 	"go.farcloser.world/lepton/pkg/cmd/network"
 	"go.farcloser.world/lepton/pkg/strutil"
+	"go.farcloser.world/lepton/pkg/utils"
 )
 
 func createCommand() *cobra.Command {

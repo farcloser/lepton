@@ -49,8 +49,7 @@ func removeOptions(cmd *cobra.Command, _ []string) (*options.VolumeRemove, error
 	}
 
 	return &options.VolumeRemove{
-		Force:  force,
-		Stdout: cmd.OutOrStdout(),
+		Force: force,
 	}, nil
 }
 
@@ -71,7 +70,7 @@ func removeAction(cmd *cobra.Command, args []string) error {
 	}
 	defer cancel()
 
-	return volume.Remove(ctx, cli, args, globalOptions, opts)
+	return volume.Remove(ctx, cli, cmd.OutOrStdout(), args, globalOptions, opts)
 }
 
 func volumeRmShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {

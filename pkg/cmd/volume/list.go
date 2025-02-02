@@ -20,6 +20,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"io"
 	"strconv"
 	"strings"
 	"text/tabwriter"
@@ -28,9 +29,9 @@ import (
 	"github.com/containerd/containerd/v2/pkg/progress"
 	"github.com/containerd/log"
 
+	"go.farcloser.world/lepton/leptonic/api"
 	"go.farcloser.world/lepton/pkg/api/options"
 	"go.farcloser.world/lepton/pkg/formatter"
-	"go.farcloser.world/lepton/pkg/inspecttypes/native"
 )
 
 type volumePrintable struct {
@@ -43,7 +44,7 @@ type volumePrintable struct {
 	// TODO: "Links"
 }
 
-func List(globalOptions *options.Global, opts *options.VolumeList) error {
+func List(output io.Writer, globalOptions *options.Global, opts *options.VolumeList) error {
 	if opts.Quiet && opts.Size {
 		log.L.Warn("cannot use --size and --quiet together, ignoring --size")
 		opts.Size = false
@@ -68,7 +69,7 @@ func List(globalOptions *options.Global, opts *options.VolumeList) error {
 	if err != nil {
 		return err
 	}
-	return lsPrintOutput(vols, opts)
+	return lsPrintOutput(output, vols, opts)
 }
 
 func hasSizeFilter(filters []string) bool {
@@ -90,8 +91,7 @@ func removeSizeFilters(filters []string) []string {
 	return res
 }
 
-func lsPrintOutput(vols map[string]native.Volume, options *options.VolumeList) error {
-	w := options.Stdout
+func lsPrintOutput(w io.Writer, vols map[string]api.Volume, options *options.VolumeList) error {
 	var tmpl *template.Template
 	switch options.Format {
 	case formatter.FormatNone, formatter.FormatTable, formatter.FormatWide:
@@ -123,7 +123,7 @@ func lsPrintOutput(vols map[string]native.Volume, options *options.VolumeList) e
 			Scope:      "local",
 		}
 		if v.Labels != nil {
-			p.Labels = formatter.FormatLabels(*v.Labels)
+			p.Labels = formatter.FormatLabels(v.Labels)
 		}
 		if options.Size {
 			p.Size = progress.Bytes(v.Size).String()
@@ -162,7 +162,7 @@ func lsPrintOutput(vols map[string]native.Volume, options *options.VolumeList) e
 // Unsupported filters:
 //   - dangling=true: Filter volumes by dangling.
 //   - driver=local: Filter volumes by driver.
-func Volumes(ns string, dataRoot string, address string, volumeSize bool, filters []string) (map[string]native.Volume, error) {
+func Volumes(ns string, dataRoot string, address string, volumeSize bool, filters []string) (map[string]api.Volume, error) {
 	volStore, err := Store(ns, dataRoot, address)
 	if err != nil {
 		return nil, err
@@ -187,9 +187,9 @@ func Volumes(ns string, dataRoot string, address string, volumeSize bool, filter
 	return vols, nil
 }
 
-func getVolumeFilterFuncs(filters []string) ([]func(*map[string]string) bool, []func(string) bool, []func(int64) bool, bool, error) {
+func getVolumeFilterFuncs(filters []string) ([]func(map[string]string) bool, []func(string) bool, []func(int64) bool, bool, error) {
 	isFilter := len(filters) > 0
-	labelFilterFuncs := make([]func(*map[string]string) bool, 0)
+	labelFilterFuncs := make([]func(map[string]string) bool, 0)
 	nameFilterFuncs := make([]func(string) bool, 0)
 	sizeFilterFuncs := make([]func(int64) bool, 0)
 	sizeOperators := []struct {
@@ -229,11 +229,11 @@ func getVolumeFilterFuncs(filters []string) ([]func(*map[string]string) bool, []
 					hasValue = true
 					k, v = subs[0], subs[1]
 				}
-				labelFilterFuncs = append(labelFilterFuncs, func(labels *map[string]string) bool {
+				labelFilterFuncs = append(labelFilterFuncs, func(labels map[string]string) bool {
 					if labels == nil {
 						return false
 					}
-					val, ok := (*labels)[k]
+					val, ok := (labels)[k]
 					if !ok || (hasValue && val != v) {
 						return false
 					}
@@ -261,7 +261,7 @@ func getVolumeFilterFuncs(filters []string) ([]func(*map[string]string) bool, []
 	return labelFilterFuncs, nameFilterFuncs, sizeFilterFuncs, isFilter, nil
 }
 
-func volumeMatchesFilter(vol native.Volume, labelFilterFuncs []func(*map[string]string) bool, nameFilterFuncs []func(string) bool, sizeFilterFuncs []func(int64) bool) bool {
+func volumeMatchesFilter(vol api.Volume, labelFilterFuncs []func(map[string]string) bool, nameFilterFuncs []func(string) bool, sizeFilterFuncs []func(int64) bool) bool {
 	for _, labelFilterFunc := range labelFilterFuncs {
 		if !labelFilterFunc(vol.Labels) {
 			return false

@@ -19,16 +19,17 @@ package volume
 import (
 	"context"
 	"fmt"
+	"io"
 	"strings"
 
 	containerd "github.com/containerd/containerd/v2/client"
 
+	"go.farcloser.world/lepton/leptonic/api"
 	"go.farcloser.world/lepton/pkg/api/options"
-	"go.farcloser.world/lepton/pkg/inspecttypes/native"
 	"go.farcloser.world/lepton/pkg/labels"
 )
 
-func Prune(ctx context.Context, client *containerd.Client, globalOptions *options.Global, opts *options.VolumePrune) error {
+func Prune(ctx context.Context, client *containerd.Client, output io.Writer, globalOptions *options.Global, opts *options.VolumePrune) error {
 	// Get the volume store and lock it until we are done.
 	// This will prevent racing new containers from being created or removed until we are done with the cleanup of volumes
 	volStore, err := Store(globalOptions.Namespace, globalOptions.DataRoot, globalOptions.Address)
@@ -38,7 +39,7 @@ func Prune(ctx context.Context, client *containerd.Client, globalOptions *option
 
 	var toRemove []string
 
-	err = volStore.Prune(func(volumes []*native.Volume) ([]string, error) {
+	err = volStore.Prune(func(volumes []*api.Volume) ([]string, error) {
 		// Get containers and see which volumes are used
 		containers, err := client.Containers(ctx)
 		if err != nil {
@@ -58,7 +59,7 @@ func Prune(ctx context.Context, client *containerd.Client, globalOptions *option
 				if volume.Labels == nil {
 					continue
 				}
-				val, ok := (*volume.Labels)[labels.AnonymousVolumes]
+				val, ok := volume.Labels[labels.AnonymousVolumes]
 				// skip the named volume and only remove the anonymous volume
 				if !ok || val != "" {
 					continue
@@ -75,9 +76,9 @@ func Prune(ctx context.Context, client *containerd.Client, globalOptions *option
 	}
 
 	if len(toRemove) > 0 {
-		fmt.Fprintln(opts.Stdout, "Deleted Volumes:")
-		fmt.Fprintln(opts.Stdout, strings.Join(toRemove, "\n"))
-		fmt.Fprintln(opts.Stdout, "")
+		fmt.Fprintln(output, "Deleted Volumes:")
+		fmt.Fprintln(output, strings.Join(toRemove, "\n"))
+		fmt.Fprintln(output, "")
 	}
 
 	return nil

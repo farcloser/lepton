@@ -22,7 +22,6 @@ import (
 
 // SystemInfo specifies options for `(system) info`.
 type SystemInfo struct {
-	Stdout io.Writer
 	Stderr io.Writer
 	// Information mode, "dockercompat" for Docker-compatible output, "native" for containerd-native output
 	Mode string
@@ -32,7 +31,6 @@ type SystemInfo struct {
 
 // SystemEvents specifies options for `(system) events`.
 type SystemEvents struct {
-	Stdout io.Writer
 	// Format the output using the given Go template, e.g, '{{json .}}
 	Format string
 	// Filter events based on given conditions
@@ -41,7 +39,6 @@ type SystemEvents struct {
 
 // SystemPrune specifies options for `system prune`.
 type SystemPrune struct {
-	Stdout io.Writer
 	Stderr io.Writer
 	// All remove all unused images, not just dangling ones
 	All bool
