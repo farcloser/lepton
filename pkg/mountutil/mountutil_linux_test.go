@@ -21,12 +21,12 @@ import (
 	"strings"
 	"testing"
 
-	"go.farcloser.world/containers/specs"
+	"github.com/containerd/containerd/v2/core/mount"
+	"github.com/containerd/containerd/v2/pkg/oci"
 	"gotest.tools/v3/assert"
 	is "gotest.tools/v3/assert/cmp"
 
-	"github.com/containerd/containerd/v2/core/mount"
-	"github.com/containerd/containerd/v2/pkg/oci"
+	"go.farcloser.world/containers/specs"
 )
 
 // TestParseVolumeOptions tests volume options are parsed as expected.

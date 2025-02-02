@@ -20,12 +20,11 @@ import (
 	"context"
 	"net"
 
+	"github.com/containerd/go-cni"
 	"github.com/rootless-containers/rootlesskit/v2/pkg/api/client"
 	"github.com/rootless-containers/rootlesskit/v2/pkg/port"
 
-	"github.com/containerd/go-cni"
-
-	"github.com/containerd/nerdctl/v2/leptonic/errs"
+	"go.farcloser.world/lepton/leptonic/errs"
 )
 
 func NewRootlessCNIPortManager(client client.Client) (*RootlessCNIPortManager, error) {

@@ -31,26 +31,26 @@ import (
 	"testing"
 	"time"
 
+	"github.com/containerd/containerd/v2/defaults"
+	"github.com/containerd/log"
+	"gotest.tools/v3/assert"
+	"gotest.tools/v3/icmd"
+
 	"go.farcloser.world/containers/digest"
 	"go.farcloser.world/containers/specs"
 	"go.farcloser.world/core/filesystem"
 	"go.farcloser.world/core/version/semver"
-	"gotest.tools/v3/assert"
-	"gotest.tools/v3/icmd"
 
-	"github.com/containerd/containerd/v2/defaults"
-	"github.com/containerd/log"
-
-	"github.com/containerd/nerdctl/v2/leptonic/emulation"
-	"github.com/containerd/nerdctl/v2/leptonic/platforms"
-	"github.com/containerd/nerdctl/v2/leptonic/rootlesskit"
-	"github.com/containerd/nerdctl/v2/pkg/buildkitutil"
-	"github.com/containerd/nerdctl/v2/pkg/imgutil"
-	"github.com/containerd/nerdctl/v2/pkg/infoutil"
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/native"
-	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
-	"github.com/containerd/nerdctl/v2/pkg/version"
+	"go.farcloser.world/lepton/leptonic/emulation"
+	"go.farcloser.world/lepton/leptonic/platforms"
+	"go.farcloser.world/lepton/leptonic/rootlesskit"
+	"go.farcloser.world/lepton/pkg/buildkitutil"
+	"go.farcloser.world/lepton/pkg/imgutil"
+	"go.farcloser.world/lepton/pkg/infoutil"
+	"go.farcloser.world/lepton/pkg/inspecttypes/dockercompat"
+	"go.farcloser.world/lepton/pkg/inspecttypes/native"
+	"go.farcloser.world/lepton/pkg/rootlessutil"
+	"go.farcloser.world/lepton/pkg/version"
 )
 
 type Base struct {
@@ -760,7 +760,7 @@ func RequireExecutable(t testing.TB, name string) {
 	}
 }
 
-var Namespace = version.RootName + "-test"
+var Namespace = "cli-test"
 
 func NewBaseWithNamespace(t *testing.T, ns string) *Base {
 	if ns == "" || ns == "default" || ns == Namespace {

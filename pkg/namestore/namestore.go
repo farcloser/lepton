@@ -27,9 +27,9 @@ import (
 
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/leptonic/errs"
-	"github.com/containerd/nerdctl/v2/leptonic/identifiers"
-	"github.com/containerd/nerdctl/v2/pkg/store"
+	"go.farcloser.world/lepton/leptonic/errs"
+	"go.farcloser.world/lepton/leptonic/identifiers"
+	"go.farcloser.world/lepton/pkg/store"
 )
 
 // ErrNameStore will wrap all errors here

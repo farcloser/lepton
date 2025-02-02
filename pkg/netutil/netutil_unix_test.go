@@ -21,8 +21,9 @@ package netutil
 import (
 	"testing"
 
-	"go.farcloser.world/core/version/semver"
 	"gotest.tools/v3/assert"
+
+	"go.farcloser.world/core/version/semver"
 )
 
 func TestGuessFirewallPluginVersion(t *testing.T) {

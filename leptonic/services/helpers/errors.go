@@ -22,7 +22,7 @@ import (
 
 	"github.com/containerd/errdefs"
 
-	"github.com/containerd/nerdctl/v2/leptonic/errs"
+	"go.farcloser.world/lepton/leptonic/errs"
 )
 
 func ErrConvert(err error) error {

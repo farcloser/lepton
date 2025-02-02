@@ -17,12 +17,12 @@
 package volume
 
 import (
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
-	"github.com/containerd/nerdctl/v2/pkg/mountutil/volumestore"
+	"go.farcloser.world/lepton/pkg/clientutil"
+	"go.farcloser.world/lepton/pkg/mountutil/volumestore"
 )
 
 // Store returns a volume store
-// that corresponds to a directory like `/var/lib/nerdctl/1935db59/volumes/default`
+// that corresponds to a directory like `/var/lib/<ROOT_NAME>/1935db59/volumes/default`
 func Store(ns string, dataRoot string, address string) (volumestore.VolumeStore, error) {
 	dataStore, err := clientutil.DataStore(dataRoot, address)
 	if err != nil {

@@ -22,19 +22,19 @@ import (
 	"fmt"
 	"time"
 
-	"go.farcloser.world/containers/reference"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/images"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/leptonic/api"
-	"github.com/containerd/nerdctl/v2/leptonic/services/image"
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/containerdutil"
-	"github.com/containerd/nerdctl/v2/pkg/formatter"
-	"github.com/containerd/nerdctl/v2/pkg/imageinspector"
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
+	"go.farcloser.world/containers/reference"
+
+	"go.farcloser.world/lepton/leptonic/api"
+	"go.farcloser.world/lepton/leptonic/services/image"
+	"go.farcloser.world/lepton/pkg/api/options"
+	"go.farcloser.world/lepton/pkg/containerdutil"
+	"go.farcloser.world/lepton/pkg/formatter"
+	"go.farcloser.world/lepton/pkg/imageinspector"
+	"go.farcloser.world/lepton/pkg/inspecttypes/dockercompat"
 )
 
 func inspectIdentifier(ctx context.Context, client *containerd.Client, identifier string) ([]*api.Image, string, string, error) {

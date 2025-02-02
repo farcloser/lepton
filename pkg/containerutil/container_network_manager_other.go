@@ -26,7 +26,7 @@ import (
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/pkg/oci"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
+	"go.farcloser.world/lepton/pkg/api/options"
 )
 
 type cniNetworkManagerPlatform struct {

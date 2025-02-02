@@ -23,9 +23,8 @@ import (
 	"os"
 	"syscall"
 
-	"golang.org/x/term"
-
 	"github.com/containerd/log"
+	"golang.org/x/term"
 )
 
 func readPassword() (string, error) {

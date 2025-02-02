@@ -26,7 +26,7 @@ import (
 	"github.com/containernetworking/plugins/pkg/ns"
 	"github.com/rootless-containers/rootlesskit/v2/pkg/api/client"
 
-	"github.com/containerd/nerdctl/v2/leptonic/rootlesskit"
+	"go.farcloser.world/lepton/leptonic/rootlesskit"
 )
 
 func IsRootless() bool {
@@ -56,7 +56,7 @@ func NewRootlessKitClient() (client.Client, error) {
 	return client.New(apiSock)
 }
 
-// RootlessContainredSockAddress returns sock address of rootless containerd based on https://github.com/containerd/nerdctl/blob/main/docs/faq.md#containerd-socket-address
+// RootlessContainredSockAddress returns sock address of rootless containerd based on https://github.com/farcloser/lepton/blob/main/docs/faq.md#containerd-socket-address
 func RootlessContainredSockAddress() (string, error) {
 	stateDir, err := rootlesskit.StateDir()
 	if err != nil {

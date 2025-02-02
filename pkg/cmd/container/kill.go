@@ -24,22 +24,21 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/moby/sys/signal"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/pkg/cio"
 	"github.com/containerd/errdefs"
 	"github.com/containerd/go-cni"
 	"github.com/containerd/log"
+	"github.com/moby/sys/signal"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/containerutil"
-	"github.com/containerd/nerdctl/v2/pkg/idutil/containerwalker"
-	"github.com/containerd/nerdctl/v2/pkg/labels"
-	"github.com/containerd/nerdctl/v2/pkg/netutil"
-	"github.com/containerd/nerdctl/v2/pkg/netutil/nettype"
-	"github.com/containerd/nerdctl/v2/pkg/portutil"
-	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
+	"go.farcloser.world/lepton/pkg/api/options"
+	"go.farcloser.world/lepton/pkg/containerutil"
+	"go.farcloser.world/lepton/pkg/idutil/containerwalker"
+	"go.farcloser.world/lepton/pkg/labels"
+	"go.farcloser.world/lepton/pkg/netutil"
+	"go.farcloser.world/lepton/pkg/netutil/nettype"
+	"go.farcloser.world/lepton/pkg/portutil"
+	"go.farcloser.world/lepton/pkg/rootlessutil"
 )
 
 // Kill kills a list of containers

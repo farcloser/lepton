@@ -18,7 +18,7 @@
 // The labels defined in this package are also passed to OCI containers as annotations.
 package labels
 
-import "github.com/containerd/nerdctl/v2/pkg/version"
+import "go.farcloser.world/lepton/pkg/version"
 
 const (
 	// ComposeProject Name
@@ -50,7 +50,7 @@ var (
 	// ExtraHosts are HostIPs to appended to /etc/hosts
 	ExtraHosts = Prefix + "extraHosts"
 
-	// StateDir is "/var/lib/nerdctl/<ADDRHASH>/containers/<NAMESPACE>/<ID>"
+	// StateDir is "/var/lib/<ROOT_NAME>/<ADDRHASH>/containers/<NAMESPACE>/<ID>"
 	StateDir = Prefix + "state-dir"
 
 	// Networks is a JSON-marshalled string of []string, e.g. []string{"bridge"}.

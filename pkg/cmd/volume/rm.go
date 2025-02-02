@@ -26,10 +26,10 @@ import (
 	"github.com/containerd/errdefs"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
-	"github.com/containerd/nerdctl/v2/pkg/labels"
-	"github.com/containerd/nerdctl/v2/pkg/mountutil"
+	"go.farcloser.world/lepton/pkg/api/options"
+	"go.farcloser.world/lepton/pkg/inspecttypes/dockercompat"
+	"go.farcloser.world/lepton/pkg/labels"
+	"go.farcloser.world/lepton/pkg/mountutil"
 )
 
 func Remove(ctx context.Context, client *containerd.Client, volumes []string, globalOptions *options.Global, options *options.VolumeRemove) error {

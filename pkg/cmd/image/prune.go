@@ -20,15 +20,15 @@ import (
 	"context"
 	"fmt"
 
-	"go.farcloser.world/containers/digest"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/images"
 	"github.com/containerd/log"
 	"github.com/containerd/platforms"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/imgutil"
+	"go.farcloser.world/containers/digest"
+
+	"go.farcloser.world/lepton/pkg/api/options"
+	"go.farcloser.world/lepton/pkg/imgutil"
 )
 
 // Prune will remove all dangling images. If all is specified, will also remove all images not referenced by any container.

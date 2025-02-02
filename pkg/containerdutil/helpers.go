@@ -19,9 +19,9 @@ package containerdutil
 import (
 	"context"
 
-	"go.farcloser.world/containers/specs"
-
 	"github.com/containerd/containerd/v2/core/content"
+
+	"go.farcloser.world/containers/specs"
 )
 
 var ReadBlob = readBlobWithCache()

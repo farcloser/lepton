@@ -17,7 +17,7 @@
 package testregistry
 
 import (
-	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest/hoststoml"
+	"go.farcloser.world/lepton/pkg/testutil/nerdtest/hoststoml"
 )
 
 func generateCertsd(dir string, certPath string, hostIP string, port int) error {

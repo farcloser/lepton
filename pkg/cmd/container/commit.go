@@ -23,14 +23,14 @@ import (
 	"fmt"
 	"strings"
 
-	"go.farcloser.world/containers/reference"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/idutil/containerwalker"
-	"github.com/containerd/nerdctl/v2/pkg/imgutil/commit"
+	"go.farcloser.world/containers/reference"
+
+	"go.farcloser.world/lepton/pkg/api/options"
+	"go.farcloser.world/lepton/pkg/idutil/containerwalker"
+	"go.farcloser.world/lepton/pkg/imgutil/commit"
 )
 
 // Commit will commit a container’s file changes or settings into a new image.

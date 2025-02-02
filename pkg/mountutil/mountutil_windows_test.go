@@ -21,9 +21,10 @@ import (
 	"strings"
 	"testing"
 
-	"go.farcloser.world/containers/specs"
 	"gotest.tools/v3/assert"
 	is "gotest.tools/v3/assert/cmp"
+
+	"go.farcloser.world/containers/specs"
 )
 
 func TestParseVolumeOptions(t *testing.T) {

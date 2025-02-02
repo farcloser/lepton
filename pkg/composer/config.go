@@ -31,8 +31,9 @@ import (
 	"strings"
 
 	"github.com/compose-spec/compose-go/v2/types"
-	"go.farcloser.world/containers/digest"
 	"gopkg.in/yaml.v3"
+
+	"go.farcloser.world/containers/digest"
 )
 
 type ConfigOptions struct {

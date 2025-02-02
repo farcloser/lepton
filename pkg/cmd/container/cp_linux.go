@@ -22,9 +22,9 @@ import (
 
 	containerd "github.com/containerd/containerd/v2/client"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/containerutil"
-	"github.com/containerd/nerdctl/v2/pkg/idutil/containerwalker"
+	"go.farcloser.world/lepton/pkg/api/options"
+	"go.farcloser.world/lepton/pkg/containerutil"
+	"go.farcloser.world/lepton/pkg/idutil/containerwalker"
 )
 
 // Cp copies files/folders between a running container and the local filesystem.

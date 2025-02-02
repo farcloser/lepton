@@ -25,9 +25,6 @@ import (
 	"os"
 	"strings"
 
-	"go.farcloser.world/containers/reference"
-	"go.farcloser.world/core/compression/zstd"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/images/converter"
 	"github.com/containerd/containerd/v2/core/images/converter/uncompress"
@@ -36,10 +33,13 @@ import (
 	zstdchunkedconvert "github.com/containerd/stargz-snapshotter/nativeconverter/zstdchunked"
 	"github.com/containerd/stargz-snapshotter/recorder"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/formatter"
-	converterutil "github.com/containerd/nerdctl/v2/pkg/imgutil/converter"
-	"github.com/containerd/nerdctl/v2/pkg/platformutil"
+	"go.farcloser.world/containers/reference"
+	"go.farcloser.world/core/compression/zstd"
+
+	"go.farcloser.world/lepton/pkg/api/options"
+	"go.farcloser.world/lepton/pkg/formatter"
+	converterutil "go.farcloser.world/lepton/pkg/imgutil/converter"
+	"go.farcloser.world/lepton/pkg/platformutil"
 )
 
 func Convert(ctx context.Context, client *containerd.Client, srcRawRef, targetRawRef string, options options.ImageConvert) error {

@@ -1,4 +1,4 @@
-module github.com/containerd/nerdctl/v2
+module go.farcloser.world/lepton
 
 go 1.23.0
 

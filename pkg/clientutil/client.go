@@ -24,15 +24,15 @@ import (
 	"runtime"
 	"strings"
 
-	"go.farcloser.world/containers/digest"
-	"go.farcloser.world/core/filesystem"
-
 	ctdcli "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/log"
 	"github.com/containerd/platforms"
 
-	"github.com/containerd/nerdctl/v2/leptonic/emulation"
-	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
+	"go.farcloser.world/containers/digest"
+	"go.farcloser.world/core/filesystem"
+
+	"go.farcloser.world/lepton/leptonic/emulation"
+	"go.farcloser.world/lepton/leptonic/services/containerd"
 )
 
 func NewClient(ctx context.Context, namespace string, address string) (*ctdcli.Client, context.Context, context.CancelFunc, error) {
@@ -52,7 +52,7 @@ func NewClientWithPlatform(ctx context.Context, namespace, address, platform str
 		}
 
 		if canExec, canExecErr := emulation.CanExecProbably(platformParsed); !canExec {
-			warn := fmt.Sprintf("Platform %q seems incompatible with the host platform %q. If you see \"exec format error\", see https://github.com/containerd/nerdctl/blob/main/docs/multi-platform.md",
+			warn := fmt.Sprintf("Platform %q seems incompatible with the host platform %q. If you see \"exec format error\", see https://github.com/farcloser/lepton/blob/main/docs/multi-platform.md",
 				platform, platforms.DefaultString())
 			if canExecErr != nil {
 				log.L.WithError(canExecErr).Warn(warn)
@@ -67,9 +67,9 @@ func NewClientWithPlatform(ctx context.Context, namespace, address, platform str
 	return containerd.NewClient(ctx, namespace, address, clientOpts...)
 }
 
-// DataStore returns a string like "/var/lib/nerdctl/1935db59".
+// DataStore returns a string like "/var/lib/<ROOT_NAME>/1935db59".
 // "1935db9" is from `$(echo -n "/run/containerd/containerd.sock" | sha256sum | cut -c1-8)`
-// on Windows it will return "%PROGRAMFILES%/nerdctl/1935db59"
+// on Windows it will return "%PROGRAMFILES%/<ROOT_NAME>/1935db59"
 func DataStore(dataRoot, address string) (string, error) {
 	addrHash, err := getAddrHash(address)
 	if err != nil {

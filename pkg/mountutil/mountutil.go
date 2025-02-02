@@ -22,16 +22,16 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/moby/sys/userns"
-	"go.farcloser.world/containers/specs"
-
 	"github.com/containerd/containerd/v2/pkg/oci"
 	"github.com/containerd/log"
+	"github.com/moby/sys/userns"
 
-	"github.com/containerd/nerdctl/v2/leptonic/identifiers"
-	"github.com/containerd/nerdctl/v2/pkg/idgen"
-	"github.com/containerd/nerdctl/v2/pkg/mountutil/volumestore"
-	"github.com/containerd/nerdctl/v2/pkg/strutil"
+	"go.farcloser.world/containers/specs"
+
+	"go.farcloser.world/lepton/leptonic/identifiers"
+	"go.farcloser.world/lepton/pkg/idgen"
+	"go.farcloser.world/lepton/pkg/mountutil/volumestore"
+	"go.farcloser.world/lepton/pkg/strutil"
 )
 
 const (

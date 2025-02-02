@@ -25,7 +25,7 @@ import (
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/runtime/restart"
 
-	"github.com/containerd/nerdctl/v2/pkg/strutil"
+	"go.farcloser.world/lepton/pkg/strutil"
 )
 
 func checkRestartCapabilities(ctx context.Context, client *containerd.Client, restartFlag string) error {

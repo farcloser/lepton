@@ -24,9 +24,9 @@ import (
 	ctdsnapshotters "github.com/containerd/containerd/v2/pkg/snapshotters"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/imgutil/pull"
-	"github.com/containerd/nerdctl/v2/pkg/snapshotterutil"
+	"go.farcloser.world/lepton/pkg/api/options"
+	"go.farcloser.world/lepton/pkg/imgutil/pull"
+	"go.farcloser.world/lepton/pkg/snapshotterutil"
 )
 
 const (

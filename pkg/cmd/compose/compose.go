@@ -21,21 +21,21 @@ import (
 	"errors"
 	"io"
 
-	"go.farcloser.world/containers/reference"
-	"go.farcloser.world/containers/specs"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/errdefs"
 	"github.com/containerd/platforms"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/cmd/volume"
-	"github.com/containerd/nerdctl/v2/pkg/composer"
-	"github.com/containerd/nerdctl/v2/pkg/composer/serviceparser"
-	"github.com/containerd/nerdctl/v2/pkg/imgutil"
-	"github.com/containerd/nerdctl/v2/pkg/netutil"
-	"github.com/containerd/nerdctl/v2/pkg/signutil"
-	"github.com/containerd/nerdctl/v2/pkg/strutil"
+	"go.farcloser.world/containers/reference"
+	"go.farcloser.world/containers/specs"
+
+	"go.farcloser.world/lepton/pkg/api/options"
+	"go.farcloser.world/lepton/pkg/cmd/volume"
+	"go.farcloser.world/lepton/pkg/composer"
+	"go.farcloser.world/lepton/pkg/composer/serviceparser"
+	"go.farcloser.world/lepton/pkg/imgutil"
+	"go.farcloser.world/lepton/pkg/netutil"
+	"go.farcloser.world/lepton/pkg/signutil"
+	"go.farcloser.world/lepton/pkg/strutil"
 )
 
 // New returns a new *composer.Composer.

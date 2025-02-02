@@ -19,7 +19,7 @@ package dockerconfigresolver
 import (
 	"errors"
 
-	"github.com/containerd/nerdctl/v2/pkg/version"
+	"go.farcloser.world/lepton/pkg/version"
 )
 
 type scheme string
@@ -39,10 +39,10 @@ const (
 
 // Errors returned by the credentials store
 var (
-	// schemeNerdctlExperimental is currently provisional, to unlock namespace based host authentication
+	// schemeExperimental is currently provisional, to unlock namespace based host authentication
 	// This may change or break without notice, and you should have no expectations that credentials saved like that
 	// will be supported in the future
-	schemeNerdctlExperimental = scheme(version.RootName + "-experimental")
+	schemeExperimental = scheme(version.RootName + "-experimental")
 
 	ErrUnableToInstantiate = errors.New("unable to instantiate docker credentials store")
 	ErrUnableToErase       = errors.New("unable to erase credentials")

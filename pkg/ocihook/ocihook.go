@@ -28,25 +28,25 @@ import (
 	"strings"
 	"time"
 
+	"github.com/containerd/go-cni"
+	"github.com/containerd/log"
 	types100 "github.com/containernetworking/cni/pkg/types/100"
 	b4nndclient "github.com/rootless-containers/bypass4netns/pkg/api/daemon/client"
 	rlkclient "github.com/rootless-containers/rootlesskit/v2/pkg/api/client"
+
 	"go.farcloser.world/containers/specs"
 	"go.farcloser.world/core/filesystem"
 
-	"github.com/containerd/go-cni"
-	"github.com/containerd/log"
-
-	"github.com/containerd/nerdctl/v2/leptonic/errs"
-	"github.com/containerd/nerdctl/v2/pkg/bypass4netnsutil"
-	"github.com/containerd/nerdctl/v2/pkg/dnsutil/hostsstore"
-	"github.com/containerd/nerdctl/v2/pkg/labels"
-	"github.com/containerd/nerdctl/v2/pkg/namestore"
-	"github.com/containerd/nerdctl/v2/pkg/netutil"
-	"github.com/containerd/nerdctl/v2/pkg/netutil/nettype"
-	"github.com/containerd/nerdctl/v2/pkg/ocihook/state"
-	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
-	"github.com/containerd/nerdctl/v2/pkg/version"
+	"go.farcloser.world/lepton/leptonic/errs"
+	"go.farcloser.world/lepton/pkg/bypass4netnsutil"
+	"go.farcloser.world/lepton/pkg/dnsutil/hostsstore"
+	"go.farcloser.world/lepton/pkg/labels"
+	"go.farcloser.world/lepton/pkg/namestore"
+	"go.farcloser.world/lepton/pkg/netutil"
+	"go.farcloser.world/lepton/pkg/netutil/nettype"
+	"go.farcloser.world/lepton/pkg/ocihook/state"
+	"go.farcloser.world/lepton/pkg/rootlessutil"
+	"go.farcloser.world/lepton/pkg/version"
 )
 
 var (

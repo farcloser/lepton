@@ -17,9 +17,9 @@
 package native
 
 import (
-	"go.farcloser.world/containers/specs"
-
 	"github.com/containerd/containerd/v2/core/images"
+
+	"go.farcloser.world/containers/specs"
 )
 
 // Image corresponds to a containerd-native image object.

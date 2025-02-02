@@ -19,8 +19,8 @@ package mountutil
 import (
 	"runtime"
 
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/native"
-	"github.com/containerd/nerdctl/v2/pkg/mountutil/volumestore"
+	"go.farcloser.world/lepton/pkg/inspecttypes/native"
+	"go.farcloser.world/lepton/pkg/mountutil/volumestore"
 )
 
 type MockVolumeStore struct {

@@ -27,23 +27,23 @@ import (
 	"runtime"
 	"strings"
 
-	"go.farcloser.world/containers/specs"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/containers"
 	"github.com/containerd/containerd/v2/pkg/oci"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
-	"github.com/containerd/nerdctl/v2/pkg/dnsutil/hostsstore"
-	"github.com/containerd/nerdctl/v2/pkg/idutil/containerwalker"
-	"github.com/containerd/nerdctl/v2/pkg/labels"
-	"github.com/containerd/nerdctl/v2/pkg/mountutil"
-	"github.com/containerd/nerdctl/v2/pkg/netutil"
-	"github.com/containerd/nerdctl/v2/pkg/netutil/nettype"
-	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
-	"github.com/containerd/nerdctl/v2/pkg/strutil"
+	"go.farcloser.world/containers/specs"
+
+	"go.farcloser.world/lepton/pkg/api/options"
+	"go.farcloser.world/lepton/pkg/clientutil"
+	"go.farcloser.world/lepton/pkg/dnsutil/hostsstore"
+	"go.farcloser.world/lepton/pkg/idutil/containerwalker"
+	"go.farcloser.world/lepton/pkg/labels"
+	"go.farcloser.world/lepton/pkg/mountutil"
+	"go.farcloser.world/lepton/pkg/netutil"
+	"go.farcloser.world/lepton/pkg/netutil/nettype"
+	"go.farcloser.world/lepton/pkg/rootlessutil"
+	"go.farcloser.world/lepton/pkg/strutil"
 )
 
 const (
@@ -651,7 +651,7 @@ func validateUtsSettings(netOpts options.ContainerNetwork) error {
 }
 
 // Writes the provided hostname string in a "hostname" file in the Container's
-// Nerdctl-managed datastore and returns the oci.SpecOpts required in the container
+// cli-managed datastore and returns the oci.SpecOpts required in the container
 // spec for the file to be mounted under /etc/hostname in the new container.
 // If the hostname is empty, the leading 12 characters of the containerID
 // This sets world readable permissions on /etc/hostname, ignoring umask

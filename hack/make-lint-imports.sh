@@ -24,7 +24,7 @@ set -o errexit -o errtrace -o functrace -o nounset -o pipefail
 ex=0
 
 while read -r file; do
-  goimports-reviser -list-diff -set-exit-status -output stdout -company-prefixes "github.com/containerd" "$file" >/dev/null 2>&1 || {
+  goimports-reviser -list-diff -set-exit-status -output stdout -company-prefixes "go.farcloser.world" "$file" >/dev/null 2>&1 || {
     ex=$?
     >&2 printf "Imports are not listed properly in %s. Consider calling make fix-imports.\n" "$file"
   }

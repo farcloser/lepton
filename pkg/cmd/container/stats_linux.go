@@ -20,10 +20,10 @@ import (
 	"context"
 	"time"
 
-	"go.farcloser.world/containers/stats"
-
 	"github.com/containerd/containerd/v2/client"
 	"github.com/containerd/typeurl/v2"
+
+	"go.farcloser.world/containers/stats"
 )
 
 func setContainerStatsAndRenderStatsEntry(ctx context.Context, container client.Container, previousStats *stats.ContainerStats) (statsEntry stats.Entry, err error) {

@@ -23,8 +23,8 @@ import (
 	"github.com/containerd/containerd/v2/client"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/leptonic/services/namespace"
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
+	"go.farcloser.world/lepton/leptonic/services/namespace"
+	"go.farcloser.world/lepton/pkg/api/options"
 )
 
 func Update(ctx context.Context, cli *client.Client, globalOptions *options.Global, opts *options.NamespaceUpdate) error {

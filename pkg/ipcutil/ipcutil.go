@@ -26,15 +26,15 @@ import (
 	"runtime"
 	"strings"
 
-	"go.farcloser.world/containers/specs"
-	"go.farcloser.world/core/units"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/containers"
 	"github.com/containerd/containerd/v2/pkg/oci"
 
-	"github.com/containerd/nerdctl/v2/pkg/idutil/containerwalker"
-	"github.com/containerd/nerdctl/v2/pkg/labels"
+	"go.farcloser.world/containers/specs"
+	"go.farcloser.world/core/units"
+
+	"go.farcloser.world/lepton/pkg/idutil/containerwalker"
+	"go.farcloser.world/lepton/pkg/labels"
 )
 
 type IPCMode string

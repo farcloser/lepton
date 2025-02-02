@@ -17,9 +17,9 @@
 package container
 
 import (
-	"go.farcloser.world/containers/specs"
-
 	"github.com/containerd/containerd/v2/pkg/cap"
+
+	"go.farcloser.world/containers/specs"
 )
 
 func setExecCapabilities(pspec *specs.Process) error {

@@ -223,7 +223,7 @@ type ContainerCreate struct {
 	// Name assign a name to the container
 	Name string
 	// Label set metadata on a container
-	// (not passed through to the OCI runtime since v2.0, with an exception for "nerdctl/bypass4netns")
+	// (not passed through to the OCI runtime since v2.0, with an exception for "<ROOT_NAME>/bypass4netns")
 	Label []string
 	// LabelFile read in a line delimited file of labels
 	LabelFile []string

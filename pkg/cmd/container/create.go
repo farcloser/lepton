@@ -29,40 +29,40 @@ import (
 	"strconv"
 	"strings"
 
-	dockercliopts "github.com/docker/cli/opts"
-	"go.farcloser.world/containers/reference"
-	"go.farcloser.world/containers/specs"
-	"go.farcloser.world/core/utils"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/containers"
 	"github.com/containerd/containerd/v2/pkg/cio"
 	"github.com/containerd/containerd/v2/pkg/oci"
 	"github.com/containerd/go-cni"
 	"github.com/containerd/log"
+	dockercliopts "github.com/docker/cli/opts"
 
-	"github.com/containerd/nerdctl/v2/leptonic/errs"
-	"github.com/containerd/nerdctl/v2/pkg/annotations"
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
-	"github.com/containerd/nerdctl/v2/pkg/cmd/image"
-	"github.com/containerd/nerdctl/v2/pkg/cmd/volume"
-	"github.com/containerd/nerdctl/v2/pkg/containerutil"
-	"github.com/containerd/nerdctl/v2/pkg/dnsutil/hostsstore"
-	"github.com/containerd/nerdctl/v2/pkg/flagutil"
-	"github.com/containerd/nerdctl/v2/pkg/idgen"
-	"github.com/containerd/nerdctl/v2/pkg/imgutil"
-	"github.com/containerd/nerdctl/v2/pkg/imgutil/load"
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
-	"github.com/containerd/nerdctl/v2/pkg/ipcutil"
-	"github.com/containerd/nerdctl/v2/pkg/labels"
-	"github.com/containerd/nerdctl/v2/pkg/logging"
-	"github.com/containerd/nerdctl/v2/pkg/maputil"
-	"github.com/containerd/nerdctl/v2/pkg/mountutil"
-	"github.com/containerd/nerdctl/v2/pkg/namestore"
-	"github.com/containerd/nerdctl/v2/pkg/platformutil"
-	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
-	"github.com/containerd/nerdctl/v2/pkg/strutil"
+	"go.farcloser.world/containers/reference"
+	"go.farcloser.world/containers/specs"
+	"go.farcloser.world/core/utils"
+
+	"go.farcloser.world/lepton/leptonic/errs"
+	"go.farcloser.world/lepton/pkg/annotations"
+	"go.farcloser.world/lepton/pkg/api/options"
+	"go.farcloser.world/lepton/pkg/clientutil"
+	"go.farcloser.world/lepton/pkg/cmd/image"
+	"go.farcloser.world/lepton/pkg/cmd/volume"
+	"go.farcloser.world/lepton/pkg/containerutil"
+	"go.farcloser.world/lepton/pkg/dnsutil/hostsstore"
+	"go.farcloser.world/lepton/pkg/flagutil"
+	"go.farcloser.world/lepton/pkg/idgen"
+	"go.farcloser.world/lepton/pkg/imgutil"
+	"go.farcloser.world/lepton/pkg/imgutil/load"
+	"go.farcloser.world/lepton/pkg/inspecttypes/dockercompat"
+	"go.farcloser.world/lepton/pkg/ipcutil"
+	"go.farcloser.world/lepton/pkg/labels"
+	"go.farcloser.world/lepton/pkg/logging"
+	"go.farcloser.world/lepton/pkg/maputil"
+	"go.farcloser.world/lepton/pkg/mountutil"
+	"go.farcloser.world/lepton/pkg/namestore"
+	"go.farcloser.world/lepton/pkg/platformutil"
+	"go.farcloser.world/lepton/pkg/rootlessutil"
+	"go.farcloser.world/lepton/pkg/strutil"
 )
 
 // Create will create a container.
@@ -215,9 +215,9 @@ func Create(ctx context.Context, client *containerd.Client, args []string, netMa
 	// Always set internalLabels.logURI
 	// to support restart the container that run with "-it", like
 	//
-	// 1, nerdctl run --name demo -it imagename
+	// 1, run --name demo -it imagename
 	// 2, ctrl + c to stop demo container
-	// 3, nerdctl start/restart demo
+	// 3, start/restart demo
 	logConfig, err := generateLogConfig(dataStore, id, opts.LogDriver, opts.LogOpt, opts.GOptions.Namespace, opts.GOptions.Address)
 	if err != nil {
 		return nil, generateRemoveStateDirFunc(ctx, id, internalLabels), err
@@ -254,7 +254,7 @@ func Create(ctx context.Context, client *containerd.Client, args []string, netMa
 	// NOTE: OCI hooks are currently not supported on Windows so we skip setting them altogether.
 	// The OCI hooks we define (whose logic can be found in pkg/ocihook) primarily
 	// perform network setup and teardown when using CNI networking.
-	// On Windows, we are forced to set up and tear down the networking from within nerdctl.
+	// On Windows, we are forced to set up and tear down the networking outside oci hooks.
 	if runtime.GOOS != "windows" {
 		hookOpt, err := withOCIHook(opts.CliCmd, opts.CliArgs)
 		if err != nil {
@@ -499,11 +499,11 @@ func withOCIHook(cmd string, args []string) (oci.SpecOpts, error) {
 			// Rewrite {cmd, args} if RootlessKit is running with --detach-netns, so that the hook can gain
 			// CAP_NET_ADMIN in the namespaces.
 			//   - Old:
-			//     - cmd:  "/usr/local/bin/nerdctl"
+			//     - cmd:  "/usr/local/bin/<ROOT_NAME>"
 			//     - args: {"--data-root=/foo", "internal", "oci-hook"}
 			//   - New:
 			//     - cmd:  "/usr/bin/nsenter"
-			//     - args: {"-n/run/user/1000/containerd-rootless/netns", "-F", "--", "/usr/local/bin/nerdctl", "--data-root=/foo", "internal", "oci-hook"}
+			//     - args: {"-n/run/user/1000/containerd-rootless/netns", "-F", "--", "/usr/local/bin/<ROOT_NAME>", "--data-root=/foo", "internal", "oci-hook"}
 			oldCmd, oldArgs := cmd, args
 			cmd, err = exec.LookPath("nsenter")
 			if err != nil {

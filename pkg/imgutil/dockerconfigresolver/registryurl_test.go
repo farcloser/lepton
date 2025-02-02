@@ -20,6 +20,8 @@ import (
 	"testing"
 
 	"gotest.tools/v3/assert"
+
+	"go.farcloser.world/lepton/pkg/version"
 )
 
 func TestURLParsingAndID(t *testing.T) {
@@ -149,9 +151,9 @@ func TestURLParsingAndID(t *testing.T) {
 		},
 		{
 			address:    "https://registry-host.com/subpath/something?bar=bar&ns=registry-namespace.com&foo=foo",
-			identifier: "nerdctl-experimental://registry-namespace.com:443/host/registry-host.com:443/subpath/something",
+			identifier: version.RootName + "-experimental://registry-namespace.com:443/host/registry-host.com:443/subpath/something",
 			allIDs: []string{
-				"nerdctl-experimental://registry-namespace.com:443/host/registry-host.com:443/subpath/something",
+				version.RootName + "-experimental://registry-namespace.com:443/host/registry-host.com:443/subpath/something",
 			},
 		},
 		{

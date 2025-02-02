@@ -23,16 +23,16 @@ import (
 	"path/filepath"
 	"strconv"
 
+	"github.com/containerd/containerd/v2/core/containers"
+	"github.com/containerd/containerd/v2/pkg/oci"
 	b4nnoci "github.com/rootless-containers/bypass4netns/pkg/oci"
+
 	"go.farcloser.world/containers/specs"
 	"go.farcloser.world/core/filesystem"
 
-	"github.com/containerd/containerd/v2/core/containers"
-	"github.com/containerd/containerd/v2/pkg/oci"
-
-	"github.com/containerd/nerdctl/v2/leptonic/errs"
-	"github.com/containerd/nerdctl/v2/leptonic/rootlesskit"
-	"github.com/containerd/nerdctl/v2/pkg/annotations"
+	"go.farcloser.world/lepton/leptonic/errs"
+	"go.farcloser.world/lepton/leptonic/rootlesskit"
+	"go.farcloser.world/lepton/pkg/annotations"
 )
 
 const (

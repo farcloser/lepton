@@ -17,10 +17,10 @@
 // Package annotations defines OCI annotations
 package annotations
 
-import "github.com/containerd/nerdctl/v2/pkg/version"
+import "go.farcloser.world/lepton/pkg/version"
 
 var (
-	// Prefix is the common prefix of nerdctl annotations
+	// Prefix is the common prefix for annotations
 	Prefix = version.RootName + "/"
 
 	// Bypass4netns is the flag for acceleration with bypass4netns

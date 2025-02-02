@@ -28,9 +28,6 @@ import (
 	"strconv"
 	"strings"
 
-	"go.farcloser.world/containers/reference"
-	"go.farcloser.world/containers/specs"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/images"
 	"github.com/containerd/containerd/v2/core/images/archive"
@@ -38,12 +35,15 @@ import (
 	"github.com/containerd/log"
 	"github.com/containerd/platforms"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/buildkitutil"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
-	"github.com/containerd/nerdctl/v2/pkg/containerutil"
-	"github.com/containerd/nerdctl/v2/pkg/platformutil"
-	"github.com/containerd/nerdctl/v2/pkg/strutil"
+	"go.farcloser.world/containers/reference"
+	"go.farcloser.world/containers/specs"
+
+	"go.farcloser.world/lepton/pkg/api/options"
+	"go.farcloser.world/lepton/pkg/buildkitutil"
+	"go.farcloser.world/lepton/pkg/clientutil"
+	"go.farcloser.world/lepton/pkg/containerutil"
+	"go.farcloser.world/lepton/pkg/platformutil"
+	"go.farcloser.world/lepton/pkg/strutil"
 )
 
 type PlatformParser interface {
@@ -536,7 +536,7 @@ func isImageSharable(buildkitHost, namespace, uuid, snapshotter string, platform
 	}
 	// NOTE: It's possible that BuildKit doesn't download the base image of non-default platform (e.g. when the provided
 	//       Dockerfile doesn't contain instructions require base images like RUN) even if `--output type=image,unpack=true`
-	//       is passed to BuildKit. Thus, we need to use `type=docker` or `type=oci` when nerdctl builds non-default platform
+	//       is passed to BuildKit. Thus, we need to use `type=docker` or `type=oci` when we build non-default platform
 	//       image using `platform` option.
 	parser := new(platformParser)
 	return executor == "containerd" && containerdUUID == uuid && containerdNamespace == namespace && workerSnapshotter == snapshotter && isBuildPlatformDefault(platform, parser), nil

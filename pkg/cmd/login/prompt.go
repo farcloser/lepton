@@ -26,7 +26,7 @@ import (
 
 	"golang.org/x/term"
 
-	"github.com/containerd/nerdctl/v2/pkg/imgutil/dockerconfigresolver"
+	"go.farcloser.world/lepton/pkg/imgutil/dockerconfigresolver"
 )
 
 var (

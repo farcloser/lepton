@@ -23,7 +23,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/containerd/nerdctl/v2/pkg/strutil"
+	"go.farcloser.world/lepton/pkg/strutil"
 )
 
 // ReplaceOrAppendEnvValues returns the defaults with the overrides either

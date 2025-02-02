@@ -28,11 +28,11 @@ import (
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/defaults"
 
-	"github.com/containerd/nerdctl/v2/leptonic/errs"
-	"github.com/containerd/nerdctl/v2/leptonic/rootlesskit"
-	"github.com/containerd/nerdctl/v2/leptonic/services/namespace"
-	"github.com/containerd/nerdctl/v2/leptonic/socket"
-	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
+	"go.farcloser.world/lepton/leptonic/errs"
+	"go.farcloser.world/lepton/leptonic/rootlesskit"
+	"go.farcloser.world/lepton/leptonic/services/namespace"
+	"go.farcloser.world/lepton/leptonic/socket"
+	"go.farcloser.world/lepton/pkg/rootlessutil"
 )
 
 const (
@@ -45,7 +45,7 @@ var (
 	ErrSocketNotAccessible = errors.New("cannot access containerd socket")
 )
 
-// RootlessContainredSockAddress returns sock address of rootless containerd based on https://github.com/containerd/nerdctl/blob/main/docs/faq.md#containerd-socket-address
+// RootlessContainredSockAddress returns sock address of rootless containerd based on https://github.com/farcloser/lepton/blob/main/docs/faq.md#containerd-socket-address
 func rootlessContainerdSockAddress() (string, error) {
 	stateDir, err := rootlesskit.StateDir()
 	if err != nil {

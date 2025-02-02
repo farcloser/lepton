@@ -23,15 +23,14 @@ import (
 	"os"
 	"text/template"
 
-	"github.com/docker/cli/templates"
-
 	"github.com/containerd/containerd/v2/core/runtime/v2/logging"
 	"github.com/containerd/log"
+	"github.com/docker/cli/templates"
 
-	"github.com/containerd/nerdctl/v2/leptonic/loggers/journald"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
-	"github.com/containerd/nerdctl/v2/pkg/containerutil"
-	"github.com/containerd/nerdctl/v2/pkg/strutil"
+	"go.farcloser.world/lepton/leptonic/loggers/journald"
+	"go.farcloser.world/lepton/pkg/clientutil"
+	"go.farcloser.world/lepton/pkg/containerutil"
+	"go.farcloser.world/lepton/pkg/strutil"
 )
 
 var JournalDriverLogOpts = []string{

@@ -29,8 +29,8 @@ import (
 
 	"gotest.tools/v3/assert"
 
-	"github.com/containerd/nerdctl/v2/pkg/testutil"
-	"github.com/containerd/nerdctl/v2/pkg/testutil/nettestutil"
+	"go.farcloser.world/lepton/pkg/testutil"
+	"go.farcloser.world/lepton/pkg/testutil/nettestutil"
 )
 
 func FindIPv6(output string) net.IP {

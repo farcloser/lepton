@@ -40,13 +40,13 @@
 # * CONTAINERD_ROOTLESS_ROOTLESSKIT_SLIRP4NETNS_SECCOMP=(auto|true|false): whether to protect slirp4netns with seccomp. Defaults to "auto".
 # * CONTAINERD_ROOTLESS_ROOTLESSKIT_DETACH_NETNS=(auto|true|false): whether to launch rootlesskit with the "detach-netns" mode.
 #   Defaults to "auto", which is resolved to "true" if RootlessKit >= 2.0 is installed.
-#   The "detached-netns" mode accelerates `nerdctl (pull|push|build)` and enables `nerdctl run --net=host`,
+#   The "detached-netns" mode accelerates `(pull|push|build)` and enables `run --net=host`,
 #   however, there is a relatively minor drawback with BuildKit prior to v0.13:
-#   the host loopback IP address (127.0.0.1) and abstract sockets are exposed to Dockerfile's "RUN" instructions during `nerdctl build` (not `nerdctl run`).
+#   the host loopback IP address (127.0.0.1) and abstract sockets are exposed to Dockerfile's "RUN" instructions during `build` (not `run`).
 #   The drawback is fixed in BuildKit v0.13. Upgrading from a prior version of BuildKit needs removing the old systemd unit:
 #   `containerd-rootless-setuptool.sh uninstall-buildkit && rm -f ~/.config/buildkit/buildkitd.toml`
 
-# See also: https://github.com/containerd/nerdctl/blob/main/docs/rootless.md#configuring-rootlesskit
+# See also: https://github.com/farcloser/lepton/blob/main/docs/rootless.md#configuring-rootlesskit
 
 set -e
 if ! [ -w "$XDG_RUNTIME_DIR" ]; then

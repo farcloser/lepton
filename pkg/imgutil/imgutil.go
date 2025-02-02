@@ -24,9 +24,6 @@ import (
 	"net/http"
 	"reflect"
 
-	"go.farcloser.world/containers/reference"
-	"go.farcloser.world/containers/specs"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/content"
 	"github.com/containerd/containerd/v2/core/images"
@@ -37,12 +34,15 @@ import (
 	"github.com/containerd/log"
 	"github.com/containerd/platforms"
 
-	"github.com/containerd/nerdctl/v2/leptonic/errs"
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/errutil"
-	"github.com/containerd/nerdctl/v2/pkg/idutil/imagewalker"
-	"github.com/containerd/nerdctl/v2/pkg/imgutil/dockerconfigresolver"
-	"github.com/containerd/nerdctl/v2/pkg/imgutil/pull"
+	"go.farcloser.world/containers/reference"
+	"go.farcloser.world/containers/specs"
+
+	"go.farcloser.world/lepton/leptonic/errs"
+	"go.farcloser.world/lepton/pkg/api/options"
+	"go.farcloser.world/lepton/pkg/errutil"
+	"go.farcloser.world/lepton/pkg/idutil/imagewalker"
+	"go.farcloser.world/lepton/pkg/imgutil/dockerconfigresolver"
+	"go.farcloser.world/lepton/pkg/imgutil/pull"
 )
 
 // EnsuredImage contains the image existed in containerd and its metadata.

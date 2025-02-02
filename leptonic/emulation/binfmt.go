@@ -22,11 +22,10 @@ import (
 	"os"
 	"runtime"
 
+	"github.com/containerd/platforms"
 	specs "github.com/opencontainers/image-spec/specs-go/v1"
 
-	"github.com/containerd/platforms"
-
-	"github.com/containerd/nerdctl/v2/leptonic/errs"
+	"go.farcloser.world/lepton/leptonic/errs"
 )
 
 var (

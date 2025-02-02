@@ -17,7 +17,7 @@
 
 # TODO: verify commit hash
 
-ARG BINARY_NAME=nerdctl
+ARG BINARY_NAME=lepton
 
 # Basic deps
 ARG CONTAINERD_VERSION=v2.0.2
@@ -200,9 +200,9 @@ RUN fname="rootlesskit-$(cat /target_uname_m).tar.gz" && \
 
 RUN echo "" >> /out/share/doc/${BINARY_NAME}-full/README.md && \
   echo "## License" >> /out/share/doc/${BINARY_NAME}-full/README.md && \
-  echo "- bin/slirp4netns:    [GNU GENERAL PUBLIC LICENSE, Version 2](https://github.com/rootless-containers/slirp4netns/blob/${SLIRP4NETNS_VERSION}/COPYING)" >> /out/share/doc/nerdctl-full/README.md && \
-  echo "- bin/fuse-overlayfs: [GNU GENERAL PUBLIC LICENSE, Version 2](https://github.com/containers/fuse-overlayfs/blob/${FUSE_OVERLAYFS_VERSION}/COPYING)" >> /out/share/doc/nerdctl-full/README.md && \
-  echo "- bin/{runc,bypass4netns,bypass4netnsd}: Apache License 2.0, statically linked with libseccomp ([LGPL 2.1](https://github.com/seccomp/libseccomp/blob/main/LICENSE), source code available at https://github.com/seccomp/libseccomp/)" >> /out/share/doc/nerdctl-full/README.md && \
+  echo "- bin/slirp4netns:    [GNU GENERAL PUBLIC LICENSE, Version 2](https://github.com/rootless-containers/slirp4netns/blob/${SLIRP4NETNS_VERSION}/COPYING)" >> /out/share/doc/${BINARY_NAME}-full/README.md && \
+  echo "- bin/fuse-overlayfs: [GNU GENERAL PUBLIC LICENSE, Version 2](https://github.com/containers/fuse-overlayfs/blob/${FUSE_OVERLAYFS_VERSION}/COPYING)" >> /out/share/doc/${BINARY_NAME}-full/README.md && \
+  echo "- bin/{runc,bypass4netns,bypass4netnsd}: Apache License 2.0, statically linked with libseccomp ([LGPL 2.1](https://github.com/seccomp/libseccomp/blob/main/LICENSE), source code available at https://github.com/seccomp/libseccomp/)" >> /out/share/doc/${BINARY_NAME}-full/README.md && \
   echo "- bin/tini: [MIT License](https://github.com/krallin/tini/blob/${TINI_VERSION}/LICENSE)" >> /out/share/doc/${BINARY_NAME}-full/README.md && \
   echo "- Other files: [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)" >> /out/share/doc/${BINARY_NAME}-full/README.md && \
   (cd /out && find ! -type d | sort | xargs sha256sum > /tmp/SHA256SUMS ) && \
@@ -211,9 +211,9 @@ RUN echo "" >> /out/share/doc/${BINARY_NAME}-full/README.md && \
 
 FROM build-dependencies AS build-full
 ARG BINARY_NAME
-COPY . /go/src/github.com/containerd/nerdctl
-RUN { echo "# ${BINARY_NAME} (full distribution)"; echo "- ${BINARY_NAME}: $(cd /go/src/github.com/containerd/nerdctl && git describe --tags)"; cat /out/share/doc/${BINARY_NAME}-full/README.md; } > /out/share/doc/${BINARY_NAME}-full/README.md.new; mv /out/share/doc/${BINARY_NAME}-full/README.md.new /out/share/doc/${BINARY_NAME}-full/README.md
-WORKDIR /go/src/github.com/containerd/nerdctl
+COPY . /go/src/go.farcloser.world/lepton
+RUN { echo "# ${BINARY_NAME} (full distribution)"; echo "- ${BINARY_NAME}: $(cd /go/src/go.farcloser.world/lepton && git describe --tags)"; cat /out/share/doc/${BINARY_NAME}-full/README.md; } > /out/share/doc/${BINARY_NAME}-full/README.md.new; mv /out/share/doc/${BINARY_NAME}-full/README.md.new /out/share/doc/${BINARY_NAME}-full/README.md
+WORKDIR /go/src/go.farcloser.world/lepton
 RUN BINDIR=/out/bin make binaries install
 COPY README.md /out/share/doc/${BINARY_NAME}/
 COPY docs /out/share/doc/${BINARY_NAME}/docs
@@ -263,8 +263,8 @@ RUN curl -fsSL --proto '=https' --tlsv1.2 https://golang.org/dl/$(cat /GOVERSION
 ENV PATH=/usr/local/go/bin:$PATH
 ARG GOTESTSUM_VERSION
 RUN GOBIN=/usr/local/bin go install gotest.tools/gotestsum@${GOTESTSUM_VERSION}
-COPY . /go/src/github.com/containerd/nerdctl
-WORKDIR /go/src/github.com/containerd/nerdctl
+COPY . /go/src/go.farcloser.world/lepton
+WORKDIR /go/src/go.farcloser.world/lepton
 VOLUME /tmp
 ENV CGO_ENABLED=0
 # copy cosign binary for integration test

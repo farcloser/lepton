@@ -27,17 +27,17 @@ import (
 	"strings"
 	"time"
 
-	"go.farcloser.world/containers/security/cgroups"
-	"go.farcloser.world/core/version/semver"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/pkg/protobuf/types"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/buildkitutil"
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/native"
-	"github.com/containerd/nerdctl/v2/pkg/version"
+	"go.farcloser.world/containers/security/cgroups"
+	"go.farcloser.world/core/version/semver"
+
+	"go.farcloser.world/lepton/pkg/buildkitutil"
+	"go.farcloser.world/lepton/pkg/inspecttypes/dockercompat"
+	"go.farcloser.world/lepton/pkg/inspecttypes/native"
+	"go.farcloser.world/lepton/pkg/version"
 )
 
 const (
@@ -107,7 +107,7 @@ func Info(ctx context.Context, client *containerd.Client, snapshotter string, cg
 	var info = &dockercompat.Info{
 		ID:   server.UUID,
 		Name: hostname,
-		// Storage drivers and logging drivers are not really Server concept for nerdctl, but mimics `docker info` output
+		// Storage drivers and logging drivers are not really Server concept here, but mimics `docker info` output
 		Driver: snapshotter,
 		Plugins: dockercompat.PluginsInfo{
 			Storage: snapshotterPlugins,

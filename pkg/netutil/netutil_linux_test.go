@@ -25,9 +25,9 @@ import (
 
 	"gotest.tools/v3/assert"
 
-	ncdefaults "github.com/containerd/nerdctl/v2/pkg/defaults"
-	"github.com/containerd/nerdctl/v2/pkg/labels"
-	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
+	ncdefaults "go.farcloser.world/lepton/pkg/defaults"
+	"go.farcloser.world/lepton/pkg/labels"
+	"go.farcloser.world/lepton/pkg/rootlessutil"
 )
 
 const testBridgeIP = "10.1.100.1/24"

@@ -76,10 +76,10 @@ exec::kind(){
   "${args[@]}" "$@"
 }
 
-exec::nerdctl(){
+exec::cli(){
   local args=()
   [ ! "$_rootful" ] || args=(sudo env PATH="$PATH")
-  args+=("$(pwd)"/_output/nerdctl)
+  args+=("$(pwd)"/_output/lepton)
 
   log::debug "${args[*]} $*"
   "${args[@]}" "$@"
@@ -94,25 +94,26 @@ main(){
   host::require kind 2>/dev/null || install::kind "$KIND_VERSION"
   host::require kubectl 2>/dev/null || install::kubectl
 
-  # Build nerdctl to use for kind
+  # Build cli to use for kind
   make binaries
-  PATH=$(pwd)/_output:"$PATH"
+  PATH="$(pwd)"/_output:"$PATH"
+  ln -s "$(pwd)"/_output/lepton "$(pwd)"/_output/nerdctl
   export PATH
 
   # Add CNI plugins
   install::cni "$CNI_PLUGINS_VERSION"
 
   # Hack to get go into kind control plane
-  exec::nerdctl rm -f go-kind 2>/dev/null || true
-  exec::nerdctl run -d --quiet --name go-kind golang:"$GO_VERSION" sleep Inf
-  exec::nerdctl cp go-kind:/usr/local/go /tmp/go
-  exec::nerdctl rm -f go-kind
+  exec::cli rm -f go-kind 2>/dev/null || true
+  exec::cli run -d --quiet --name go-kind golang:"$GO_VERSION" sleep Inf
+  exec::cli cp go-kind:/usr/local/go /tmp/go
+  exec::cli rm -f go-kind
 
   # Create fresh cluster
   log::info "Creating new cluster"
   export KIND_EXPERIMENTAL_PROVIDER=nerdctl
-  exec::kind delete cluster --name nerdctl-test 2>/dev/null || true
-  exec::kind create cluster --name nerdctl-test --config=./hack/kind.yaml
+  exec::kind delete cluster --name cli-test 2>/dev/null || true
+  exec::kind create cluster --name cli-test --config=./hack/kind.yaml
 }
 
 main "$@"

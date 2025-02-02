@@ -22,8 +22,8 @@ import (
 
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/formatter"
+	"go.farcloser.world/lepton/pkg/api/options"
+	"go.farcloser.world/lepton/pkg/formatter"
 )
 
 func Inspect(ctx context.Context, volumes []string, globalOptions *options.Global, options *options.VolumeInspect) error {

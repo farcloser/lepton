@@ -71,7 +71,7 @@ jobs:
         uses: ./.github/actions/install-go
         with:
           strategy: canary
-      - run: go install ./cmd/nerdctl
+      - run: go install ./cmd/lepton
       - run: go install -v gotest.tools/gotestsum@v1
       # This here is solely to get the cni install script, which has not been modified in 3+ years.
       # There is little to no reason to update this to latest containerd

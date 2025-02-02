@@ -29,22 +29,22 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/containernetworking/cni/libcni"
-	"go.farcloser.world/core/filesystem"
-	"go.farcloser.world/core/utils"
-
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/pkg/namespaces"
 	"github.com/containerd/errdefs"
 	"github.com/containerd/log"
+	"github.com/containernetworking/cni/libcni"
 
-	"github.com/containerd/nerdctl/v2/leptonic/errs"
-	"github.com/containerd/nerdctl/v2/leptonic/services/namespace"
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/labels"
-	"github.com/containerd/nerdctl/v2/pkg/netutil/nettype"
-	subnetutil "github.com/containerd/nerdctl/v2/pkg/netutil/subnet"
-	"github.com/containerd/nerdctl/v2/pkg/version"
+	"go.farcloser.world/core/filesystem"
+	"go.farcloser.world/core/utils"
+
+	"go.farcloser.world/lepton/leptonic/errs"
+	"go.farcloser.world/lepton/leptonic/services/namespace"
+	"go.farcloser.world/lepton/pkg/api/options"
+	"go.farcloser.world/lepton/pkg/labels"
+	"go.farcloser.world/lepton/pkg/netutil/nettype"
+	subnetutil "go.farcloser.world/lepton/pkg/netutil/subnet"
+	"go.farcloser.world/lepton/pkg/version"
 )
 
 type CNIEnv struct {

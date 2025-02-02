@@ -25,8 +25,8 @@ ifeq ($(GOOS),windows)
 	BIN_EXT := .exe
 endif
 
-PACKAGE := github.com/containerd/nerdctl/v2
-BINARY := nerdctl
+PACKAGE := go.farcloser.world/lepton
+BINARY := lepton
 
 # distro builders might wanna override these
 PREFIX  ?= /usr/local
@@ -39,7 +39,7 @@ GO_BUILD_FLAGS ?=
 export GO_BUILD=CGO_ENABLED=0 GOOS=$(GOOS) $(GO) -C $(MAKEFILE_DIR) build -ldflags "$(GO_BUILD_LDFLAGS) $(VERBOSE_FLAG) -X $(PACKAGE)/pkg/version.Version=$(VERSION) -X $(PACKAGE)/pkg/version.Revision=$(REVISION) -X $(PACKAGE)/pkg/version.RootName=$(BINARY)"
 
 # Variables
-COMPANY_PREFIXES := "github.com/containerd"
+COMPANY_PREFIXES := "go.farcloser.world"
 
 MAKEFILE_DIR := $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 VERSION ?= $(shell git -C $(MAKEFILE_DIR) describe --match 'v[0-9]*' --dirty='.m' --always --tags)

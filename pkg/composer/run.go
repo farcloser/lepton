@@ -24,12 +24,11 @@ import (
 
 	"github.com/compose-spec/compose-go/v2/format"
 	"github.com/compose-spec/compose-go/v2/types"
+	"github.com/containerd/log"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/containerd/log"
-
-	"github.com/containerd/nerdctl/v2/pkg/composer/serviceparser"
-	"github.com/containerd/nerdctl/v2/pkg/idgen"
+	"go.farcloser.world/lepton/pkg/composer/serviceparser"
+	"go.farcloser.world/lepton/pkg/idgen"
 )
 
 type RunOptions struct {
@@ -265,7 +264,6 @@ func (c *Composer) runServices(ctx context.Context, parsedServices []*servicepar
 	}
 
 	// TODO: fix it when `logs` supports `run` without detach
-	// https://github.com/containerd/nerdctl/blob/v0.22.2/pkg/taskutil/taskutil.go#L55
 	if !ro.Interactive && !ro.Tty {
 		log.G(ctx).Info("Attaching to logs")
 		lo := LogsOptions{

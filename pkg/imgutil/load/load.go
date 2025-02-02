@@ -30,9 +30,9 @@ import (
 	"github.com/containerd/containerd/v2/pkg/archive/compression"
 	"github.com/containerd/platforms"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/imgutil"
-	"github.com/containerd/nerdctl/v2/pkg/platformutil"
+	"go.farcloser.world/lepton/pkg/api/options"
+	"go.farcloser.world/lepton/pkg/imgutil"
+	"go.farcloser.world/lepton/pkg/platformutil"
 )
 
 // FromArchive loads and unpacks the images from the tar archive specified in image load options.

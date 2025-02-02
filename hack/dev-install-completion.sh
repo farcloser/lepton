@@ -16,4 +16,6 @@
 
 set -o errexit -o errtrace -o functrace -o nounset -o pipefail
 
-nerdctl completion bash | sudo tee /usr/share/bash-completion/completions/nerdctl
+readonly binary=lepton
+
+"$binary" completion bash | sudo tee /usr/share/bash-completion/completions/"$binary"

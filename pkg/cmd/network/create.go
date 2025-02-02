@@ -23,9 +23,9 @@ import (
 
 	"github.com/containerd/errdefs"
 
-	"github.com/containerd/nerdctl/v2/leptonic/identifiers"
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/netutil"
+	"go.farcloser.world/lepton/leptonic/identifiers"
+	"go.farcloser.world/lepton/pkg/api/options"
+	"go.farcloser.world/lepton/pkg/netutil"
 )
 
 func Create(output io.Writer, globalOption *options.Global, options *options.NetworkCreate) error {

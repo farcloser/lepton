@@ -25,13 +25,13 @@ import (
 	"text/tabwriter"
 	"text/template"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/formatter"
-	"github.com/containerd/nerdctl/v2/pkg/netutil"
+	"go.farcloser.world/lepton/pkg/api/options"
+	"go.farcloser.world/lepton/pkg/formatter"
+	"go.farcloser.world/lepton/pkg/netutil"
 )
 
 type networkPrintable struct {
-	ID     string // empty for non-nerdctl networks
+	ID     string // empty for networks we do not manage
 	Name   string
 	Labels string
 	// TODO: "CreatedAt", "Driver", "IPv6", "Internal", "Scope"

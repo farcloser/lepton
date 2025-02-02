@@ -30,8 +30,9 @@ import (
 	"testing"
 	"time"
 
-	"go.farcloser.world/tigron/test"
 	"gotest.tools/v3/assert"
+
+	"go.farcloser.world/tigron/test"
 )
 
 type Cert struct {

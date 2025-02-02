@@ -24,11 +24,11 @@ import (
 
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/formatter"
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/dockercompat"
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/native"
-	"github.com/containerd/nerdctl/v2/pkg/netutil"
+	"go.farcloser.world/lepton/pkg/api/options"
+	"go.farcloser.world/lepton/pkg/formatter"
+	"go.farcloser.world/lepton/pkg/inspecttypes/dockercompat"
+	"go.farcloser.world/lepton/pkg/inspecttypes/native"
+	"go.farcloser.world/lepton/pkg/netutil"
 )
 
 func Inspect(ctx context.Context, globalOptions *options.Global, opts *options.NetworkInspect) error {

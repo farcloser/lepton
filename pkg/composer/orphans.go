@@ -22,8 +22,8 @@ import (
 
 	containerd "github.com/containerd/containerd/v2/client"
 
-	"github.com/containerd/nerdctl/v2/pkg/composer/serviceparser"
-	"github.com/containerd/nerdctl/v2/pkg/labels"
+	"go.farcloser.world/lepton/pkg/composer/serviceparser"
+	"go.farcloser.world/lepton/pkg/labels"
 )
 
 func (c *Composer) getOrphanContainers(ctx context.Context, parsedServices []*serviceparser.Service) ([]containerd.Container, error) {

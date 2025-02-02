@@ -25,9 +25,9 @@ import (
 	"io"
 	"text/tabwriter"
 
-	"github.com/containerd/nerdctl/v2/leptonic/services/apparmor"
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/formatter"
+	"go.farcloser.world/lepton/leptonic/services/apparmor"
+	"go.farcloser.world/lepton/pkg/api/options"
+	"go.farcloser.world/lepton/pkg/formatter"
 )
 
 func List(output io.Writer, options *options.AppArmorList) error {

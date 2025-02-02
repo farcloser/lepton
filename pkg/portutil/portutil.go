@@ -22,13 +22,12 @@ import (
 	"net"
 	"strings"
 
-	"github.com/docker/go-connections/nat"
-
 	"github.com/containerd/go-cni"
 	"github.com/containerd/log"
+	"github.com/docker/go-connections/nat"
 
-	"github.com/containerd/nerdctl/v2/pkg/labels"
-	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
+	"go.farcloser.world/lepton/pkg/labels"
+	"go.farcloser.world/lepton/pkg/rootlessutil"
 )
 
 // return respectively ip, hostPort, containerPort

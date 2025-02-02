@@ -17,14 +17,14 @@
 package nerdtest
 
 import (
-	"fmt"
 	"os/exec"
 
-	"go.farcloser.world/tigron/test"
 	"gotest.tools/v3/assert"
 
-	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest/ca"
-	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest/registry"
+	"go.farcloser.world/tigron/test"
+
+	"go.farcloser.world/lepton/pkg/testutil/nerdtest/ca"
+	"go.farcloser.world/lepton/pkg/testutil/nerdtest/registry"
 )
 
 func BuildCtlCommand(helpers test.Helpers, args ...string) test.TestableCommand {
@@ -39,7 +39,7 @@ func BuildCtlCommand(helpers test.Helpers, args ...string) test.TestableCommand 
 func KubeCtlCommand(helpers test.Helpers, args ...string) test.TestableCommand {
 	kubectl, _ := exec.LookPath("kubectl")
 	cmd := helpers.Custom(kubectl)
-	cmd.WithArgs(fmt.Sprintf("--namespace=%s-test-k8s", getTarget()))
+	cmd.WithArgs("--namespace=cli-test-k8s")
 	cmd.WithArgs(args...)
 	return cmd
 }

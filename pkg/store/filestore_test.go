@@ -22,7 +22,7 @@ import (
 
 	"gotest.tools/v3/assert"
 
-	"github.com/containerd/nerdctl/v2/leptonic/errs"
+	"go.farcloser.world/lepton/leptonic/errs"
 )
 
 func TestFileStoreBasics(t *testing.T) {

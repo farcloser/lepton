@@ -26,9 +26,9 @@ import (
 	"strings"
 	"syscall"
 
-	"go.farcloser.world/containers/specs"
-
 	"github.com/containerd/containerd/v2/pkg/oci"
+
+	"go.farcloser.world/containers/specs"
 )
 
 // volumeNameLen returns length of the leading volume name on Windows.

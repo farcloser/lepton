@@ -28,11 +28,6 @@ import (
 	"strings"
 	"time"
 
-	dockercliopts "github.com/docker/cli/opts"
-	dockeropts "github.com/docker/docker/opts"
-	"github.com/moby/sys/signal"
-	"go.farcloser.world/containers/specs"
-
 	"github.com/containerd/console"
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/containers"
@@ -41,18 +36,23 @@ import (
 	"github.com/containerd/containerd/v2/pkg/oci"
 	"github.com/containerd/errdefs"
 	"github.com/containerd/log"
+	dockercliopts "github.com/docker/cli/opts"
+	dockeropts "github.com/docker/docker/opts"
+	"github.com/moby/sys/signal"
 
-	"github.com/containerd/nerdctl/v2/pkg/consoleutil"
-	"github.com/containerd/nerdctl/v2/pkg/errutil"
-	"github.com/containerd/nerdctl/v2/pkg/formatter"
-	"github.com/containerd/nerdctl/v2/pkg/ipcutil"
-	"github.com/containerd/nerdctl/v2/pkg/labels"
-	"github.com/containerd/nerdctl/v2/pkg/labels/k8slabels"
-	"github.com/containerd/nerdctl/v2/pkg/portutil"
-	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
-	"github.com/containerd/nerdctl/v2/pkg/signalutil"
-	"github.com/containerd/nerdctl/v2/pkg/strutil"
-	"github.com/containerd/nerdctl/v2/pkg/taskutil"
+	"go.farcloser.world/containers/specs"
+
+	"go.farcloser.world/lepton/pkg/consoleutil"
+	"go.farcloser.world/lepton/pkg/errutil"
+	"go.farcloser.world/lepton/pkg/formatter"
+	"go.farcloser.world/lepton/pkg/ipcutil"
+	"go.farcloser.world/lepton/pkg/labels"
+	"go.farcloser.world/lepton/pkg/labels/k8slabels"
+	"go.farcloser.world/lepton/pkg/portutil"
+	"go.farcloser.world/lepton/pkg/rootlessutil"
+	"go.farcloser.world/lepton/pkg/signalutil"
+	"go.farcloser.world/lepton/pkg/strutil"
+	"go.farcloser.world/lepton/pkg/taskutil"
 )
 
 // PrintHostPort writes to `writer` the public (HostIP:HostPort) of a given `containerPort/protocol` in a container.
@@ -282,7 +282,7 @@ func Start(ctx context.Context, container containerd.Container, flagA bool, clie
 	attachStreamOpt := []string{}
 	if flagA {
 		// In start, flagA attaches only STDOUT/STDERR
-		// source: https://github.com/containerd/nerdctl/blob/main/docs/command-reference.md#whale-nerdctl-start
+		// source: https://github.com/farcloser/lepton/blob/main/docs/command-reference.md#whale-nerdctl-start
 		attachStreamOpt = []string{"STDOUT", "STDERR"}
 	}
 	task, err := taskutil.NewTask(ctx, client, container, attachStreamOpt, false, flagT, true, con, logURI, detachKeys, namespace, detachC)
@@ -528,7 +528,7 @@ func Unpause(ctx context.Context, client *containerd.Client, id string) error {
 	}
 }
 
-// ContainerStateDirPath returns the path to the Nerdctl-managed state directory for the container with the given ID.
+// ContainerStateDirPath returns the path to the managed state directory for the container with the given ID.
 func ContainerStateDirPath(ns, dataStore, id string) (string, error) {
 	return filepath.Join(dataStore, "containers", ns, id), nil
 }

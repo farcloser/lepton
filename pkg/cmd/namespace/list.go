@@ -26,11 +26,11 @@ import (
 	"github.com/containerd/containerd/v2/client"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/leptonic/services/namespace"
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
-	"github.com/containerd/nerdctl/v2/pkg/formatter"
-	"github.com/containerd/nerdctl/v2/pkg/mountutil/volumestore"
+	"go.farcloser.world/lepton/leptonic/services/namespace"
+	"go.farcloser.world/lepton/pkg/api/options"
+	"go.farcloser.world/lepton/pkg/clientutil"
+	"go.farcloser.world/lepton/pkg/formatter"
+	"go.farcloser.world/lepton/pkg/mountutil/volumestore"
 )
 
 type namespaceListOutput struct {

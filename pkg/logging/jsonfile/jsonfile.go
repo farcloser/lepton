@@ -28,7 +28,7 @@ import (
 
 	"github.com/containerd/log"
 
-	timetypes "github.com/containerd/nerdctl/v2/leptonic/time"
+	timetypes "go.farcloser.world/lepton/leptonic/time"
 )
 
 // Entry is compatible with Docker "json-file" logs

@@ -26,13 +26,13 @@ import (
 	"github.com/containerd/containerd/v2/pkg/oci"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
-	"github.com/containerd/nerdctl/v2/pkg/dnsutil"
-	"github.com/containerd/nerdctl/v2/pkg/dnsutil/hostsstore"
-	"github.com/containerd/nerdctl/v2/pkg/netutil"
-	"github.com/containerd/nerdctl/v2/pkg/resolvconf"
-	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
+	"go.farcloser.world/lepton/pkg/api/options"
+	"go.farcloser.world/lepton/pkg/clientutil"
+	"go.farcloser.world/lepton/pkg/dnsutil"
+	"go.farcloser.world/lepton/pkg/dnsutil/hostsstore"
+	"go.farcloser.world/lepton/pkg/netutil"
+	"go.farcloser.world/lepton/pkg/resolvconf"
+	"go.farcloser.world/lepton/pkg/rootlessutil"
 )
 
 type cniNetworkManagerPlatform struct {

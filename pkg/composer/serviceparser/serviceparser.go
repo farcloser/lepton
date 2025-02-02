@@ -29,12 +29,11 @@ import (
 	"time"
 
 	"github.com/compose-spec/compose-go/v2/types"
-
 	"github.com/containerd/containerd/v2/contrib/nvidia"
 	"github.com/containerd/log"
 
-	"github.com/containerd/nerdctl/v2/leptonic/identifiers"
-	"github.com/containerd/nerdctl/v2/pkg/reflectutil"
+	"go.farcloser.world/lepton/leptonic/identifiers"
+	"go.farcloser.world/lepton/pkg/reflectutil"
 )
 
 // ComposeExtensionKey defines fields used to implement extension features.

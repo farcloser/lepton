@@ -24,16 +24,15 @@ import (
 	"net/http"
 	"net/url"
 
-	"golang.org/x/net/context/ctxhttp"
-
 	"github.com/containerd/containerd/v2/core/remotes/docker"
 	"github.com/containerd/containerd/v2/core/remotes/docker/config"
 	"github.com/containerd/errdefs"
 	"github.com/containerd/log"
+	"golang.org/x/net/context/ctxhttp"
 
-	"github.com/containerd/nerdctl/v2/pkg/api/options"
-	"github.com/containerd/nerdctl/v2/pkg/errutil"
-	"github.com/containerd/nerdctl/v2/pkg/imgutil/dockerconfigresolver"
+	"go.farcloser.world/lepton/pkg/api/options"
+	"go.farcloser.world/lepton/pkg/errutil"
+	"go.farcloser.world/lepton/pkg/imgutil/dockerconfigresolver"
 )
 
 const unencryptedPasswordWarning = `WARNING: Your password will be stored unencrypted in %s.

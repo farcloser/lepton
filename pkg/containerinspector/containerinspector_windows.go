@@ -19,7 +19,7 @@ package containerinspector
 import (
 	"context"
 
-	"github.com/containerd/nerdctl/v2/pkg/inspecttypes/native"
+	"go.farcloser.world/lepton/pkg/inspecttypes/native"
 )
 
 func InspectNetNS(ctx context.Context, pid int) (*native.NetNS, error) {

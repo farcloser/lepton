@@ -19,4 +19,4 @@ set -o errexit -o errtrace -o functrace -o nounset -o pipefail
 sudo apt-get install -qq --no-install-recommends golang make yamllint shellcheck expect gcc
 make install-dev-tools
 
-# CONTAINERD_NAMESPACE=nerdctl-test containerd-rootless-setuptool.sh install-buildkit-containerd
+# CONTAINERD_NAMESPACE=cli-test containerd-rootless-setuptool.sh install-buildkit-containerd
