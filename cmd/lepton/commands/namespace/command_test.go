@@ -23,6 +23,8 @@ import (
 
 	"gotest.tools/v3/assert"
 
+	"go.farcloser.world/tigron/expect"
+	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/leptonic/api"
@@ -43,7 +45,7 @@ func TestCreateFail(t *testing.T) {
 	testCase.Description = "Namespace creation failure tests"
 
 	// Docker has no concept of namespace
-	testCase.Require = test.Not(nerdtest.Docker)
+	testCase.Require = require.Not(nerdtest.Docker)
 
 	testCase.SubTests = []*test.Case{
 		{
@@ -77,38 +79,38 @@ func TestInspectFail(t *testing.T) {
 	testCase.Description = "Namespace inspection failure tests"
 
 	// Docker has no concept of namespace
-	testCase.Require = test.Not(nerdtest.Docker)
+	testCase.Require = require.Not(nerdtest.Docker)
 
 	testCase.SubTests = []*test.Case{
 		{
 			Description: "missing namespace name",
 			Command:     test.Command("namespace", "inspect"),
-			Expected:    test.Expects(1, []error{errors.New("requires at least 1 arg")}, test.Equals("")),
+			Expected:    test.Expects(1, []error{errors.New("requires at least 1 arg")}, expect.Equals("")),
 		},
 		{
 			Description: "empty namespace name",
 			Command:     test.Command("namespace", "inspect", ""),
-			Expected:    test.Expects(1, []error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument}, test.Equals("")),
+			Expected:    test.Expects(1, []error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument}, expect.Equals("")),
 		},
 		{
 			Description: "invalid namespace name, non-ascii",
 			Command:     test.Command("namespace", "inspect", "∞"),
-			Expected:    test.Expects(1, []error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument}, test.Equals("")),
+			Expected:    test.Expects(1, []error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument}, expect.Equals("")),
 		},
 		{
 			Description: "invalid namespace name",
 			Command:     test.Command("namespace", "inspect", "_"),
-			Expected:    test.Expects(1, []error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument}, test.Equals("")),
+			Expected:    test.Expects(1, []error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument}, expect.Equals("")),
 		},
 		{
 			Description: "non existent namespace",
 			Command:     test.Command("namespace", "inspect", "doesnotexistandneverwill"),
-			Expected:    test.Expects(1, []error{namespace.ErrServiceNamespace, errs.ErrNotFound}, test.Equals("")),
+			Expected:    test.Expects(1, []error{namespace.ErrServiceNamespace, errs.ErrNotFound}, expect.Equals("")),
 		},
 		{
 			Description: "mixing errors",
 			Command:     test.Command("namespace", "inspect", "doesnotexistandneverwill", "_", "∞"),
-			Expected:    test.Expects(1, []error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument, errs.ErrNotFound}, test.Equals("")),
+			Expected:    test.Expects(1, []error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument, errs.ErrNotFound}, expect.Equals("")),
 		},
 		/*
 			// FIXME looks like for some reason windows does not have the default namespace at this point
@@ -137,43 +139,43 @@ func TestUpdateFail(t *testing.T) {
 	testCase.Description = "Namespace updating failure tests"
 
 	// Docker has no concept of namespace
-	testCase.Require = test.Not(nerdtest.Docker)
+	testCase.Require = require.Not(nerdtest.Docker)
 
 	testCase.SubTests = []*test.Case{
 		{
 			Description: "missing namespace name",
 			Command:     test.Command("namespace", "update", "--label", "key=value"),
-			Expected:    test.Expects(1, []error{errors.New("accepts 1 arg(s), received 0")}, test.Equals("")),
+			Expected:    test.Expects(1, []error{errors.New("accepts 1 arg(s), received 0")}, expect.Equals("")),
 		},
 		{
 			Description: "empty namespace name",
 			Command:     test.Command("namespace", "update", "", "--label", "key=value"),
-			Expected:    test.Expects(1, []error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument}, test.Equals("")),
+			Expected:    test.Expects(1, []error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument}, expect.Equals("")),
 		},
 		{
 			Description: "invalid namespace name, non-ascii",
 			Command:     test.Command("namespace", "update", "∞", "--label", "key=value"),
-			Expected:    test.Expects(1, []error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument}, test.Equals("")),
+			Expected:    test.Expects(1, []error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument}, expect.Equals("")),
 		},
 		{
 			Description: "invalid namespace name",
 			Command:     test.Command("namespace", "update", "_", "--label", "key=value"),
-			Expected:    test.Expects(1, []error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument}, test.Equals("")),
+			Expected:    test.Expects(1, []error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument}, expect.Equals("")),
 		},
 		{
 			Description: "non existent namespace",
 			Command:     test.Command("namespace", "update", "doesnotexistandneverwill", "--label", "key=value"),
-			Expected:    test.Expects(1, []error{namespace.ErrServiceNamespace, errs.ErrNotFound}, test.Equals("")),
+			Expected:    test.Expects(1, []error{namespace.ErrServiceNamespace, errs.ErrNotFound}, expect.Equals("")),
 		},
 		{
 			Description: "exiting namespace with no label",
 			Command:     test.Command("namespace", "update", "cli-test"),
-			Expected:    test.Expects(1, []error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument}, test.Equals("")),
+			Expected:    test.Expects(1, []error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument}, expect.Equals("")),
 		},
 		{
 			Description: "exiting namespace with empty label key",
 			Command:     test.Command("namespace", "update", "cli-test", "--label"),
-			Expected:    test.Expects(1, []error{errors.New("flag needs an argument")}, test.Equals("")),
+			Expected:    test.Expects(1, []error{errors.New("flag needs an argument")}, expect.Equals("")),
 		},
 	}
 
@@ -183,7 +185,7 @@ func TestUpdateFail(t *testing.T) {
 func TestCreateSuccess(t *testing.T) {
 	testCase := nerdtest.Setup()
 
-	testCase.Require = test.Not(nerdtest.Docker)
+	testCase.Require = require.Not(nerdtest.Docker)
 
 	testCase.Description = "successful creation"
 	testCase.Command = func(data test.Data, helpers test.Helpers) test.TestableCommand {
@@ -191,7 +193,7 @@ func TestCreateSuccess(t *testing.T) {
 		return helpers.Command("namespace", "create", data.Identifier())
 	}
 
-	testCase.Expected = test.Expects(0, nil, test.Equals(""))
+	testCase.Expected = test.Expects(0, nil, expect.Equals(""))
 
 	testCase.Cleanup = func(data test.Data, helpers test.Helpers) {
 		helpers.Anyhow("namespace", "remove", data.Identifier())
@@ -248,7 +250,7 @@ func TestCreateSuccess(t *testing.T) {
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("namespace", "remove", data.Get("namespace"))
 			},
-			Expected: test.Expects(0, nil, test.Equals("")),
+			Expected: test.Expects(0, nil, expect.Equals("")),
 		},
 		{
 			Description: "not visible in list anymore",
@@ -279,7 +281,7 @@ func TestCreateSuccess(t *testing.T) {
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("namespace", "inspect", data.Get("namespace"))
 			},
-			Expected: test.Expects(1, []error{errs.ErrNotFound}, test.Equals("")),
+			Expected: test.Expects(1, []error{errs.ErrNotFound}, expect.Equals("")),
 		},
 	}
 
@@ -289,7 +291,7 @@ func TestCreateSuccess(t *testing.T) {
 func TestCreateWithLabelsSuccess(t *testing.T) {
 	testCase := nerdtest.Setup()
 
-	testCase.Require = test.Not(nerdtest.Docker)
+	testCase.Require = require.Not(nerdtest.Docker)
 
 	testCase.Description = "successful creation"
 	testCase.Command = func(data test.Data, helpers test.Helpers) test.TestableCommand {
@@ -297,7 +299,7 @@ func TestCreateWithLabelsSuccess(t *testing.T) {
 		return helpers.Command("namespace", "create", data.Identifier())
 	}
 
-	testCase.Expected = test.Expects(0, nil, test.Equals(""))
+	testCase.Expected = test.Expects(0, nil, expect.Equals(""))
 
 	testCase.Cleanup = func(data test.Data, helpers test.Helpers) {
 		helpers.Anyhow("namespace", "remove", data.Identifier())

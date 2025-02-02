@@ -22,6 +22,8 @@ import (
 
 	"github.com/containerd/containerd/v2/defaults"
 
+	"go.farcloser.world/tigron/expect"
+	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/pkg/testutil"
@@ -67,12 +69,12 @@ func TestUnknownCommand(t *testing.T) {
 		{
 			Description: "system info",
 			Command:     test.Command("system", "info"),
-			Expected:    test.Expects(0, nil, test.Contains("Kernel Version:")),
+			Expected:    test.Expects(0, nil, expect.Contains("Kernel Version:")),
 		},
 		{
 			Description: "info",
 			Command:     test.Command("info"),
-			Expected:    test.Expects(0, nil, test.Contains("Kernel Version:")),
+			Expected:    test.Expects(0, nil, expect.Contains("Kernel Version:")),
 		},
 	}
 
@@ -84,38 +86,38 @@ func TestConfig(t *testing.T) {
 	testCase := nerdtest.Setup()
 
 	// Docker does not support loading toml configuration obviously
-	testCase.Require = test.Not(nerdtest.Docker)
+	testCase.Require = require.Not(nerdtest.Docker)
 
 	testCase.SubTests = []*test.Case{
 		{
 			Description: "Default",
 			Command:     test.Command("info", "-f", "{{.Driver}}"),
-			Expected:    test.Expects(0, nil, test.Equals(defaults.DefaultSnapshotter+"\n")),
+			Expected:    test.Expects(0, nil, expect.Equals(defaults.DefaultSnapshotter+"\n")),
 		},
 		{
 			Description: "TOML > Default",
 			Command:     test.Command("info", "-f", "{{.Driver}}"),
-			Expected:    test.Expects(0, nil, test.Equals("dummy-snapshotter-via-toml\n")),
+			Expected:    test.Expects(0, nil, expect.Equals("dummy-snapshotter-via-toml\n")),
 			Config:      test.WithConfig(nerdtest.NerdishctlToml, `snapshotter = "dummy-snapshotter-via-toml"`),
 		},
 		{
 			Description: "Cli > TOML > Default",
 			Command:     test.Command("info", "-f", "{{.Driver}}", "--snapshotter=dummy-snapshotter-via-cli"),
-			Expected:    test.Expects(0, nil, test.Equals("dummy-snapshotter-via-cli\n")),
+			Expected:    test.Expects(0, nil, expect.Equals("dummy-snapshotter-via-cli\n")),
 			Config:      test.WithConfig(nerdtest.NerdishctlToml, `snapshotter = "dummy-snapshotter-via-toml"`),
 		},
 		{
 			Description: "Env > TOML > Default",
 			Command:     test.Command("info", "-f", "{{.Driver}}"),
 			Env:         map[string]string{"CONTAINERD_SNAPSHOTTER": "dummy-snapshotter-via-env"},
-			Expected:    test.Expects(0, nil, test.Equals("dummy-snapshotter-via-env\n")),
+			Expected:    test.Expects(0, nil, expect.Equals("dummy-snapshotter-via-env\n")),
 			Config:      test.WithConfig(nerdtest.NerdishctlToml, `snapshotter = "dummy-snapshotter-via-toml"`),
 		},
 		{
 			Description: "Cli > Env > TOML > Default",
 			Command:     test.Command("info", "-f", "{{.Driver}}", "--snapshotter=dummy-snapshotter-via-cli"),
 			Env:         map[string]string{"CONTAINERD_SNAPSHOTTER": "dummy-snapshotter-via-env"},
-			Expected:    test.Expects(0, nil, test.Equals("dummy-snapshotter-via-cli\n")),
+			Expected:    test.Expects(0, nil, expect.Equals("dummy-snapshotter-via-cli\n")),
 			Config:      test.WithConfig(nerdtest.NerdishctlToml, `snapshotter = "dummy-snapshotter-via-toml"`),
 		},
 		{

@@ -24,6 +24,7 @@ import (
 
 	"gotest.tools/v3/assert"
 
+	"go.farcloser.world/tigron/expect"
 	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/leptonic/testtooling"
@@ -143,7 +144,7 @@ func TestRunWithTtyAndDetached(t *testing.T) {
 		return helpers.Command("logs", data.Identifier("with-terminal"))
 	}
 
-	testCase.Expected = test.Expects(0, nil, test.Contains("Hello, World with TTY!"))
+	testCase.Expected = test.Expects(0, nil, expect.Contains("Hello, World with TTY!"))
 
 	testCase.Run(t)
 }

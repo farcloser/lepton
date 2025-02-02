@@ -20,6 +20,7 @@ import (
 	"runtime"
 	"testing"
 
+	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/pkg/testutil"
@@ -48,7 +49,7 @@ func TestTop(t *testing.T) {
 		{
 			Description: "with o pid,user,cmd",
 			// Docker does not support top -o
-			Require: test.Not(nerdtest.Docker),
+			Require: require.Not(nerdtest.Docker),
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("top", data.Get("cID"), "-o", "pid,user,cmd")
 			},

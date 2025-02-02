@@ -19,6 +19,7 @@ package network
 import (
 	"testing"
 
+	"go.farcloser.world/tigron/expect"
 	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/pkg/testutil"
@@ -46,7 +47,7 @@ func TestNetworkPrune(t *testing.T) {
 			Command: test.Command("network", "prune", "-f"),
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 				return &test.Expected{
-					Output: test.DoesNotContain(data.Identifier()),
+					Output: expect.DoesNotContain(data.Identifier()),
 				}
 			},
 		},
@@ -65,7 +66,7 @@ func TestNetworkPrune(t *testing.T) {
 			Command: test.Command("network", "prune", "-f"),
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 				return &test.Expected{
-					Output: test.Contains(data.Identifier()),
+					Output: expect.Contains(data.Identifier()),
 				}
 			},
 		},

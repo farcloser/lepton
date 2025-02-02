@@ -19,6 +19,7 @@ package container
 import (
 	"testing"
 
+	"go.farcloser.world/tigron/expect"
 	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/pkg/testutil"
@@ -42,7 +43,7 @@ func TestWait(t *testing.T) {
 		return helpers.Command("wait", data.Identifier("1"), data.Identifier("2"), data.Identifier("3"))
 	}
 
-	testCase.Expected = test.Expects(0, nil, test.Equals(`0
+	testCase.Expected = test.Expects(0, nil, expect.Equals(`0
 0
 123
 `))

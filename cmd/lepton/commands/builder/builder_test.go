@@ -26,6 +26,7 @@ import (
 
 	"gotest.tools/v3/assert"
 
+	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/pkg/testutil"
@@ -37,9 +38,9 @@ func TestBuilder(t *testing.T) {
 
 	testCase := &test.Case{
 		NoParallel: true,
-		Require: test.Require(
+		Require: require.All(
 			nerdtest.Build,
-			test.Not(test.Windows),
+			require.Not(require.Windows),
 		),
 		SubTests: []*test.Case{
 			{
@@ -73,7 +74,7 @@ CMD ["echo", "test-builder-prune"]`, testutil.CommonImage)
 			{
 				Description: "Debug",
 				// `builder debug` is currently incompatible with `docker buildx debug`.
-				Require:    test.Require(test.Not(nerdtest.Docker)),
+				Require:    require.All(require.Not(nerdtest.Docker)),
 				NoParallel: true,
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 					dockerfile := fmt.Sprintf(`FROM %s

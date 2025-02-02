@@ -28,6 +28,7 @@ import (
 	"gotest.tools/v3/assert"
 
 	"go.farcloser.world/containers/digest"
+	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/pkg/testutil"
@@ -178,7 +179,7 @@ func TestCreateWithTty(t *testing.T) {
 func TestIssue2993(t *testing.T) {
 	testCase := nerdtest.Setup()
 
-	testCase.Require = test.Not(nerdtest.Docker)
+	testCase.Require = require.Not(nerdtest.Docker)
 
 	const (
 		containersPathKey = "containersPath"

@@ -26,6 +26,8 @@ import (
 
 	"gotest.tools/v3/assert"
 
+	"go.farcloser.world/tigron/expect"
+	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/pkg/testutil"
@@ -41,11 +43,11 @@ func TestImagePullWithCosign(t *testing.T) {
 	var keyPair *various.CosignKeyPair
 
 	testCase := &test.Case{
-		Require: test.Require(
-			test.Linux,
+		Require: require.All(
+			require.Linux,
 			nerdtest.Build,
-			test.Binary("cosign"),
-			test.Not(nerdtest.Docker),
+			require.Binary("cosign"),
+			require.Not(nerdtest.Docker),
 		),
 		Env: map[string]string{
 			"COSIGN_PASSWORD": "1",
@@ -110,9 +112,9 @@ func TestImagePullPlainHttpWithDefaultPort(t *testing.T) {
 	var registry *testregistry.RegistryServer
 
 	testCase := &test.Case{
-		Require: test.Require(
-			test.Linux,
-			test.Not(nerdtest.Docker),
+		Require: require.All(
+			require.Linux,
+			require.Not(nerdtest.Docker),
 			nerdtest.Build,
 		),
 		Setup: func(data test.Data, helpers test.Helpers) {
@@ -153,9 +155,9 @@ func TestImagePullSoci(t *testing.T) {
 	nerdtest.Setup()
 
 	testCase := &test.Case{
-		Require: test.Require(
-			test.Linux,
-			test.Not(nerdtest.Docker),
+		Require: require.All(
+			require.Linux,
+			require.Not(nerdtest.Docker),
 			nerdtest.Soci,
 		),
 
@@ -248,7 +250,7 @@ func TestImagePullProcessOutput(t *testing.T) {
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 					return helpers.Command("pull", testutil.BusyboxImage)
 				},
-				Expected: test.Expects(0, nil, test.Contains(testutil.BusyboxImage)),
+				Expected: test.Expects(0, nil, expect.Contains(testutil.BusyboxImage)),
 			},
 			{
 				Description: "Run Container with image pull - output should be in stderr",
@@ -259,7 +261,7 @@ func TestImagePullProcessOutput(t *testing.T) {
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 					return helpers.Command("run", "--rm", testutil.BusyboxImage)
 				},
-				Expected: test.Expects(0, nil, test.DoesNotContain(testutil.BusyboxImage)),
+				Expected: test.Expects(0, nil, expect.DoesNotContain(testutil.BusyboxImage)),
 			},
 		},
 	}

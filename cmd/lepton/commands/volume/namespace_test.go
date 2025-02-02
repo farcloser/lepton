@@ -19,6 +19,8 @@ package volume
 import (
 	"testing"
 
+	"go.farcloser.world/tigron/expect"
+	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/leptonic/errs"
@@ -29,7 +31,7 @@ func TestVolumeNamespace(t *testing.T) {
 	testCase := nerdtest.Setup()
 
 	// Docker does not support namespaces
-	testCase.Require = test.Not(nerdtest.Docker)
+	testCase.Require = require.Not(nerdtest.Docker)
 
 	// Create a volume in a different namespace
 	testCase.Setup = func(data test.Data, helpers test.Helpers) {
@@ -72,8 +74,8 @@ func TestVolumeNamespace(t *testing.T) {
 			Command: test.Command("volume", "prune", "-a", "-f"),
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 				return &test.Expected{
-					Output: test.All(
-						test.DoesNotContain(data.Get("root_volume")),
+					Output: expect.All(
+						expect.DoesNotContain(data.Get("root_volume")),
 						func(stdout string, info string, t *testing.T) {
 							helpers.Ensure("--namespace", data.Get("root_namespace"), "volume", "inspect", data.Get("root_volume"))
 						},

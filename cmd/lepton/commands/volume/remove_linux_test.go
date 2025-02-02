@@ -23,6 +23,7 @@ import (
 	"github.com/containerd/errdefs"
 	"gotest.tools/v3/assert"
 
+	"go.farcloser.world/tigron/expect"
 	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/leptonic/errs"
@@ -123,7 +124,7 @@ func TestVolumeRemove(t *testing.T) {
 
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 				return &test.Expected{
-					Output: test.Equals(data.Identifier() + "\n"),
+					Output: expect.Equals(data.Identifier() + "\n"),
 				}
 			},
 		},
@@ -144,7 +145,7 @@ func TestVolumeRemove(t *testing.T) {
 
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 				return &test.Expected{
-					Output: test.Equals(data.Identifier() + "\n"),
+					Output: expect.Equals(data.Identifier() + "\n"),
 				}
 			},
 		},
@@ -175,7 +176,7 @@ func TestVolumeRemove(t *testing.T) {
 						errdefs.ErrFailedPrecondition,
 						errs.ErrInvalidArgument,
 					},
-					Output: test.Equals(data.Identifier() + "\n"),
+					Output: expect.Equals(data.Identifier() + "\n"),
 				}
 			},
 		},
@@ -197,7 +198,7 @@ func TestVolumeRemove(t *testing.T) {
 
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 				return &test.Expected{
-					Output: test.Equals(data.Identifier("1") + "\n" + data.Identifier("2") + "\n"),
+					Output: expect.Equals(data.Identifier("1") + "\n" + data.Identifier("2") + "\n"),
 				}
 			},
 		},

@@ -28,6 +28,8 @@ import (
 
 	"gotest.tools/v3/assert"
 
+	"go.farcloser.world/tigron/expect"
+	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/pkg/tabutil"
@@ -39,7 +41,7 @@ func TestImages(t *testing.T) {
 	nerdtest.Setup()
 
 	testCase := &test.Case{
-		Require: test.Not(nerdtest.Docker),
+		Require: require.Not(nerdtest.Docker),
 		Setup: func(data test.Data, helpers test.Helpers) {
 			helpers.Ensure("pull", "--quiet", testutil.CommonImage)
 			helpers.Ensure("pull", "--quiet", testutil.NginxAlpineImage)
@@ -79,8 +81,8 @@ func TestImages(t *testing.T) {
 				Command:     test.Command("images", "--names", testutil.CommonImage),
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
-						Output: test.All(
-							test.Contains(testutil.CommonImage),
+						Output: expect.All(
+							expect.Contains(testutil.CommonImage),
 							func(stdout string, info string, t *testing.T) {
 								lines := strings.Split(strings.TrimSpace(stdout), "\n")
 								assert.Assert(t, len(lines) >= 2, info)
@@ -121,7 +123,7 @@ func TestImages(t *testing.T) {
 	}
 
 	if runtime.GOOS == "windows" {
-		testCase.Require = test.Require(
+		testCase.Require = require.All(
 			testCase.Require,
 			nerdtest.IsFlaky("https://github.com/containerd/nerdctl/issues/3524"),
 		)
@@ -167,7 +169,7 @@ RUN echo "actually creating a layer so that docker sets the createdAt time"
 				Command:     test.Command("images", "--filter", "label=foo=bar"),
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
-						Output: test.Contains(data.Get("builtImageID")),
+						Output: expect.Contains(data.Get("builtImageID")),
 					}
 				},
 			},
@@ -176,7 +178,7 @@ RUN echo "actually creating a layer so that docker sets the createdAt time"
 				Command:     test.Command("images", "--filter", "label=foo=bar1"),
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
-						Output: test.DoesNotContain(data.Get("builtImageID")),
+						Output: expect.DoesNotContain(data.Get("builtImageID")),
 					}
 				},
 			},
@@ -185,7 +187,7 @@ RUN echo "actually creating a layer so that docker sets the createdAt time"
 				Command:     test.Command("images", "--filter", "label=foo=bar", "--filter", "label=version=0.1"),
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
-						Output: test.Contains(data.Get("builtImageID")),
+						Output: expect.Contains(data.Get("builtImageID")),
 					}
 				},
 			},
@@ -194,7 +196,7 @@ RUN echo "actually creating a layer so that docker sets the createdAt time"
 				Command:     test.Command("images", "--filter", "label=foo=bar", "--filter", "label=version=0.2"),
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
-						Output: test.DoesNotContain(data.Get("builtImageID")),
+						Output: expect.DoesNotContain(data.Get("builtImageID")),
 					}
 				},
 			},
@@ -203,7 +205,7 @@ RUN echo "actually creating a layer so that docker sets the createdAt time"
 				Command:     test.Command("images", "--filter", "label=version"),
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
-						Output: test.Contains(data.Get("builtImageID")),
+						Output: expect.Contains(data.Get("builtImageID")),
 					}
 				},
 			},
@@ -214,16 +216,16 @@ RUN echo "actually creating a layer so that docker sets the createdAt time"
 				},
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
-						Output: test.Contains(data.Get("builtImageID")),
+						Output: expect.Contains(data.Get("builtImageID")),
 					}
 				},
 			},
 			{
 				Description: "reference=tagged*:*fragment*",
 				Command:     test.Command("images", "--filter", "reference=tagged*:*fragment*"),
-				Expected: test.Expects(0, nil, test.All(
-					test.Contains("one-"),
-					test.Contains("two-"),
+				Expected: test.Expects(0, nil, expect.All(
+					expect.Contains("one-"),
+					expect.Contains("two-"),
 				)),
 			},
 			{
@@ -233,9 +235,9 @@ RUN echo "actually creating a layer so that docker sets the createdAt time"
 				},
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
-						Output: test.All(
-							test.Contains(testutil.ImageRepo(testutil.CommonImage)),
-							test.DoesNotContain(data.Get("builtImageID")),
+						Output: expect.All(
+							expect.Contains(testutil.ImageRepo(testutil.CommonImage)),
+							expect.DoesNotContain(data.Get("builtImageID")),
 						),
 					}
 				},
@@ -245,9 +247,9 @@ RUN echo "actually creating a layer so that docker sets the createdAt time"
 				Command:     test.Command("images", "--filter", "since="+testutil.CommonImage),
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
-						Output: test.All(
-							test.Contains(data.Get("builtImageID")),
-							test.DoesNotContain(testutil.ImageRepo(testutil.CommonImage)),
+						Output: expect.All(
+							expect.Contains(data.Get("builtImageID")),
+							expect.DoesNotContain(testutil.ImageRepo(testutil.CommonImage)),
 						),
 					}
 				},
@@ -257,9 +259,9 @@ RUN echo "actually creating a layer so that docker sets the createdAt time"
 				Command:     test.Command("images", "--filter", "since="+testutil.CommonImage, testutil.CommonImage),
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
-						Output: test.All(
-							test.DoesNotContain(data.Get("builtImageID")),
-							test.DoesNotContain(testutil.ImageRepo(testutil.CommonImage)),
+						Output: expect.All(
+							expect.DoesNotContain(data.Get("builtImageID")),
+							expect.DoesNotContain(testutil.ImageRepo(testutil.CommonImage)),
 						),
 					}
 				},
@@ -311,12 +313,12 @@ CMD ["echo", "build-notag-string"]
 			{
 				Description: "dangling",
 				Command:     test.Command("images", "--filter", "dangling=true"),
-				Expected:    test.Expects(0, nil, test.Contains("<none>")),
+				Expected:    test.Expects(0, nil, expect.Contains("<none>")),
 			},
 			{
 				Description: "not dangling",
 				Command:     test.Command("images", "--filter", "dangling=false"),
-				Expected:    test.Expects(0, nil, test.DoesNotContain("<none>")),
+				Expected:    test.Expects(0, nil, expect.DoesNotContain("<none>")),
 			},
 		},
 	}
@@ -328,7 +330,7 @@ func TestImagesKubeWithKubeHideDupe(t *testing.T) {
 	nerdtest.Setup()
 
 	testCase := &test.Case{
-		Require: test.Require(
+		Require: require.All(
 			nerdtest.OnlyKubernetes,
 		),
 		Setup: func(data test.Data, helpers test.Helpers) {
@@ -381,7 +383,7 @@ func TestImagesKubeWithKubeHideDupe(t *testing.T) {
 				Command:     test.Command("images"),
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
-						Output: test.Contains("<none>"),
+						Output: expect.Contains("<none>"),
 					}
 				},
 			},

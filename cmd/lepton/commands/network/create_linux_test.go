@@ -23,6 +23,7 @@ import (
 
 	"gotest.tools/v3/assert"
 
+	"go.farcloser.world/tigron/expect"
 	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/pkg/testutil"
@@ -75,7 +76,7 @@ func TestNetworkCreate(t *testing.T) {
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("run", "--rm", "--net", data.Identifier(), testutil.CommonImage, "ifconfig", "eth0")
 			},
-			Expected: test.Expects(0, nil, test.Contains("MTU:9216")),
+			Expected: test.Expects(0, nil, expect.Contains("MTU:9216")),
 		},
 		{
 			Description: "with ipv6",

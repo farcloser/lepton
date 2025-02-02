@@ -23,6 +23,7 @@ import (
 
 	"gotest.tools/v3/assert"
 
+	"go.farcloser.world/tigron/expect"
 	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/pkg/inspecttypes/dockercompat"
@@ -48,7 +49,7 @@ func TestCreate(t *testing.T) {
 			NoParallel:  true,
 			Command:     test.Command("ps", "-a"),
 			// FIXME: this might get a false positive if other tests have created a container
-			Expected: test.Expects(0, nil, test.Contains("Created")),
+			Expected: test.Expects(0, nil, expect.Contains("Created")),
 		},
 		{
 			Description: "start",
@@ -64,7 +65,7 @@ func TestCreate(t *testing.T) {
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("logs", data.Get("cID"))
 			},
-			Expected: test.Expects(0, nil, test.Contains("foo")),
+			Expected: test.Expects(0, nil, expect.Contains("foo")),
 		},
 	}
 
@@ -91,7 +92,7 @@ func TestCreateHyperVContainer(t *testing.T) {
 			NoParallel:  true,
 			Command:     test.Command("ps", "-a"),
 			// FIXME: this might get a false positive if other tests have created a container
-			Expected: test.Expects(0, nil, test.Contains("Created")),
+			Expected: test.Expects(0, nil, expect.Contains("Created")),
 		},
 		{
 			Description: "start",
@@ -102,7 +103,7 @@ func TestCreateHyperVContainer(t *testing.T) {
 				for i := 0; i < 10 && !ran; i++ {
 					helpers.Command("container", "inspect", data.Get("cID")).
 						Run(&test.Expected{
-							ExitCode: test.ExitCodeNoCheck,
+							ExitCode: expect.ExitCodeNoCheck,
 							Output: func(stdout string, info string, t *testing.T) {
 								var dc []dockercompat.Container
 								err := json.Unmarshal([]byte(stdout), &dc)
@@ -120,7 +121,7 @@ func TestCreateHyperVContainer(t *testing.T) {
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("logs", data.Get("cID"))
 			},
-			Expected: test.Expects(0, nil, test.Contains("foo")),
+			Expected: test.Expects(0, nil, expect.Contains("foo")),
 		},
 	}
 

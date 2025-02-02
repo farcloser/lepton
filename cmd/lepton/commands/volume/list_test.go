@@ -24,6 +24,7 @@ import (
 
 	"gotest.tools/v3/assert"
 
+	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/pkg/tabutil"
@@ -34,7 +35,7 @@ func TestVolumeLsSize(t *testing.T) {
 	nerdtest.Setup()
 
 	tc := &test.Case{
-		Require: test.Not(nerdtest.Docker),
+		Require: require.Not(nerdtest.Docker),
 		Setup: func(data test.Data, helpers test.Helpers) {
 			helpers.Ensure("volume", "create", data.Identifier("1"))
 			helpers.Ensure("volume", "create", data.Identifier("2"))
@@ -282,7 +283,7 @@ func TestVolumeLsFilter(t *testing.T) {
 		{
 			Description: "Retrieving name=volume1 and name=volume2",
 			// Nerdctl filter behavior is broken
-			// Require: nerdtest.NerdishctlNeedsFixing("https://github.com/containerd/nerdctl/issues/3452"),
+			// All: nerdtest.NerdishctlNeedsFixing("https://github.com/containerd/nerdctl/issues/3452"),
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("volume", "ls", "--quiet", "--filter", "name="+data.Get("vol1"), "--filter", "name="+data.Get("vol2"))
 			},
@@ -305,7 +306,7 @@ func TestVolumeLsFilter(t *testing.T) {
 		},
 		{
 			Description: "Retrieving size=1024000",
-			Require:     test.Not(nerdtest.Docker),
+			Require:     require.Not(nerdtest.Docker),
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("volume", "ls", "--size", "--filter", "size=1024000")
 			},
@@ -336,7 +337,7 @@ func TestVolumeLsFilter(t *testing.T) {
 		},
 		{
 			Description: "Retrieving size>=1024000 size<=2048000",
-			Require:     test.Not(nerdtest.Docker),
+			Require:     require.Not(nerdtest.Docker),
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("volume", "ls", "--size", "--filter", "size>=1024000", "--filter", "size<=2048000")
 			},
@@ -367,7 +368,7 @@ func TestVolumeLsFilter(t *testing.T) {
 		},
 		{
 			Description: "Retrieving size>204800 size<1024000",
-			Require:     test.Not(nerdtest.Docker),
+			Require:     require.Not(nerdtest.Docker),
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("volume", "ls", "--size", "--filter", "size>204800", "--filter", "size<1024000")
 			},

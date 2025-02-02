@@ -51,9 +51,9 @@ require (
 	github.com/spf13/pflag v1.0.6
 	github.com/vishvananda/netlink v1.3.0
 	github.com/yuchanns/srslog v1.1.0
-	go.farcloser.world/containers v0.0.0-20250130235254-5b3644b7a42d
+	go.farcloser.world/containers v0.0.0-20250202050720-eb26437fa9d1
 	go.farcloser.world/core v0.0.0-20250202045807-ac4264f8ecf9
-	go.farcloser.world/tigron v0.0.0-20250201231533-d31754e8a8fa
+	go.farcloser.world/tigron v0.1.1-0.20250202101647-57d4973c9532
 	go.uber.org/mock v0.5.0
 	golang.org/x/crypto v0.32.0
 	golang.org/x/net v0.34.0

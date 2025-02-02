@@ -30,6 +30,7 @@ import (
 	"gotest.tools/v3/icmd"
 
 	"go.farcloser.world/tigron/test"
+	"go.farcloser.world/tigron/utils"
 
 	"go.farcloser.world/lepton/pkg/imgutil/dockerconfigresolver"
 	"go.farcloser.world/lepton/pkg/testutil"
@@ -116,8 +117,8 @@ func TestLoginPersistence(t *testing.T) {
 			t.Run("Server "+tc.auth, func(t *testing.T) {
 				t.Parallel()
 
-				username := test.RandomStringBase64(30) + "∞"
-				password := test.RandomStringBase64(30) + ":∞"
+				username := utils.RandomStringBase64(30) + "∞"
+				password := utils.RandomStringBase64(30) + ":∞"
 
 				// Add the requested authentication
 				var auth testregistry.Auth
@@ -313,8 +314,8 @@ func TestLoginAgainstVariants(t *testing.T) {
 				}
 
 				// Generate credentials that are specific to each registry, so that we never cross hit another one
-				username := test.RandomStringBase64(30) + "∞"
-				password := test.RandomStringBase64(30) + ":∞"
+				username := utils.RandomStringBase64(30) + "∞"
+				password := utils.RandomStringBase64(30) + ":∞"
 
 				// Get a CA if we want TLS
 				var ca *testca.CA
