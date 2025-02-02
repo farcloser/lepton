@@ -302,8 +302,8 @@ github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9dec
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
 go.farcloser.world/containers v0.0.0-20250130235254-5b3644b7a42d h1:ymGDZ1GVQUg36LmN5yXrz2F1p2REMABtOy92AeCWECk=
 go.farcloser.world/containers v0.0.0-20250130235254-5b3644b7a42d/go.mod h1:jFz5slK6RADTAdnil77V7+6nC9NXuBqatq4ccyevoh0=
-go.farcloser.world/core v0.0.0-20250124005019-159469b525b1 h1:LKO8Om0SXlZJSvzVI3fZQvzriiFbG9wYw2H9ej+wkOs=
-go.farcloser.world/core v0.0.0-20250124005019-159469b525b1/go.mod h1:O7QnEAnQjvA1s8m2hsPlVwbPtBAnYkxLaByJUW01MHM=
+go.farcloser.world/core v0.0.0-20250202045807-ac4264f8ecf9 h1:CRPKHsdEoQwxbUBNrWZ+Ft8V8A5XwdHgRGu6tI1ZdO8=
+go.farcloser.world/core v0.0.0-20250202045807-ac4264f8ecf9/go.mod h1:gXbQVptSmDlD5SijiQM0QzpCDE4rK8EjXdYKaKNs1Sg=
 go.farcloser.world/tigron v0.0.0-20250201231533-d31754e8a8fa h1:6+ZnjU+IP+PtyTYzE2klIaAjgki/qv0P5ns4ULJHZ8M=
 go.farcloser.world/tigron v0.0.0-20250201231533-d31754e8a8fa/go.mod h1:vVhfkzWpZw/CF9MwxHcRd0/0zV/Ymgc2k7ZIzDYAS+Y=
 go.opencensus.io v0.24.0 h1:y73uSU6J157QMP2kn2r30vwW1A2W2WFwSCGnAVxeaD0=

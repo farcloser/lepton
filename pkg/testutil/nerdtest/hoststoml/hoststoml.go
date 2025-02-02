@@ -32,6 +32,7 @@ type hostsTomlHost struct {
 }
 
 // See https://github.com/containerd/containerd/blob/main/docs/hosts.md
+
 type HostsToml struct {
 	CA         string                    `toml:"ca,omitempty"`
 	SkipVerify bool                      `toml:"skip_verify,omitempty"`

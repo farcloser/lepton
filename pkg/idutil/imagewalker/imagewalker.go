@@ -56,6 +56,7 @@ The boolean value will return true only when the repo:tag is successfully
 deleted for each image. Once all repo:tag entries are deleted, it is necessary
 to clean up the remaining repo:digest and configID.
 */
+
 type OnFoundCriRm func(ctx context.Context, found Found) (bool, error)
 
 type ImageWalker struct {
