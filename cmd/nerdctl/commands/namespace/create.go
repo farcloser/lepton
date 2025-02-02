@@ -21,44 +21,42 @@ import (
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
-	"github.com/containerd/nerdctl/v2/leptonic/services/namespace"
 	"github.com/containerd/nerdctl/v2/leptonic/utils"
 	"github.com/containerd/nerdctl/v2/pkg/api/options"
+	"github.com/containerd/nerdctl/v2/pkg/cmd/namespace"
 )
 
-type namespaceCreateOptions struct {
-	// Labels are the namespace labels
-	Labels map[string]string
-}
-
 func createCommand() *cobra.Command {
-	namespaceCreateCommand := &cobra.Command{
+	cmd := &cobra.Command{
 		Use:           "create NAMESPACE",
 		Short:         "Create a new namespace",
-		Args:          cobra.MinimumNArgs(1),
+		Args:          cobra.ExactArgs(1),
 		RunE:          createAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
 
-	namespaceCreateCommand.Flags().StringArrayP("label", "l", nil, "Set labels for a namespace")
-	return namespaceCreateCommand
+	cmd.Flags().StringArrayP("label", "l", nil, "Set labels for a namespace")
+
+	return cmd
 }
 
-func processNamespaceCreateCommandOption(cmd *cobra.Command) (*options.Global, *namespaceUpdateOptions, error) {
-	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
-	if err != nil {
-		return nil, nil, err
-	}
+func createOption(cmd *cobra.Command, args []string) (*options.NamespaceCreate, error) {
 	labels, err := cmd.Flags().GetStringArray("label")
 	if err != nil {
-		return globalOptions, nil, err
+		return nil, err
 	}
-	return globalOptions, &namespaceUpdateOptions{Labels: utils.StringSlice2KVMap(labels, "=")}, nil
+
+	return &options.NamespaceCreate{Name: args[0], Labels: utils.StringSlice2KVMap(labels, "=")}, nil
 }
 
 func createAction(cmd *cobra.Command, args []string) error {
-	globalOptions, options, err := processNamespaceCreateCommandOption(cmd)
+	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
+	if err != nil {
+		return err
+	}
+
+	opts, err := createOption(cmd, args)
 	if err != nil {
 		return err
 	}
@@ -70,8 +68,5 @@ func createAction(cmd *cobra.Command, args []string) error {
 
 	defer cancel()
 
-	name := args[0]
-
-	return namespace.Create(ctx, cli, name, options.Labels)
-
+	return namespace.Create(ctx, cli, globalOptions, opts)
 }

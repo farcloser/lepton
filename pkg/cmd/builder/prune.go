@@ -30,19 +30,19 @@ import (
 )
 
 // Prune will prune all build cache.
-func Prune(ctx context.Context, options *options.BuilderPrune) ([]buildkitutil.UsageInfo, error) {
+func Prune(ctx context.Context, _ *options.Global, opts *options.BuilderPrune) ([]buildkitutil.UsageInfo, error) {
 	buildctlBinary, err := buildkitutil.BuildctlBinary()
 	if err != nil {
 		return nil, err
 	}
-	buildctlArgs := buildkitutil.BuildctlBaseArgs(options.BuildKitHost)
+	buildctlArgs := buildkitutil.BuildctlBaseArgs(opts.BuildKitHost)
 	buildctlArgs = append(buildctlArgs, "prune", "--format={{json .}}")
-	if options.All {
+	if opts.All {
 		buildctlArgs = append(buildctlArgs, "--all")
 	}
 	buildctlCmd := exec.Command(buildctlBinary, buildctlArgs...)
 	log.G(ctx).Debugf("running %v", buildctlCmd.Args)
-	buildctlCmd.Stderr = options.Stderr
+	buildctlCmd.Stderr = opts.Stderr
 	stdout, err := buildctlCmd.StdoutPipe()
 	if err != nil {
 		return nil, fmt.Errorf("faild to get stdout piper for %v: %w", buildctlCmd.Args, err)

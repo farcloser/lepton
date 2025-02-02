@@ -28,7 +28,7 @@ import (
 )
 
 func pruneCommand() *cobra.Command {
-	imagePruneCommand := &cobra.Command{
+	cmd := &cobra.Command{
 		Use:           "prune [flags]",
 		Short:         "Remove unused images",
 		Args:          cobra.NoArgs,
@@ -37,17 +37,14 @@ func pruneCommand() *cobra.Command {
 		SilenceErrors: true,
 	}
 
-	imagePruneCommand.Flags().BoolP("all", "a", false, "Remove all unused images, not just dangling ones")
-	imagePruneCommand.Flags().StringSlice("filter", []string{}, "Filter output based on conditions provided")
-	imagePruneCommand.Flags().BoolP("force", "f", false, "Do not prompt for confirmation")
-	return imagePruneCommand
+	cmd.Flags().BoolP("all", "a", false, "Remove all unused images, not just dangling ones")
+	cmd.Flags().StringSlice("filter", []string{}, "Filter output based on conditions provided")
+	cmd.Flags().BoolP("force", "f", false, "Do not prompt for confirmation")
+
+	return cmd
 }
 
 func pruneOptions(cmd *cobra.Command, _ []string) (options.ImagePrune, error) {
-	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
-	if err != nil {
-		return options.ImagePrune{}, err
-	}
 	all, err := cmd.Flags().GetBool("all")
 	if err != nil {
 		return options.ImagePrune{}, err
@@ -67,23 +64,27 @@ func pruneOptions(cmd *cobra.Command, _ []string) (options.ImagePrune, error) {
 	}
 
 	return options.ImagePrune{
-		Stdout:   cmd.OutOrStdout(),
-		GOptions: globalOptions,
-		All:      all,
-		Filters:  filters,
-		Force:    force,
+		Stdout:  cmd.OutOrStdout(),
+		All:     all,
+		Filters: filters,
+		Force:   force,
 	}, err
 }
 
 func pruneAction(cmd *cobra.Command, args []string) error {
-	options, err := pruneOptions(cmd, args)
+	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return err
 	}
 
-	if !options.Force {
+	opts, err := pruneOptions(cmd, args)
+	if err != nil {
+		return err
+	}
+
+	if !opts.Force {
 		var msg string
-		if !options.All {
+		if !opts.All {
 			msg = "This will remove all dangling images."
 		} else {
 			msg = "This will remove all images without at least one container associated to them."
@@ -94,11 +95,11 @@ func pruneAction(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	return image.Prune(ctx, cli, options)
+	return image.Prune(ctx, cli, globalOptions, opts)
 }

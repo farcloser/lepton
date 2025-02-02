@@ -38,8 +38,7 @@ type networkPrintable struct {
 	file string `json:"-"`
 }
 
-func List(ctx context.Context, options *options.NetworkList) error {
-	globalOptions := options.GOptions
+func List(ctx context.Context, globalOptions *options.Global, options *options.NetworkList) error {
 	quiet := options.Quiet
 	format := options.Format
 	w := options.Stdout
@@ -63,7 +62,7 @@ func List(ctx context.Context, options *options.NetworkList) error {
 		}
 	}
 
-	e, err := netutil.NewCNIEnv(globalOptions.CNIPath, globalOptions.CNINetConfPath, netutil.WithNamespace(options.GOptions.Namespace))
+	e, err := netutil.NewCNIEnv(globalOptions.CNIPath, globalOptions.CNINetConfPath, netutil.WithNamespace(globalOptions.Namespace))
 	if err != nil {
 		return err
 	}

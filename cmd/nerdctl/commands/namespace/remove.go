@@ -17,26 +17,17 @@
 package namespace
 
 import (
-	"errors"
-
 	"github.com/spf13/cobra"
-
-	"github.com/containerd/log"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
-	"github.com/containerd/nerdctl/v2/leptonic/services/namespace"
 	"github.com/containerd/nerdctl/v2/pkg/api/options"
+	"github.com/containerd/nerdctl/v2/pkg/cmd/namespace"
 )
 
-type namespaceRemoveOptions struct {
-	// CGroup delete the namespace's cgroup
-	CGroup bool
-}
-
 func removeCommand() *cobra.Command {
-	namespaceRmCommand := &cobra.Command{
+	cmd := &cobra.Command{
 		Use:               "remove [flags] NAMESPACE [NAMESPACE...]",
 		Aliases:           []string{"rm"},
 		Args:              cobra.MinimumNArgs(1),
@@ -47,12 +38,12 @@ func removeCommand() *cobra.Command {
 		SilenceErrors:     true,
 	}
 
-	namespaceRmCommand.Flags().BoolP("cgroup", "c", false, "delete the namespace's cgroup")
+	cmd.Flags().BoolP("cgroup", "c", false, "delete the namespace's cgroup")
 
-	return namespaceRmCommand
+	return cmd
 }
 
-func removeOptions(cmd *cobra.Command, _ []string) (*options.Global, *namespaceRemoveOptions, error) {
+func removeOptions(cmd *cobra.Command, args []string) (*options.Global, *options.NamespaceRemove, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return nil, nil, err
@@ -63,13 +54,14 @@ func removeOptions(cmd *cobra.Command, _ []string) (*options.Global, *namespaceR
 		return globalOptions, nil, err
 	}
 
-	return globalOptions, &namespaceRemoveOptions{
-		CGroup: cgroup,
+	return globalOptions, &options.NamespaceRemove{
+		NamesList: args,
+		CGroup:    cgroup,
 	}, nil
 }
 
 func removeAction(cmd *cobra.Command, args []string) error {
-	globalOptions, options, err := removeOptions(cmd, args)
+	globalOptions, opts, err := removeOptions(cmd, args)
 	if err != nil {
 		return err
 	}
@@ -81,15 +73,5 @@ func removeAction(cmd *cobra.Command, args []string) error {
 
 	defer cancel()
 
-	errs := namespace.Remove(ctx, cli, args, options.CGroup)
-
-	if len(errs) > 0 {
-		for _, err = range errs {
-			log.G(ctx).WithError(err).Error()
-		}
-
-		return errors.New("failed to remove namespaces")
-	}
-
-	return nil
+	return namespace.Remove(ctx, cli, globalOptions, opts)
 }

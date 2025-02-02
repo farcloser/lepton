@@ -35,12 +35,15 @@ func listCommand() *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
+
 	cmd.Flags().BoolP("quiet", "q", false, "Only display network IDs")
 	cmd.Flags().StringSliceP("filter", "f", []string{}, "Provide filter values (e.g. \"name=default\")")
 	cmd.Flags().String("format", "", "Format the output using the given Go template, e.g, '{{json .}}'")
-	cmd.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+
+	_ = cmd.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return []string{formatter.FormatJSON, formatter.FormatTable, formatter.FormatWide}, cobra.ShellCompDirectiveNoFileComp
 	})
+
 	return cmd
 }
 
@@ -49,23 +52,26 @@ func listAction(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+
 	quiet, err := cmd.Flags().GetBool("quiet")
 	if err != nil {
 		return err
 	}
+
 	format, err := cmd.Flags().GetString("format")
 	if err != nil {
 		return err
 	}
+
 	filters, err := cmd.Flags().GetStringSlice("filter")
 	if err != nil {
 		return err
 	}
-	return network.List(cmd.Context(), &options.NetworkList{
-		GOptions: globalOptions,
-		Quiet:    quiet,
-		Format:   format,
-		Filters:  filters,
-		Stdout:   cmd.OutOrStdout(),
+
+	return network.List(cmd.Context(), globalOptions, &options.NetworkList{
+		Quiet:   quiet,
+		Format:  format,
+		Filters: filters,
+		Stdout:  cmd.OutOrStdout(),
 	})
 }

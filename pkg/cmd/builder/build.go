@@ -61,8 +61,8 @@ func (p platformParser) DefaultSpec() platforms.Platform {
 	return platforms.DefaultSpec()
 }
 
-func Build(ctx context.Context, client *containerd.Client, options *options.BuilderBuild) error {
-	buildctlBinary, buildctlArgs, needsLoading, metaFile, tags, cleanup, err := generateBuildctlArgs(ctx, client, options)
+func Build(ctx context.Context, client *containerd.Client, globalOptions *options.Global, opts *options.BuilderBuild) error {
+	buildctlBinary, buildctlArgs, needsLoading, metaFile, tags, cleanup, err := generateBuildctlArgs(ctx, client, globalOptions, opts)
 	if err != nil {
 		return err
 	}
@@ -81,10 +81,10 @@ func Build(ctx context.Context, client *containerd.Client, options *options.Buil
 			return err
 		}
 	} else {
-		buildctlCmd.Stdout = options.Stdout
+		buildctlCmd.Stdout = opts.Stdout
 	}
-	if !options.Quiet {
-		buildctlCmd.Stderr = options.Stderr
+	if !opts.Quiet {
+		buildctlCmd.Stderr = opts.Stderr
 	}
 
 	if err := buildctlCmd.Start(); err != nil {
@@ -92,11 +92,11 @@ func Build(ctx context.Context, client *containerd.Client, options *options.Buil
 	}
 
 	if needsLoading {
-		platMC, err := platformutil.NewMatchComparer(false, options.Platform)
+		platMC, err := platformutil.NewMatchComparer(false, opts.Platform)
 		if err != nil {
 			return err
 		}
-		if err = loadImage(ctx, buildctlStdout, options.GOptions.Namespace, options.GOptions.Address, options.GOptions.Snapshotter, options.Stdout, platMC, options.Quiet); err != nil {
+		if err = loadImage(ctx, buildctlStdout, globalOptions.Namespace, globalOptions.Address, globalOptions.Snapshotter, opts.Stdout, platMC, opts.Quiet); err != nil {
 			return err
 		}
 	}
@@ -105,12 +105,12 @@ func Build(ctx context.Context, client *containerd.Client, options *options.Buil
 		return err
 	}
 
-	if options.IidFile != "" {
+	if opts.IidFile != "" {
 		id, err := getDigestFromMetaFile(metaFile)
 		if err != nil {
 			return err
 		}
-		if err := os.WriteFile(options.IidFile, []byte(id), 0o644); err != nil {
+		if err := os.WriteFile(opts.IidFile, []byte(id), 0o644); err != nil {
 			return err
 		}
 	}
@@ -193,7 +193,7 @@ func loadImage(ctx context.Context, in io.Reader, namespace, address, snapshotte
 	return nil
 }
 
-func generateBuildctlArgs(ctx context.Context, client *containerd.Client, options *options.BuilderBuild) (buildCtlBinary string,
+func generateBuildctlArgs(ctx context.Context, client *containerd.Client, globalOptions *options.Global, opts *options.BuilderBuild) (buildCtlBinary string,
 	buildctlArgs []string, needsLoading bool, metaFile string, tags []string, cleanup func(), err error) {
 
 	buildctlBinary, err := buildkitutil.BuildctlBinary()
@@ -201,13 +201,13 @@ func generateBuildctlArgs(ctx context.Context, client *containerd.Client, option
 		return "", nil, false, "", nil, nil, err
 	}
 
-	output := options.Output
+	output := opts.Output
 	if output == "" {
 		info, err := client.Server(ctx)
 		if err != nil {
 			return "", nil, false, "", nil, nil, err
 		}
-		sharable, err := isImageSharable(options.BuildKitHost, options.GOptions.Namespace, info.UUID, options.GOptions.Snapshotter, options.Platform)
+		sharable, err := isImageSharable(opts.BuildKitHost, globalOptions.Namespace, info.UUID, globalOptions.Snapshotter, opts.Platform)
 		if err != nil {
 			return "", nil, false, "", nil, nil, err
 		}
@@ -215,9 +215,9 @@ func generateBuildctlArgs(ctx context.Context, client *containerd.Client, option
 			output = "type=image,unpack=true" // ensure the target stage is unlazied (needed for any snapshotters)
 		} else {
 			output = "type=docker"
-			if len(options.Platform) > 1 {
+			if len(opts.Platform) > 1 {
 				// For avoiding `error: failed to solve: docker exporter does not currently support exporting manifest lists`
-				// TODO: consider using type=oci for single-options.Platform build too
+				// TODO: consider using type=oci for single-opts.Platform build too
 				output = "type=oci"
 			}
 			needsLoading = true
@@ -234,7 +234,7 @@ func generateBuildctlArgs(ctx context.Context, client *containerd.Client, option
 			}
 		}
 	}
-	if tags = strutil.DedupeStrSlice(options.Tag); len(tags) > 0 {
+	if tags = strutil.DedupeStrSlice(opts.Tag); len(tags) > 0 {
 		ref := tags[0]
 		parsedReference, err := reference.Parse(ref)
 		if err != nil {
@@ -254,23 +254,23 @@ func generateBuildctlArgs(ctx context.Context, client *containerd.Client, option
 		output += ",dangling-name-prefix=<none>"
 	}
 
-	buildctlArgs = buildkitutil.BuildctlBaseArgs(options.BuildKitHost)
+	buildctlArgs = buildkitutil.BuildctlBaseArgs(opts.BuildKitHost)
 
 	buildctlArgs = append(buildctlArgs, []string{
 		"build",
-		"--progress=" + options.Progress,
+		"--progress=" + opts.Progress,
 		"--frontend=dockerfile.v0",
-		"--local=context=" + options.BuildContext,
+		"--local=context=" + opts.BuildContext,
 		"--output=" + output,
 	}...)
 
-	dir := options.BuildContext
+	dir := opts.BuildContext
 	file := buildkitutil.DefaultDockerfileName
-	if options.File != "" {
-		if options.File == "-" {
+	if opts.File != "" {
+		if opts.File == "-" {
 			// Super Warning: this is a special trick to update the dir variable, Don't move this line!!!!!!
 			var err error
-			dir, err = buildkitutil.WriteTempDockerfile(options.Stdin)
+			dir, err = buildkitutil.WriteTempDockerfile(opts.Stdin)
 			if err != nil {
 				return "", nil, false, "", nil, nil, err
 			}
@@ -278,7 +278,7 @@ func generateBuildctlArgs(ctx context.Context, client *containerd.Client, option
 				os.RemoveAll(dir)
 			}
 		} else {
-			dir, file = filepath.Split(options.File)
+			dir, file = filepath.Split(opts.File)
 		}
 
 		if dir == "" {
@@ -290,7 +290,7 @@ func generateBuildctlArgs(ctx context.Context, client *containerd.Client, option
 		return "", nil, false, "", nil, nil, err
 	}
 
-	buildCtx, err := parseContextNames(options.ExtendedBuildContext)
+	buildCtx, err := parseContextNames(opts.ExtendedBuildContext)
 	if err != nil {
 		return "", nil, false, "", nil, nil, err
 	}
@@ -325,16 +325,16 @@ func generateBuildctlArgs(ctx context.Context, client *containerd.Client, option
 	buildctlArgs = append(buildctlArgs, "--local=dockerfile="+dir)
 	buildctlArgs = append(buildctlArgs, "--opt=filename="+file)
 
-	if options.Target != "" {
-		buildctlArgs = append(buildctlArgs, "--opt=target="+options.Target)
+	if opts.Target != "" {
+		buildctlArgs = append(buildctlArgs, "--opt=target="+opts.Target)
 	}
 
-	if len(options.Platform) > 0 {
-		buildctlArgs = append(buildctlArgs, "--opt=platform="+strings.Join(options.Platform, ","))
+	if len(opts.Platform) > 0 {
+		buildctlArgs = append(buildctlArgs, "--opt=platform="+strings.Join(opts.Platform, ","))
 	}
 
 	seenBuildArgs := make(map[string]struct{})
-	for _, ba := range strutil.DedupeStrSlice(options.BuildArgs) {
+	for _, ba := range strutil.DedupeStrSlice(opts.BuildArgs) {
 		arr := strings.Split(ba, "=")
 		seenBuildArgs[arr[0]] = struct{}{}
 		if len(arr) == 1 && len(arr[0]) > 0 {
@@ -375,16 +375,16 @@ func generateBuildctlArgs(ctx context.Context, client *containerd.Client, option
 		}
 	}
 
-	for _, l := range strutil.DedupeStrSlice(options.Label) {
+	for _, l := range strutil.DedupeStrSlice(opts.Label) {
 		buildctlArgs = append(buildctlArgs, "--opt=label:"+l)
 	}
 
-	if options.NoCache {
+	if opts.NoCache {
 		buildctlArgs = append(buildctlArgs, "--no-cache")
 	}
 
-	if options.Pull != nil {
-		switch *options.Pull {
+	if opts.Pull != nil {
+		switch *opts.Pull {
 		case true:
 			buildctlArgs = append(buildctlArgs, "--opt=image-resolve-mode=pull")
 		case false:
@@ -392,15 +392,15 @@ func generateBuildctlArgs(ctx context.Context, client *containerd.Client, option
 		}
 	}
 
-	for _, s := range strutil.DedupeStrSlice(options.Secret) {
+	for _, s := range strutil.DedupeStrSlice(opts.Secret) {
 		buildctlArgs = append(buildctlArgs, "--secret="+s)
 	}
 
-	for _, s := range strutil.DedupeStrSlice(options.Allow) {
+	for _, s := range strutil.DedupeStrSlice(opts.Allow) {
 		buildctlArgs = append(buildctlArgs, "--allow="+s)
 	}
 
-	for _, s := range strutil.DedupeStrSlice(options.Attest) {
+	for _, s := range strutil.DedupeStrSlice(opts.Attest) {
 		optAttestType, optAttestAttrs, _ := strings.Cut(s, ",")
 		if strings.HasPrefix(optAttestType, "type=") {
 			optAttestType := strings.TrimPrefix(optAttestType, "type=")
@@ -410,29 +410,29 @@ func generateBuildctlArgs(ctx context.Context, client *containerd.Client, option
 		}
 	}
 
-	for _, s := range strutil.DedupeStrSlice(options.SSH) {
+	for _, s := range strutil.DedupeStrSlice(opts.SSH) {
 		buildctlArgs = append(buildctlArgs, "--ssh="+s)
 	}
 
-	for _, s := range strutil.DedupeStrSlice(options.CacheFrom) {
+	for _, s := range strutil.DedupeStrSlice(opts.CacheFrom) {
 		if !strings.Contains(s, "type=") {
 			s = "type=registry,ref=" + s
 		}
 		buildctlArgs = append(buildctlArgs, "--import-cache="+s)
 	}
 
-	for _, s := range strutil.DedupeStrSlice(options.CacheTo) {
+	for _, s := range strutil.DedupeStrSlice(opts.CacheTo) {
 		if !strings.Contains(s, "type=") {
 			s = "type=registry,ref=" + s
 		}
 		buildctlArgs = append(buildctlArgs, "--export-cache="+s)
 	}
 
-	if !options.Rm {
+	if !opts.Rm {
 		log.L.Warn("ignoring deprecated flag: '--rm=false'")
 	}
 
-	if options.IidFile != "" {
+	if opts.IidFile != "" {
 		file, err := os.CreateTemp("", "buildkit-meta-*")
 		if err != nil {
 			return "", nil, false, "", nil, cleanup, err
@@ -442,20 +442,20 @@ func generateBuildctlArgs(ctx context.Context, client *containerd.Client, option
 		buildctlArgs = append(buildctlArgs, "--metadata-file="+metaFile)
 	}
 
-	if options.NetworkMode != "" {
-		switch options.NetworkMode {
+	if opts.NetworkMode != "" {
+		switch opts.NetworkMode {
 		case "none":
-			buildctlArgs = append(buildctlArgs, "--opt=force-network-mode="+options.NetworkMode)
+			buildctlArgs = append(buildctlArgs, "--opt=force-network-mode="+opts.NetworkMode)
 		case "host":
-			buildctlArgs = append(buildctlArgs, "--opt=force-network-mode="+options.NetworkMode, "--allow=network.host", "--allow=security.insecure")
+			buildctlArgs = append(buildctlArgs, "--opt=force-network-mode="+opts.NetworkMode, "--allow=network.host", "--allow=security.insecure")
 		case "", "default":
 		default:
-			log.L.Debugf("ignoring network build arg %s", options.NetworkMode)
+			log.L.Debugf("ignoring network build arg %s", opts.NetworkMode)
 		}
 	}
 
-	if len(options.ExtraHosts) > 0 {
-		extraHosts, err := containerutil.ParseExtraHosts(options.ExtraHosts, options.GOptions.HostGatewayIP, "=")
+	if len(opts.ExtraHosts) > 0 {
+		extraHosts, err := containerutil.ParseExtraHosts(opts.ExtraHosts, globalOptions.HostGatewayIP, "=")
 		if err != nil {
 			return "", nil, false, "", nil, nil, err
 		}

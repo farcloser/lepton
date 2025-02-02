@@ -22,10 +22,10 @@ import (
 
 	"github.com/spf13/cobra"
 
+	imageCmd "github.com/containerd/nerdctl/v2/cmd/nerdctl/commands/image"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/completion"
 	containerCmd "github.com/containerd/nerdctl/v2/cmd/nerdctl/container"
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
-	imageCmd "github.com/containerd/nerdctl/v2/cmd/nerdctl/image"
 	"github.com/containerd/nerdctl/v2/leptonic/services/containerd"
 	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/container"

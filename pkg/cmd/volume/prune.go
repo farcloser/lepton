@@ -28,10 +28,10 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/labels"
 )
 
-func Prune(ctx context.Context, client *containerd.Client, options *options.VolumePrune) error {
+func Prune(ctx context.Context, client *containerd.Client, globalOptions *options.Global, opts *options.VolumePrune) error {
 	// Get the volume store and lock it until we are done.
 	// This will prevent racing new containers from being created or removed until we are done with the cleanup of volumes
-	volStore, err := Store(options.GOptions.Namespace, options.GOptions.DataRoot, options.GOptions.Address)
+	volStore, err := Store(globalOptions.Namespace, globalOptions.DataRoot, globalOptions.Address)
 	if err != nil {
 		return err
 	}
@@ -54,7 +54,7 @@ func Prune(ctx context.Context, client *containerd.Client, options *options.Volu
 			if _, ok := usedVolumesList[volume.Name]; ok {
 				continue
 			}
-			if !options.All {
+			if !opts.All {
 				if volume.Labels == nil {
 					continue
 				}
@@ -75,9 +75,9 @@ func Prune(ctx context.Context, client *containerd.Client, options *options.Volu
 	}
 
 	if len(toRemove) > 0 {
-		fmt.Fprintln(options.Stdout, "Deleted Volumes:")
-		fmt.Fprintln(options.Stdout, strings.Join(toRemove, "\n"))
-		fmt.Fprintln(options.Stdout, "")
+		fmt.Fprintln(opts.Stdout, "Deleted Volumes:")
+		fmt.Fprintln(opts.Stdout, strings.Join(toRemove, "\n"))
+		fmt.Fprintln(opts.Stdout, "")
 	}
 
 	return nil

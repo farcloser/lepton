@@ -42,13 +42,13 @@ import (
 	"github.com/containerd/nerdctl/v2/pkg/strutil"
 )
 
-func Info(ctx context.Context, client *containerd.Client, options *options.SystemInfo) error {
+func Info(ctx context.Context, client *containerd.Client, globalOptions *options.Global, opts *options.SystemInfo) error {
 	var (
 		tmpl *template.Template
 		err  error
 	)
-	if options.Format != "" {
-		tmpl, err = formatter.ParseTemplate(options.Format)
+	if opts.Format != "" {
+		tmpl, err = formatter.ParseTemplate(opts.Format)
 		if err != nil {
 			return err
 		}
@@ -58,21 +58,21 @@ func Info(ctx context.Context, client *containerd.Client, options *options.Syste
 		infoNative *native.Info
 		infoCompat *dockercompat.Info
 	)
-	switch options.Mode {
+	switch opts.Mode {
 	case "native":
 		di, err := infoutil.NativeDaemonInfo(ctx, client)
 		if err != nil {
 			return err
 		}
-		infoNative = fulfillNativeInfo(di, options.GOptions)
+		infoNative = fulfillNativeInfo(di, globalOptions)
 	case "dockercompat":
-		infoCompat, err = infoutil.Info(ctx, client, options.GOptions.Snapshotter, options.GOptions.CgroupManager)
+		infoCompat, err = infoutil.Info(ctx, client, globalOptions.Snapshotter, globalOptions.CgroupManager)
 		if err != nil {
 			return err
 		}
 		infoCompat.Plugins.Log = logging.Drivers()
 	default:
-		return fmt.Errorf("unknown mode %q", options.Mode)
+		return fmt.Errorf("unknown mode %q", opts.Mode)
 	}
 
 	if tmpl != nil {
@@ -80,7 +80,7 @@ func Info(ctx context.Context, client *containerd.Client, options *options.Syste
 		if infoCompat != nil {
 			x = infoCompat
 		}
-		w := options.Stdout
+		w := opts.Stdout
 		if err := tmpl.Execute(w, x); err != nil {
 			return err
 		}
@@ -88,11 +88,11 @@ func Info(ctx context.Context, client *containerd.Client, options *options.Syste
 		return err
 	}
 
-	switch options.Mode {
+	switch opts.Mode {
 	case "native":
-		return prettyPrintInfoNative(options.Stdout, infoNative)
+		return prettyPrintInfoNative(opts.Stdout, infoNative)
 	case "dockercompat":
-		return prettyPrintInfoDockerCompat(options.Stdout, options.Stderr, infoCompat, options.GOptions)
+		return prettyPrintInfoDockerCompat(opts.Stdout, opts.Stderr, infoCompat, globalOptions)
 	}
 	return nil
 }

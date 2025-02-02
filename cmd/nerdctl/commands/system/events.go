@@ -47,35 +47,40 @@ func EventsCommand() *cobra.Command {
 }
 
 func eventsOptions(cmd *cobra.Command, _ []string) (*options.SystemEvents, error) {
-	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
-	if err != nil {
-		return nil, err
-	}
 	format, err := cmd.Flags().GetString("format")
 	if err != nil {
 		return nil, err
 	}
+
 	filters, err := cmd.Flags().GetStringSlice("filter")
 	if err != nil {
 		return nil, err
 	}
+
 	return &options.SystemEvents{
-		Stdout:   cmd.OutOrStdout(),
-		GOptions: globalOptions,
-		Format:   format,
-		Filters:  filters,
+		Stdout:  cmd.OutOrStdout(),
+		Format:  format,
+		Filters: filters,
 	}, nil
 }
 
 func eventsAction(cmd *cobra.Command, args []string) error {
-	options, err := eventsOptions(cmd, args)
+	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return err
 	}
-	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+
+	opts, err := eventsOptions(cmd, args)
 	if err != nil {
 		return err
 	}
+
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
+	if err != nil {
+		return err
+	}
+
 	defer cancel()
-	return system.Events(ctx, cli, options)
+
+	return system.Events(ctx, cli, globalOptions, opts)
 }

@@ -22,10 +22,11 @@ import (
 	"fmt"
 	"testing"
 
+	"go.farcloser.world/tigron/test"
+
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest/registry"
-	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
 )
 
 func TestIssue3425(t *testing.T) {

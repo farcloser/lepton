@@ -43,11 +43,6 @@ func pruneCommand() *cobra.Command {
 }
 
 func pruneOptions(cmd *cobra.Command, _ []string) (*options.VolumePrune, error) {
-	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
-	if err != nil {
-		return nil, err
-	}
-
 	all, err := cmd.Flags().GetBool("all")
 	if err != nil {
 		return nil, err
@@ -58,26 +53,29 @@ func pruneOptions(cmd *cobra.Command, _ []string) (*options.VolumePrune, error) 
 		return nil, err
 	}
 
-	options := &options.VolumePrune{
-		GOptions: globalOptions,
-		All:      all,
-		Force:    force,
-		Stdout:   cmd.OutOrStdout(),
-	}
-	return options, nil
+	return &options.VolumePrune{
+		All:    all,
+		Force:  force,
+		Stdout: cmd.OutOrStdout(),
+	}, nil
 }
 
 func pruneAction(cmd *cobra.Command, args []string) error {
-	options, err := pruneOptions(cmd, args)
+	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return err
 	}
 
-	if !options.Force {
+	opts, err := pruneOptions(cmd, args)
+	if err != nil {
+		return err
+	}
+
+	if !opts.Force {
 		var confirm string
 		msg := "This will remove all local volumes not used by at least one container."
 		msg += "\nAre you sure you want to continue? [y/N] "
-		fmt.Fprintf(options.Stdout, "WARNING! %s", msg)
+		fmt.Fprintf(opts.Stdout, "WARNING! %s", msg)
 		fmt.Fscanf(cmd.InOrStdin(), "%s", &confirm)
 
 		if strings.ToLower(confirm) != "y" {
@@ -85,11 +83,11 @@ func pruneAction(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	return volume.Prune(ctx, cli, options)
+	return volume.Prune(ctx, cli, globalOptions, opts)
 }

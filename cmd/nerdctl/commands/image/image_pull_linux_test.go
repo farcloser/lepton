@@ -24,11 +24,11 @@ import (
 	"strings"
 	"testing"
 
+	"go.farcloser.world/tigron/test"
 	"gotest.tools/v3/assert"
 
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
-	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/testregistry"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/various"
 )
@@ -51,8 +51,7 @@ func TestImagePullWithCosign(t *testing.T) {
 		},
 		Setup: func(data test.Data, helpers test.Helpers) {
 			keyPair = various.NewCosignKeyPair(t, "cosign-key-pair", "1")
-			base := testutil.NewBase(t)
-			registry = testregistry.NewWithNoAuth(base, 0, false)
+			registry = testregistry.NewWithNoAuth(data, helpers, 0, false)
 			testImageRef := fmt.Sprintf("%s:%d/%s", "127.0.0.1", registry.Port, data.Identifier())
 			dockerfile := fmt.Sprintf(`FROM %s
 CMD ["echo", "build-test-string"]
@@ -116,8 +115,7 @@ func TestImagePullPlainHttpWithDefaultPort(t *testing.T) {
 			nerdtest.Build,
 		),
 		Setup: func(data test.Data, helpers test.Helpers) {
-			base := testutil.NewBase(t)
-			registry = testregistry.NewWithNoAuth(base, 80, false)
+			registry = testregistry.NewWithNoAuth(data, helpers, 80, false)
 			testImageRef := fmt.Sprintf("%s/%s:%s",
 				registry.IP.String(), data.Identifier(), strings.Split(testutil.CommonImage, ":")[1])
 			dockerfile := fmt.Sprintf(`FROM %s
@@ -166,8 +164,7 @@ func TestImagePullSoci(t *testing.T) {
 			{
 				Description: "Run without specifying SOCI index",
 				NoParallel:  true,
-				Data: test.
-					WithData("remoteSnapshotsExpectedCount", "11").
+				Data: test.WithData("remoteSnapshotsExpectedCount", "11").
 					Set("sociIndexDigest", ""),
 				Setup: func(data test.Data, helpers test.Helpers) {
 					cmd := helpers.Custom("mount")
@@ -200,8 +197,7 @@ func TestImagePullSoci(t *testing.T) {
 			{
 				Description: "Run with bad SOCI index",
 				NoParallel:  true,
-				Data: test.
-					WithData("remoteSnapshotsExpectedCount", "11").
+				Data: test.WithData("remoteSnapshotsExpectedCount", "11").
 					Set("sociIndexDigest", "sha256:thisisabadindex0000000000000000000000000000000000000000000000000"),
 				Setup: func(data test.Data, helpers test.Helpers) {
 					cmd := helpers.Custom("mount")

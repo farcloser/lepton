@@ -26,96 +26,105 @@ import (
 	"time"
 
 	syslog "github.com/yuchanns/srslog"
+	"go.farcloser.world/tigron/test"
 
 	"github.com/containerd/nerdctl/v2/pkg/rootlessutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
+	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/testca"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/testsyslog"
 )
 
 func runSyslogTest(t *testing.T, networks []string, syslogFacilities map[string]syslog.Priority, fmtValidFuncs map[string]func(string, string, string, string, syslog.Priority, bool) error) {
-	if runtime.GOOS == "windows" {
-		t.Skip("syslog container logging is not officially supported on Windows")
-	}
+	testCase := nerdtest.Setup()
 
-	base := testutil.NewBase(t)
-	base.Cmd("pull", testutil.CommonImage).AssertOK()
-	hostname, err := os.Hostname()
-	if err != nil {
-		t.Fatalf("Error retrieving hostname")
-	}
-	ca := testca.New(base.T)
-	cert := ca.NewCert("127.0.0.1")
-	t.Cleanup(func() {
-		cert.Close()
-		ca.Close()
-	})
-	rI := 0
-	for _, network := range networks {
-		for rFK, rFV := range syslogFacilities {
-			fPriV := rFV
-			// test both string and number facility
-			for _, fPriK := range []string{rFK, strconv.Itoa(int(fPriV) >> 3)} {
-				for fmtK, fmtValidFunc := range fmtValidFuncs {
-					fmtKT := "empty"
-					if fmtK != "" {
-						fmtKT = fmtK
-					}
-					subTestName := fmt.Sprintf("%s_%s_%s", strings.ReplaceAll(network, "+", "_"), fPriK, fmtKT)
-					i := rI
-					rI++
-					t.Run(subTestName, func(t *testing.T) {
-						tID := testutil.Identifier(t)
-						tag := tID + "_syslog_driver"
-						msg := "hello, " + tID + "_syslog_driver"
-						if !testsyslog.TestableNetwork(network) {
-							if rootlessutil.IsRootless() {
-								t.Skipf("skipping on %s/%s; '%s' for rootless containers are not supported", runtime.GOOS, runtime.GOARCH, network)
+	testCase.Setup = func(data test.Data, helpers test.Helpers) {
+
+		if runtime.GOOS == "windows" {
+			t.Skip("syslog container logging is not officially supported on Windows")
+		}
+
+		base := testutil.NewBase(t)
+		base.Cmd("pull", testutil.CommonImage).AssertOK()
+		hostname, err := os.Hostname()
+		if err != nil {
+			t.Fatalf("Error retrieving hostname")
+		}
+		ca := testca.New(data, helpers)
+		cert := ca.NewCert("127.0.0.1")
+		t.Cleanup(func() {
+			cert.Close()
+			ca.Close()
+		})
+		rI := 0
+		for _, network := range networks {
+			for rFK, rFV := range syslogFacilities {
+				fPriV := rFV
+				// test both string and number facility
+				for _, fPriK := range []string{rFK, strconv.Itoa(int(fPriV) >> 3)} {
+					for fmtK, fmtValidFunc := range fmtValidFuncs {
+						fmtKT := "empty"
+						if fmtK != "" {
+							fmtKT = fmtK
+						}
+						subTestName := fmt.Sprintf("%s_%s_%s", strings.ReplaceAll(network, "+", "_"), fPriK, fmtKT)
+						i := rI
+						rI++
+						t.Run(subTestName, func(t *testing.T) {
+							tID := testutil.Identifier(t)
+							tag := tID + "_syslog_driver"
+							msg := "hello, " + tID + "_syslog_driver"
+							if !testsyslog.TestableNetwork(network) {
+								if rootlessutil.IsRootless() {
+									t.Skipf("skipping on %s/%s; '%s' for rootless containers are not supported", runtime.GOOS, runtime.GOARCH, network)
+								}
+								t.Skipf("skipping on %s/%s; '%s' is not supported", runtime.GOOS, runtime.GOARCH, network)
 							}
-							t.Skipf("skipping on %s/%s; '%s' is not supported", runtime.GOOS, runtime.GOARCH, network)
-						}
-						testContainerName := fmt.Sprintf("%s-%d-%s", tID, i, fPriK)
-						done := make(chan string)
-						addr, closer := testsyslog.StartServer(network, "", done, cert)
-						args := []string{
-							"run",
-							"-d",
-							"--name",
-							testContainerName,
-							"--restart=no",
-							"--log-driver=syslog",
-							"--log-opt=syslog-facility=" + fPriK,
-							"--log-opt=tag=" + tag,
-							"--log-opt=syslog-format=" + fmtK,
-							"--log-opt=syslog-address=" + fmt.Sprintf("%s://%s", network, addr),
-						}
-						if network == "tcp+tls" {
-							args = append(args,
-								"--log-opt=syslog-tls-cert="+cert.CertPath,
-								"--log-opt=syslog-tls-key="+cert.KeyPath,
-								"--log-opt=syslog-tls-ca-cert="+ca.CertPath,
-							)
-						}
-						args = append(args, testutil.CommonImage, "echo", msg)
-						base.Cmd(args...).AssertOK()
-						t.Cleanup(func() {
-							base.Cmd("rm", "-f", testContainerName).AssertOK()
+							testContainerName := fmt.Sprintf("%s-%d-%s", tID, i, fPriK)
+							done := make(chan string)
+							addr, closer := testsyslog.StartServer(network, "", done, cert)
+							args := []string{
+								"run",
+								"-d",
+								"--name",
+								testContainerName,
+								"--restart=no",
+								"--log-driver=syslog",
+								"--log-opt=syslog-facility=" + fPriK,
+								"--log-opt=tag=" + tag,
+								"--log-opt=syslog-format=" + fmtK,
+								"--log-opt=syslog-address=" + fmt.Sprintf("%s://%s", network, addr),
+							}
+							if network == "tcp+tls" {
+								args = append(args,
+									"--log-opt=syslog-tls-cert="+cert.CertPath,
+									"--log-opt=syslog-tls-key="+cert.KeyPath,
+									"--log-opt=syslog-tls-ca-cert="+ca.CertPath,
+								)
+							}
+							args = append(args, testutil.CommonImage, "echo", msg)
+							base.Cmd(args...).AssertOK()
+							t.Cleanup(func() {
+								base.Cmd("rm", "-f", testContainerName).AssertOK()
+							})
+							defer closer.Close()
+							defer close(done)
+							select {
+							case rcvd := <-done:
+								if err := fmtValidFunc(rcvd, msg, tag, hostname, fPriV, network == "tcp+tls"); err != nil {
+									t.Error(err)
+								}
+							case <-time.Tick(time.Second * 3):
+								t.Errorf("timeout with %s", subTestName)
+							}
 						})
-						defer closer.Close()
-						defer close(done)
-						select {
-						case rcvd := <-done:
-							if err := fmtValidFunc(rcvd, msg, tag, hostname, fPriV, network == "tcp+tls"); err != nil {
-								t.Error(err)
-							}
-						case <-time.Tick(time.Second * 3):
-							t.Errorf("timeout with %s", subTestName)
-						}
-					})
+					}
 				}
 			}
 		}
 	}
+
+	testCase.Run(t)
 }
 
 func TestSyslogNetwork(t *testing.T) {

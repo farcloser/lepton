@@ -22,9 +22,6 @@ import (
 
 // NetworkCreate specifies options for `network create`.
 type NetworkCreate struct {
-	// GOptions is the global options
-	GOptions *Global
-
 	Name        string
 	Driver      string
 	Options     map[string]string
@@ -40,8 +37,6 @@ type NetworkCreate struct {
 // NetworkInspect specifies options for `network inspect`.
 type NetworkInspect struct {
 	Stdout io.Writer
-	// GOptions is the global options
-	GOptions *Global
 	// Inspect mode, "dockercompat" for Docker-compatible output, "native" for containerd-native output
 	Mode string
 	// Format the output using the given Go template, e.g, '{{json .}}'
@@ -53,8 +48,6 @@ type NetworkInspect struct {
 // NetworkList specifies options for `network ls`.
 type NetworkList struct {
 	Stdout io.Writer
-	// GOptions is the global options
-	GOptions *Global
 	// Quiet only show numeric IDs
 	Quiet bool
 	// Format the output using the given Go template, e.g, '{{json .}}', 'wide'
@@ -66,8 +59,6 @@ type NetworkList struct {
 // NetworkPrune specifies options for `network prune`.
 type NetworkPrune struct {
 	Stdout io.Writer
-	// GOptions is the global options
-	GOptions *Global
 	// Network drivers to keep while pruning
 	NetworkDriversToKeep []string
 }
@@ -75,8 +66,6 @@ type NetworkPrune struct {
 // NetworkRemove specifies options for `network rm`.
 type NetworkRemove struct {
 	Stdout io.Writer
-	// GOptions is the global options
-	GOptions *Global
 	// Networks are the networks to be removed
 	Networks []string
 }

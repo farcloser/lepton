@@ -23,11 +23,13 @@ import (
 	"testing"
 	"time"
 
+	"go.farcloser.world/tigron/test"
 	"gotest.tools/v3/assert"
 
 	"github.com/containerd/log"
 
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
+	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nettestutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/testregistry"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/various"
@@ -386,10 +388,13 @@ services:
 }
 
 func TestComposeRunWithVolume(t *testing.T) {
-	base := testutil.NewBase(t)
-	containerName := testutil.Identifier(t)
+	testCase := nerdtest.Setup()
 
-	dockerComposeYAML := fmt.Sprintf(`
+	testCase.Setup = func(data test.Data, helpers test.Helpers) {
+		base := testutil.NewBase(t)
+		containerName := testutil.Identifier(t)
+
+		dockerComposeYAML := fmt.Sprintf(`
 version: '3.1'
 services:
   alpine:
@@ -398,59 +403,65 @@ services:
     - stty # no meaning, just put any command
 `, testutil.AlpineImage)
 
-	comp := testutil.NewComposeDir(t, dockerComposeYAML)
-	defer comp.CleanUp()
-	projectName := comp.ProjectName()
-	t.Logf("projectName=%q", projectName)
-	defer base.ComposeCmd("-f", comp.YAMLFullPath(), "down", "-v").Run()
+		comp := testutil.NewComposeDir(t, dockerComposeYAML)
+		defer comp.CleanUp()
+		projectName := comp.ProjectName()
+		t.Logf("projectName=%q", projectName)
+		defer base.ComposeCmd("-f", comp.YAMLFullPath(), "down", "-v").Run()
 
-	// The directory is automatically removed by Cleanup
-	tmpDir := t.TempDir()
-	destinationDir := "/data"
-	volumeFlagStr := fmt.Sprintf("%s:%s", tmpDir, destinationDir)
+		// The directory is automatically removed by Cleanup
+		tmpDir := t.TempDir()
+		destinationDir := "/data"
+		volumeFlagStr := fmt.Sprintf("%s:%s", tmpDir, destinationDir)
 
-	defer base.Cmd("rm", "-f", "-v", containerName).Run()
-	// unbuffer(1) emulates tty, which is required by `run -t`.
-	// unbuffer(1) can be installed with `apt-get install expect`.
-	unbuffer := []string{"unbuffer"}
-	base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(),
-		"run", "--volume", volumeFlagStr, "--name", containerName, "alpine").AssertOK()
+		defer base.Cmd("rm", "-f", "-v", containerName).Run()
+		// unbuffer(1) emulates tty, which is required by `run -t`.
+		// unbuffer(1) can be installed with `apt-get install expect`.
+		unbuffer := []string{"unbuffer"}
+		base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(),
+			"run", "--volume", volumeFlagStr, "--name", containerName, "alpine").AssertOK()
 
-	container := base.InspectContainer(containerName)
-	errMsg := fmt.Sprintf("test failed, cannot find volume: %v", container.Mounts)
-	assert.Assert(t, container.Mounts != nil, errMsg)
-	assert.Assert(t, len(container.Mounts) == 1, errMsg)
-	assert.Assert(t, container.Mounts[0].Source == tmpDir, errMsg)
-	assert.Assert(t, container.Mounts[0].Destination == destinationDir, errMsg)
+		container := base.InspectContainer(containerName)
+		errMsg := fmt.Sprintf("test failed, cannot find volume: %v", container.Mounts)
+		assert.Assert(t, container.Mounts != nil, errMsg)
+		assert.Assert(t, len(container.Mounts) == 1, errMsg)
+		assert.Assert(t, container.Mounts[0].Source == tmpDir, errMsg)
+		assert.Assert(t, container.Mounts[0].Destination == destinationDir, errMsg)
+
+	}
+	testCase.Run(t)
 }
 
 func TestComposePushAndPullWithCosignVerify(t *testing.T) {
-	testutil.RequireExecutable(t, "cosign")
-	testutil.DockerIncompatible(t)
-	testutil.RequiresBuild(t)
-	testutil.RegisterBuildCacheCleanup(t)
-	t.Parallel()
+	testCase := nerdtest.Setup()
 
-	base := testutil.NewBase(t)
-	base.Env = append(base.Env, "COSIGN_PASSWORD=1")
+	testCase.Setup = func(data test.Data, helpers test.Helpers) {
+		testutil.RequireExecutable(t, "cosign")
+		testutil.DockerIncompatible(t)
+		testutil.RequiresBuild(t)
+		testutil.RegisterBuildCacheCleanup(t)
+		t.Parallel()
 
-	keyPair := various.NewCosignKeyPair(t, "cosign-key-pair", "1")
-	reg := testregistry.NewWithNoAuth(base, 0, false)
-	t.Cleanup(func() {
-		keyPair.Cleanup()
-		reg.Cleanup(nil)
-	})
+		base := testutil.NewBase(t)
+		base.Env = append(base.Env, "COSIGN_PASSWORD=1")
 
-	tID := testutil.Identifier(t)
-	testImageRefPrefix := fmt.Sprintf("127.0.0.1:%d/%s/", reg.Port, tID)
+		keyPair := various.NewCosignKeyPair(t, "cosign-key-pair", "1")
+		reg := testregistry.NewWithNoAuth(data, helpers, 0, false)
+		t.Cleanup(func() {
+			keyPair.Cleanup()
+			reg.Cleanup(nil)
+		})
 
-	var (
-		imageSvc0 = testImageRefPrefix + "composebuild_svc0"
-		imageSvc1 = testImageRefPrefix + "composebuild_svc1"
-		imageSvc2 = testImageRefPrefix + "composebuild_svc2"
-	)
+		tID := testutil.Identifier(t)
+		testImageRefPrefix := fmt.Sprintf("127.0.0.1:%d/%s/", reg.Port, tID)
 
-	dockerComposeYAML := fmt.Sprintf(`
+		var (
+			imageSvc0 = testImageRefPrefix + "composebuild_svc0"
+			imageSvc1 = testImageRefPrefix + "composebuild_svc1"
+			imageSvc2 = testImageRefPrefix + "composebuild_svc2"
+		)
+
+		dockerComposeYAML := fmt.Sprintf(`
 services:
   svc0:
     build: .
@@ -478,36 +489,39 @@ services:
     entrypoint:
       - stty
 `, imageSvc0, keyPair.PublicKey, keyPair.PrivateKey,
-		imageSvc1, keyPair.PrivateKey, imageSvc2)
+			imageSvc1, keyPair.PrivateKey, imageSvc2)
 
-	dockerfile := "FROM " + testutil.AlpineImage
+		dockerfile := "FROM " + testutil.AlpineImage
 
-	comp := testutil.NewComposeDir(t, dockerComposeYAML)
-	defer comp.CleanUp()
-	comp.WriteFile("Dockerfile", dockerfile)
+		comp := testutil.NewComposeDir(t, dockerComposeYAML)
+		defer comp.CleanUp()
+		comp.WriteFile("Dockerfile", dockerfile)
 
-	projectName := comp.ProjectName()
-	t.Logf("projectName=%q", projectName)
-	defer base.ComposeCmd("-f", comp.YAMLFullPath(), "down", "-v").Run()
+		projectName := comp.ProjectName()
+		t.Logf("projectName=%q", projectName)
+		defer base.ComposeCmd("-f", comp.YAMLFullPath(), "down", "-v").Run()
 
-	// 1. build both services/images
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "build").AssertOK()
-	// 2. compose push with cosign for svc0/svc1, (and none for svc2)
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "push").AssertOK()
-	// 3. compose pull with cosign
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "pull", "svc0").AssertOK()   // key match
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "pull", "svc1").AssertFail() // key mismatch
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "pull", "svc2").AssertOK()   // verify passed
-	// 4. compose run
-	const sttyPartialOutput = "speed 38400 baud"
-	// unbuffer(1) emulates tty, which is required by `run -t`.
-	// unbuffer(1) can be installed with `apt-get install expect`.
-	unbuffer := []string{"unbuffer"}
-	base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(), "run", "svc0").AssertOutContains(sttyPartialOutput) // key match
-	base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(), "run", "svc1").AssertFail()                         // key mismatch
-	base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(), "run", "svc2").AssertOutContains(sttyPartialOutput) // verify passed
-	// 5. compose up
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "up", "svc0").AssertOK()   // key match
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "up", "svc1").AssertFail() // key mismatch
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "up", "svc2").AssertOK()   // verify passed
+		// 1. build both services/images
+		base.ComposeCmd("-f", comp.YAMLFullPath(), "build").AssertOK()
+		// 2. compose push with cosign for svc0/svc1, (and none for svc2)
+		base.ComposeCmd("-f", comp.YAMLFullPath(), "push").AssertOK()
+		// 3. compose pull with cosign
+		base.ComposeCmd("-f", comp.YAMLFullPath(), "pull", "svc0").AssertOK()   // key match
+		base.ComposeCmd("-f", comp.YAMLFullPath(), "pull", "svc1").AssertFail() // key mismatch
+		base.ComposeCmd("-f", comp.YAMLFullPath(), "pull", "svc2").AssertOK()   // verify passed
+		// 4. compose run
+		const sttyPartialOutput = "speed 38400 baud"
+		// unbuffer(1) emulates tty, which is required by `run -t`.
+		// unbuffer(1) can be installed with `apt-get install expect`.
+		unbuffer := []string{"unbuffer"}
+		base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(), "run", "svc0").AssertOutContains(sttyPartialOutput) // key match
+		base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(), "run", "svc1").AssertFail()                         // key mismatch
+		base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(), "run", "svc2").AssertOutContains(sttyPartialOutput) // verify passed
+		// 5. compose up
+		base.ComposeCmd("-f", comp.YAMLFullPath(), "up", "svc0").AssertOK()   // key match
+		base.ComposeCmd("-f", comp.YAMLFullPath(), "up", "svc1").AssertFail() // key mismatch
+		base.ComposeCmd("-f", comp.YAMLFullPath(), "up", "svc2").AssertOK()   // verify passed
+
+	}
+	testCase.Run(t)
 }

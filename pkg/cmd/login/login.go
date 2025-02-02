@@ -41,8 +41,8 @@ Configure a credential helper to remove this warning. See
 https://docs.docker.com/engine/reference/commandline/login/#credentials-store
 `
 
-func Login(ctx context.Context, options *options.LoginCommand, stdout io.Writer) error {
-	registryURL, err := dockerconfigresolver.Parse(options.ServerAddress)
+func Login(ctx context.Context, stdout io.Writer, globalOptions *options.Global, opts *options.LoginCommand) error {
+	registryURL, err := dockerconfigresolver.Parse(opts.ServerAddress)
 	if err != nil {
 		return err
 	}
@@ -54,20 +54,20 @@ func Login(ctx context.Context, options *options.LoginCommand, stdout io.Writer)
 
 	var responseIdentityToken string
 
-	credentials, err := credStore.Retrieve(registryURL, options.Username == "" && options.Password == "")
+	credentials, err := credStore.Retrieve(registryURL, opts.Username == "" && opts.Password == "")
 	credentials.IdentityToken = ""
 
 	if err == nil && credentials.Username != "" && credentials.Password != "" {
-		responseIdentityToken, err = loginClientSide(ctx, options.GOptions, registryURL, credentials)
+		responseIdentityToken, err = loginClientSide(ctx, globalOptions, registryURL, credentials)
 	}
 
 	if err != nil || credentials.Username == "" || credentials.Password == "" {
-		err = promptUserForAuthentication(credentials, options.Username, options.Password, stdout)
+		err = promptUserForAuthentication(credentials, opts.Username, opts.Password, stdout)
 		if err != nil {
 			return err
 		}
 
-		responseIdentityToken, err = loginClientSide(ctx, options.GOptions, registryURL, credentials)
+		responseIdentityToken, err = loginClientSide(ctx, globalOptions, registryURL, credentials)
 		if err != nil {
 			return err
 		}

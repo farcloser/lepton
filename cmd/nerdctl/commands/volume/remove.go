@@ -43,34 +43,35 @@ func removeCommand() *cobra.Command {
 }
 
 func removeOptions(cmd *cobra.Command, _ []string) (*options.VolumeRemove, error) {
-	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
-	if err != nil {
-		return nil, err
-	}
 	force, err := cmd.Flags().GetBool("force")
 	if err != nil {
 		return nil, err
 	}
+
 	return &options.VolumeRemove{
-		GOptions: globalOptions,
-		Force:    force,
-		Stdout:   cmd.OutOrStdout(),
+		Force:  force,
+		Stdout: cmd.OutOrStdout(),
 	}, nil
 }
 
 func removeAction(cmd *cobra.Command, args []string) error {
-	options, err := removeOptions(cmd, args)
+	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return err
 	}
 
-	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	opts, err := removeOptions(cmd, args)
+	if err != nil {
+		return err
+	}
+
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	return volume.Remove(ctx, cli, args, options)
+	return volume.Remove(ctx, cli, args, globalOptions, opts)
 }
 
 func volumeRmShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {

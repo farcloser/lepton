@@ -23,6 +23,7 @@ import (
 	"path/filepath"
 	"strconv"
 
+	"go.farcloser.world/tigron/test"
 	"golang.org/x/crypto/bcrypt"
 	"gotest.tools/v3/assert"
 
@@ -54,8 +55,9 @@ type TokenAuthServer struct {
 	CertPath string
 }
 
-func EnsureImages(base *testutil.Base) {
+func ensureImages(_ test.Data, helpers test.Helpers) {
 	registryImage := platform.RegistryImageStable
+
 	up := os.Getenv("DISTRIBUTION_VERSION")
 	if up != "" {
 		if up[0:1] != "v" {
@@ -63,24 +65,24 @@ func EnsureImages(base *testutil.Base) {
 		}
 		registryImage = platform.RegistryImageNext + up
 	}
-	base.Cmd("pull", "--quiet", registryImage).AssertOK()
-	base.Cmd("pull", "--quiet", platform.DockerAuthImage).AssertOK()
+
+	helpers.Ensure("pull", "--quiet", registryImage)
+	helpers.Ensure("pull", "--quiet", platform.DockerAuthImage)
 }
 
-func NewAuthServer(base *testutil.Base, ca *testca.CA, port int, user, pass string, tls bool) *TokenAuthServer {
-	EnsureImages(base)
-
-	name := testutil.Identifier(base.T)
+func NewAuthServer(data test.Data, helpers test.Helpers, ca *testca.CA, port int, user, pass string, tls bool) *TokenAuthServer {
+	ensureImages(data, helpers)
+	name := data.Identifier()
 	// listen on 0.0.0.0 to enable 127.0.0.1
 	listenIP := net.ParseIP("0.0.0.0")
 	hostIP, err := nettestutil.NonLoopbackIPv4()
-	assert.NilError(base.T, err, fmt.Errorf("failed finding ipv4 non loopback interface: %w", err))
+	assert.NilError(helpers.T(), err, fmt.Errorf("failed finding ipv4 non loopback interface: %w", err))
 	// Prepare configuration file for authentication server
 	// Details: https://github.com/cesanta/docker_auth/blob/1.7.1/examples/simple.yml
 	configFile, err := os.CreateTemp("", "authconfig")
-	assert.NilError(base.T, err, fmt.Errorf("failed creating temporary directory for config file: %w", err))
+	assert.NilError(helpers.T(), err, fmt.Errorf("failed creating temporary directory for config file: %w", err))
 	bpass, err := bcrypt.GenerateFromPassword([]byte(pass), bcrypt.DefaultCost)
-	assert.NilError(base.T, err, fmt.Errorf("failed bcrypt encrypting password: %w", err))
+	assert.NilError(helpers.T(), err, fmt.Errorf("failed bcrypt encrypting password: %w", err))
 	configFileName := configFile.Name()
 	scheme := "http"
 	configContent := fmt.Sprintf(`
@@ -117,34 +119,34 @@ acl:
 `, user, string(bpass), user)
 	}
 	_, err = configFile.WriteString(configContent)
-	assert.NilError(base.T, err, fmt.Errorf("failed writing configuration: %w", err))
+	assert.NilError(helpers.T(), err, fmt.Errorf("failed writing configuration: %w", err))
 
 	cert := ca.NewCert(hostIP.String())
 
 	port, err = portlock.Acquire(port)
-	assert.NilError(base.T, err, fmt.Errorf("failed acquiring port: %w", err))
+	assert.NilError(helpers.T(), err, fmt.Errorf("failed acquiring port: %w", err))
 	containerName := fmt.Sprintf("auth-%s-%d", name, port)
 	// Cleanup possible leftovers first
-	base.Cmd("rm", "-f", containerName).Run()
+	helpers.Anyhow("rm", "-f", containerName)
 
 	cleanup := func(err error) {
-		result := base.Cmd("rm", "-f", containerName).Run()
+		helpers.Anyhow("rm", "-f", containerName)
 		errPortRelease := portlock.Release(port)
 		errCertClose := cert.Close()
 		errConfigClose := configFile.Close()
 		errConfigRemove := os.Remove(configFileName)
 		if err == nil {
-			assert.NilError(base.T, result.Error, fmt.Errorf("failed stopping container: %w", err))
-			assert.NilError(base.T, errPortRelease, fmt.Errorf("failed releasing port: %w", err))
-			assert.NilError(base.T, errCertClose, fmt.Errorf("failed cleaning certs: %w", err))
-			assert.NilError(base.T, errConfigClose, fmt.Errorf("failed closing config file: %w", err))
-			assert.NilError(base.T, errConfigRemove, fmt.Errorf("failed removing config file: %w", err))
+			// assert.NilError(helpers.T(), result.Error, fmt.Errorf("failed stopping container: %w", err))
+			assert.NilError(helpers.T(), errPortRelease, fmt.Errorf("failed releasing port: %w", err))
+			assert.NilError(helpers.T(), errCertClose, fmt.Errorf("failed cleaning certs: %w", err))
+			assert.NilError(helpers.T(), errConfigClose, fmt.Errorf("failed closing config file: %w", err))
+			assert.NilError(helpers.T(), errConfigRemove, fmt.Errorf("failed removing config file: %w", err))
 		}
 	}
 
 	err = func() error {
 		// Run authentication server
-		cmd := base.Cmd(
+		helpers.Ensure(
 			"run",
 			"--pull=never",
 			"-d",
@@ -154,21 +156,18 @@ acl:
 			"-v", cert.KeyPath+":/auth/domain.key",
 			"-v", configFileName+":/config/auth_config.yml",
 			testutil.DockerAuthImage,
-			"/config/auth_config.yml").Run()
-		if cmd.Error != nil {
-			base.T.Logf("%s:\n%s\n%s\n-------\n%s", containerName, cmd.Cmd, cmd.Stdout(), cmd.Stderr())
-			return cmd.Error
-		}
+			"/config/auth_config.yml")
+
 		joined := net.JoinHostPort(hostIP.String(), strconv.Itoa(port))
 		_, err = nettestutil.HTTPGet(fmt.Sprintf("%s://%s/auth", scheme, joined), 30, true)
 		return err
 	}()
 	if err != nil {
-		cl := base.Cmd("logs", containerName).Run()
-		base.T.Logf("%s:\n%s\n%s\n=========================\n%s", containerName, cl.Cmd, cl.Stdout(), cl.Stderr())
+		cl := helpers.Capture("logs", containerName)
+		helpers.T().Logf("%s:\n%s\n", containerName, cl)
 		cleanup(err)
 	}
-	assert.NilError(base.T, err, fmt.Errorf("failed starting auth container in a timely manner: %w", err))
+	assert.NilError(helpers.T(), err, fmt.Errorf("failed starting auth container in a timely manner: %w", err))
 
 	return &TokenAuthServer{
 		IP:       hostIP,
@@ -182,20 +181,20 @@ acl:
 		},
 		Cleanup: cleanup,
 		Logs: func() {
-			base.T.Logf("%s: %q", containerName, base.Cmd("logs", containerName).Run().String())
+			helpers.T().Logf("%s: %q", containerName, helpers.Capture("logs", containerName))
 		},
 	}
 }
 
 // Auth is an interface to pass to the test registry for configuring authentication
 type Auth interface {
-	Params(base *testutil.Base) []string
+	Params(data test.Data, helpers test.Helpers) []string
 }
 
 type NoAuth struct {
 }
 
-func (na *NoAuth) Params(base *testutil.Base) []string {
+func (na *NoAuth) Params(data test.Data, helpers test.Helpers) []string {
 	return []string{}
 }
 
@@ -204,7 +203,7 @@ type TokenAuth struct {
 	CertPath string
 }
 
-func (ta *TokenAuth) Params(base *testutil.Base) []string {
+func (ta *TokenAuth) Params(data test.Data, helpers test.Helpers) []string {
 	return []string{
 		"--env", "REGISTRY_AUTH=token",
 		"--env", "REGISTRY_AUTH_TOKEN_REALM=" + ta.Address + "/auth",
@@ -222,14 +221,14 @@ type BasicAuth struct {
 	Password string
 }
 
-func (ba *BasicAuth) Params(base *testutil.Base) []string {
+func (ba *BasicAuth) Params(data test.Data, helpers test.Helpers) []string {
 	if ba.Realm == "" {
 		ba.Realm = "Basic Realm"
 	}
 	if ba.HtFile == "" && ba.Username != "" && ba.Password != "" {
 		pass := ba.Password
 		encryptedPass, _ := bcrypt.GenerateFromPassword([]byte(pass), bcrypt.DefaultCost)
-		tmpDir, _ := os.MkdirTemp(base.T.TempDir(), "htpasswd")
+		tmpDir, _ := os.MkdirTemp(helpers.T().TempDir(), "htpasswd")
 		ba.HtFile = filepath.Join(tmpDir, "htpasswd")
 		_ = os.WriteFile(ba.HtFile, []byte(fmt.Sprintf(`%s:%s`, ba.Username, string(encryptedPass))), 0o600)
 	}
@@ -244,20 +243,20 @@ func (ba *BasicAuth) Params(base *testutil.Base) []string {
 	return ret
 }
 
-func NewRegistry(base *testutil.Base, ca *testca.CA, port int, auth Auth, boundCleanup func(error)) *RegistryServer {
-	EnsureImages(base)
+func NewRegistry(data test.Data, helpers test.Helpers, ca *testca.CA, port int, auth Auth, boundCleanup func(error)) *RegistryServer {
+	ensureImages(data, helpers)
 
-	name := testutil.Identifier(base.T)
+	name := data.Identifier()
 	// listen on 0.0.0.0 to enable 127.0.0.1
 	listenIP := net.ParseIP("0.0.0.0")
 	hostIP, err := nettestutil.NonLoopbackIPv4()
-	assert.NilError(base.T, err, fmt.Errorf("failed finding ipv4 non loopback interface: %w", err))
+	assert.NilError(helpers.T(), err, fmt.Errorf("failed finding ipv4 non loopback interface: %w", err))
 	port, err = portlock.Acquire(port)
-	assert.NilError(base.T, err, fmt.Errorf("failed acquiring port: %w", err))
+	assert.NilError(helpers.T(), err, fmt.Errorf("failed acquiring port: %w", err))
 
 	containerName := fmt.Sprintf("registry-%s-%d", name, port)
 	// Cleanup possible leftovers first
-	base.Cmd("rm", "-f", containerName).Run()
+	helpers.Anyhow("rm", "-f", containerName)
 
 	args := []string{
 		"run",
@@ -279,7 +278,7 @@ func NewRegistry(base *testutil.Base, ca *testca.CA, port int, auth Auth, boundC
 		)
 	}
 
-	args = append(args, auth.Params(base)...)
+	args = append(args, auth.Params(data, helpers)...)
 	registryImage := testutil.RegistryImageStable
 
 	up := os.Getenv("DISTRIBUTION_VERSION")
@@ -292,7 +291,7 @@ func NewRegistry(base *testutil.Base, ca *testca.CA, port int, auth Auth, boundC
 	args = append(args, registryImage)
 
 	cleanup := func(err error) {
-		result := base.Cmd("rm", "-f", containerName).Run()
+		helpers.Anyhow("rm", "-f", containerName)
 		errPortRelease := portlock.Release(port)
 		var errCertClose error
 		if cert != nil {
@@ -302,16 +301,15 @@ func NewRegistry(base *testutil.Base, ca *testca.CA, port int, auth Auth, boundC
 			boundCleanup(err)
 		}
 		if cert != nil && err == nil {
-			assert.NilError(base.T, errCertClose, fmt.Errorf("failed cleaning certificates: %w", err))
+			assert.NilError(helpers.T(), errCertClose, fmt.Errorf("failed cleaning certificates: %w", err))
 		}
 		if err == nil {
-			assert.NilError(base.T, result.Error, fmt.Errorf("failed removing container: %w", err))
-			assert.NilError(base.T, errPortRelease, fmt.Errorf("failed releasing port: %w", err))
+			assert.NilError(helpers.T(), errPortRelease, fmt.Errorf("failed releasing port: %w", err))
 		}
 	}
 
 	hostsDir, err := func() (string, error) {
-		hDir, err := os.MkdirTemp(base.T.TempDir(), "certs.d")
+		hDir, err := os.MkdirTemp(helpers.T().TempDir(), "certs.d")
 		if err != nil {
 			return "", err
 		}
@@ -345,11 +343,7 @@ func NewRegistry(base *testutil.Base, ca *testca.CA, port int, auth Auth, boundC
 			}
 		}
 
-		cmd := base.Cmd(args...).Run()
-		if cmd.Error != nil {
-			base.T.Logf("%s:\n%s\n%s\n-------\n%s", containerName, cmd.Cmd, cmd.Stdout(), cmd.Stderr())
-			return "", cmd.Error
-		}
+		helpers.Ensure(args...)
 
 		if _, err = nettestutil.HTTPGet(fmt.Sprintf("%s://%s:%s/v2", scheme, hostIP.String(), strconv.Itoa(port)), 30, true); err != nil {
 			return "", err
@@ -358,12 +352,13 @@ func NewRegistry(base *testutil.Base, ca *testca.CA, port int, auth Auth, boundC
 		return hDir, nil
 	}()
 	if err != nil {
-		cl := base.Cmd("logs", containerName).Run()
-		base.T.Logf("%s:\n%s\n%s\n=========================\n%s", containerName, cl.Cmd, cl.Stdout(), cl.Stderr())
+		cl := helpers.Capture("logs", containerName)
+		helpers.T().Logf("%s:\n%s\n", containerName, cl)
 		cleanup(err)
 	}
-	assert.NilError(base.T, err, fmt.Errorf("failed starting registry container in a timely manner: %w", err))
+	assert.NilError(helpers.T(), err, fmt.Errorf("failed starting registry container in a timely manner: %w", err))
 
+	output := helpers.Capture("logs", containerName)
 	return &RegistryServer{
 		IP:       hostIP,
 		Port:     port,
@@ -371,26 +366,26 @@ func NewRegistry(base *testutil.Base, ca *testca.CA, port int, auth Auth, boundC
 		ListenIP: listenIP,
 		Cleanup:  cleanup,
 		Logs: func() {
-			base.T.Logf("%s: %q", containerName, base.Cmd("logs", containerName).Run().String())
+			helpers.T().Logf("%s: %q", containerName, output)
 		},
 		HostsDir: hostsDir,
 	}
 }
 
-func NewWithTokenAuth(base *testutil.Base, user, pass string, port int, tls bool) *RegistryServer {
-	ca := testca.New(base.T)
-	as := NewAuthServer(base, ca, 0, user, pass, tls)
+func NewWithTokenAuth(data test.Data, helpers test.Helpers, user, pass string, port int, tls bool) *RegistryServer {
+	ca := testca.New(data, helpers)
+	as := NewAuthServer(data, helpers, ca, 0, user, pass, tls)
 	auth := &TokenAuth{
 		Address:  as.Scheme + "://" + net.JoinHostPort(as.IP.String(), strconv.Itoa(as.Port)),
 		CertPath: as.CertPath,
 	}
-	return NewRegistry(base, ca, port, auth, as.Cleanup)
+	return NewRegistry(data, helpers, ca, port, auth, as.Cleanup)
 }
 
-func NewWithNoAuth(base *testutil.Base, port int, tls bool) *RegistryServer {
+func NewWithNoAuth(data test.Data, helpers test.Helpers, port int, tls bool) *RegistryServer {
 	var ca *testca.CA
 	if tls {
-		ca = testca.New(base.T)
+		ca = testca.New(data, helpers)
 	}
-	return NewRegistry(base, ca, port, &NoAuth{}, nil)
+	return NewRegistry(data, helpers, ca, port, &NoAuth{}, nil)
 }

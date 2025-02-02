@@ -22,9 +22,11 @@ import (
 	"strings"
 	"testing"
 
+	"go.farcloser.world/tigron/test"
 	"gotest.tools/v3/assert"
 
 	"github.com/containerd/nerdctl/v2/pkg/testutil"
+	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/nettestutil"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/testregistry"
 	"github.com/containerd/nerdctl/v2/pkg/testutil/various"
@@ -53,70 +55,108 @@ func TestMultiPlatformRun(t *testing.T) {
 }
 
 func TestMultiPlatformBuildPush(t *testing.T) {
-	testutil.DockerIncompatible(t) // non-buildx version of `docker build` lacks multi-platform. Also, `docker push` lacks --platform.
-	testutil.RequiresBuild(t)
-	testutil.RegisterBuildCacheCleanup(t)
-	testutil.RequireExecPlatform(t, "linux/amd64", "linux/arm64", "linux/arm/v7")
-	base := testutil.NewBase(t)
-	tID := testutil.Identifier(t)
-	reg := testregistry.NewWithNoAuth(base, 0, false)
-	defer reg.Cleanup(nil)
+	testCase := nerdtest.Setup()
 
-	imageName := fmt.Sprintf("localhost:%d/%s:latest", reg.Port, tID)
-	defer base.Cmd("rmi", imageName).Run()
+	// non-buildx version of `docker build` lacks multi-platform. Also, `docker push` lacks --platform.
+	testCase.Require = test.Require(
+		test.Not(nerdtest.Docker),
+		nerdtest.Build,
+		nerdtest.IsFlaky("mixed tests using both legacy and non-legacy are considered flaky"),
+	)
 
-	dockerfile := fmt.Sprintf(`FROM %s
+	var reg *testregistry.RegistryServer
+
+	testCase.Setup = func(data test.Data, helpers test.Helpers) {
+		testutil.RequireExecPlatform(t, "linux/amd64", "linux/arm64", "linux/arm/v7")
+		base := testutil.NewBase(t)
+		tID := data.Identifier()
+		reg = testregistry.NewWithNoAuth(data, helpers, 0, false)
+
+		data.Set("imageName", fmt.Sprintf("localhost:%d/%s:latest", reg.Port, tID))
+
+		dockerfile := fmt.Sprintf(`FROM %s
 RUN echo dummy
 	`, testutil.AlpineImage)
 
-	buildCtx := various.CreateBuildContext(t, dockerfile)
+		buildCtx := various.CreateBuildContext(t, dockerfile)
 
-	base.Cmd("build", "-t", imageName, "--platform=amd64,arm64,linux/arm/v7", buildCtx).AssertOK()
-	testMultiPlatformRun(base, imageName)
-	base.Cmd("push", "--platform=amd64,arm64,linux/arm/v7", imageName).AssertOK()
+		base.Cmd("build", "-t", data.Get("imageName"), "--platform=amd64,arm64,linux/arm/v7", buildCtx).AssertOK()
+		testMultiPlatformRun(base, data.Get("imageName"))
+		base.Cmd("push", "--platform=amd64,arm64,linux/arm/v7", data.Get("imageName")).AssertOK()
+	}
+
+	testCase.Cleanup = func(data test.Data, helpers test.Helpers) {
+		helpers.Anyhow("rmi", data.Get("imageName"))
+		if reg != nil {
+			reg.Cleanup(nil)
+		}
+	}
+
+	testCase.Run(t)
 }
 
 // TestMultiPlatformBuildPushNoRun tests if the push succeeds in a situation where nerdctl builds
 // a Dockerfile without RUN, COPY, etc. commands. In such situation, BuildKit doesn't download the base image
 // so nerdctl needs to ensure these blobs to be locally available.
 func TestMultiPlatformBuildPushNoRun(t *testing.T) {
-	testutil.DockerIncompatible(t) // non-buildx version of `docker build` lacks multi-platform. Also, `docker push` lacks --platform.
-	testutil.RequiresBuild(t)
-	testutil.RegisterBuildCacheCleanup(t)
-	testutil.RequireExecPlatform(t, "linux/amd64", "linux/arm64", "linux/arm/v7")
-	base := testutil.NewBase(t)
-	tID := testutil.Identifier(t)
-	reg := testregistry.NewWithNoAuth(base, 0, false)
-	defer reg.Cleanup(nil)
+	testCase := nerdtest.Setup()
 
-	imageName := fmt.Sprintf("localhost:%d/%s:latest", reg.Port, tID)
-	defer base.Cmd("rmi", imageName).Run()
+	// non-buildx version of `docker build` lacks multi-platform. Also, `docker push` lacks --platform.
+	testCase.Require = test.Require(
+		test.Not(nerdtest.Docker),
+		nerdtest.Build,
+		nerdtest.IsFlaky("mixed tests using both legacy and non-legacy are considered flaky"),
+	)
 
-	dockerfile := fmt.Sprintf(`FROM %s
+	testCase.Setup = func(data test.Data, helpers test.Helpers) {
+		testutil.RequireExecPlatform(t, "linux/amd64", "linux/arm64", "linux/arm/v7")
+		base := testutil.NewBase(t)
+		tID := data.Identifier()
+		reg := testregistry.NewWithNoAuth(data, helpers, 0, false)
+		defer reg.Cleanup(nil)
+
+		imageName := fmt.Sprintf("localhost:%d/%s:latest", reg.Port, tID)
+		defer base.Cmd("rmi", imageName).Run()
+
+		dockerfile := fmt.Sprintf(`FROM %s
 CMD echo dummy
 	`, testutil.AlpineImage)
 
-	buildCtx := various.CreateBuildContext(t, dockerfile)
+		buildCtx := various.CreateBuildContext(t, dockerfile)
 
-	base.Cmd("build", "-t", imageName, "--platform=amd64,arm64,linux/arm/v7", buildCtx).AssertOK()
-	testMultiPlatformRun(base, imageName)
-	base.Cmd("push", "--platform=amd64,arm64,linux/arm/v7", imageName).AssertOK()
+		base.Cmd("build", "-t", imageName, "--platform=amd64,arm64,linux/arm/v7", buildCtx).AssertOK()
+		testMultiPlatformRun(base, imageName)
+		base.Cmd("push", "--platform=amd64,arm64,linux/arm/v7", imageName).AssertOK()
+	}
+
+	testCase.Run(t)
 }
 
 func TestMultiPlatformPullPushAllPlatforms(t *testing.T) {
-	testutil.DockerIncompatible(t)
-	base := testutil.NewBase(t)
-	tID := testutil.Identifier(t)
-	reg := testregistry.NewWithNoAuth(base, 0, false)
-	defer reg.Cleanup(nil)
+	testCase := nerdtest.Setup()
 
-	pushImageName := fmt.Sprintf("localhost:%d/%s:latest", reg.Port, tID)
-	defer base.Cmd("rmi", pushImageName).Run()
+	// non-buildx version of `docker build` lacks multi-platform. Also, `docker push` lacks --platform.
+	testCase.Require = test.Require(
+		test.Not(nerdtest.Docker),
+		nerdtest.IsFlaky("mixed tests using both legacy and non-legacy are considered flaky"),
+	)
 
-	base.Cmd("pull", "--all-platforms", testutil.AlpineImage).AssertOK()
-	base.Cmd("tag", testutil.AlpineImage, pushImageName).AssertOK()
-	base.Cmd("push", "--all-platforms", pushImageName).AssertOK()
-	testMultiPlatformRun(base, pushImageName)
+	testCase.Setup = func(data test.Data, helpers test.Helpers) {
+		base := testutil.NewBase(t)
+		tID := data.Identifier()
+		reg := testregistry.NewWithNoAuth(data, helpers, 0, false)
+		defer reg.Cleanup(nil)
+
+		pushImageName := fmt.Sprintf("localhost:%d/%s:latest", reg.Port, tID)
+		defer base.Cmd("rmi", pushImageName).Run()
+
+		base.Cmd("pull", "--all-platforms", testutil.AlpineImage).AssertOK()
+		base.Cmd("tag", testutil.AlpineImage, pushImageName).AssertOK()
+		base.Cmd("push", "--all-platforms", pushImageName).AssertOK()
+		testMultiPlatformRun(base, pushImageName)
+	}
+
+	testCase.Run(t)
 }
 
 func TestMultiPlatformComposeUpBuild(t *testing.T) {

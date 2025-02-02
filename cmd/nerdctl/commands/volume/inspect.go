@@ -27,7 +27,7 @@ import (
 )
 
 func inspectCommand() *cobra.Command {
-	volumeInspectCommand := &cobra.Command{
+	cmd := &cobra.Command{
 		Use:               "inspect [flags] VOLUME [VOLUME...]",
 		Short:             "Display detailed information on one or more volumes",
 		Args:              cobra.MinimumNArgs(1),
@@ -36,41 +36,47 @@ func inspectCommand() *cobra.Command {
 		SilenceUsage:      true,
 		SilenceErrors:     true,
 	}
-	volumeInspectCommand.Flags().StringP("format", "f", "", "Format the output using the given Go template, e.g, '{{json .}}'")
-	volumeInspectCommand.Flags().BoolP("size", "s", false, "Display the disk usage of the volume")
-	volumeInspectCommand.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+
+	cmd.Flags().StringP("format", "f", "", "Format the output using the given Go template, e.g, '{{json .}}'")
+	cmd.Flags().BoolP("size", "s", false, "Display the disk usage of the volume")
+
+	_ = cmd.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return []string{formatter.FormatJSON}, cobra.ShellCompDirectiveNoFileComp
 	})
-	return volumeInspectCommand
+
+	return cmd
 }
 
 func inspectOptions(cmd *cobra.Command, _ []string) (*options.VolumeInspect, error) {
-	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
-	if err != nil {
-		return nil, err
-	}
 	volumeSize, err := cmd.Flags().GetBool("size")
 	if err != nil {
 		return nil, err
 	}
+
 	format, err := cmd.Flags().GetString("format")
 	if err != nil {
 		return nil, err
 	}
+
 	return &options.VolumeInspect{
-		GOptions: globalOptions,
-		Format:   format,
-		Size:     volumeSize,
-		Stdout:   cmd.OutOrStdout(),
+		Format: format,
+		Size:   volumeSize,
+		Stdout: cmd.OutOrStdout(),
 	}, nil
 }
 
 func inspectAction(cmd *cobra.Command, args []string) error {
-	options, err := inspectOptions(cmd, args)
+	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return err
 	}
-	return volume.Inspect(cmd.Context(), args, options)
+
+	opts, err := inspectOptions(cmd, args)
+	if err != nil {
+		return err
+	}
+
+	return volume.Inspect(cmd.Context(), args, globalOptions, opts)
 }
 
 func volumeInspectShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {

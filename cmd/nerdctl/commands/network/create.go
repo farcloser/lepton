@@ -28,7 +28,7 @@ import (
 )
 
 func createCommand() *cobra.Command {
-	var networkCreateCommand = &cobra.Command{
+	var cmd = &cobra.Command{
 		Use:           "create [flags] NETWORK",
 		Short:         "Create a network",
 		Long:          `NOTE: To isolate CNI bridge, CNI plugin "firewall" (>= v1.1.0) is needed.`,
@@ -37,18 +37,21 @@ func createCommand() *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
-	networkCreateCommand.Flags().StringP("driver", "d", DefaultNetworkDriver, "Driver to manage the Network")
-	networkCreateCommand.RegisterFlagCompletionFunc("driver", completion.NetworkDrivers)
-	networkCreateCommand.Flags().StringArrayP("opt", "o", nil, "Set driver specific options")
-	networkCreateCommand.Flags().String("ipam-driver", "default", "IP Address helpers.Management Driver")
-	networkCreateCommand.RegisterFlagCompletionFunc("ipam-driver", completion.IPAMDrivers)
-	networkCreateCommand.Flags().StringArray("ipam-opt", nil, "Set IPAM driver specific options")
-	networkCreateCommand.Flags().StringArray("subnet", nil, `Subnet in CIDR format that represents a network segment, e.g. "10.5.0.0/16"`)
-	networkCreateCommand.Flags().String("gateway", "", `Gateway for the master subnet`)
-	networkCreateCommand.Flags().String("ip-range", "", `Allocate container ip from a sub-range`)
-	networkCreateCommand.Flags().StringArray("label", nil, "Set metadata for a network")
-	networkCreateCommand.Flags().Bool("ipv6", false, "Enable IPv6 networking")
-	return networkCreateCommand
+
+	cmd.Flags().StringP("driver", "d", DefaultNetworkDriver, "Driver to manage the Network")
+	cmd.Flags().StringArrayP("opt", "o", nil, "Set driver specific options")
+	cmd.Flags().String("ipam-driver", "default", "IP Address helpers.Management Driver")
+	cmd.Flags().StringArray("ipam-opt", nil, "Set IPAM driver specific options")
+	cmd.Flags().StringArray("subnet", nil, `Subnet in CIDR format that represents a network segment, e.g. "10.5.0.0/16"`)
+	cmd.Flags().String("gateway", "", `Gateway for the master subnet`)
+	cmd.Flags().String("ip-range", "", `Allocate container ip from a sub-range`)
+	cmd.Flags().StringArray("label", nil, "Set metadata for a network")
+	cmd.Flags().Bool("ipv6", false, "Enable IPv6 networking")
+
+	_ = cmd.RegisterFlagCompletionFunc("driver", completion.NetworkDrivers)
+	_ = cmd.RegisterFlagCompletionFunc("ipam-driver", completion.IPAMDrivers)
+
+	return cmd
 }
 
 func createAction(cmd *cobra.Command, args []string) error {
@@ -56,47 +59,56 @@ func createAction(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+
 	name := args[0]
 	driver, err := cmd.Flags().GetString("driver")
 	if err != nil {
 		return err
 	}
+
 	opts, err := cmd.Flags().GetStringArray("opt")
 	if err != nil {
 		return err
 	}
+
 	ipamDriver, err := cmd.Flags().GetString("ipam-driver")
 	if err != nil {
 		return err
 	}
+
 	ipamOpts, err := cmd.Flags().GetStringArray("ipam-opt")
 	if err != nil {
 		return err
 	}
+
 	subnets, err := cmd.Flags().GetStringArray("subnet")
 	if err != nil {
 		return err
 	}
+
 	gatewayStr, err := cmd.Flags().GetString("gateway")
 	if err != nil {
 		return err
 	}
+
 	ipRangeStr, err := cmd.Flags().GetString("ip-range")
 	if err != nil {
 		return err
 	}
+
 	labels, err := cmd.Flags().GetStringArray("label")
 	if err != nil {
 		return err
 	}
+
 	labels = strutil.DedupeStrSlice(labels)
+
 	ipv6, err := cmd.Flags().GetBool("ipv6")
 	if err != nil {
 		return err
 	}
 
-	return network.Create(&options.NetworkCreate{
-		GOptions:    globalOptions,
+	return network.Create(cmd.OutOrStdout(), globalOptions, &options.NetworkCreate{
 		Name:        name,
 		Driver:      driver,
 		Options:     utils.KeyValueStringsToMap(opts),
@@ -107,5 +119,5 @@ func createAction(cmd *cobra.Command, args []string) error {
 		IPRange:     ipRangeStr,
 		Labels:      labels,
 		IPv6:        ipv6,
-	}, cmd.OutOrStdout())
+	})
 }

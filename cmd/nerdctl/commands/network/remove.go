@@ -28,7 +28,7 @@ import (
 )
 
 func removeCommand() *cobra.Command {
-	networkRmCommand := &cobra.Command{
+	return &cobra.Command{
 		Use:               "rm [flags] NETWORK [NETWORK, ...]",
 		Aliases:           []string{"remove"},
 		Short:             "Remove one or more networks",
@@ -39,7 +39,6 @@ func removeCommand() *cobra.Command {
 		SilenceUsage:      true,
 		SilenceErrors:     true,
 	}
-	return networkRmCommand
 }
 
 func removeAction(cmd *cobra.Command, args []string) error {
@@ -48,19 +47,18 @@ func removeAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	options := &options.NetworkRemove{
-		GOptions: globalOptions,
+	opts := &options.NetworkRemove{
 		Networks: args,
 		Stdout:   cmd.OutOrStdout(),
 	}
 
-	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	return network.Remove(ctx, cli, options)
+	return network.Remove(ctx, cli, globalOptions, opts)
 }
 
 func networkRmShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {

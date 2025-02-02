@@ -17,55 +17,84 @@
 package builder
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/spf13/cobra"
 	"go.farcloser.world/core/units"
 
 	"github.com/containerd/nerdctl/v2/cmd/nerdctl/helpers"
+	"github.com/containerd/nerdctl/v2/leptonic/errs"
 	"github.com/containerd/nerdctl/v2/pkg/api/options"
 	"github.com/containerd/nerdctl/v2/pkg/cmd/builder"
 )
 
 func pruneCommand() *cobra.Command {
-	shortHelp := `Clean up BuildKit build cache`
-	var buildPruneCommand = &cobra.Command{
+	var cmd = &cobra.Command{
 		Use:           "prune",
 		Args:          cobra.NoArgs,
-		Short:         shortHelp,
+		Short:         "Clean up BuildKit build cache",
 		RunE:          pruneAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
 
-	helpers.AddStringFlag(buildPruneCommand, "buildkit-host", nil, "", "BUILDKIT_HOST", "BuildKit address")
+	helpers.AddStringFlag(cmd, "buildkit-host", nil, "", "BUILDKIT_HOST", "BuildKit address")
+	cmd.Flags().BoolP("all", "a", false, "Remove all unused build cache, not just dangling ones")
+	cmd.Flags().BoolP("force", "f", false, "Do not prompt for confirmation")
 
-	buildPruneCommand.Flags().BoolP("all", "a", false, "Remove all unused build cache, not just dangling ones")
-	buildPruneCommand.Flags().BoolP("force", "f", false, "Do not prompt for confirmation")
-	return buildPruneCommand
+	return cmd
 }
 
-func pruneAction(cmd *cobra.Command, args []string) error {
-	opts, err := pruneOptions(cmd, args)
+func pruneOptions(cmd *cobra.Command, _ []string) (*options.BuilderPrune, error) {
+	all, err := cmd.Flags().GetBool("all")
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	if !opts.Force {
+	force, err := cmd.Flags().GetBool("force")
+	if err != nil {
+		return nil, err
+	}
+
+	if !force {
 		var msg string
 
-		if opts.All {
+		if all {
 			msg = "This will remove all build cache."
 		} else {
 			msg = "This will remove any dangling build cache."
 		}
 
 		if confirmed, err := helpers.Confirm(cmd, fmt.Sprintf("WARNING! %s.", msg)); err != nil || !confirmed {
-			return err
+			return nil, errors.Join(errs.ErrCancelled, err)
 		}
 	}
 
-	prunedObjects, err := builder.Prune(cmd.Context(), opts)
+	return &options.BuilderPrune{
+		Stderr: cmd.OutOrStderr(),
+		All:    all,
+		Force:  force,
+	}, nil
+}
+
+func pruneAction(cmd *cobra.Command, args []string) error {
+	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
+	if err != nil {
+		return err
+	}
+
+	opts, err := pruneOptions(cmd, args)
+	if err != nil {
+		return err
+	}
+
+	opts.BuildKitHost, err = GetBuildkitHostOption(cmd, globalOptions.Namespace)
+	if err != nil {
+		return err
+	}
+
+	prunedObjects, err := builder.Prune(cmd.Context(), globalOptions, opts)
 	if err != nil {
 		return err
 	}
@@ -79,34 +108,4 @@ func pruneAction(cmd *cobra.Command, args []string) error {
 	_, err = fmt.Fprintf(cmd.OutOrStdout(), "Total:  %s\n", units.BytesSize(float64(totalReclaimedSpace)))
 
 	return err
-}
-
-func pruneOptions(cmd *cobra.Command, _ []string) (*options.BuilderPrune, error) {
-	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
-	if err != nil {
-		return nil, err
-	}
-
-	buildkitHost, err := GetBuildkitHost(cmd, globalOptions.Namespace)
-	if err != nil {
-		return nil, err
-	}
-
-	all, err := cmd.Flags().GetBool("all")
-	if err != nil {
-		return nil, err
-	}
-
-	force, err := cmd.Flags().GetBool("force")
-	if err != nil {
-		return nil, err
-	}
-
-	return &options.BuilderPrune{
-		Stderr:       cmd.OutOrStderr(),
-		GOptions:     globalOptions,
-		BuildKitHost: buildkitHost,
-		All:          all,
-		Force:        force,
-	}, nil
 }
