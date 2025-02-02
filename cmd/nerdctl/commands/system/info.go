@@ -75,16 +75,16 @@ func processInfoOptions(cmd *cobra.Command, _ []string) (*options.SystemInfo, er
 }
 
 func infoAction(cmd *cobra.Command, args []string) error {
-	options, err := processInfoOptions(cmd, args)
+	opts, err := processInfoOptions(cmd, args)
 	if err != nil {
 		return err
 	}
 
-	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), opts.GOptions.Namespace, opts.GOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	return system.Info(ctx, cli, options)
+	return system.Info(ctx, cli, opts)
 }

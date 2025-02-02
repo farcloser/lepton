@@ -31,10 +31,12 @@ func Command() *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
+
 	builderCommand.AddCommand(
 		BuildCommand(),
 		pruneCommand(),
 		debugCommand(),
 	)
+
 	return builderCommand
 }

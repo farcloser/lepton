@@ -117,7 +117,7 @@ func GetInfo(withName string) (bool, error) {
 	if apparmor.Enabled() {
 		enabled = true
 		if rootlessutil.IsRootless() && !apparmor.CanApplyProfile(withName) {
-			return enabled, ErrUnsupported
+			return enabled, ErrCannotApply
 		}
 	}
 
