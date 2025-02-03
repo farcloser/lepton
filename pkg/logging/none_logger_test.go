@@ -47,7 +47,7 @@ func TestNoneLogger(t *testing.T) {
 		stderr := make(chan string)
 
 		go func() {
-			for i := 0; i < 10; i++ {
+			for range 10 {
 				stdout <- "test stdout"
 				stderr <- "test stderr"
 			}

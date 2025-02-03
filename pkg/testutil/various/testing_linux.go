@@ -150,7 +150,7 @@ func ComposeUp(t *testing.T, base *testutil.Base, dockerComposeYAML string, opts
 	}
 
 	var wordpressWorking bool
-	for i := 0; i < 30; i++ {
+	for i := range 30 {
 		t.Logf("(retry %d)", i)
 		err := checkWordpress()
 		if err == nil {

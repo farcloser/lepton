@@ -66,7 +66,7 @@ func TestReadRotatedJSONLog(t *testing.T) {
 		Time   string `json:"time"`
 	}
 
-	for line := 0; line < 10; line++ {
+	for line := range 10 {
 		// Write the first three lines to log file
 		log := logContent{}
 		log.Log = fmt.Sprintf("line%d\n", line)

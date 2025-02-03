@@ -452,7 +452,7 @@ func Parse(project *types.Project, svc types.ServiceConfig) (*Service, error) {
 		log.L.Warnf("Ignoring: service %s: pull_policy: %q", svc.Name, svc.PullPolicy)
 	}
 
-	for i := 0; i < replicas; i++ {
+	for i := range replicas {
 		container, err := newContainer(project, parsed, i)
 		if err != nil {
 			return nil, err

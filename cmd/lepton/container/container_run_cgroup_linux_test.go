@@ -139,7 +139,7 @@ func TestRunDevice(t *testing.T) {
 	lo := make([]*loopback.Loopback, n)
 	loContent := make([]string, n)
 
-	for i := 0; i < n; i++ {
+	for i := range n {
 		var err error
 		lo[i], err = loopback.New(4096)
 		assert.NilError(t, err)

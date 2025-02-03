@@ -184,7 +184,7 @@ func (b *Base) EnsureDaemonActive() {
 		maxRetry = 30
 		sleep    = 3 * time.Second
 	)
-	for i := 0; i < maxRetry; i++ {
+	for i := range maxRetry {
 		cmd := exec.Command("systemctl", append(systemctlArgs, "is-active", target)...)
 		out, err := cmd.CombinedOutput()
 		b.T.Logf("(retry=%d) %s", i, string(out))
@@ -317,7 +317,7 @@ func (b *Base) EnsureContainerStarted(con string) {
 		maxRetry = 5
 		sleep    = time.Second
 	)
-	for i := 0; i < maxRetry; i++ {
+	for i := range maxRetry {
 		if b.InspectContainer(con).State.Running {
 			b.T.Logf("container %s is now running", con)
 			return
@@ -336,7 +336,7 @@ func (b *Base) EnsureContainerExited(con string, expectedExitCode int) {
 		sleep    = time.Second
 	)
 	var c dockercompat.Container
-	for i := 0; i < maxRetry; i++ {
+	for i := range maxRetry {
 		c = b.InspectContainer(con)
 		if c.State.Status == "exited" {
 			b.T.Logf("container %s have exited with status %d", con, c.State.ExitCode)

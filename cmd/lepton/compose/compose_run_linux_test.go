@@ -153,7 +153,7 @@ services:
 		return nil
 	}
 	var nginxWorking bool
-	for i := 0; i < 30; i++ {
+	for i := range 30 {
 		t.Logf("(retry %d)", i)
 		err := checkNginx()
 		if err == nil {
@@ -213,7 +213,7 @@ services:
 		return nil
 	}
 	var nginxWorking bool
-	for i := 0; i < 30; i++ {
+	for i := range 30 {
 		t.Logf("(retry %d)", i)
 		err := checkNginx()
 		if err == nil {
