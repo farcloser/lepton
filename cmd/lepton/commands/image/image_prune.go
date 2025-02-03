@@ -90,7 +90,7 @@ func pruneAction(cmd *cobra.Command, args []string) error {
 			msg = "This will remove all images without at least one container associated to them."
 		}
 
-		if confirmed, err := helpers.Confirm(cmd, fmt.Sprintf("WARNING! %s.", msg)); err != nil || !confirmed {
+		if err := helpers.Confirm(cmd, fmt.Sprintf("WARNING! %s.", msg)); err != nil {
 			return err
 		}
 	}

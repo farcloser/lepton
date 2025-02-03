@@ -26,15 +26,17 @@ import (
 )
 
 func stopCommand() *cobra.Command {
-	var composeStopCommand = &cobra.Command{
+	var cmd = &cobra.Command{
 		Use:           "stop [flags] [SERVICE...]",
 		Short:         "Stop running containers without removing them.",
 		RunE:          stopAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
-	composeStopCommand.Flags().UintP("timeout", "t", 10, "Seconds to wait for stop before killing them")
-	return composeStopCommand
+
+	cmd.Flags().UintP("timeout", "t", 10, "Seconds to wait for stop before killing them")
+
+	return cmd
 }
 
 func stopAction(cmd *cobra.Command, args []string) error {

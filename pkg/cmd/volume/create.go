@@ -21,22 +21,21 @@ import (
 	"fmt"
 	"io"
 
-	"go.farcloser.world/lepton/leptonic/api"
 	"go.farcloser.world/lepton/pkg/api/options"
 )
 
-func Create(ctx context.Context, output io.Writer, globalOptions *options.Global, opts *options.VolumeCreate) (*api.Volume, error) {
+func Create(ctx context.Context, output io.Writer, globalOptions *options.Global, opts *options.VolumeCreate) error {
 	volStore, err := Store(globalOptions.Namespace, globalOptions.DataRoot, globalOptions.Address)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	vol, err := volStore.Create(opts.Name, opts.Labels)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	_, err = fmt.Fprintln(output, vol.Name)
 
-	return vol, err
+	return err
 }

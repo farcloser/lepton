@@ -32,25 +32,27 @@ import (
 )
 
 func CreateCommand() *cobra.Command {
-	shortHelp := "Create a new container."
-	longHelp := shortHelp
+	longHelp := ""
 	if runtime.GOOS == "windows" {
 		longHelp += "\n"
 		longHelp += "WARNING: `create` is experimental on Windows and currently broken (https://github.com/containerd/nerdctl/issues/28)"
 	}
-	var createCommand = &cobra.Command{
+
+	var cmd = &cobra.Command{
 		Use:               "create [flags] IMAGE [COMMAND] [ARG...]",
 		Args:              cobra.MinimumNArgs(1),
-		Short:             shortHelp,
+		Short:             "Create a new container.",
 		Long:              longHelp,
 		RunE:              createAction,
 		ValidArgsFunction: runShellComplete,
 		SilenceUsage:      true,
 		SilenceErrors:     true,
 	}
-	createCommand.Flags().SetInterspersed(false)
-	setCreateFlags(createCommand)
-	return createCommand
+
+	cmd.Flags().SetInterspersed(false)
+	setCreateFlags(cmd)
+
+	return cmd
 }
 
 func createOptions(cmd *cobra.Command, args []string) (*options.ContainerCreate, error) {

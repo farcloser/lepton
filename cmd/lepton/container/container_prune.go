@@ -26,7 +26,7 @@ import (
 )
 
 func pruneCommand() *cobra.Command {
-	containerPruneCommand := &cobra.Command{
+	cmd := &cobra.Command{
 		Use:           "prune [flags]",
 		Short:         "Remove all stopped containers",
 		Args:          cobra.NoArgs,
@@ -34,51 +34,44 @@ func pruneCommand() *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
-	containerPruneCommand.Flags().BoolP("force", "f", false, "Do not prompt for confirmation")
-	return containerPruneCommand
+
+	cmd.Flags().BoolP("force", "f", false, "Do not prompt for confirmation")
+
+	return cmd
 }
 
-func pruneOptions(cmd *cobra.Command, _ []string) (options.ContainerPrune, error) {
-	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
-	if err != nil {
-		return options.ContainerPrune{}, err
-	}
-
-	return options.ContainerPrune{
-		GOptions: globalOptions,
-		Stdout:   cmd.OutOrStdout(),
-	}, nil
-}
-
-func grantPrunePermission(cmd *cobra.Command) (bool, error) {
+func pruneOptions(cmd *cobra.Command, _ []string) (*options.ContainerPrune, error) {
 	force, err := cmd.Flags().GetBool("force")
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 
 	if !force {
-		return helpers.Confirm(cmd, "WARNING! This will remove all stopped containers.")
+		if err := helpers.Confirm(cmd, "WARNING! This will remove all stopped containers."); err != nil {
+			return nil, err
+		}
 	}
-	return true, nil
+
+	return &options.ContainerPrune{}, nil
 }
 
 func pruneAction(cmd *cobra.Command, args []string) error {
-	options, err := pruneOptions(cmd, args)
+	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return err
 	}
 
-	if ok, err := grantPrunePermission(cmd); err != nil {
-		return err
-	} else if !ok {
-		return nil
-	}
-
-	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	opts, err := pruneOptions(cmd, args)
 	if err != nil {
 		return err
 	}
+
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
+	if err != nil {
+		return err
+	}
+
 	defer cancel()
 
-	return container.Prune(ctx, cli, options)
+	return container.Prune(ctx, cli, cmd.OutOrStdout(), globalOptions, opts)
 }

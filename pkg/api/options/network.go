@@ -58,9 +58,9 @@ type NetworkList struct {
 
 // NetworkPrune specifies options for `network prune`.
 type NetworkPrune struct {
-	Stdout io.Writer
 	// Network drivers to keep while pruning
 	NetworkDriversToKeep []string
+	Force                bool
 }
 
 // NetworkRemove specifies options for `network rm`.

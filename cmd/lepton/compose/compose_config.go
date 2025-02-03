@@ -28,21 +28,24 @@ import (
 )
 
 func configCommand() *cobra.Command {
-	var composeConfigCommand = &cobra.Command{
+	var cmd = &cobra.Command{
 		Use:           "config",
 		Short:         "Validate and view the Compose file",
 		RunE:          configAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
-	composeConfigCommand.Flags().BoolP("quiet", "q", false, "Only validate the configuration, don't print anything.")
-	composeConfigCommand.Flags().Bool("services", false, "Print the service names, one per line.")
-	composeConfigCommand.Flags().Bool("volumes", false, "Print the volume names, one per line.")
-	composeConfigCommand.Flags().String("hash", "", "Print the service config hash, one per line.")
-	composeConfigCommand.RegisterFlagCompletionFunc("hash", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+
+	cmd.Flags().BoolP("quiet", "q", false, "Only validate the configuration, don't print anything.")
+	cmd.Flags().Bool("services", false, "Print the service names, one per line.")
+	cmd.Flags().Bool("volumes", false, "Print the volume names, one per line.")
+	cmd.Flags().String("hash", "", "Print the service config hash, one per line.")
+
+	_ = cmd.RegisterFlagCompletionFunc("hash", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return []string{"\"*\""}, cobra.ShellCompDirectiveNoFileComp
 	})
-	return composeConfigCommand
+
+	return cmd
 }
 
 func configAction(cmd *cobra.Command, args []string) error {

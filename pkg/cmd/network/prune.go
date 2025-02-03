@@ -19,6 +19,7 @@ package network
 import (
 	"context"
 	"fmt"
+	"io"
 
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/log"
@@ -28,7 +29,7 @@ import (
 	"go.farcloser.world/lepton/pkg/strutil"
 )
 
-func Prune(ctx context.Context, client *containerd.Client, globalOptions *options.Global, opts *options.NetworkPrune) error {
+func Prune(ctx context.Context, client *containerd.Client, output io.Writer, globalOptions *options.Global, opts *options.NetworkPrune) error {
 	e, err := netutil.NewCNIEnv(globalOptions.CNIPath, globalOptions.CNINetConfPath, netutil.WithNamespace(globalOptions.Namespace))
 	if err != nil {
 		return err
@@ -63,11 +64,12 @@ func Prune(ctx context.Context, client *containerd.Client, globalOptions *option
 	}
 
 	if len(removedNetworks) > 0 {
-		fmt.Fprintln(opts.Stdout, "Deleted Networks:")
+		fmt.Fprintln(output, "Deleted Networks:")
 		for _, name := range removedNetworks {
-			fmt.Fprintln(opts.Stdout, name)
+			fmt.Fprintln(output, name)
 		}
-		fmt.Fprintln(opts.Stdout, "")
+		fmt.Fprintln(output, "")
 	}
+
 	return nil
 }

@@ -35,24 +35,20 @@ import (
 func registerImgcryptFlags(cmd *cobra.Command, encrypt bool) {
 	flags := cmd.Flags()
 
-	// #region platform flags
-	// platform is defined as StringSlice, not StringArray, to allow specifying "--platform=amd64,arm64"
 	flags.StringSlice("platform", []string{}, "Convert content for a specific platform")
-	cmd.RegisterFlagCompletionFunc("platform", completion.Platforms)
 	flags.Bool("all-platforms", false, "Convert content for all platforms")
-	// #endregion
-
 	flags.String("gpg-homedir", "", "The GPG homedir to use; by default gpg uses ~/.gnupg")
 	flags.String("gpg-version", "", "The GPG version (\"v1\" or \"v2\"), default will make an educated guess")
 	flags.StringSlice("key", []string{}, "A secret key's filename and an optional password separated by colon; this option may be provided multiple times")
 	// While --recipient can be specified only for `image encrypt`,
 	// --dec-recipient can be specified for both `image encrypt` and `image decrypt`.
 	flags.StringSlice("dec-recipient", []string{}, "Recipient of the image; used only for PKCS7 and must be an x509 certificate")
-
 	if encrypt {
 		// recipient is defined as StringSlice, not StringArray, to allow specifying "--recipient=jwe:FILE1,jwe:FILE2"
 		flags.StringSlice("recipient", []string{}, "Recipient of the image is the person who can decrypt it in the form specified above (i.e. jwe:/path/to/pubkey)")
 	}
+
+	_ = cmd.RegisterFlagCompletionFunc("platform", completion.Platforms)
 }
 
 func cryptOptions(cmd *cobra.Command, _args []string, encrypt bool) (options.ImageCrypt, error) {
@@ -60,30 +56,37 @@ func cryptOptions(cmd *cobra.Command, _args []string, encrypt bool) (options.Ima
 	if err != nil {
 		return options.ImageCrypt{}, err
 	}
+
 	platforms, err := cmd.Flags().GetStringSlice("platform")
 	if err != nil {
 		return options.ImageCrypt{}, err
 	}
+
 	allPlatforms, err := cmd.Flags().GetBool("all-platforms")
 	if err != nil {
 		return options.ImageCrypt{}, err
 	}
+
 	gpgHomeDir, err := cmd.Flags().GetString("gpg-homedir")
 	if err != nil {
 		return options.ImageCrypt{}, err
 	}
+
 	gpgVersion, err := cmd.Flags().GetString("gpg-version")
 	if err != nil {
 		return options.ImageCrypt{}, err
 	}
+
 	keys, err := cmd.Flags().GetStringSlice("key")
 	if err != nil {
 		return options.ImageCrypt{}, err
 	}
+
 	decRecipients, err := cmd.Flags().GetStringSlice("dec-recipient")
 	if err != nil {
 		return options.ImageCrypt{}, err
 	}
+
 	var recipients []string
 	if encrypt {
 		recipients, err = cmd.Flags().GetStringSlice("recipient")
@@ -91,6 +94,7 @@ func cryptOptions(cmd *cobra.Command, _args []string, encrypt bool) (options.Ima
 			return options.ImageCrypt{}, err
 		}
 	}
+
 	return options.ImageCrypt{
 		GOptions:      globalOptions,
 		Platforms:     platforms,
@@ -106,24 +110,20 @@ func cryptOptions(cmd *cobra.Command, _args []string, encrypt bool) (options.Ima
 
 func imgcryptAction(encrypt bool) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
-		options, err := cryptOptions(cmd, args, encrypt)
+		opts, err := cryptOptions(cmd, args, encrypt)
 		if err != nil {
 			return err
 		}
 		srcRawRef := args[0]
 		targetRawRef := args[1]
 
-		cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+		cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), opts.GOptions.Namespace, opts.GOptions.Address)
 		if err != nil {
 			return err
 		}
+
 		defer cancel()
 
-		return image.Crypt(ctx, cli, srcRawRef, targetRawRef, encrypt, options)
+		return image.Crypt(ctx, cli, srcRawRef, targetRawRef, encrypt, opts)
 	}
-}
-
-func imgcryptShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-	// show image names
-	return completion.ImageNames(cmd, args, toComplete)
 }

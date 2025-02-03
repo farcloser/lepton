@@ -34,22 +34,17 @@ import (
 // Prune will remove all unused containers, networks,
 // images (dangling only or both dangling and unreferenced), and optionally, volumes.
 func Prune(ctx context.Context, client *containerd.Client, output io.Writer, globalOptions *options.Global, opts *options.SystemPrune) error {
-	if err := container.Prune(ctx, client, options.ContainerPrune{
-		GOptions: globalOptions,
-		Stdout:   output,
-	}); err != nil {
+	if err := container.Prune(ctx, client, output, globalOptions, &options.ContainerPrune{}); err != nil {
 		return err
 	}
-	if err := network.Prune(ctx, client, globalOptions, &options.NetworkPrune{
+	if err := network.Prune(ctx, client, output, globalOptions, &options.NetworkPrune{
 		NetworkDriversToKeep: opts.NetworkDriversToKeep,
-		Stdout:               output,
 	}); err != nil {
 		return err
 	}
 	if opts.Volumes {
 		if err := volume.Prune(ctx, client, output, globalOptions, &options.VolumePrune{
-			All:   false,
-			Force: true,
+			All: false,
 		}); err != nil {
 			return err
 		}

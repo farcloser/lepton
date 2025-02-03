@@ -20,7 +20,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func capShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+func capShellComplete(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
 	candidates := []string{}
 	return candidates, cobra.ShellCompDirectiveNoFileComp
 }

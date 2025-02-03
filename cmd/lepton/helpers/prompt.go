@@ -21,19 +21,26 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+
+	"go.farcloser.world/lepton/leptonic/errs"
 )
 
-func Confirm(cmd *cobra.Command, message string) (bool, error) {
+func Confirm(cmd *cobra.Command, message string) error {
 	message += "\nAre you sure you want to continue? [y/N] "
+
 	_, err := fmt.Fprint(cmd.OutOrStdout(), message)
 	if err != nil {
-		return false, err
+		return err
 	}
 
 	var confirm string
-	_, err = fmt.Fscanf(cmd.InOrStdin(), "%s", &confirm)
-	if err != nil {
-		return false, err
+	if _, err = fmt.Fscanf(cmd.InOrStdin(), "%s", &confirm); err != nil {
+		return err
 	}
-	return strings.ToLower(confirm) == "y", err
+
+	if strings.ToLower(confirm) != "y" {
+		err = errs.ErrCancelled
+	}
+
+	return err
 }

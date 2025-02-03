@@ -18,6 +18,6 @@ package container
 
 import "github.com/spf13/cobra"
 
-func AddCpCommand(rootCmd *cobra.Command) {
+func AddCopyCommand(rootCmd *cobra.Command) {
 	// NOP
 }

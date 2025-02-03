@@ -28,7 +28,7 @@ import (
 )
 
 func StatsCommand() *cobra.Command {
-	var statsCommand = &cobra.Command{
+	var cmd = &cobra.Command{
 		Use:               "stats",
 		Short:             "Display a live stream of container(s) resource usage statistics.",
 		RunE:              statsAction,
@@ -37,19 +37,15 @@ func StatsCommand() *cobra.Command {
 		SilenceErrors:     true,
 	}
 
-	addStatsFlags(statsCommand)
-
-	return statsCommand
-}
-
-func addStatsFlags(cmd *cobra.Command) {
 	cmd.Flags().BoolP("all", "a", false, "Show all containers (default shows just running)")
 	cmd.Flags().String("format", "", "Pretty-print images using a Go template, e.g, '{{json .}}'")
 	cmd.Flags().Bool("no-stream", false, "Disable streaming stats and only pull the first result")
 	cmd.Flags().Bool("no-trunc", false, "Do not truncate output")
+
+	return cmd
 }
 
-func processStatsCommandFlags(cmd *cobra.Command) (options.ContainerStats, error) {
+func statsOptions(cmd *cobra.Command) (options.ContainerStats, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return options.ContainerStats{}, err
@@ -87,21 +83,21 @@ func processStatsCommandFlags(cmd *cobra.Command) (options.ContainerStats, error
 }
 
 func statsAction(cmd *cobra.Command, args []string) error {
-	options, err := processStatsCommandFlags(cmd)
+	opts, err := statsOptions(cmd)
 	if err != nil {
 		return err
 	}
 
-	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), opts.GOptions.Namespace, opts.GOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	return container.Stats(ctx, cli, args, options)
+	return container.Stats(ctx, cli, args, opts)
 }
 
-func statsShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+func statsShellComplete(cmd *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
 	// show running container names
 	statusFilterFn := func(st client.ProcessStatus) bool {
 		return st == client.Running

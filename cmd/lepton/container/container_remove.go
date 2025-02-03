@@ -26,20 +26,22 @@ import (
 	"go.farcloser.world/lepton/pkg/cmd/container"
 )
 
-func RmCommand() *cobra.Command {
-	var rmCommand = &cobra.Command{
+func RemoveCommand() *cobra.Command {
+	var cmd = &cobra.Command{
 		Use:               "rm [flags] CONTAINER [CONTAINER, ...]",
 		Args:              cobra.MinimumNArgs(1),
 		Short:             "Remove one or more containers",
 		RunE:              removeAction,
-		ValidArgsFunction: rmShellComplete,
+		ValidArgsFunction: removeShellComplete,
 		SilenceUsage:      true,
 		SilenceErrors:     true,
 	}
-	rmCommand.Aliases = []string{"remove"}
-	rmCommand.Flags().BoolP("force", "f", false, "Force the removal of a running|paused|unknown container (uses SIGKILL)")
-	rmCommand.Flags().BoolP("volumes", "v", false, "Remove volumes associated with the container")
-	return rmCommand
+
+	cmd.Aliases = []string{"remove"}
+	cmd.Flags().BoolP("force", "f", false, "Force the removal of a running|paused|unknown container (uses SIGKILL)")
+	cmd.Flags().BoolP("volumes", "v", false, "Remove volumes associated with the container")
+
+	return cmd
 }
 
 func removeAction(cmd *cobra.Command, args []string) error {
@@ -55,23 +57,24 @@ func removeAction(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	options := options.ContainerRemove{
+	opts := options.ContainerRemove{
 		GOptions: globalOptions,
 		Force:    force,
 		Volumes:  removeAnonVolumes,
 		Stdout:   cmd.OutOrStdout(),
 	}
 
-	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), opts.GOptions.Namespace, opts.GOptions.Address)
 	if err != nil {
 		return err
 	}
+
 	defer cancel()
 
-	return container.Remove(ctx, cli, args, options)
+	return container.Remove(ctx, cli, args, opts)
 }
 
-func rmShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+func removeShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 	// show container names
 	return completion.ContainerNames(cmd, nil)
 }

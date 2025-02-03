@@ -30,13 +30,13 @@ func listCommand() *cobra.Command {
 		Use:           "ls",
 		Aliases:       []string{"list"},
 		Short:         "List volumes",
+		Args:          cobra.NoArgs,
 		RunE:          listAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
 
 	cmd.Flags().BoolP("quiet", "q", false, "Only display volume names")
-	// Alias "-f" is reserved for "--filter"
 	cmd.Flags().String("format", "", "Format the output using the given go template")
 	cmd.Flags().BoolP("size", "s", false, "Display the disk usage of volumes. Can be slow with volumes having loads of directories.")
 	cmd.Flags().StringSliceP("filter", "f", []string{}, "Filter matches volumes based on given conditions")
@@ -88,5 +88,5 @@ func listAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	return volume.List(cmd.OutOrStdout(), globalOptions, opts)
+	return volume.List(cmd.Context(), cmd.OutOrStdout(), globalOptions, opts)
 }

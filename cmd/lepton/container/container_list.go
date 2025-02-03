@@ -34,7 +34,7 @@ import (
 )
 
 func PsCommand() *cobra.Command {
-	var psCommand = &cobra.Command{
+	var cmd = &cobra.Command{
 		Use:           "ps",
 		Args:          cobra.NoArgs,
 		Short:         "List containers",
@@ -42,23 +42,24 @@ func PsCommand() *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
-	psCommand.Flags().BoolP("all", "a", false, "Show all containers (default shows just running)")
-	psCommand.Flags().IntP("last", "n", -1, "Show n last created containers (includes all states)")
-	psCommand.Flags().BoolP("latest", "l", false, "Show the latest created container (includes all states)")
-	psCommand.Flags().Bool("no-trunc", false, "Don't truncate output")
-	psCommand.Flags().BoolP("quiet", "q", false, "Only display container IDs")
-	psCommand.Flags().BoolP("size", "s", false, "Display total file sizes")
 
-	// Alias "-f" is reserved for "--filter"
-	psCommand.Flags().String("format", "", "Format the output using the given Go template, e.g, '{{json .}}', 'wide'")
-	psCommand.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	cmd.Flags().BoolP("all", "a", false, "Show all containers (default shows just running)")
+	cmd.Flags().IntP("last", "n", -1, "Show n last created containers (includes all states)")
+	cmd.Flags().BoolP("latest", "l", false, "Show the latest created container (includes all states)")
+	cmd.Flags().Bool("no-trunc", false, "Don't truncate output")
+	cmd.Flags().BoolP("quiet", "q", false, "Only display container IDs")
+	cmd.Flags().BoolP("size", "s", false, "Display total file sizes")
+	cmd.Flags().String("format", "", "Format the output using the given Go template, e.g, '{{json .}}', 'wide'")
+	cmd.Flags().StringSliceP("filter", "f", nil, "Filter matches containers based on given conditions. When specifying the condition 'status', it filters all containers")
+
+	_ = cmd.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return []string{formatter.FormatJSON, formatter.FormatTable, formatter.FormatWide}, cobra.ShellCompDirectiveNoFileComp
 	})
-	psCommand.Flags().StringSliceP("filter", "f", nil, "Filter matches containers based on given conditions. When specifying the condition 'status', it filters all containers")
-	return psCommand
+
+	return cmd
 }
 
-func processOptions(cmd *cobra.Command, _ []string) (options.ContainerList, FormattingAndPrintingOptions, error) {
+func psOptions(cmd *cobra.Command, _ []string) (options.ContainerList, FormattingAndPrintingOptions, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return options.ContainerList{}, FormattingAndPrintingOptions{}, err
@@ -124,7 +125,7 @@ func processOptions(cmd *cobra.Command, _ []string) (options.ContainerList, Form
 }
 
 func psAction(cmd *cobra.Command, args []string) error {
-	clOpts, fpOpts, err := processOptions(cmd, args)
+	clOpts, fpOpts, err := psOptions(cmd, args)
 	if err != nil {
 		return err
 	}

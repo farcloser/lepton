@@ -29,7 +29,7 @@ import (
 )
 
 func PullCommand() *cobra.Command {
-	var pullCommand = &cobra.Command{
+	var cmd = &cobra.Command{
 		Use:           "pull [flags] NAME[:TAG]",
 		Short:         "Pull an image from a registry.",
 		Args:          helpers.IsExactArgs(1),
@@ -37,37 +37,28 @@ func PullCommand() *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
-	pullCommand.Flags().String("unpack", "auto", "Unpack the image for the current single platform (auto/true/false)")
-	pullCommand.RegisterFlagCompletionFunc("unpack", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+
+	cmd.Flags().String("unpack", "auto", "Unpack the image for the current single platform (auto/true/false)")
+	cmd.Flags().StringSlice("platform", nil, "Pull content for a specific platform")
+	cmd.Flags().Bool("all-platforms", false, "Pull content for all platforms")
+	cmd.Flags().String("verify", "none", "Verify the image (none|cosign|notation)")
+	cmd.Flags().String("cosign-key", "", "Path to the public key file, KMS, URI or Kubernetes Secret for --verify=cosign")
+	cmd.Flags().String("cosign-certificate-identity", "", "The identity expected in a valid Fulcio certificate for --verify=cosign. Valid values include email address, DNS names, IP addresses, and URIs. Either --cosign-certificate-identity or --cosign-certificate-identity-regexp must be set for keyless flows")
+	cmd.Flags().String("cosign-certificate-identity-regexp", "", "A regular expression alternative to --cosign-certificate-identity for --verify=cosign. Accepts the Go regular expression syntax described at https://golang.org/s/re2syntax. Either --cosign-certificate-identity or --cosign-certificate-identity-regexp must be set for keyless flows")
+	cmd.Flags().String("cosign-certificate-oidc-issuer", "", "The OIDC issuer expected in a valid Fulcio certificate for --verify=cosign,, e.g. https://token.actions.githubusercontent.com or https://oauth2.sigstore.dev/auth. Either --cosign-certificate-oidc-issuer or --cosign-certificate-oidc-issuer-regexp must be set for keyless flows")
+	cmd.Flags().String("cosign-certificate-oidc-issuer-regexp", "", "A regular expression alternative to --certificate-oidc-issuer for --verify=cosign,. Accepts the Go regular expression syntax described at https://golang.org/s/re2syntax. Either --cosign-certificate-oidc-issuer or --cosign-certificate-oidc-issuer-regexp must be set for keyless flows")
+	cmd.Flags().String("soci-index-digest", "", "Specify a particular index digest for SOCI. If left empty, SOCI will automatically use the index determined by the selection policy.")
+	cmd.Flags().BoolP("quiet", "q", false, "Suppress verbose output")
+
+	_ = cmd.RegisterFlagCompletionFunc("unpack", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return []string{"auto", "true", "false"}, cobra.ShellCompDirectiveNoFileComp
 	})
-
-	// #region platform flags
-	// platform is defined as StringSlice, not StringArray, to allow specifying "--platform=amd64,arm64"
-	pullCommand.Flags().StringSlice("platform", nil, "Pull content for a specific platform")
-	pullCommand.RegisterFlagCompletionFunc("platform", completion.Platforms)
-	pullCommand.Flags().Bool("all-platforms", false, "Pull content for all platforms")
-	// #endregion
-
-	// #region verify flags
-	pullCommand.Flags().String("verify", "none", "Verify the image (none|cosign|notation)")
-	pullCommand.RegisterFlagCompletionFunc("verify", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	_ = cmd.RegisterFlagCompletionFunc("platform", completion.Platforms)
+	_ = cmd.RegisterFlagCompletionFunc("verify", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return []string{"none", "cosign", "notation"}, cobra.ShellCompDirectiveNoFileComp
 	})
-	pullCommand.Flags().String("cosign-key", "", "Path to the public key file, KMS, URI or Kubernetes Secret for --verify=cosign")
-	pullCommand.Flags().String("cosign-certificate-identity", "", "The identity expected in a valid Fulcio certificate for --verify=cosign. Valid values include email address, DNS names, IP addresses, and URIs. Either --cosign-certificate-identity or --cosign-certificate-identity-regexp must be set for keyless flows")
-	pullCommand.Flags().String("cosign-certificate-identity-regexp", "", "A regular expression alternative to --cosign-certificate-identity for --verify=cosign. Accepts the Go regular expression syntax described at https://golang.org/s/re2syntax. Either --cosign-certificate-identity or --cosign-certificate-identity-regexp must be set for keyless flows")
-	pullCommand.Flags().String("cosign-certificate-oidc-issuer", "", "The OIDC issuer expected in a valid Fulcio certificate for --verify=cosign,, e.g. https://token.actions.githubusercontent.com or https://oauth2.sigstore.dev/auth. Either --cosign-certificate-oidc-issuer or --cosign-certificate-oidc-issuer-regexp must be set for keyless flows")
-	pullCommand.Flags().String("cosign-certificate-oidc-issuer-regexp", "", "A regular expression alternative to --certificate-oidc-issuer for --verify=cosign,. Accepts the Go regular expression syntax described at https://golang.org/s/re2syntax. Either --cosign-certificate-oidc-issuer or --cosign-certificate-oidc-issuer-regexp must be set for keyless flows")
-	// #endregion
 
-	// #region socipull flags
-	pullCommand.Flags().String("soci-index-digest", "", "Specify a particular index digest for SOCI. If left empty, SOCI will automatically use the index determined by the selection policy.")
-	// #endregion
-
-	pullCommand.Flags().BoolP("quiet", "q", false, "Suppress verbose output")
-
-	return pullCommand
+	return cmd
 }
 
 func pullOptions(cmd *cobra.Command, args []string) (options.ImagePull, error) {

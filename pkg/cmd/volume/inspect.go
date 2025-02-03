@@ -19,6 +19,7 @@ package volume
 import (
 	"context"
 	"errors"
+	"io"
 
 	"github.com/containerd/log"
 
@@ -26,26 +27,30 @@ import (
 	"go.farcloser.world/lepton/pkg/formatter"
 )
 
-func Inspect(ctx context.Context, volumes []string, globalOptions *options.Global, options *options.VolumeInspect) error {
+func Inspect(ctx context.Context, output io.Writer, globalOptions *options.Global, opts *options.VolumeInspect) error {
 	volStore, err := Store(globalOptions.Namespace, globalOptions.DataRoot, globalOptions.Address)
 	if err != nil {
 		return err
 	}
-	result := []interface{}{}
 
+	result := []interface{}{}
 	warns := []error{}
-	for _, name := range volumes {
-		var vol, err = volStore.Get(name, options.Size)
+
+	for _, name := range opts.NamesList {
+		var vol, err = volStore.Get(name, opts.Size)
 		if err != nil {
 			warns = append(warns, err)
 			continue
 		}
+
 		result = append(result, vol)
 	}
-	err = formatter.FormatSlice(options.Format, options.Stdout, result)
+
+	err = formatter.FormatSlice(opts.Format, output, result)
 	if err != nil {
 		return err
 	}
+
 	for _, warn := range warns {
 		log.G(ctx).Warn(warn)
 	}
@@ -53,5 +58,6 @@ func Inspect(ctx context.Context, volumes []string, globalOptions *options.Globa
 	if len(warns) != 0 {
 		return errors.New("some volumes could not be inspected")
 	}
+
 	return nil
 }

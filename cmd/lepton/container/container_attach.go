@@ -44,7 +44,7 @@ Caveats:
 - Until dual logging (issue #1946) is implemented,
   a container that is spun up by either 'nerdctl run -d' or 'nerdctl start' (without '--attach') cannot be attached to.`
 
-	var attachCommand = &cobra.Command{
+	var cmd = &cobra.Command{
 		Use:               "attach [flags] CONTAINER",
 		Args:              cobra.ExactArgs(1),
 		Short:             shortHelp,
@@ -54,8 +54,10 @@ Caveats:
 		SilenceUsage:      true,
 		SilenceErrors:     true,
 	}
-	attachCommand.Flags().String("detach-keys", consoleutil.DefaultDetachKeys, "Override the default detach keys")
-	return attachCommand
+
+	cmd.Flags().String("detach-keys", consoleutil.DefaultDetachKeys, "Override the default detach keys")
+
+	return cmd
 }
 
 func attachOptions(cmd *cobra.Command, _ []string) (options.ContainerAttach, error) {
@@ -77,18 +79,18 @@ func attachOptions(cmd *cobra.Command, _ []string) (options.ContainerAttach, err
 }
 
 func attachAction(cmd *cobra.Command, args []string) error {
-	options, err := attachOptions(cmd, args)
+	opts, err := attachOptions(cmd, args)
 	if err != nil {
 		return err
 	}
 
-	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), opts.GOptions.Namespace, opts.GOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	return container.Attach(ctx, cli, args[0], options)
+	return container.Attach(ctx, cli, args[0], opts)
 }
 
 func attachShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {

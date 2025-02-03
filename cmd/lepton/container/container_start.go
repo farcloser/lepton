@@ -29,7 +29,7 @@ import (
 )
 
 func StartCommand() *cobra.Command {
-	var startCommand = &cobra.Command{
+	var cmd = &cobra.Command{
 		Use:               "start [flags] CONTAINER [CONTAINER, ...]",
 		Args:              cobra.MinimumNArgs(1),
 		Short:             "Start one or more running containers",
@@ -39,27 +39,30 @@ func StartCommand() *cobra.Command {
 		SilenceErrors:     true,
 	}
 
-	startCommand.Flags().SetInterspersed(false)
-	startCommand.Flags().BoolP("attach", "a", false, "Attach STDOUT/STDERR and forward signals")
-	startCommand.Flags().String("detach-keys", consoleutil.DefaultDetachKeys, "Override the default detach keys")
+	cmd.Flags().SetInterspersed(false)
+	cmd.Flags().BoolP("attach", "a", false, "Attach STDOUT/STDERR and forward signals")
+	cmd.Flags().String("detach-keys", consoleutil.DefaultDetachKeys, "Override the default detach keys")
 
-	return startCommand
+	return cmd
 }
 
-func startOptions(cmd *cobra.Command, _ []string) (options.ContainerStart, error) {
+func startOptions(cmd *cobra.Command, _ []string) (*options.ContainerStart, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
-		return options.ContainerStart{}, err
+		return nil, err
 	}
+
 	attach, err := cmd.Flags().GetBool("attach")
 	if err != nil {
-		return options.ContainerStart{}, err
+		return nil, err
 	}
+
 	detachKeys, err := cmd.Flags().GetString("detach-keys")
 	if err != nil {
-		return options.ContainerStart{}, err
+		return nil, err
 	}
-	return options.ContainerStart{
+
+	return &options.ContainerStart{
 		Stdout:     cmd.OutOrStdout(),
 		GOptions:   globalOptions,
 		Attach:     attach,
@@ -68,21 +71,22 @@ func startOptions(cmd *cobra.Command, _ []string) (options.ContainerStart, error
 }
 
 func startAction(cmd *cobra.Command, args []string) error {
-	options, err := startOptions(cmd, args)
+	opts, err := startOptions(cmd, args)
 	if err != nil {
 		return err
 	}
 
-	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), opts.GOptions.Namespace, opts.GOptions.Address)
 	if err != nil {
 		return err
 	}
+
 	defer cancel()
 
-	return container.Start(ctx, cli, args, options)
+	return container.Start(ctx, cli, args, opts)
 }
 
-func startShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+func startShellComplete(cmd *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
 	// show non-running container names
 	statusFilterFn := func(st client.ProcessStatus) bool {
 		return st != client.Running && st != client.Unknown

@@ -32,7 +32,7 @@ func inspectCommand() *cobra.Command {
 		Short:             "Display detailed information on one or more volumes",
 		Args:              cobra.MinimumNArgs(1),
 		RunE:              inspectAction,
-		ValidArgsFunction: volumeInspectShellComplete,
+		ValidArgsFunction: completion.VolumeNames,
 		SilenceUsage:      true,
 		SilenceErrors:     true,
 	}
@@ -47,7 +47,7 @@ func inspectCommand() *cobra.Command {
 	return cmd
 }
 
-func inspectOptions(cmd *cobra.Command, _ []string) (*options.VolumeInspect, error) {
+func inspectOptions(cmd *cobra.Command, args []string) (*options.VolumeInspect, error) {
 	volumeSize, err := cmd.Flags().GetBool("size")
 	if err != nil {
 		return nil, err
@@ -59,9 +59,9 @@ func inspectOptions(cmd *cobra.Command, _ []string) (*options.VolumeInspect, err
 	}
 
 	return &options.VolumeInspect{
-		Format: format,
-		Size:   volumeSize,
-		Stdout: cmd.OutOrStdout(),
+		NamesList: args,
+		Format:    format,
+		Size:      volumeSize,
 	}, nil
 }
 
@@ -76,10 +76,5 @@ func inspectAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	return volume.Inspect(cmd.Context(), args, globalOptions, opts)
-}
-
-func volumeInspectShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-	// show volume names
-	return completion.VolumeNames(cmd)
+	return volume.Inspect(cmd.Context(), cmd.OutOrStdout(), globalOptions, opts)
 }

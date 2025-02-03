@@ -24,15 +24,38 @@ import (
 	"github.com/spf13/cobra"
 
 	"go.farcloser.world/lepton/cmd/lepton/helpers"
-	"go.farcloser.world/lepton/leptonic/api"
 	"go.farcloser.world/lepton/leptonic/services/containerd"
 	"go.farcloser.world/lepton/leptonic/services/image"
 	"go.farcloser.world/lepton/leptonic/services/namespace"
-	"go.farcloser.world/lepton/pkg/api/options"
 	"go.farcloser.world/lepton/pkg/cmd/volume"
 	"go.farcloser.world/lepton/pkg/labels"
 	"go.farcloser.world/lepton/pkg/netutil"
 )
+
+func VolumeNames(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
+	if err != nil {
+		return nil, cobra.ShellCompDirectiveError
+	}
+
+	volumeSize, err := cmd.Flags().GetBool("size")
+	if err != nil {
+		// The `volume rm` does not have the flag `size`, so set it to false as the default value.
+		volumeSize = false
+	}
+
+	vols, err := volume.Volumes(globalOptions.Namespace, globalOptions.DataRoot, globalOptions.Address, volumeSize, nil)
+	if err != nil {
+		return nil, cobra.ShellCompDirectiveError
+	}
+
+	candidates := []string{}
+	for _, v := range vols {
+		candidates = append(candidates, v.Name)
+	}
+
+	return candidates, cobra.ShellCompDirectiveNoFileComp
+}
 
 func ImageNames(cmd *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
@@ -167,22 +190,6 @@ func NetworkNames(cmd *cobra.Command, exclude []string) ([]string, cobra.ShellCo
 	return candidates, cobra.ShellCompDirectiveNoFileComp
 }
 
-func VolumeNames(cmd *cobra.Command) ([]string, cobra.ShellCompDirective) {
-	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
-	if err != nil {
-		return nil, cobra.ShellCompDirectiveError
-	}
-	vols, err := getVolumes(cmd, globalOptions)
-	if err != nil {
-		return nil, cobra.ShellCompDirectiveError
-	}
-	candidates := []string{}
-	for _, v := range vols {
-		candidates = append(candidates, v.Name)
-	}
-	return candidates, cobra.ShellCompDirectiveNoFileComp
-}
-
 func Platforms(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 	candidates := []string{
 		"amd64",
@@ -195,13 +202,4 @@ func Platforms(cmd *cobra.Command, args []string, toComplete string) ([]string, 
 		"linux/arm/v6", // "arm/v6" is invalid (interpreted as OS="arm", Arch="v7")
 	}
 	return candidates, cobra.ShellCompDirectiveNoFileComp
-}
-
-func getVolumes(cmd *cobra.Command, globalOptions *options.Global) (map[string]api.Volume, error) {
-	volumeSize, err := cmd.Flags().GetBool("size")
-	if err != nil {
-		// The `volume rm` does not have the flag `size`, so set it to false as the default value.
-		volumeSize = false
-	}
-	return volume.Volumes(globalOptions.Namespace, globalOptions.DataRoot, globalOptions.Address, volumeSize, nil)
 }

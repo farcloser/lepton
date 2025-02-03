@@ -40,7 +40,7 @@ func Command() *cobra.Command {
 		inspectCommand(),
 		LogsCommand(),
 		PortCommand(),
-		RmCommand(),
+		RemoveCommand(),
 		StopCommand(),
 		StartCommand(),
 		RestartCommand(),
@@ -55,7 +55,7 @@ func Command() *cobra.Command {
 		StatsCommand(),
 		AttachCommand(),
 	)
-	AddCpCommand(containerCommand)
+	AddCopyCommand(containerCommand)
 	return containerCommand
 }
 

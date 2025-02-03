@@ -49,16 +49,16 @@ const (
 )
 
 func RunCommand() *cobra.Command {
-	shortHelp := "Run a command in a new container."
-	longHelp := shortHelp
+	longHelp := ""
 	if runtime.GOOS == "windows" {
 		longHelp += "\n"
 		longHelp += "WARNING: `run` is experimental on Windows and currently broken (https://github.com/containerd/nerdctl/issues/28)"
 	}
-	var runCommand = &cobra.Command{
+
+	var cmd = &cobra.Command{
 		Use:               "run [flags] IMAGE [COMMAND] [ARG...]",
 		Args:              cobra.MinimumNArgs(1),
-		Short:             shortHelp,
+		Short:             "Run a command in a new container.",
 		Long:              longHelp,
 		RunE:              runAction,
 		ValidArgsFunction: runShellComplete,
@@ -66,13 +66,12 @@ func RunCommand() *cobra.Command {
 		SilenceErrors:     true,
 	}
 
-	runCommand.Flags().SetInterspersed(false)
-	setCreateFlags(runCommand)
+	cmd.Flags().SetInterspersed(false)
+	setCreateFlags(cmd)
+	cmd.Flags().BoolP("detach", "d", false, "Run container in background and print container ID")
+	cmd.Flags().StringSliceP("attach", "a", []string{}, "Attach STDIN, STDOUT, or STDERR")
 
-	runCommand.Flags().BoolP("detach", "d", false, "Run container in background and print container ID")
-	runCommand.Flags().StringSliceP("attach", "a", []string{}, "Attach STDIN, STDOUT, or STDERR")
-
-	return runCommand
+	return cmd
 }
 
 func setCreateFlags(cmd *cobra.Command) {

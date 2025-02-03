@@ -27,7 +27,7 @@ import (
 )
 
 func InfoCommand() *cobra.Command {
-	var infoCommand = &cobra.Command{
+	var cmd = &cobra.Command{
 		Use:           "info",
 		Args:          cobra.NoArgs,
 		Short:         "Display information about the system",
@@ -36,20 +36,20 @@ func InfoCommand() *cobra.Command {
 		SilenceErrors: true,
 	}
 
-	infoCommand.Flags().String("mode", "dockercompat", `Information mode, "dockercompat" for Docker-compatible output, "native" for containerd-native output`)
-	_ = infoCommand.RegisterFlagCompletionFunc("mode", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	cmd.Flags().String("mode", "dockercompat", `Information mode, "dockercompat" for Docker-compatible output, "native" for containerd-native output`)
+	cmd.Flags().StringP("format", "f", "", "Format the output using the given Go template, e.g, '{{json .}}'")
+
+	_ = cmd.RegisterFlagCompletionFunc("mode", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return []string{"dockercompat", "native"}, cobra.ShellCompDirectiveNoFileComp
 	})
-
-	infoCommand.Flags().StringP("format", "f", "", "Format the output using the given Go template, e.g, '{{json .}}'")
-	_ = infoCommand.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	_ = cmd.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return []string{formatter.FormatJSON}, cobra.ShellCompDirectiveNoFileComp
 	})
 
-	return infoCommand
+	return cmd
 }
 
-func processInfoOptions(cmd *cobra.Command, _ []string) (*options.SystemInfo, error) {
+func infoOptions(cmd *cobra.Command, _ []string) (*options.SystemInfo, error) {
 	mode, err := cmd.Flags().GetString("mode")
 	if err != nil {
 		return nil, err
@@ -73,7 +73,7 @@ func infoAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	opts, err := processInfoOptions(cmd, args)
+	opts, err := infoOptions(cmd, args)
 	if err != nil {
 		return err
 	}

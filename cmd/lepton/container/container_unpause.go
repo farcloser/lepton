@@ -28,7 +28,7 @@ import (
 )
 
 func UnpauseCommand() *cobra.Command {
-	var unpauseCommand = &cobra.Command{
+	return &cobra.Command{
 		Use:               "unpause [flags] CONTAINER [CONTAINER, ...]",
 		Args:              cobra.MinimumNArgs(1),
 		Short:             "Unpause all processes within one or more containers",
@@ -37,7 +37,6 @@ func UnpauseCommand() *cobra.Command {
 		SilenceUsage:      true,
 		SilenceErrors:     true,
 	}
-	return unpauseCommand
 }
 
 func unpauseOptions(cmd *cobra.Command, _ []string) (options.ContainerUnpauseOptions, error) {
@@ -52,21 +51,21 @@ func unpauseOptions(cmd *cobra.Command, _ []string) (options.ContainerUnpauseOpt
 }
 
 func unpauseAction(cmd *cobra.Command, args []string) error {
-	options, err := unpauseOptions(cmd, args)
+	opts, err := unpauseOptions(cmd, args)
 	if err != nil {
 		return err
 	}
 
-	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), opts.GOptions.Namespace, opts.GOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	return container.Unpause(ctx, cli, args, options)
+	return container.Unpause(ctx, cli, args, opts)
 }
 
-func unpauseShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+func unpauseShellComplete(cmd *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
 	// show paused container names
 	statusFilterFn := func(st client.ProcessStatus) bool {
 		return st == client.Paused

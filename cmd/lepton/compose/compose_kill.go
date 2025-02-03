@@ -26,15 +26,17 @@ import (
 )
 
 func killCommand() *cobra.Command {
-	var composeKillCommand = &cobra.Command{
+	var cmd = &cobra.Command{
 		Use:           "kill [flags] [SERVICE...]",
 		Short:         "Force stop service containers",
 		RunE:          killAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
-	composeKillCommand.Flags().StringP("signal", "s", "SIGKILL", "SIGNAL to send to the container.")
-	return composeKillCommand
+
+	cmd.Flags().StringP("signal", "s", "SIGKILL", "SIGNAL to send to the container.")
+
+	return cmd
 }
 
 func killAction(cmd *cobra.Command, args []string) error {

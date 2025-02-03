@@ -30,7 +30,7 @@ import (
 )
 
 func LoginCommand() *cobra.Command {
-	var loginCommand = &cobra.Command{
+	var cmd = &cobra.Command{
 		Use:           "login [flags] [SERVER]",
 		Args:          cobra.MaximumNArgs(1),
 		Short:         "Log in to a container registry",
@@ -38,13 +38,15 @@ func LoginCommand() *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
-	loginCommand.Flags().StringP("username", "u", "", "Username")
-	loginCommand.Flags().StringP("password", "p", "", "Password")
-	loginCommand.Flags().Bool("password-stdin", false, "Take the password from stdin")
-	return loginCommand
+
+	cmd.Flags().StringP("username", "u", "", "Username")
+	cmd.Flags().StringP("password", "p", "", "Password")
+	cmd.Flags().Bool("password-stdin", false, "Take the password from stdin")
+
+	return cmd
 }
 
-func processLoginOptions(cmd *cobra.Command, _ []string) (*options.LoginCommand, error) {
+func loginOptions(cmd *cobra.Command, args []string) (*options.LoginCommand, error) {
 	username, err := cmd.Flags().GetString("username")
 	if err != nil {
 		return nil, err
@@ -85,9 +87,15 @@ func processLoginOptions(cmd *cobra.Command, _ []string) (*options.LoginCommand,
 		password = strings.TrimSuffix(password, "\r")
 	}
 
+	serverAddress := ""
+	if len(args) == 1 {
+		serverAddress = args[0]
+	}
+
 	return &options.LoginCommand{
-		Username: username,
-		Password: password,
+		Username:      username,
+		Password:      password,
+		ServerAddress: serverAddress,
 	}, nil
 }
 
@@ -97,13 +105,9 @@ func loginAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	opts, err := processLoginOptions(cmd, args)
+	opts, err := loginOptions(cmd, args)
 	if err != nil {
 		return err
-	}
-
-	if len(args) == 1 {
-		opts.ServerAddress = args[0]
 	}
 
 	return login.Login(cmd.Context(), cmd.OutOrStdout(), globalOptions, opts)

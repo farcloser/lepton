@@ -30,7 +30,7 @@ import (
 )
 
 func StopCommand() *cobra.Command {
-	var stopCommand = &cobra.Command{
+	var cmd = &cobra.Command{
 		Use:               "stop [flags] CONTAINER [CONTAINER, ...]",
 		Args:              cobra.MinimumNArgs(1),
 		Short:             "Stop one or more running containers",
@@ -39,8 +39,10 @@ func StopCommand() *cobra.Command {
 		SilenceUsage:      true,
 		SilenceErrors:     true,
 	}
-	stopCommand.Flags().IntP("time", "t", 10, "Seconds to wait before sending a SIGKILL")
-	return stopCommand
+
+	cmd.Flags().IntP("time", "t", 10, "Seconds to wait before sending a SIGKILL")
+
+	return cmd
 }
 
 func stopOptions(cmd *cobra.Command, _ []string) (options.ContainerStop, error) {
@@ -66,21 +68,21 @@ func stopOptions(cmd *cobra.Command, _ []string) (options.ContainerStop, error) 
 }
 
 func stopAction(cmd *cobra.Command, args []string) error {
-	options, err := stopOptions(cmd, args)
+	opts, err := stopOptions(cmd, args)
 	if err != nil {
 		return err
 	}
 
-	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), opts.GOptions.Namespace, opts.GOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	return container.Stop(ctx, cli, args, options)
+	return container.Stop(ctx, cli, args, opts)
 }
 
-func stopShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+func stopShellComplete(cmd *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
 	// show non-stopped container names
 	statusFilterFn := func(st client.ProcessStatus) bool {
 		return st != client.Stopped && st != client.Created && st != client.Unknown

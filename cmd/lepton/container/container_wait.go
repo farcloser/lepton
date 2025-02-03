@@ -28,7 +28,7 @@ import (
 )
 
 func WaitCommand() *cobra.Command {
-	var waitCommand = &cobra.Command{
+	return &cobra.Command{
 		Use:               "wait [flags] CONTAINER [CONTAINER, ...]",
 		Args:              cobra.MinimumNArgs(1),
 		Short:             "Block until one or more containers stop, then print their exit codes.",
@@ -37,7 +37,6 @@ func WaitCommand() *cobra.Command {
 		SilenceUsage:      true,
 		SilenceErrors:     true,
 	}
-	return waitCommand
 }
 
 func waitOptions(cmd *cobra.Command, _ []string) (options.ContainerWait, error) {
@@ -52,21 +51,21 @@ func waitOptions(cmd *cobra.Command, _ []string) (options.ContainerWait, error) 
 }
 
 func waitAction(cmd *cobra.Command, args []string) error {
-	options, err := waitOptions(cmd, args)
+	opts, err := waitOptions(cmd, args)
 	if err != nil {
 		return err
 	}
 
-	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), opts.GOptions.Namespace, opts.GOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	return container.Wait(ctx, cli, args, options)
+	return container.Wait(ctx, cli, args, opts)
 }
 
-func waitShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+func waitShellComplete(cmd *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
 	// show running container names
 	statusFilterFn := func(st client.ProcessStatus) bool {
 		return st == client.Running

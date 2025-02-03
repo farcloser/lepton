@@ -27,7 +27,7 @@ import (
 )
 
 func versionCommand() *cobra.Command {
-	var composeVersionCommand = &cobra.Command{
+	var cmd = &cobra.Command{
 		Use:           "version",
 		Short:         "Show the Compose version information",
 		Args:          cobra.NoArgs,
@@ -35,12 +35,15 @@ func versionCommand() *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
-	composeVersionCommand.Flags().StringP("format", "f", formatter.FormatPretty, "Format the output. Values: [pretty | json]")
-	composeVersionCommand.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+
+	cmd.Flags().StringP("format", "f", formatter.FormatPretty, "Format the output. Values: [pretty | json]")
+	cmd.Flags().Bool("short", false, "Shows only Compose's version number")
+
+	_ = cmd.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return []string{formatter.FormatJSON, formatter.FormatPretty}, cobra.ShellCompDirectiveNoFileComp
 	})
-	composeVersionCommand.Flags().Bool("short", false, "Shows only Compose's version number")
-	return composeVersionCommand
+
+	return cmd
 }
 
 func versionAction(cmd *cobra.Command, args []string) error {
