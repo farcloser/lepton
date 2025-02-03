@@ -31,7 +31,7 @@ import (
 	"time"
 
 	"go.farcloser.world/lepton/leptonic/errs"
-	"go.farcloser.world/lepton/pkg/store"
+	"go.farcloser.world/lepton/leptonic/store"
 )
 
 // lifecycleFile is the name of file carrying the container information, relative to stateDir

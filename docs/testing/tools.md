@@ -23,8 +23,8 @@ package main
 import (
 	"testing"
 
-	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
-	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
+	"go.farcloser.world/lepton/pkg/testutil/nerdtest"
+	"go.farcloser.world/lepton/pkg/testutil/test"
 )
 
 func TestMyThing(t *testing.T) {
@@ -80,7 +80,7 @@ import (
 
 	"gotest.tools/v3/assert"
 
-	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
+	"go.farcloser.world/lepton/pkg/testutil/test"
 )
 
 func MyComparator(compare string) test.Comparator {
@@ -116,10 +116,10 @@ import (
 
 	"gotest.tools/v3/assert"
 
-	"github.com/containerd/nerdctl/v2/leptonic/errs"
+	"go.farcloser.world/lepton/leptonic/errs"
 
-	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
-	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
+	"go.farcloser.world/lepton/pkg/testutil/nerdtest"
+	"go.farcloser.world/lepton/pkg/testutil/test"
 )
 
 func TestMyThing(t *testing.T) {
@@ -225,9 +225,9 @@ import (
 
 	"gotest.tools/v3/assert"
 
-	"github.com/containerd/nerdctl/v2/leptonic/errs"
-	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
-	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
+	"go.farcloser.world/lepton/leptonic/errs"
+	"go.farcloser.world/lepton/pkg/testutil/nerdtest"
+	"go.farcloser.world/lepton/pkg/testutil/test"
 )
 
 func TestMyThing(t *testing.T) {
@@ -303,9 +303,9 @@ import (
 
 	"gotest.tools/v3/assert"
 
-    "github.com/containerd/nerdctl/v2/leptonic/errs"
-	"github.com/containerd/nerdctl/v2/pkg/testutil/nerdtest"
-	"github.com/containerd/nerdctl/v2/pkg/testutil/test"
+    "go.farcloser.world/lepton/leptonic/errs"
+	"go.farcloser.world/lepton/pkg/testutil/nerdtest"
+	"go.farcloser.world/lepton/pkg/testutil/test"
 )
 
 func TestMyThing(t *testing.T) {

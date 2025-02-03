@@ -30,9 +30,9 @@ import (
 	"go.farcloser.world/lepton/leptonic/api"
 	"go.farcloser.world/lepton/leptonic/errs"
 	"go.farcloser.world/lepton/leptonic/identifiers"
+	"go.farcloser.world/lepton/leptonic/store"
 	"go.farcloser.world/lepton/leptonic/utils"
-	labels2 "go.farcloser.world/lepton/pkg/labels"
-	"go.farcloser.world/lepton/pkg/store"
+	"go.farcloser.world/lepton/pkg/labels"
 )
 
 const (
@@ -319,7 +319,7 @@ func (vs *volumeStore) rawGet(name string, size bool) (vol *api.Volume, err erro
 
 	vol = &api.Volume{
 		Name:   name,
-		Labels: labels(content),
+		Labels: parseLabels(content),
 	}
 
 	vol.Mountpoint, err = vs.manager.Location(name, dataDirName)
@@ -346,7 +346,7 @@ func (vs *volumeStore) rawCreate(name string, lbls map[string]string) (vol *api.
 
 	if name == "" {
 		name = utils.GenerateID(utils.ID64)
-		lbls[labels2.AnonymousVolumes] = ""
+		lbls[labels.AnonymousVolumes] = ""
 	}
 
 	if err = identifiers.Validate(name); err != nil {
@@ -388,7 +388,7 @@ func (vs *volumeStore) rawCreate(name string, lbls map[string]string) (vol *api.
 }
 
 // Private helpers
-func labels(b []byte) map[string]string {
+func parseLabels(b []byte) map[string]string {
 	type volumeOpts struct {
 		Labels map[string]string `json:"labels,omitempty"`
 	}

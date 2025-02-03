@@ -29,7 +29,7 @@ import (
 
 	"go.farcloser.world/lepton/leptonic/errs"
 	"go.farcloser.world/lepton/leptonic/identifiers"
-	"go.farcloser.world/lepton/pkg/store"
+	"go.farcloser.world/lepton/leptonic/store"
 )
 
 // ErrNameStore will wrap all errors here

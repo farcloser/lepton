@@ -51,12 +51,7 @@ func registerImgcryptFlags(cmd *cobra.Command, encrypt bool) {
 	_ = cmd.RegisterFlagCompletionFunc("platform", completion.Platforms)
 }
 
-func cryptOptions(cmd *cobra.Command, _ []string, encrypt bool) (options.ImageCrypt, error) {
-	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
-	if err != nil {
-		return options.ImageCrypt{}, err
-	}
-
+func cryptOptions(cmd *cobra.Command, args []string, encrypt bool) (options.ImageCrypt, error) {
 	platforms, err := cmd.Flags().GetStringSlice("platform")
 	if err != nil {
 		return options.ImageCrypt{}, err
@@ -96,34 +91,37 @@ func cryptOptions(cmd *cobra.Command, _ []string, encrypt bool) (options.ImageCr
 	}
 
 	return options.ImageCrypt{
-		GOptions:      globalOptions,
-		Platforms:     platforms,
-		AllPlatforms:  allPlatforms,
-		GpgHomeDir:    gpgHomeDir,
-		GpgVersion:    gpgVersion,
-		Keys:          keys,
-		DecRecipients: decRecipients,
-		Recipients:    recipients,
-		Stdout:        cmd.OutOrStdout(),
+		SourceRef:      args[0],
+		DestinationRef: args[1],
+		Platforms:      platforms,
+		AllPlatforms:   allPlatforms,
+		GpgHomeDir:     gpgHomeDir,
+		GpgVersion:     gpgVersion,
+		Keys:           keys,
+		DecRecipients:  decRecipients,
+		Recipients:     recipients,
 	}, nil
 }
 
 func imgcryptAction(encrypt bool) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
+		globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
+		if err != nil {
+			return err
+		}
+
 		opts, err := cryptOptions(cmd, args, encrypt)
 		if err != nil {
 			return err
 		}
-		srcRawRef := args[0]
-		targetRawRef := args[1]
 
-		cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), opts.GOptions.Namespace, opts.GOptions.Address)
+		cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
 		if err != nil {
 			return err
 		}
 
 		defer cancel()
 
-		return image.Crypt(ctx, cli, srcRawRef, targetRawRef, encrypt, opts)
+		return image.Crypt(ctx, encrypt, cli, cmd.OutOrStdout(), globalOptions, opts)
 	}
 }

@@ -47,8 +47,8 @@ type ImageList struct {
 
 // ImageConvert specifies options for `image convert`.
 type ImageConvert struct {
-	Stdout   io.Writer
-	GOptions *Global
+	SourceRef      string
+	DestinationRef string
 
 	// #region generic flags
 	// Uncompress convert tar.gz layers to uncompressed tar layers
@@ -88,8 +88,8 @@ type ImageConvert struct {
 
 // ImageCrypt specifies options for `image encrypt` and `image decrypt`.
 type ImageCrypt struct {
-	Stdout   io.Writer
-	GOptions *Global
+	SourceRef      string
+	DestinationRef string
 	// Platforms convert content for a specific platform
 	Platforms []string
 	// AllPlatforms convert content for all platforms
