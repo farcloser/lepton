@@ -97,7 +97,6 @@ func TestLoginPersistence(t *testing.T) {
 	testCase.Require = nerdtest.IsFlaky("mixed tests using both legacy and non-legacy are considered flaky")
 
 	testCase.Setup = func(data test.Data, helpers test.Helpers) {
-
 		base := testutil.NewBase(t)
 
 		// Retrieve from the store
