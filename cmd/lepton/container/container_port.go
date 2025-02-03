@@ -99,6 +99,6 @@ func portAction(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func portShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+func portShellComplete(cmd *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
 	return completion.ContainerNames(cmd, nil)
 }

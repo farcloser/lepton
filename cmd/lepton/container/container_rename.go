@@ -50,17 +50,17 @@ func renameOptions(cmd *cobra.Command, _ []string) (options.ContainerRename, err
 }
 
 func renameAction(cmd *cobra.Command, args []string) error {
-	options, err := renameOptions(cmd, args)
+	opts, err := renameOptions(cmd, args)
 	if err != nil {
 		return err
 	}
-	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), opts.GOptions.Namespace, opts.GOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
-	return container.Rename(ctx, cli, args[0], args[1], options)
+	return container.Rename(ctx, cli, args[0], args[1], opts)
 }
-func renameShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+func renameShellComplete(cmd *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
 	return completion.ContainerNames(cmd, nil)
 }

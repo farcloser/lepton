@@ -50,7 +50,7 @@ func newVersionCommand() *cobra.Command {
 	return versionCommand
 }
 
-func versionAction(cmd *cobra.Command, args []string) error {
+func versionAction(cmd *cobra.Command, _ []string) error {
 	var w io.Writer = os.Stdout
 	var tmpl *template.Template
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)

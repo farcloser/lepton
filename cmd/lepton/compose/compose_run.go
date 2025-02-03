@@ -161,11 +161,7 @@ func runAction(cmd *cobra.Command, args []string) error {
 	}
 
 	if interactive && detach {
-		return errors.New("currently flag -i and -d cannot be specified together (FIXME)")
-	}
-
-	if tty && detach {
-		return errors.New("currently flag -t and -d cannot be specified together (FIXME)")
+		return errors.New("currently flag -t (or -i) and -d cannot be specified together (FIXME)")
 	}
 
 	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)

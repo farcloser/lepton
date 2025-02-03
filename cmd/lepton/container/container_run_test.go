@@ -485,9 +485,9 @@ COPY --from=builder /go/src/logger/logger /
 	defer base.Cmd("container", "rm", "-f", containerName).AssertOK()
 
 	inspectedContainer := base.InspectContainer(containerName)
-	bytes, err := os.ReadFile(filepath.Join(os.TempDir(), fmt.Sprintf("%s_%s.log", inspectedContainer.ID, "stdout")))
+	output, err := os.ReadFile(filepath.Join(os.TempDir(), fmt.Sprintf("%s_%s.log", inspectedContainer.ID, "stdout")))
 	assert.NilError(t, err)
-	log := string(bytes)
+	log := string(output)
 	assert.Check(t, strings.Contains(log, "foo"))
 	assert.Check(t, strings.Contains(log, "bar"))
 }

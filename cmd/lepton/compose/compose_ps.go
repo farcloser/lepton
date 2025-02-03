@@ -366,14 +366,14 @@ func statusForFilter(ctx context.Context, c client.Container) string {
 	if err != nil {
 		return string(client.Unknown)
 	}
-	labels, err := c.Labels(ctx)
+	lbls, err := c.Labels(ctx)
 	if err != nil {
 		return string(client.Unknown)
 	}
 
 	switch s := status.Status; s {
 	case client.Stopped:
-		if labels[restart.StatusLabel] == string(client.Running) && restart.Reconcile(status, labels) {
+		if lbls[restart.StatusLabel] == string(client.Running) && restart.Reconcile(status, lbls) {
 			return "restarting"
 		}
 		return "exited"

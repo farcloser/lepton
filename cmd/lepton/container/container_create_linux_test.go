@@ -88,12 +88,12 @@ func TestCreateWithMACAddress(t *testing.T) {
 		{networkMACvlan, false, passedMac},
 		{networkIPvlan, true, "not support"},
 	}
-	for i, test := range tests {
+	for i, testCase := range tests {
 		containerName := fmt.Sprintf("%s_%d", tID, i)
-		testName := fmt.Sprintf("%s_container:%s_network:%s_expect:%s", tID, containerName, test.Network, test.Expect)
-		expect := test.Expect
-		network := test.Network
-		wantErr := test.WantErr
+		testName := fmt.Sprintf("%s_container:%s_network:%s_expect:%s", tID, containerName, testCase.Network, testCase.Expect)
+		expect := testCase.Expect
+		network := testCase.Network
+		wantErr := testCase.WantErr
 		t.Run(testName, func(tt *testing.T) {
 			tt.Parallel()
 

@@ -120,16 +120,16 @@ func pullOptions(cmd *cobra.Command, args []string) (options.ImagePull, error) {
 }
 
 func pullAction(cmd *cobra.Command, args []string) error {
-	options, err := pullOptions(cmd, args)
+	opts, err := pullOptions(cmd, args)
 	if err != nil {
 		return err
 	}
 
-	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), opts.GOptions.Namespace, opts.GOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	return image.Pull(ctx, cli, args[0], options)
+	return image.Pull(ctx, cli, args[0], opts)
 }

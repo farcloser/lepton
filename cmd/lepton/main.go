@@ -54,7 +54,6 @@ import (
 )
 
 var (
-	// To print Bold Text
 	Bold = color.New(color.Bold).SprintfFunc()
 )
 
@@ -168,7 +167,6 @@ func initRootCmdFlags(rootCmd *cobra.Command, tomlPath string) (*pflag.FlagSet, 
 
 	rootCmd.PersistentFlags().Bool("debug", cfg.Debug, "debug mode")
 	rootCmd.PersistentFlags().Bool("debug-full", cfg.DebugFull, "debug mode (with full output)")
-	// -a is aliases (conflicts with images -a)
 	helpers.AddPersistentStringFlag(rootCmd, "address", []string{"a", "H"}, nil, []string{"host"}, aliasToBeInherited, cfg.Address, "CONTAINERD_ADDRESS", `containerd address, optionally with "unix://" prefix`)
 	// -n is aliases (conflicts with logs -n)
 	helpers.AddPersistentStringFlag(rootCmd, "namespace", []string{"n"}, nil, nil, aliasToBeInherited, cfg.Namespace, "CONTAINERD_NAMESPACE", `containerd namespace, such as "moby" for Docker, "k8s.io" for Kubernetes`)

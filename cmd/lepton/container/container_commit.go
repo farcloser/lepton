@@ -98,7 +98,7 @@ func commitAction(cmd *cobra.Command, args []string) error {
 	return container.Commit(ctx, cli, args[1], args[0], opts)
 }
 
-func commitShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+func commitShellComplete(cmd *cobra.Command, args []string, _ string) ([]string, cobra.ShellCompDirective) {
 	if len(args) == 0 {
 		return completion.ContainerNames(cmd, nil)
 	}

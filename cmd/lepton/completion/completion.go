@@ -32,7 +32,7 @@ import (
 	"go.farcloser.world/lepton/pkg/netutil"
 )
 
-func VolumeNames(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+func VolumeNames(cmd *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return nil, cobra.ShellCompDirectiveError
@@ -190,8 +190,8 @@ func NetworkNames(cmd *cobra.Command, exclude []string) ([]string, cobra.ShellCo
 	return candidates, cobra.ShellCompDirectiveNoFileComp
 }
 
-func Platforms(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-	candidates := []string{
+func Platforms(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
+	return []string{
 		"amd64",
 		"arm64",
 		"riscv64",
@@ -200,6 +200,5 @@ func Platforms(cmd *cobra.Command, args []string, toComplete string) ([]string, 
 		"386",
 		"arm",          // alias of "linux/arm/v7"
 		"linux/arm/v6", // "arm/v6" is invalid (interpreted as OS="arm", Arch="v7")
-	}
-	return candidates, cobra.ShellCompDirectiveNoFileComp
+	}, cobra.ShellCompDirectiveNoFileComp
 }

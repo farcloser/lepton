@@ -79,18 +79,18 @@ func loadOptions(cmd *cobra.Command) (options.ImageLoad, error) {
 	}, nil
 }
 
-func loadAction(cmd *cobra.Command, args []string) error {
-	options, err := loadOptions(cmd)
+func loadAction(cmd *cobra.Command, _ []string) error {
+	opts, err := loadOptions(cmd)
 	if err != nil {
 		return err
 	}
 
-	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), opts.GOptions.Namespace, opts.GOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	_, err = load.FromArchive(ctx, cli, options)
+	_, err = load.FromArchive(ctx, cli, opts)
 	return err
 }

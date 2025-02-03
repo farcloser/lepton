@@ -113,7 +113,7 @@ CMD ["echo", "build-test-string"]
 func TestImagePullPlainHttpWithDefaultPort(t *testing.T) {
 	nerdtest.Setup()
 
-	var registry *testregistry.RegistryServer
+	var reg *testregistry.RegistryServer
 
 	testCase := &test.Case{
 		Require: require.All(
@@ -122,9 +122,9 @@ func TestImagePullPlainHttpWithDefaultPort(t *testing.T) {
 			nerdtest.Build,
 		),
 		Setup: func(data test.Data, helpers test.Helpers) {
-			registry = testregistry.NewWithNoAuth(data, helpers, 80, false)
+			reg = testregistry.NewWithNoAuth(data, helpers, 80, false)
 			testImageRef := fmt.Sprintf("%s/%s:%s",
-				registry.IP.String(), data.Identifier(), strings.Split(testutil.CommonImage, ":")[1])
+				reg.IP.String(), data.Identifier(), strings.Split(testutil.CommonImage, ":")[1])
 			dockerfile := fmt.Sprintf(`FROM %s
 CMD ["echo", "build-test-string"]
 	`, testutil.CommonImage)
@@ -138,15 +138,15 @@ CMD ["echo", "build-test-string"]
 		},
 		Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 			testImageRef := fmt.Sprintf("%s/%s:%s",
-				registry.IP.String(), data.Identifier(), strings.Split(testutil.CommonImage, ":")[1])
+				reg.IP.String(), data.Identifier(), strings.Split(testutil.CommonImage, ":")[1])
 			return helpers.Command("--insecure-registry", "pull", testImageRef)
 		},
 		Expected: test.Expects(0, nil, nil),
 		Cleanup: func(data test.Data, helpers test.Helpers) {
-			if registry != nil {
-				registry.Cleanup(nil)
+			if reg != nil {
+				reg.Cleanup(nil)
 				testImageRef := fmt.Sprintf("%s/%s:%s",
-					registry.IP.String(), data.Identifier(), strings.Split(testutil.CommonImage, ":")[1])
+					reg.IP.String(), data.Identifier(), strings.Split(testutil.CommonImage, ":")[1])
 				helpers.Anyhow("rmi", "-f", testImageRef)
 			}
 		},

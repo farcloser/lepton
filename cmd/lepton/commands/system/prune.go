@@ -87,7 +87,7 @@ func pruneOptions(cmd *cobra.Command, _ []string) (*options.SystemPrune, error) 
 		Stderr:               cmd.ErrOrStderr(),
 		All:                  all,
 		Volumes:              vFlag,
-		NetworkDriversToKeep: network.NetworkDriversToKeep,
+		NetworkDriversToKeep: network.DriversToKeep,
 	}, nil
 }
 

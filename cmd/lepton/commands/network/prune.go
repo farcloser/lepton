@@ -25,7 +25,7 @@ import (
 	"go.farcloser.world/lepton/pkg/cmd/network"
 )
 
-var NetworkDriversToKeep = []string{"host", "none", DefaultNetworkDriver}
+var DriversToKeep = []string{"host", "none", DefaultNetworkDriver}
 
 func pruneCommand() *cobra.Command {
 	cmd := &cobra.Command{
@@ -56,7 +56,7 @@ func pruneOptions(cmd *cobra.Command, _ []string) (*options.NetworkPrune, error)
 	}
 
 	return &options.NetworkPrune{
-		NetworkDriversToKeep: NetworkDriversToKeep,
+		NetworkDriversToKeep: DriversToKeep,
 		Force:                force,
 	}, nil
 }

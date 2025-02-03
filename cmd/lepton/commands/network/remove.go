@@ -61,7 +61,7 @@ func removeAction(cmd *cobra.Command, args []string) error {
 	return network.Remove(ctx, cli, globalOptions, opts)
 }
 
-func networkRmShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+func networkRmShellComplete(cmd *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
 	// show network names, including "bridge"
 	exclude := []string{netutil.DefaultNetworkName, "host", "none"}
 	return completion.NetworkNames(cmd, exclude)

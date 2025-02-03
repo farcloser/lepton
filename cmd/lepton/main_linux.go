@@ -24,7 +24,7 @@ import (
 	"go.farcloser.world/lepton/pkg/strutil"
 )
 
-func appNeedsRootlessParentMain(cmd *cobra.Command, args []string) bool {
+func appNeedsRootlessParentMain(cmd *cobra.Command, _ []string) bool {
 	commands := []string{}
 	for tcmd := cmd; tcmd != nil; tcmd = tcmd.Parent() {
 		commands = append(commands, tcmd.Name())

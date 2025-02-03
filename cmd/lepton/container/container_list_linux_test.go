@@ -354,7 +354,7 @@ func TestContainerListWithFilter(t *testing.T) {
 
 	// docker filter by id only support full ID no truncate
 	// https://github.com/docker/for-linux/issues/258
-	// yet we also support truncate ID
+	// we do also support truncate ID
 	base.Cmd("ps", "--no-trunc", "--filter", "since="+testContainerA.name).AssertOutWithFunc(func(stdout string) error {
 		lines := strings.Split(strings.TrimSpace(stdout), "\n")
 		if len(lines) < 2 {
@@ -411,7 +411,7 @@ func TestContainerListWithFilter(t *testing.T) {
 
 	// docker filter by id only support full ID no truncate
 	// https://github.com/docker/for-linux/issues/258
-	// yet we also support truncate ID
+	// we do also support truncate ID
 	base.Cmd("ps", "--no-trunc", "--filter", "before="+testContainerB.name).AssertOutWithFunc(func(stdout string) error {
 		lines := strings.Split(strings.TrimSpace(stdout), "\n")
 		if len(lines) < 2 {

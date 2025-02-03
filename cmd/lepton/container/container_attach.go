@@ -93,7 +93,7 @@ func attachAction(cmd *cobra.Command, args []string) error {
 	return container.Attach(ctx, cli, args[0], opts)
 }
 
-func attachShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+func attachShellComplete(cmd *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
 	statusFilterFn := func(st client.ProcessStatus) bool {
 		return st == client.Running
 	}
