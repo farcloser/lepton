@@ -17,10 +17,19 @@
 package compose
 
 import (
+	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
 	"testing"
 
+	"gotest.tools/v3/assert"
+
+	"go.farcloser.world/tigron/expect"
+	"go.farcloser.world/tigron/test"
+
 	"go.farcloser.world/lepton/pkg/testutil"
+	"go.farcloser.world/lepton/pkg/testutil/nerdtest"
 )
 
 func TestComposeBuild(t *testing.T) {
@@ -45,29 +54,72 @@ services:
 
 	dockerfile := "FROM " + testutil.AlpineImage
 
-	testutil.RequiresBuild(t)
-	testutil.RegisterBuildCacheCleanup(t)
-	base := testutil.NewBase(t)
+	testCase := nerdtest.Setup()
 
-	comp := testutil.NewComposeDir(t, dockerComposeYAML)
-	defer comp.CleanUp()
-	comp.WriteFile("Dockerfile", dockerfile)
-	projectName := comp.ProjectName()
-	t.Logf("projectName=%q", projectName)
+	testCase.Require = nerdtest.Build
 
-	defer base.Cmd("rmi", imageSvc0).Run()
-	defer base.Cmd("rmi", imageSvc1).Run()
+	testCase.Setup = func(data test.Data, helpers test.Helpers) {
+		err := os.WriteFile(filepath.Join(data.TempDir(), "compose.yaml"), []byte(dockerComposeYAML), 0o600)
+		assert.NilError(t, err)
+		err = os.WriteFile(filepath.Join(data.TempDir(), "Dockerfile"), []byte(dockerfile), 0o600)
+		assert.NilError(t, err)
+		data.Set("composeYaml", filepath.Join(data.TempDir(), "compose.yaml"))
+	}
 
-	// 1. build only 1 service without triggering the dependency service build
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "build", "svc0").AssertOK()
-	base.Cmd("images").AssertOutContains(imageSvc0)
-	base.Cmd("images").AssertOutNotContains(imageSvc1)
-	// 2. build multiple services
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "build", "svc0", "svc1").AssertOK()
-	base.Cmd("images").AssertOutContains(imageSvc0)
-	base.Cmd("images").AssertOutContains(imageSvc1)
-	// 3. build all if no args are given
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "build").AssertOK()
-	// 4. fail if some services args not exist in compose.yml
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "build", "svc0", "svc100").AssertFail()
+	testCase.SubTests = []*test.Case{
+		{
+			Description: "build svc0",
+			NoParallel:  true,
+			Setup: func(data test.Data, helpers test.Helpers) {
+				helpers.Ensure("compose", "-f", data.Get("composeYaml"), "build", "svc0")
+			},
+
+			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
+				return helpers.Command("images")
+			},
+
+			Expected: test.Expects(0, nil, expect.All(
+				expect.Contains(imageSvc0),
+				expect.DoesNotContain(imageSvc1),
+			)),
+		},
+		{
+			Description: "build svc0 and svc1",
+			NoParallel:  true,
+			Setup: func(data test.Data, helpers test.Helpers) {
+				helpers.Ensure("compose", "-f", data.Get("composeYaml"), "build", "svc0", "svc1")
+			},
+
+			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
+				return helpers.Command("images")
+			},
+
+			Expected: test.Expects(0, nil, expect.All(
+				expect.Contains(imageSvc0),
+				expect.Contains(imageSvc1),
+			)),
+		},
+		{
+			Description: "build no arg",
+			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
+				return helpers.Command("compose", "-f", data.Get("composeYaml"), "build")
+			},
+
+			Expected: test.Expects(0, nil, nil),
+		},
+		{
+			Description: "build bogus",
+			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
+				return helpers.Command("compose", "-f", data.Get("composeYaml"), "build", "svc0", "svc100")
+			},
+
+			Expected: test.Expects(1, []error{errors.New("no such service: svc100")}, nil),
+		},
+	}
+
+	testCase.Cleanup = func(data test.Data, helpers test.Helpers) {
+		helpers.Anyhow("rmi", imageSvc0, imageSvc1)
+	}
+
+	testCase.Run(t)
 }

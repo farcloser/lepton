@@ -28,6 +28,7 @@ import (
 
 	"go.farcloser.world/containers/security/apparmor"
 
+	"go.farcloser.world/lepton/pkg/defaults"
 	"go.farcloser.world/lepton/pkg/rootlessutil"
 	"go.farcloser.world/lepton/pkg/testutil"
 )
@@ -171,7 +172,7 @@ func TestRunSecurityOptSeccomp(t *testing.T) {
 func TestRunApparmor(t *testing.T) {
 	base := testutil.NewBase(t)
 	defaultProfile := base.Target + "-default"
-	if !apparmor.Enabled() {
+	if !apparmor.Enabled() || (!apparmor.CanLoadProfile() && !apparmor.CanApplyProfile(defaults.AppArmorProfileName)) {
 		t.Skipf("needs to be able to apply %q profile", defaultProfile)
 	}
 
