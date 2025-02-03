@@ -239,6 +239,7 @@ func CopyFiles(ctx context.Context, client *containerd.Client, container contain
 			return fmt.Errorf("failed to execute %v: %w (out=%q)", cpCmd.Args, err, string(out))
 		}
 	}
+
 	tarC := []string{tarBinary}
 	if options.FollowSymLink {
 		tarC = append(tarC, "-h")

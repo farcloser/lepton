@@ -39,7 +39,7 @@ import (
 	types100 "github.com/containernetworking/cni/pkg/types/100"
 
 	"go.farcloser.world/lepton/leptonic/errs"
-	"go.farcloser.world/lepton/pkg/store"
+	"go.farcloser.world/lepton/leptonic/store"
 )
 
 const (

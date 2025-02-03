@@ -19,7 +19,7 @@ package containerutil
 import (
 	"path/filepath"
 
-	"go.farcloser.world/lepton/pkg/store"
+	"go.farcloser.world/lepton/leptonic/store"
 )
 
 func Lock(stateDir string) (store.Store, error) {

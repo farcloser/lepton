@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package store
+package store_test
 
 import (
 	"testing"
@@ -23,13 +23,14 @@ import (
 	"gotest.tools/v3/assert"
 
 	"go.farcloser.world/lepton/leptonic/errs"
+	"go.farcloser.world/lepton/leptonic/store"
 )
 
 func TestFileStoreBasics(t *testing.T) {
 	tempDir := t.TempDir()
 
 	// Creation
-	tempStore, err := New(tempDir, false, 0, 0)
+	tempStore, err := store.New(tempDir, false, 0, 0)
 	assert.NilError(t, err, "temporary store creation should succeed")
 
 	// Lock acquisition
@@ -110,7 +111,7 @@ func TestFileStoreGroups(t *testing.T) {
 	tempDir := t.TempDir()
 
 	// Creation
-	tempStore, err := New(tempDir, false, 0, 0)
+	tempStore, err := store.New(tempDir, false, 0, 0)
 	assert.NilError(t, err, "temporary store creation should succeed")
 
 	_ = tempStore.Lock()
@@ -166,7 +167,7 @@ func TestFileStoreConcurrent(t *testing.T) {
 	tempDir := t.TempDir()
 
 	// Creation
-	tempStore, err := New(tempDir, true, 0, 0)
+	tempStore, err := store.New(tempDir, true, 0, 0)
 	assert.NilError(t, err, "temporary store creation should succeed")
 
 	go func() {
