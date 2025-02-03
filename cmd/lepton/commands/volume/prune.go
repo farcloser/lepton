@@ -54,9 +54,8 @@ func pruneOptions(cmd *cobra.Command, _ []string) (*options.VolumePrune, error) 
 	}
 
 	return &options.VolumePrune{
-		All:    all,
-		Force:  force,
-		Stdout: cmd.OutOrStdout(),
+		All:   all,
+		Force: force,
 	}, nil
 }
 
@@ -75,7 +74,7 @@ func pruneAction(cmd *cobra.Command, args []string) error {
 		var confirm string
 		msg := "This will remove all local volumes not used by at least one container."
 		msg += "\nAre you sure you want to continue? [y/N] "
-		fmt.Fprintf(opts.Stdout, "WARNING! %s", msg)
+		fmt.Fprintf(cmd.OutOrStdout(), "WARNING! %s", msg)
 		fmt.Fscanf(cmd.InOrStdin(), "%s", &confirm)
 
 		if strings.ToLower(confirm) != "y" {
@@ -89,5 +88,5 @@ func pruneAction(cmd *cobra.Command, args []string) error {
 	}
 	defer cancel()
 
-	return volume.Prune(ctx, cli, globalOptions, opts)
+	return volume.Prune(ctx, cli, cmd.OutOrStdout(), globalOptions, opts)
 }

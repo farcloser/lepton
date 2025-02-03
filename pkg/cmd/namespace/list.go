@@ -137,6 +137,6 @@ func List(ctx context.Context, client *client.Client, output io.Writer, globalOp
 	//		log.G(ctx).WithError(err)
 	//	}
 	//}
-	//
+
 	return w.Flush()
 }

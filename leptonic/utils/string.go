@@ -14,29 +14,31 @@
    limitations under the License.
 */
 
-package volume
+package utils
 
 import (
-	"context"
+	"crypto/rand"
+	"encoding/hex"
 	"fmt"
-	"io"
-
-	"go.farcloser.world/lepton/leptonic/api"
-	"go.farcloser.world/lepton/pkg/api/options"
 )
 
-func Create(ctx context.Context, output io.Writer, globalOptions *options.Global, opts *options.VolumeCreate) (*api.Volume, error) {
-	volStore, err := Store(globalOptions.Namespace, globalOptions.DataRoot, globalOptions.Address)
+const (
+	ID64 = 64
+	ID32 = 32
+	ID12 = 12
+)
+
+func GenerateID(length int) string {
+	b := make([]byte, length/2)
+
+	n, err := rand.Read(b)
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 
-	vol, err := volStore.Create(opts.Name, opts.Labels)
-	if err != nil {
-		return nil, err
+	if n != length/2 {
+		panic(fmt.Errorf("expected %d bytes, got %d bytes", length/2, n))
 	}
 
-	_, err = fmt.Fprintln(output, vol.Name)
-
-	return vol, err
+	return hex.EncodeToString(b)
 }

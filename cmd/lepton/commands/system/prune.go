@@ -58,7 +58,6 @@ func pruneOptions(cmd *cobra.Command, _ []string) (*options.SystemPrune, error) 
 	}
 
 	return &options.SystemPrune{
-		Stdout:               cmd.OutOrStdout(),
 		Stderr:               cmd.ErrOrStderr(),
 		All:                  all,
 		Volumes:              vFlag,
@@ -92,7 +91,7 @@ func grantSystemPrunePermission(cmd *cobra.Command, options *options.SystemPrune
 		}
 
 		msg += "\nAre you sure you want to continue? [y/N] "
-		fmt.Fprintf(options.Stdout, "WARNING! %s", msg)
+		fmt.Fprintf(cmd.OutOrStdout(), "WARNING! %s", msg)
 		fmt.Fscanf(cmd.InOrStdin(), "%s", &confirm)
 
 		if strings.ToLower(confirm) != "y" {
@@ -134,5 +133,5 @@ func pruneAction(cmd *cobra.Command, args []string) error {
 	}
 	defer cancel()
 
-	return system.Prune(ctx, cli, globalOptions, opts)
+	return system.Prune(ctx, cli, cmd.OutOrStdout(), globalOptions, opts)
 }

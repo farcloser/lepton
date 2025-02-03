@@ -27,32 +27,14 @@ import (
 	"go.farcloser.world/lepton/pkg/api/options"
 )
 
-func Update(ctx context.Context, cli *client.Client, globalOptions *options.Global, opts *options.NamespaceUpdate) error {
+func Update(ctx context.Context, cli *client.Client, _ *options.Global, opts *options.NamespaceUpdate) error {
 	errs := namespace.Update(ctx, cli, opts.Name, opts.Labels)
 	if len(errs) > 0 {
 		for _, err := range errs {
 			log.G(ctx).WithError(err).Error()
 		}
 
-		return errors.New("an error occurred")
-	}
-
-	return nil
-}
-
-func Create(ctx context.Context, cli *client.Client, globalOptions *options.Global, opts *options.NamespaceCreate) error {
-	return namespace.Create(ctx, cli, opts.Name, opts.Labels)
-}
-
-func Remove(ctx context.Context, client *client.Client, globalOptions *options.Global, opts *options.NamespaceRemove) error {
-	errs := namespace.Remove(ctx, client, opts.NamesList, opts.CGroup)
-
-	if len(errs) > 0 {
-		for _, err := range errs {
-			log.G(ctx).WithError(err).Error()
-		}
-
-		return errors.New("failed to remove namespaces")
+		return errors.New("error while updating namespace")
 	}
 
 	return nil

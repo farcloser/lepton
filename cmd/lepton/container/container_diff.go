@@ -36,8 +36,8 @@ import (
 	"go.farcloser.world/lepton/cmd/lepton/completion"
 	"go.farcloser.world/lepton/cmd/lepton/helpers"
 	"go.farcloser.world/lepton/leptonic/services/containerd"
+	"go.farcloser.world/lepton/leptonic/utils"
 	"go.farcloser.world/lepton/pkg/api/options"
-	"go.farcloser.world/lepton/pkg/idgen"
 	"go.farcloser.world/lepton/pkg/idutil/containerwalker"
 	"go.farcloser.world/lepton/pkg/imgutil"
 	"go.farcloser.world/lepton/pkg/labels"
@@ -168,7 +168,7 @@ func getChanges(ctx context.Context, cli *client.Client, container client.Contai
 
 	rootfsID := specs.ChainID(baseImgConfig.RootFS.DiffIDs).String()
 
-	randomID := idgen.GenerateID()
+	randomID := utils.GenerateID(utils.ID32)
 	parent, err := sn.View(ctx, randomID, rootfsID)
 	if err != nil {
 		return nil, err

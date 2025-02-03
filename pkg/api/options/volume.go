@@ -22,14 +22,14 @@ import (
 
 // VolumeCreate specifies options for `volume create`.
 type VolumeCreate struct {
-	Stdout io.Writer
-	// Labels are the volume labels
-	Labels []string
+	Name   string
+	Labels map[string]string
 }
 
 // VolumeInspect specifies options for `volume inspect`.
 type VolumeInspect struct {
 	Stdout io.Writer
+	Name   string
 	// Format the output using the given go template
 	Format string
 	// Display the disk usage of volumes. Can be slow with volumes having loads of directories.
@@ -38,7 +38,6 @@ type VolumeInspect struct {
 
 // VolumeList specifies options for `volume ls`.
 type VolumeList struct {
-	Stdout io.Writer
 	// Only display volume names
 	Quiet bool
 	// Format the output using the given go template
@@ -51,7 +50,6 @@ type VolumeList struct {
 
 // VolumePrune specifies options for `volume prune`.
 type VolumePrune struct {
-	Stdout io.Writer
 	// Remove all unused volumes, not just anonymous ones
 	All bool
 	// Do not prompt for confirmation
@@ -60,7 +58,7 @@ type VolumePrune struct {
 
 // VolumeRemove specifies options for `volume rm`.
 type VolumeRemove struct {
-	Stdout io.Writer
+	Name string
 	// Force the removal of one or more volumes
 	Force bool
 }

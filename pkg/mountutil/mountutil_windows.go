@@ -82,11 +82,11 @@ func ProcessFlagTmpfs(s string) (*Processed, error) {
 	return nil, errdefs.ErrNotImplemented
 }
 
-func ProcessFlagMount(s string, volStore volumestore.VolumeStore) (*Processed, error) {
+func ProcessFlagMount(s string, volStore volumestore.VolumeService) (*Processed, error) {
 	return nil, errdefs.ErrNotImplemented
 }
 
-func handleVolumeToMount(source string, dst string, volStore volumestore.VolumeStore, createDir bool) (volumeSpec, error) {
+func handleVolumeToMount(source string, dst string, volStore volumestore.VolumeService, createDir bool) (volumeSpec, error) {
 	// Validate source and destination types
 	if _, err := (validateNamedPipeSpec(source, dst)); err != nil {
 		return volumeSpec{}, err

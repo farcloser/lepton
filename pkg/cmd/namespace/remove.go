@@ -14,12 +14,28 @@
    limitations under the License.
 */
 
-package native
+package namespace
 
-// Volume is also compatible with Docker
-type Volume struct {
-	Name       string             `json:"Name"`
-	Mountpoint string             `json:"Mountpoint"`
-	Labels     *map[string]string `json:"Labels,omitempty"`
-	Size       int64              `json:"Size,omitempty"`
+import (
+	"context"
+	"errors"
+
+	"github.com/containerd/containerd/v2/client"
+	"github.com/containerd/log"
+
+	"go.farcloser.world/lepton/leptonic/services/namespace"
+	"go.farcloser.world/lepton/pkg/api/options"
+)
+
+func Remove(ctx context.Context, client *client.Client, _ *options.Global, opts *options.NamespaceRemove) error {
+	errs := namespace.Remove(ctx, client, opts.NamesList, opts.CGroup)
+	if len(errs) > 0 {
+		for _, err := range errs {
+			log.G(ctx).WithError(err).Error()
+		}
+
+		return errors.New("error while removing namespaces")
+	}
+
+	return nil
 }

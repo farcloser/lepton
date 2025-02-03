@@ -14,29 +14,28 @@
    limitations under the License.
 */
 
-package volume
+package registry
 
 import (
-	"context"
-	"fmt"
-	"io"
+	"github.com/spf13/cobra"
 
-	"go.farcloser.world/lepton/leptonic/api"
-	"go.farcloser.world/lepton/pkg/api/options"
+	"go.farcloser.world/lepton/cmd/lepton/helpers"
 )
 
-func Create(ctx context.Context, output io.Writer, globalOptions *options.Global, opts *options.VolumeCreate) (*api.Volume, error) {
-	volStore, err := Store(globalOptions.Namespace, globalOptions.DataRoot, globalOptions.Address)
-	if err != nil {
-		return nil, err
+func Command() *cobra.Command {
+	var cmd = &cobra.Command{
+		Annotations:   map[string]string{helpers.Category: helpers.Management},
+		Use:           "registry",
+		Short:         "Manage registry credentials",
+		RunE:          helpers.UnknownSubcommandAction,
+		SilenceUsage:  true,
+		SilenceErrors: true,
 	}
 
-	vol, err := volStore.Create(opts.Name, opts.Labels)
-	if err != nil {
-		return nil, err
-	}
+	cmd.AddCommand(
+		LoginCommand(),
+		LogoutCommand(),
+	)
 
-	_, err = fmt.Fprintln(output, vol.Name)
-
-	return vol, err
+	return cmd
 }

@@ -17,7 +17,7 @@
 package volume
 
 import (
-	"fmt"
+	"errors"
 
 	"github.com/spf13/cobra"
 
@@ -25,10 +25,11 @@ import (
 	"go.farcloser.world/lepton/leptonic/errs"
 	"go.farcloser.world/lepton/pkg/api/options"
 	"go.farcloser.world/lepton/pkg/cmd/volume"
+	"go.farcloser.world/lepton/pkg/utils"
 )
 
 func createCommand() *cobra.Command {
-	volumeCreateCommand := &cobra.Command{
+	cmd := &cobra.Command{
 		Use:           "create [flags] [VOLUME]",
 		Short:         "Create a volume",
 		Args:          cobra.MaximumNArgs(1),
@@ -36,11 +37,13 @@ func createCommand() *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
-	volumeCreateCommand.Flags().StringArray("label", nil, "Set a label on the volume")
-	return volumeCreateCommand
+
+	cmd.Flags().StringArray("label", nil, "Set a label on the volume")
+
+	return cmd
 }
 
-func createOptions(cmd *cobra.Command, _ []string) (*options.VolumeCreate, error) {
+func createOptions(cmd *cobra.Command, args []string) (*options.VolumeCreate, error) {
 	labels, err := cmd.Flags().GetStringArray("label")
 	if err != nil {
 		return nil, err
@@ -48,13 +51,23 @@ func createOptions(cmd *cobra.Command, _ []string) (*options.VolumeCreate, error
 
 	for _, label := range labels {
 		if label == "" {
-			return &options.VolumeCreate{}, fmt.Errorf("labels cannot be empty (%w)", errs.ErrInvalidArgument)
+			return nil, errors.Join(errs.ErrInvalidArgument, errors.New("labels cannot be empty"))
 		}
 	}
 
+	lbls := map[string]string{}
+	if len(labels) > 0 {
+		lbls = utils.KeyValueStringsToMap(labels)
+	}
+
+	name := ""
+	if len(args) > 0 {
+		name = args[0]
+	}
+
 	return &options.VolumeCreate{
-		Labels: labels,
-		Stdout: cmd.OutOrStdout(),
+		Name:   name,
+		Labels: lbls,
 	}, nil
 }
 
@@ -69,12 +82,7 @@ func createAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	volumeName := ""
-	if len(args) > 0 {
-		volumeName = args[0]
-	}
-
-	_, err = volume.Create(volumeName, globalOptions, opts)
+	_, err = volume.Create(cmd.Context(), cmd.OutOrStdout(), globalOptions, opts)
 
 	return err
 }

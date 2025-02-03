@@ -26,8 +26,8 @@ import (
 	"go.farcloser.world/tigron/expect"
 	"go.farcloser.world/tigron/test"
 
+	"go.farcloser.world/lepton/leptonic/api"
 	"go.farcloser.world/lepton/pkg/inspecttypes/dockercompat"
-	"go.farcloser.world/lepton/pkg/inspecttypes/native"
 )
 
 const (
@@ -64,8 +64,8 @@ func InspectContainer(helpers test.Helpers, name string) dockercompat.Container 
 	return dc[0]
 }
 
-func InspectVolume(helpers test.Helpers, name string) native.Volume {
-	var dc []native.Volume
+func InspectVolume(helpers test.Helpers, name string) api.Volume {
+	var dc []api.Volume
 	cmd := helpers.Command("volume", "inspect", name)
 	cmd.Run(&test.Expected{
 		Output: func(stdout string, info string, t *testing.T) {

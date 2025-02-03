@@ -26,12 +26,13 @@ import (
 	"github.com/containerd/log"
 	"gotest.tools/v3/assert"
 
+	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/pkg/testutil"
 	"go.farcloser.world/lepton/pkg/testutil/nerdtest"
+	"go.farcloser.world/lepton/pkg/testutil/nerdtest/registry"
 	"go.farcloser.world/lepton/pkg/testutil/nettestutil"
-	"go.farcloser.world/lepton/pkg/testutil/testregistry"
 	"go.farcloser.world/lepton/pkg/testutil/various"
 )
 
@@ -435,21 +436,31 @@ services:
 func TestComposePushAndPullWithCosignVerify(t *testing.T) {
 	testCase := nerdtest.Setup()
 
+	testCase.Require = require.All(
+		require.Binary("cosign"),
+		nerdtest.Build,
+		nerdtest.Registry,
+		require.Not(nerdtest.Docker),
+	)
+
+	var reg *registry.Server
+
+	testCase.Cleanup = func(data test.Data, helpers test.Helpers) {
+		if reg != nil {
+			reg.Cleanup(data, helpers)
+		}
+	}
+
 	testCase.Setup = func(data test.Data, helpers test.Helpers) {
-		testutil.RequireExecutable(t, "cosign")
-		testutil.DockerIncompatible(t)
-		testutil.RequiresBuild(t)
-		testutil.RegisterBuildCacheCleanup(t)
-		t.Parallel()
+		reg = nerdtest.RegistryWithNoAuth(data, helpers, 0, false)
+		reg.Setup(data, helpers)
 
 		base := testutil.NewBase(t)
 		base.Env = append(base.Env, "COSIGN_PASSWORD=1")
 
 		keyPair := various.NewCosignKeyPair(t, "cosign-key-pair", "1")
-		reg := testregistry.NewWithNoAuth(data, helpers, 0, false)
 		t.Cleanup(func() {
 			keyPair.Cleanup()
-			reg.Cleanup(nil)
 		})
 
 		tID := testutil.Identifier(t)

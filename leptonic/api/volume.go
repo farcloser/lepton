@@ -14,29 +14,11 @@
    limitations under the License.
 */
 
-package volume
+package api
 
-import (
-	"context"
-	"fmt"
-	"io"
-
-	"go.farcloser.world/lepton/leptonic/api"
-	"go.farcloser.world/lepton/pkg/api/options"
-)
-
-func Create(ctx context.Context, output io.Writer, globalOptions *options.Global, opts *options.VolumeCreate) (*api.Volume, error) {
-	volStore, err := Store(globalOptions.Namespace, globalOptions.DataRoot, globalOptions.Address)
-	if err != nil {
-		return nil, err
-	}
-
-	vol, err := volStore.Create(opts.Name, opts.Labels)
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = fmt.Fprintln(output, vol.Name)
-
-	return vol, err
+type Volume struct {
+	Name       string            `json:"name"`
+	Labels     map[string]string `json:"labels,omitempty"`
+	Mountpoint string            `json:"mountpoint"`
+	Size       int64             `json:"size,omitempty"`
 }

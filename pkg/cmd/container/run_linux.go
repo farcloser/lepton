@@ -30,7 +30,6 @@ import (
 	"github.com/moby/sys/userns"
 
 	"go.farcloser.world/containers/specs"
-	"go.farcloser.world/core/utils"
 
 	"go.farcloser.world/lepton/pkg/api/options"
 	"go.farcloser.world/lepton/pkg/bypass4netnsutil"
@@ -39,6 +38,7 @@ import (
 	"go.farcloser.world/lepton/pkg/ipcutil"
 	"go.farcloser.world/lepton/pkg/rootlessutil"
 	"go.farcloser.world/lepton/pkg/strutil"
+	"go.farcloser.world/lepton/pkg/utils"
 )
 
 // WithoutRunMount returns a SpecOpts that unmounts the default tmpfs on "/run"

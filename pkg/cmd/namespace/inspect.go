@@ -28,20 +28,20 @@ import (
 	"github.com/containerd/containerd/v2/core/images"
 	"github.com/containerd/log"
 
+	"go.farcloser.world/lepton/leptonic/api"
 	"go.farcloser.world/lepton/leptonic/services/namespace"
 	"go.farcloser.world/lepton/pkg/api/options"
 	"go.farcloser.world/lepton/pkg/clientutil"
 	"go.farcloser.world/lepton/pkg/formatter"
-	"go.farcloser.world/lepton/pkg/inspecttypes/native"
 	"go.farcloser.world/lepton/pkg/mountutil/volumestore"
 )
 
 type namespaceInspectOutput struct {
-	Name       string                   `json:"name"`
-	Containers []client.Container       `json:"containers"`
-	Images     []images.Image           `json:"images"`
-	Volumes    map[string]native.Volume `json:"volumes"`
-	Labels     map[string]string        `json:"labels,omitempty"`
+	Name       string                `json:"name"`
+	Containers []client.Container    `json:"containers"`
+	Images     []images.Image        `json:"images"`
+	Volumes    map[string]api.Volume `json:"volumes"`
+	Labels     map[string]string     `json:"labels,omitempty"`
 }
 
 func Inspect(ctx context.Context, client *client.Client, output io.Writer, globalOptions *options.Global, opts *options.NamespaceInspect) error {

@@ -42,7 +42,10 @@ func TestPush(t *testing.T) {
 	var registryNoAuthHTTPRandom, registryNoAuthHTTPDefault, registryTokenAuthHTTPSRandom *testregistry.RegistryServer
 
 	testCase := &test.Case{
-		Require: require.Linux,
+		Require: require.All(
+			require.Linux,
+			nerdtest.Registry,
+		),
 
 		Setup: func(data test.Data, helpers test.Helpers) {
 			registryNoAuthHTTPRandom = testregistry.NewWithNoAuth(data, helpers, 0, false)

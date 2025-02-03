@@ -28,14 +28,14 @@ import (
 
 	"go.farcloser.world/lepton/pkg/testutil"
 	"go.farcloser.world/lepton/pkg/testutil/nerdtest"
-	"go.farcloser.world/lepton/pkg/testutil/testregistry"
+	"go.farcloser.world/lepton/pkg/testutil/nerdtest/registry"
 	"go.farcloser.world/lepton/pkg/testutil/various"
 )
 
 func TestImageEncryptJWE(t *testing.T) {
 	nerdtest.Setup()
 
-	var registry *testregistry.RegistryServer
+	var reg *registry.Server
 	var keyPair *various.JweKeyPair
 
 	const remoteImageKey = "remoteImageKey"
@@ -43,24 +43,27 @@ func TestImageEncryptJWE(t *testing.T) {
 	testCase := &test.Case{
 		Require: require.All(
 			nerdtest.NerdishctlNeedsFixing("https://github.com/containerd/nerdctl/pull/3792"),
+			nerdtest.Registry,
 			require.Linux,
 			require.Not(nerdtest.Docker),
 			// This test needs to rmi the common image
 			nerdtest.Private,
 		),
 		Cleanup: func(data test.Data, helpers test.Helpers) {
-			if registry != nil {
-				registry.Cleanup(nil)
+			if reg != nil {
+				reg.Cleanup(data, helpers)
 				keyPair.Cleanup()
 				helpers.Anyhow("rmi", "-f", data.Get(remoteImageKey))
 			}
 			helpers.Anyhow("rmi", "-f", data.Identifier("decrypted"))
 		},
 		Setup: func(data test.Data, helpers test.Helpers) {
-			registry = testregistry.NewWithNoAuth(data, helpers, 0, false)
+			reg = nerdtest.RegistryWithNoAuth(data, helpers, 0, false)
+			reg.Setup(data, helpers)
+
 			keyPair = various.NewJWEKeyPair(t)
 			helpers.Ensure("pull", "--quiet", testutil.CommonImage)
-			encryptImageRef := fmt.Sprintf("127.0.0.1:%d/%s:encrypted", registry.Port, data.Identifier())
+			encryptImageRef := fmt.Sprintf("127.0.0.1:%d/%s:encrypted", reg.Port, data.Identifier())
 			helpers.Ensure("image", "encrypt", "--recipient=jwe:"+keyPair.Pub, testutil.CommonImage, encryptImageRef)
 			inspector := helpers.Capture("image", "inspect", "--mode=native", "--format={{len .Index.Manifests}}", encryptImageRef)
 			assert.Equal(t, inspector, "1\n")

@@ -27,11 +27,11 @@ import (
 
 	"github.com/containerd/log"
 
-	"go.farcloser.world/core/utils"
-
+	"go.farcloser.world/lepton/leptonic/api"
 	"go.farcloser.world/lepton/leptonic/errs"
 	"go.farcloser.world/lepton/leptonic/identifiers"
-	"go.farcloser.world/lepton/pkg/inspecttypes/native"
+	"go.farcloser.world/lepton/leptonic/utils"
+	labels2 "go.farcloser.world/lepton/pkg/labels"
 	"go.farcloser.world/lepton/pkg/store"
 )
 
@@ -41,25 +41,26 @@ const (
 	volumeJSONFileName = "volume.json"
 )
 
-// ErrVolumeStore will wrap all errors here
-var ErrVolumeStore = errors.New("volume-store error")
+// ErrServiceVolume will wrap all errors here
+var ErrServiceVolume = errors.New("volume-store error")
 
-type VolumeStore interface {
-	// Exists checks if a given volume exists
-	Exists(name string) (bool, error)
-	// Get returns an existing volume
-	Get(name string, size bool) (*native.Volume, error)
+type VolumeService interface {
 	// Create will either return an existing volume, or create a new one
 	// NOTE that different labels will NOT create a new volume if there is one by that name already,
 	// but instead return the existing one with the (possibly different) labels
-	Create(name string, labels []string) (vol *native.Volume, err error)
-	// List returns all existing volumes.
-	// Note that list is expensive as it reads all volumes individual info
-	List(size bool) (map[string]native.Volume, error)
+	Create(name string, labels map[string]string) (vol *api.Volume, err error)
 	// Remove one of more volumes
 	Remove(generator func() ([]string, []error, error)) (removed []string, warns []error, err error)
+	// Exists checks if a given volume exists
+	// FIXME: currently only used by compose
+	Exists(name string) (bool, error)
+	// Get returns an existing volume
+	Get(name string, size bool) (*api.Volume, error)
+	// List returns all existing volumes.
+	// Note that list is expensive as it reads all volumes individual info
+	List(size bool) (map[string]api.Volume, error)
 	// Prune will call a filtering function expected to return the volumes name to delete
-	Prune(filter func(volumes []*native.Volume) ([]string, error)) (err error)
+	Prune(filter func(volumes []*api.Volume) ([]string, error)) (err error)
 	// Count returns the number of volumes
 	Count() (count int, err error)
 
@@ -69,16 +70,16 @@ type VolumeStore interface {
 	// This method does NOT lock (unlike Create).
 	// It is meant to be used between `Lock` and `Release`, and is specifically useful when multiple different volume
 	// creation will have to happen in different method calls (eg: container create).
-	CreateWithoutLock(name string, labels []string) (*native.Volume, error)
+	CreateWithoutLock(name string, labels map[string]string) (*api.Volume, error)
 	// Release: see store implementation
 	Release() error
 }
 
-// New returns a VolumeStore
-func New(dataStore, namespace string) (volStore VolumeStore, err error) {
+// New returns a VolumeService
+func New(dataStore, namespace string) (volStore VolumeService, err error) {
 	defer func() {
 		if err != nil {
-			err = errors.Join(ErrVolumeStore, err)
+			err = errors.Join(ErrServiceVolume, err)
 		}
 	}()
 
@@ -108,7 +109,7 @@ type volumeStore struct {
 func (vs *volumeStore) Exists(name string) (doesExist bool, err error) {
 	defer func() {
 		if err != nil {
-			err = errors.Join(ErrVolumeStore, err)
+			err = errors.Join(ErrServiceVolume, err)
 		}
 	}()
 
@@ -121,10 +122,10 @@ func (vs *volumeStore) Exists(name string) (doesExist bool, err error) {
 }
 
 // Get retrieves a native volume from the store, optionally with its size
-func (vs *volumeStore) Get(name string, size bool) (vol *native.Volume, err error) {
+func (vs *volumeStore) Get(name string, size bool) (vol *api.Volume, err error) {
 	defer func() {
 		if err != nil {
-			err = errors.Join(ErrVolumeStore, err)
+			err = errors.Join(ErrServiceVolume, err)
 		}
 	}()
 
@@ -149,30 +150,22 @@ func (vs *volumeStore) Get(name string, size bool) (vol *native.Volume, err erro
 // volStore.Lock()
 // defer volStore.Release()
 // volStore.CreateWithoutLock(...)
-func (vs *volumeStore) CreateWithoutLock(name string, labels []string) (vol *native.Volume, err error) {
+func (vs *volumeStore) CreateWithoutLock(name string, labels map[string]string) (vol *api.Volume, err error) {
 	defer func() {
 		if err != nil {
-			err = errors.Join(ErrVolumeStore, err)
+			err = errors.Join(ErrServiceVolume, err)
 		}
 	}()
-
-	if err = identifiers.Validate(name); err != nil {
-		return nil, err
-	}
 
 	return vs.rawCreate(name, labels)
 }
 
-func (vs *volumeStore) Create(name string, labels []string) (vol *native.Volume, err error) {
+func (vs *volumeStore) Create(name string, labels map[string]string) (vol *api.Volume, err error) {
 	defer func() {
 		if err != nil {
-			err = errors.Join(ErrVolumeStore, err)
+			err = errors.Join(ErrServiceVolume, err)
 		}
 	}()
-
-	if err = identifiers.Validate(name); err != nil {
-		return nil, err
-	}
 
 	err = vs.Locker.WithLock(func() error {
 		vol, err = vs.rawCreate(name, labels)
@@ -185,7 +178,7 @@ func (vs *volumeStore) Create(name string, labels []string) (vol *native.Volume,
 func (vs *volumeStore) Count() (count int, err error) {
 	defer func() {
 		if err != nil {
-			err = errors.Join(ErrVolumeStore, err)
+			err = errors.Join(ErrServiceVolume, err)
 		}
 	}()
 
@@ -202,14 +195,14 @@ func (vs *volumeStore) Count() (count int, err error) {
 	return count, err
 }
 
-func (vs *volumeStore) List(size bool) (res map[string]native.Volume, err error) {
+func (vs *volumeStore) List(size bool) (res map[string]api.Volume, err error) {
 	defer func() {
 		if err != nil {
-			err = errors.Join(ErrVolumeStore, err)
+			err = errors.Join(ErrServiceVolume, err)
 		}
 	}()
 
-	res = make(map[string]native.Volume)
+	res = make(map[string]api.Volume)
 
 	err = vs.Locker.WithLock(func() error {
 		names, err := vs.manager.List()
@@ -236,7 +229,7 @@ func (vs *volumeStore) List(size bool) (res map[string]native.Volume, err error)
 func (vs *volumeStore) Remove(generator func() ([]string, []error, error)) (removed []string, warns []error, err error) {
 	defer func() {
 		if err != nil {
-			err = errors.Join(ErrVolumeStore, err)
+			err = errors.Join(ErrServiceVolume, err)
 		}
 	}()
 
@@ -256,7 +249,7 @@ func (vs *volumeStore) Remove(generator func() ([]string, []error, error)) (remo
 				continue
 			}
 
-			// Erroring on Exists is a hard error
+			// Erroring on exists is a hard error
 			// !doesExist is a soft error
 			// Inability to delete is a hard error
 			if doesExist, err := vs.manager.Exists(name); err != nil {
@@ -279,10 +272,10 @@ func (vs *volumeStore) Remove(generator func() ([]string, []error, error)) (remo
 	return removed, warns, err
 }
 
-func (vs *volumeStore) Prune(filter func(vol []*native.Volume) ([]string, error)) (err error) {
+func (vs *volumeStore) Prune(filter func(vol []*api.Volume) ([]string, error)) (err error) {
 	defer func() {
 		if err != nil {
-			err = errors.Join(ErrVolumeStore, err)
+			err = errors.Join(ErrServiceVolume, err)
 		}
 	}()
 
@@ -292,7 +285,7 @@ func (vs *volumeStore) Prune(filter func(vol []*native.Volume) ([]string, error)
 			return err
 		}
 
-		res := []*native.Volume{}
+		res := []*api.Volume{}
 		for _, name := range names {
 			vol, err := vs.rawGet(name, false)
 			if err != nil {
@@ -318,13 +311,13 @@ func (vs *volumeStore) Prune(filter func(vol []*native.Volume) ([]string, error)
 	})
 }
 
-func (vs *volumeStore) rawGet(name string, size bool) (vol *native.Volume, err error) {
+func (vs *volumeStore) rawGet(name string, size bool) (vol *api.Volume, err error) {
 	content, err := vs.manager.Get(name, volumeJSONFileName)
 	if err != nil {
 		return nil, err
 	}
 
-	vol = &native.Volume{
+	vol = &api.Volume{
 		Name:   name,
 		Labels: labels(content),
 	}
@@ -344,13 +337,20 @@ func (vs *volumeStore) rawGet(name string, size bool) (vol *native.Volume, err e
 	return vol, nil
 }
 
-func (vs *volumeStore) rawCreate(name string, labels []string) (vol *native.Volume, err error) {
+func (vs *volumeStore) rawCreate(name string, lbls map[string]string) (vol *api.Volume, err error) {
 	volOpts := struct {
 		Labels map[string]string `json:"labels"`
-	}{}
+	}{
+		Labels: lbls,
+	}
 
-	if len(labels) > 0 {
-		volOpts.Labels = utils.KeyValueStringsToMap(labels)
+	if name == "" {
+		name = utils.GenerateID(utils.ID64)
+		lbls[labels2.AnonymousVolumes] = ""
+	}
+
+	if err = identifiers.Validate(name); err != nil {
+		return nil, err
 	}
 
 	// Failure here must exit, no need to clean-up
@@ -371,8 +371,9 @@ func (vs *volumeStore) rawCreate(name string, labels []string) (vol *native.Volu
 	}
 
 	// At this point, we either have an existing volume, or created a new one successfully
-	vol = &native.Volume{
-		Name: name,
+	vol = &api.Volume{
+		Name:   name,
+		Labels: lbls,
 	}
 
 	if err = vs.manager.GroupEnsure(name, dataDirName); err != nil {
@@ -387,9 +388,9 @@ func (vs *volumeStore) rawCreate(name string, labels []string) (vol *native.Volu
 }
 
 // Private helpers
-func labels(b []byte) *map[string]string {
+func labels(b []byte) map[string]string {
 	type volumeOpts struct {
-		Labels *map[string]string `json:"labels,omitempty"`
+		Labels map[string]string `json:"labels,omitempty"`
 	}
 	var vo volumeOpts
 	if err := json.Unmarshal(b, &vo); err != nil {

@@ -63,7 +63,6 @@ func processInfoOptions(cmd *cobra.Command, _ []string) (*options.SystemInfo, er
 	return &options.SystemInfo{
 		Mode:   mode,
 		Format: format,
-		Stdout: cmd.OutOrStdout(),
 		Stderr: cmd.OutOrStderr(),
 	}, nil
 }
@@ -86,5 +85,5 @@ func infoAction(cmd *cobra.Command, args []string) error {
 
 	defer cancel()
 
-	return system.Info(ctx, cli, globalOptions, opts)
+	return system.Info(ctx, cli, cmd.OutOrStdout(), globalOptions, opts)
 }

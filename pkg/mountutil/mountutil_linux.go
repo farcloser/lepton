@@ -291,7 +291,7 @@ func ProcessFlagTmpfs(s string) (*Processed, error) {
 	return res, nil
 }
 
-func ProcessFlagMount(s string, volStore volumestore.VolumeStore) (*Processed, error) {
+func ProcessFlagMount(s string, volStore volumestore.VolumeService) (*Processed, error) {
 	fields := strings.Split(s, ",")
 	var (
 		mountType        string

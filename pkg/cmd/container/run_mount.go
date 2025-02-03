@@ -41,8 +41,8 @@ import (
 
 	"go.farcloser.world/containers/specs"
 
+	"go.farcloser.world/lepton/leptonic/utils"
 	"go.farcloser.world/lepton/pkg/api/options"
-	"go.farcloser.world/lepton/pkg/idgen"
 	"go.farcloser.world/lepton/pkg/imgutil"
 	"go.farcloser.world/lepton/pkg/inspecttypes/dockercompat"
 	"go.farcloser.world/lepton/pkg/labels"
@@ -91,7 +91,7 @@ func withMounts(mounts []specs.Mount) oci.SpecOpts {
 }
 
 // parseMountFlags parses --volume, --mount and --tmpfs.
-func parseMountFlags(volStore volumestore.VolumeStore, options *options.ContainerCreate) ([]*mountutil.Processed, error) {
+func parseMountFlags(volStore volumestore.VolumeService, options *options.ContainerCreate) ([]*mountutil.Processed, error) {
 	var parsed []*mountutil.Processed //nolint:prealloc
 	for _, v := range strutil.DedupeStrSlice(options.Volume) {
 		// createDir=true for -v option to allow creation of directory on host if not found.
@@ -124,7 +124,7 @@ func parseMountFlags(volStore volumestore.VolumeStore, options *options.Containe
 // generateMountOpts generates volume-related mount opts.
 // Other mounts such as procfs mount are not handled here.
 func generateMountOpts(ctx context.Context, client *containerd.Client, ensuredImage *imgutil.EnsuredImage,
-	volStore volumestore.VolumeStore, options *options.ContainerCreate) ([]oci.SpecOpts, []string, []*mountutil.Processed, error) {
+	volStore volumestore.VolumeService, options *options.ContainerCreate) ([]oci.SpecOpts, []string, []*mountutil.Processed, error) {
 	//nolint:golint,prealloc
 	var (
 		opts        []oci.SpecOpts
@@ -253,11 +253,11 @@ func generateMountOpts(ctx context.Context, client *containerd.Client, ensuredIm
 		if _, ok := mounted[imgVol]; ok {
 			continue
 		}
-		anonVolName := idgen.GenerateID()
+		anonVolName := utils.GenerateID(utils.ID32)
 
 		log.G(ctx).Debugf("creating anonymous volume %q, for \"VOLUME %s\"",
 			anonVolName, imgVolRaw)
-		anonVol, err := volStore.CreateWithoutLock(anonVolName, []string{})
+		anonVol, err := volStore.CreateWithoutLock(anonVolName, nil)
 		if err != nil {
 			return nil, nil, nil, err
 		}

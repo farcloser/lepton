@@ -18,7 +18,6 @@ package container
 
 import (
 	"fmt"
-	"os/exec"
 	"testing"
 
 	"go.farcloser.world/tigron/require"
@@ -26,8 +25,8 @@ import (
 
 	"go.farcloser.world/lepton/pkg/testutil"
 	"go.farcloser.world/lepton/pkg/testutil/nerdtest"
-	"go.farcloser.world/lepton/pkg/testutil/testregistry"
-	helpers2 "go.farcloser.world/lepton/pkg/testutil/various"
+	"go.farcloser.world/lepton/pkg/testutil/nerdtest/registry"
+	"go.farcloser.world/lepton/pkg/testutil/various"
 )
 
 func TestRunVerifyCosign(t *testing.T) {
@@ -36,37 +35,27 @@ func TestRunVerifyCosign(t *testing.T) {
 	testCase.Require = require.All(
 		require.Not(nerdtest.Docker),
 		nerdtest.Build,
-		&test.Requirement{
-			Check: func(data test.Data, helpers test.Helpers) (ret bool, mess string) {
-				ret = true
-				mess = "cosign is in the path"
-				_, err := exec.LookPath("cosign")
-				if err != nil {
-					ret = false
-					mess = fmt.Sprintf("cosign is not in the path: %+v", err)
-					return ret, mess
-				}
-				return ret, mess
-			},
-		},
+		nerdtest.Registry,
+		require.Binary("cosign"),
 	)
 
 	testCase.Env = map[string]string{
 		"COSIGN_PASSWORD": "1",
 	}
 
-	var keyPair *helpers2.CosignKeyPair
-	var reg *testregistry.RegistryServer
+	var reg *registry.Server
+	var keyPair *various.CosignKeyPair
 
 	testCase.Setup = func(data test.Data, helpers test.Helpers) {
-		keyPair = helpers2.NewCosignKeyPair(t, "cosign-key-pair", "1")
-		reg = testregistry.NewWithNoAuth(data, helpers, 0, false)
+		reg = nerdtest.RegistryWithNoAuth(data, helpers, 0, false)
+		reg.Setup(data, helpers)
+		keyPair = various.NewCosignKeyPair(t, "cosign-key-pair", "1")
 	}
 
 	testCase.Cleanup = func(data test.Data, helpers test.Helpers) {
-		if keyPair != nil {
+		if reg != nil {
+			reg.Cleanup(data, helpers)
 			keyPair.Cleanup()
-			reg.Cleanup(nil)
 		}
 	}
 
@@ -76,12 +65,12 @@ func TestRunVerifyCosign(t *testing.T) {
 		dockerfile := fmt.Sprintf(`FROM %s
 CMD ["echo", "build-test-string"]
 	`, testutil.CommonImage)
-
-		buildCtx := helpers2.CreateBuildContext(t, dockerfile)
+		buildCtx := various.CreateBuildContext(t, dockerfile)
 
 		helpers.Ensure("build", "-t", testImageRef, buildCtx)
 		helpers.Ensure("push", testImageRef, "--sign=cosign", "--cosign-key="+keyPair.PrivateKey)
 		helpers.Ensure("run", "--rm", "--verify=cosign", "--cosign-key="+keyPair.PublicKey, testImageRef)
+
 		return helpers.Command("run", "--rm", "--verify=cosign", "--cosign-key=dummy", testImageRef)
 	}
 

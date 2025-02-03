@@ -42,7 +42,7 @@ import (
 	"go.farcloser.world/lepton/pkg/strutil"
 )
 
-func Info(ctx context.Context, client *containerd.Client, globalOptions *options.Global, opts *options.SystemInfo) error {
+func Info(ctx context.Context, client *containerd.Client, output io.Writer, globalOptions *options.Global, opts *options.SystemInfo) error {
 	var (
 		tmpl *template.Template
 		err  error
@@ -80,7 +80,7 @@ func Info(ctx context.Context, client *containerd.Client, globalOptions *options
 		if infoCompat != nil {
 			x = infoCompat
 		}
-		w := opts.Stdout
+		w := output
 		if err := tmpl.Execute(w, x); err != nil {
 			return err
 		}
@@ -90,9 +90,9 @@ func Info(ctx context.Context, client *containerd.Client, globalOptions *options
 
 	switch opts.Mode {
 	case "native":
-		return prettyPrintInfoNative(opts.Stdout, infoNative)
+		return prettyPrintInfoNative(output, infoNative)
 	case "dockercompat":
-		return prettyPrintInfoDockerCompat(opts.Stdout, opts.Stderr, infoCompat, globalOptions)
+		return prettyPrintInfoDockerCompat(output, opts.Stderr, infoCompat, globalOptions)
 	}
 	return nil
 }
