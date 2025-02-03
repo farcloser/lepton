@@ -32,7 +32,7 @@ import (
 )
 
 func SaveCommand() *cobra.Command {
-	var saveCommand = &cobra.Command{
+	var cmd = &cobra.Command{
 		Use:               "save",
 		Args:              cobra.MinimumNArgs(1),
 		Short:             "Save one or more images to a tar archive (streamed to STDOUT by default)",
@@ -42,16 +42,14 @@ func SaveCommand() *cobra.Command {
 		SilenceUsage:      true,
 		SilenceErrors:     true,
 	}
-	saveCommand.Flags().StringP("output", "o", "", "Write to a file, instead of STDOUT")
 
-	// #region platform flags
-	// platform is defined as StringSlice, not StringArray, to allow specifying "--platform=amd64,arm64"
-	saveCommand.Flags().StringSlice("platform", []string{}, "Export content for a specific platform")
-	saveCommand.RegisterFlagCompletionFunc("platform", completion.Platforms)
-	saveCommand.Flags().Bool("all-platforms", false, "Export content for all platforms")
-	// #endregion
+	cmd.Flags().StringP("output", "o", "", "Write to a file, instead of STDOUT")
+	cmd.Flags().StringSlice("platform", []string{}, "Export content for a specific platform")
+	cmd.Flags().Bool("all-platforms", false, "Export content for all platforms")
 
-	return saveCommand
+	_ = cmd.RegisterFlagCompletionFunc("platform", completion.Platforms)
+
+	return cmd
 }
 
 func saveOptions(cmd *cobra.Command, _ []string) (options.ImageSave, error) {

@@ -18,6 +18,7 @@ package volume
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -44,7 +45,7 @@ type volumePrintable struct {
 	// TODO: "Links"
 }
 
-func List(output io.Writer, globalOptions *options.Global, opts *options.VolumeList) error {
+func List(ctx context.Context, output io.Writer, globalOptions *options.Global, opts *options.VolumeList) error {
 	if opts.Quiet && opts.Size {
 		log.L.Warn("cannot use --size and --quiet together, ignoring --size")
 		opts.Size = false

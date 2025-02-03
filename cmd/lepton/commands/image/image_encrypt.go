@@ -18,6 +18,8 @@ package image
 
 import (
 	"github.com/spf13/cobra"
+
+	"go.farcloser.world/lepton/cmd/lepton/completion"
 )
 
 const imageEncryptHelp = `Encrypt image layers.
@@ -51,10 +53,12 @@ func encryptCommand() *cobra.Command {
 		Long:              imageEncryptHelp,
 		Args:              cobra.MinimumNArgs(2),
 		RunE:              imgcryptAction(true),
-		ValidArgsFunction: imgcryptShellComplete,
+		ValidArgsFunction: completion.ImageNames,
 		SilenceUsage:      true,
 		SilenceErrors:     true,
 	}
+
 	registerImgcryptFlags(cmd, true)
+
 	return cmd
 }

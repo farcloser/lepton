@@ -27,7 +27,7 @@ import (
 )
 
 func TagCommand() *cobra.Command {
-	var tagCommand = &cobra.Command{
+	return &cobra.Command{
 		Use:               "tag [flags] SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]",
 		Short:             "Create a tag TARGET_IMAGE that refers to SOURCE_IMAGE",
 		Args:              helpers.IsExactArgs(2),
@@ -36,7 +36,6 @@ func TagCommand() *cobra.Command {
 		SilenceUsage:      true,
 		SilenceErrors:     true,
 	}
-	return tagCommand
 }
 
 func tagAction(cmd *cobra.Command, args []string) error {

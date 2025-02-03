@@ -25,10 +25,12 @@ import (
 
 func capShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 	candidates := []string{}
+
 	for _, c := range cap.Known() {
 		// "CAP_SYS_ADMIN" -> "sys_admin"
 		s := strings.ToLower(strings.TrimPrefix(c, "CAP_"))
 		candidates = append(candidates, s)
 	}
+
 	return candidates, cobra.ShellCompDirectiveNoFileComp
 }

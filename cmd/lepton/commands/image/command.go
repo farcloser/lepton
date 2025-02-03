@@ -36,14 +36,14 @@ func Command() *cobra.Command {
 	cmd.AddCommand(
 		builder.BuildCommand(),
 		// commitCommand is in "container", not in "image"
-		imageLsCommand(),
+		listCommand(),
 		HistoryCommand(),
 		PullCommand(),
 		PushCommand(),
 		LoadCommand(),
 		SaveCommand(),
 		TagCommand(),
-		imageRmCommand(),
+		removeCommand(),
 		convertCommand(),
 		inspectCommand(),
 		encryptCommand(),
@@ -54,18 +54,18 @@ func Command() *cobra.Command {
 	return cmd
 }
 
-func imageLsCommand() *cobra.Command {
-	cmd := ImagesCommand()
-	cmd.Use = "ls"
-	cmd.Aliases = []string{"list"}
+func listCommand() *cobra.Command {
+	cmd := ListCommand()
+	cmd.Use = "list"
+	cmd.Aliases = []string{"ls"}
 
 	return cmd
 }
 
-func imageRmCommand() *cobra.Command {
-	cmd := RmiCommand()
-	cmd.Use = "rm"
-	cmd.Aliases = []string{"remove"}
+func removeCommand() *cobra.Command {
+	cmd := RemoveCommand()
+	cmd.Use = "remove"
+	cmd.Aliases = []string{"rm"}
 
 	return cmd
 }

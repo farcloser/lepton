@@ -26,18 +26,19 @@ import (
 )
 
 func buildCommand() *cobra.Command {
-	var composeBuildCommand = &cobra.Command{
+	var cmd = &cobra.Command{
 		Use:           "build [flags] [SERVICE...]",
 		Short:         "Build or rebuild services",
 		RunE:          buildAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
-	composeBuildCommand.Flags().StringArray("build-arg", nil, "Set build-time variables for services.")
-	composeBuildCommand.Flags().Bool("no-cache", false, "Do not use cache when building the image.")
-	composeBuildCommand.Flags().String("progress", "", "Set type of progress output (auto, plain, tty). Use plain to show container output")
 
-	return composeBuildCommand
+	cmd.Flags().StringArray("build-arg", nil, "Set build-time variables for services.")
+	cmd.Flags().Bool("no-cache", false, "Do not use cache when building the image.")
+	cmd.Flags().String("progress", "", "Set type of progress output (auto, plain, tty). Use plain to show container output")
+
+	return cmd
 }
 
 func buildAction(cmd *cobra.Command, args []string) error {

@@ -20,18 +20,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"go.farcloser.world/containers/security/cgroups"
-
-	"go.farcloser.world/lepton/leptonic/services/apparmor"
 )
-
-func ApparmorProfiles(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
-	names, err := apparmor.ListNames()
-	if err != nil {
-		return nil, cobra.ShellCompDirectiveError
-	}
-
-	return names, cobra.ShellCompDirectiveNoFileComp
-}
 
 func CgroupManagerNames(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 	availableManagers := cgroups.AvailableManagers()

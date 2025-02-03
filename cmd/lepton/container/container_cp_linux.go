@@ -30,10 +30,8 @@ import (
 	"go.farcloser.world/lepton/pkg/rootlessutil"
 )
 
-func newCpCommand() *cobra.Command {
-	shortHelp := "Copy files/folders between a running container and the local filesystem."
-
-	longHelp := shortHelp + `
+func copyCommand() *cobra.Command {
+	longHelp := `
 This command requires 'tar' to be installed on the host (not in the container).
 Using GNU tar is recommended.
 The path of the 'tar' binary can be specified with an environment variable '$TAR'.
@@ -44,43 +42,43 @@ Using 'nerdctl cp' with untrusted or malicious containers is unsupported and may
 
 	usage := `cp [flags] CONTAINER:SRC_PATH DEST_PATH|-
   nerdctl cp [flags] SRC_PATH|- CONTAINER:DEST_PATH`
-	var cpCommand = &cobra.Command{
+	var cmd = &cobra.Command{
 		Use:               usage,
 		Args:              helpers.IsExactArgs(2),
-		Short:             shortHelp,
+		Short:             "Copy files/folders between a running container and the local filesystem.",
 		Long:              longHelp,
-		RunE:              cpAction,
-		ValidArgsFunction: cpShellComplete,
+		RunE:              copyAction,
+		ValidArgsFunction: copyShellComplete,
 		SilenceUsage:      true,
 		SilenceErrors:     true,
 	}
 
-	cpCommand.Flags().BoolP("follow-link", "L", false, "Always follow symbolic link in SRC_PATH.")
+	cmd.Flags().BoolP("follow-link", "L", false, "Always follow symbolic link in SRC_PATH.")
 
-	return cpCommand
+	return cmd
 }
 
-func cpAction(cmd *cobra.Command, args []string) error {
-	options, err := processCpOptions(cmd, args)
+func copyAction(cmd *cobra.Command, args []string) error {
+	opts, err := copyOptions(cmd, args)
 	if err != nil {
 		return err
 	}
 	if rootlessutil.IsRootless() {
-		options.GOptions.Address, err = rootlessutil.RootlessContainredSockAddress()
+		opts.GOptions.Address, err = rootlessutil.RootlessContainredSockAddress()
 		if err != nil {
 			return err
 		}
 	}
-	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), opts.GOptions.Namespace, opts.GOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	return container.Cp(ctx, cli, options)
+	return container.Cp(ctx, cli, opts)
 }
 
-func processCpOptions(cmd *cobra.Command, args []string) (options.ContainerCp, error) {
+func copyOptions(cmd *cobra.Command, args []string) (options.ContainerCp, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return options.ContainerCp{}, err
@@ -130,8 +128,8 @@ func processCpOptions(cmd *cobra.Command, args []string) (options.ContainerCp, e
 	}, nil
 }
 
-func AddCpCommand(rootCmd *cobra.Command) {
-	rootCmd.AddCommand(newCpCommand())
+func AddCopyCommand(rootCmd *cobra.Command) {
+	rootCmd.AddCommand(copyCommand())
 }
 
 var errFileSpecDoesntMatchFormat = errors.New("filespec must match the canonical format: [container:]file/path")
@@ -173,6 +171,6 @@ type cpFileSpec struct {
 	Path      string
 }
 
-func cpShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+func copyShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 	return nil, cobra.ShellCompDirectiveFilterFileExt
 }

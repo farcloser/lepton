@@ -27,7 +27,7 @@ import (
 )
 
 func CommitCommand() *cobra.Command {
-	var commitCommand = &cobra.Command{
+	var cmd = &cobra.Command{
 		Use:               "commit [flags] CONTAINER REPOSITORY[:TAG]",
 		Short:             "Create a new image from a container's changes",
 		Args:              helpers.IsExactArgs(2),
@@ -36,11 +36,13 @@ func CommitCommand() *cobra.Command {
 		SilenceUsage:      true,
 		SilenceErrors:     true,
 	}
-	commitCommand.Flags().StringP("author", "a", "", `Author (e.g., "contributor <dev@example.com>")`)
-	commitCommand.Flags().StringP("message", "m", "", "Commit message")
-	commitCommand.Flags().StringArrayP("change", "c", nil, "Apply Dockerfile instruction to the created image (supported directives: [CMD, ENTRYPOINT])")
-	commitCommand.Flags().BoolP("pause", "p", true, "Pause container during commit")
-	return commitCommand
+
+	cmd.Flags().StringP("author", "a", "", `Author (e.g., "contributor <dev@example.com>")`)
+	cmd.Flags().StringP("message", "m", "", "Commit message")
+	cmd.Flags().StringArrayP("change", "c", nil, "Apply Dockerfile instruction to the created image (supported directives: [CMD, ENTRYPOINT])")
+	cmd.Flags().BoolP("pause", "p", true, "Pause container during commit")
+
+	return cmd
 }
 
 func commitOptions(cmd *cobra.Command, _ []string) (options.ContainerCommit, error) {
@@ -48,14 +50,17 @@ func commitOptions(cmd *cobra.Command, _ []string) (options.ContainerCommit, err
 	if err != nil {
 		return options.ContainerCommit{}, err
 	}
+
 	author, err := cmd.Flags().GetString("author")
 	if err != nil {
 		return options.ContainerCommit{}, err
 	}
+
 	message, err := cmd.Flags().GetString("message")
 	if err != nil {
 		return options.ContainerCommit{}, err
 	}
+
 	pause, err := cmd.Flags().GetBool("pause")
 	if err != nil {
 		return options.ContainerCommit{}, err
@@ -78,18 +83,19 @@ func commitOptions(cmd *cobra.Command, _ []string) (options.ContainerCommit, err
 }
 
 func commitAction(cmd *cobra.Command, args []string) error {
-	options, err := commitOptions(cmd, args)
+	opts, err := commitOptions(cmd, args)
 	if err != nil {
 		return err
 	}
 
-	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), opts.GOptions.Namespace, opts.GOptions.Address)
 	if err != nil {
 		return err
 	}
+
 	defer cancel()
 
-	return container.Commit(ctx, cli, args[1], args[0], options)
+	return container.Commit(ctx, cli, args[1], args[0], opts)
 }
 
 func commitShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {

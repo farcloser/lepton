@@ -32,7 +32,7 @@ import (
 )
 
 func topCommand() *cobra.Command {
-	var composeTopCommand = &cobra.Command{
+	return &cobra.Command{
 		Use:                   "top [SERVICE...]",
 		Short:                 "Display the running processes of service containers",
 		RunE:                  topAction,
@@ -40,7 +40,6 @@ func topCommand() *cobra.Command {
 		SilenceErrors:         true,
 		DisableFlagsInUseLine: true,
 	}
-	return composeTopCommand
 }
 
 func topAction(cmd *cobra.Command, args []string) error {

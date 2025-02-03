@@ -17,9 +17,6 @@
 package system
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/containerd/log"
 	"github.com/spf13/cobra"
 
@@ -32,7 +29,7 @@ import (
 )
 
 func pruneCommand() *cobra.Command {
-	systemPruneCommand := &cobra.Command{
+	cmd := &cobra.Command{
 		Use:           "prune [flags]",
 		Short:         "Remove unused data",
 		Args:          cobra.NoArgs,
@@ -40,10 +37,12 @@ func pruneCommand() *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
-	systemPruneCommand.Flags().BoolP("all", "a", false, "Remove all unused images, not just dangling ones")
-	systemPruneCommand.Flags().BoolP("force", "f", false, "Do not prompt for confirmation")
-	systemPruneCommand.Flags().Bool("volumes", false, "Prune volumes")
-	return systemPruneCommand
+
+	cmd.Flags().BoolP("all", "a", false, "Remove all unused images, not just dangling ones")
+	cmd.Flags().BoolP("force", "f", false, "Do not prompt for confirmation")
+	cmd.Flags().Bool("volumes", false, "Prune volumes")
+
+	return cmd
 }
 
 func pruneOptions(cmd *cobra.Command, _ []string) (*options.SystemPrune, error) {
@@ -57,30 +56,20 @@ func pruneOptions(cmd *cobra.Command, _ []string) (*options.SystemPrune, error) 
 		return nil, err
 	}
 
-	return &options.SystemPrune{
-		Stderr:               cmd.ErrOrStderr(),
-		All:                  all,
-		Volumes:              vFlag,
-		NetworkDriversToKeep: network.NetworkDriversToKeep,
-	}, nil
-}
-
-func grantSystemPrunePermission(cmd *cobra.Command, options *options.SystemPrune) (bool, error) {
 	force, err := cmd.Flags().GetBool("force")
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 
 	if !force {
-		var confirm string
 		msg := `This will remove:
   - all stopped containers
   - all networks not used by at least one container`
-		if options.Volumes {
+		if vFlag {
 			msg += `
   - all volumes not used by at least one container`
 		}
-		if options.All {
+		if all {
 			msg += `
   - all images without at least one container associated to them
   - all build cache`
@@ -90,16 +79,17 @@ func grantSystemPrunePermission(cmd *cobra.Command, options *options.SystemPrune
   - all dangling build cache`
 		}
 
-		msg += "\nAre you sure you want to continue? [y/N] "
-		fmt.Fprintf(cmd.OutOrStdout(), "WARNING! %s", msg)
-		fmt.Fscanf(cmd.InOrStdin(), "%s", &confirm)
-
-		if strings.ToLower(confirm) != "y" {
-			return false, nil
+		if err := helpers.Confirm(cmd, msg); err != nil {
+			return nil, err
 		}
 	}
 
-	return true, nil
+	return &options.SystemPrune{
+		Stderr:               cmd.ErrOrStderr(),
+		All:                  all,
+		Volumes:              vFlag,
+		NetworkDriversToKeep: network.NetworkDriversToKeep,
+	}, nil
 }
 
 func pruneAction(cmd *cobra.Command, args []string) error {
@@ -121,16 +111,11 @@ func pruneAction(cmd *cobra.Command, args []string) error {
 
 	opts.BuildKitHost = buildkitHost
 
-	if ok, err := grantSystemPrunePermission(cmd, opts); err != nil {
-		return err
-	} else if !ok {
-		return nil
-	}
-
 	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
 	if err != nil {
 		return err
 	}
+
 	defer cancel()
 
 	return system.Prune(ctx, cli, cmd.OutOrStdout(), globalOptions, opts)

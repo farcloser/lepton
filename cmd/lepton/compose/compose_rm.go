@@ -29,17 +29,19 @@ import (
 )
 
 func removeCommand() *cobra.Command {
-	var composeRemoveCommand = &cobra.Command{
+	var cmd = &cobra.Command{
 		Use:           "rm [flags] [SERVICE...]",
 		Short:         "Remove stopped service containers",
 		RunE:          removeAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
-	composeRemoveCommand.Flags().BoolP("force", "f", false, "Do not prompt for confirmation")
-	composeRemoveCommand.Flags().BoolP("stop", "s", false, "Stop containers before removing")
-	composeRemoveCommand.Flags().BoolP("volumes", "v", false, "Remove anonymous volumes associated with containers")
-	return composeRemoveCommand
+
+	cmd.Flags().BoolP("force", "f", false, "Do not prompt for confirmation")
+	cmd.Flags().BoolP("stop", "s", false, "Stop containers before removing")
+	cmd.Flags().BoolP("volumes", "v", false, "Remove anonymous volumes associated with containers")
+
+	return cmd
 }
 
 func removeAction(cmd *cobra.Command, args []string) error {
@@ -59,7 +61,7 @@ func removeAction(cmd *cobra.Command, args []string) error {
 
 		msg := fmt.Sprintf("This will remove all stopped containers from services: %s.", services)
 
-		if confirmed, err := helpers.Confirm(cmd, fmt.Sprintf("WARNING! %s.", msg)); err != nil || !confirmed {
+		if err := helpers.Confirm(cmd, fmt.Sprintf("WARNING! %s.", msg)); err != nil {
 			return err
 		}
 	}

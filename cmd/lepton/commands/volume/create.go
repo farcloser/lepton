@@ -82,7 +82,5 @@ func createAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	_, err = volume.Create(cmd.Context(), cmd.OutOrStdout(), globalOptions, opts)
-
-	return err
+	return volume.Create(cmd.Context(), cmd.OutOrStdout(), globalOptions, opts)
 }

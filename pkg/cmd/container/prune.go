@@ -20,6 +20,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"strings"
 
 	containerd "github.com/containerd/containerd/v2/client"
@@ -29,7 +30,7 @@ import (
 )
 
 // Prune remove all stopped containers
-func Prune(ctx context.Context, client *containerd.Client, options options.ContainerPrune) error {
+func Prune(ctx context.Context, client *containerd.Client, output io.Writer, globalOptions *options.Global, options *options.ContainerPrune) error {
 	containers, err := client.Containers(ctx)
 	if err != nil {
 		return err
@@ -37,7 +38,7 @@ func Prune(ctx context.Context, client *containerd.Client, options options.Conta
 
 	var deleted []string
 	for _, c := range containers {
-		if err = RemoveContainer(ctx, c, options.GOptions, false, true, client); err == nil {
+		if err = RemoveContainer(ctx, c, globalOptions, false, true, client); err == nil {
 			deleted = append(deleted, c.ID())
 			continue
 		}
@@ -48,8 +49,8 @@ func Prune(ctx context.Context, client *containerd.Client, options options.Conta
 	}
 
 	if len(deleted) > 0 {
-		fmt.Fprintln(options.Stdout, "Deleted Containers:")
-		fmt.Fprintln(options.Stdout, strings.Join(deleted, "\n"))
+		fmt.Fprintln(output, "Deleted Containers:")
+		fmt.Fprintln(output, strings.Join(deleted, "\n"))
 	}
 
 	return nil

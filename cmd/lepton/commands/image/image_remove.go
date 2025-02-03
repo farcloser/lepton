@@ -26,8 +26,8 @@ import (
 	"go.farcloser.world/lepton/pkg/cmd/image"
 )
 
-func RmiCommand() *cobra.Command {
-	var rmiCommand = &cobra.Command{
+func RemoveCommand() *cobra.Command {
+	var cmd = &cobra.Command{
 		Use:               "rmi [flags] IMAGE [IMAGE, ...]",
 		Short:             "Remove one or more images",
 		Args:              cobra.MinimumNArgs(1),
@@ -36,10 +36,11 @@ func RmiCommand() *cobra.Command {
 		SilenceUsage:      true,
 		SilenceErrors:     true,
 	}
-	rmiCommand.Flags().BoolP("force", "f", false, "Force removal of the image")
-	// Alias `-a` is reserved for `--all`. Should be compatible with `podman rmi --all`.
-	rmiCommand.Flags().Bool("async", false, "Asynchronous mode")
-	return rmiCommand
+
+	cmd.Flags().BoolP("force", "f", false, "Force removal of the image")
+	cmd.Flags().Bool("async", false, "Asynchronous mode")
+
+	return cmd
 }
 
 func removeOptions(cmd *cobra.Command, _ []string) (options.ImageRemove, error) {
@@ -66,18 +67,18 @@ func removeOptions(cmd *cobra.Command, _ []string) (options.ImageRemove, error) 
 }
 
 func rmiAction(cmd *cobra.Command, args []string) error {
-	options, err := removeOptions(cmd, args)
+	opts, err := removeOptions(cmd, args)
 	if err != nil {
 		return err
 	}
 
-	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), opts.GOptions.Namespace, opts.GOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	return image.Remove(ctx, cli, args, options)
+	return image.Remove(ctx, cli, args, opts)
 }
 
 func rmiShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {

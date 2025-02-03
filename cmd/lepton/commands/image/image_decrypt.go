@@ -18,6 +18,8 @@ package image
 
 import (
 	"github.com/spf13/cobra"
+
+	"go.farcloser.world/lepton/cmd/lepton/completion"
 )
 
 const imageDecryptHelp = `Decrypt an image locally.
@@ -52,10 +54,12 @@ func decryptCommand() *cobra.Command {
 		Long:              imageDecryptHelp,
 		Args:              cobra.MinimumNArgs(2),
 		RunE:              imgcryptAction(false),
-		ValidArgsFunction: imgcryptShellComplete,
+		ValidArgsFunction: completion.ImageNames,
 		SilenceUsage:      true,
 		SilenceErrors:     true,
 	}
+
 	registerImgcryptFlags(cmd, false)
+
 	return cmd
 }

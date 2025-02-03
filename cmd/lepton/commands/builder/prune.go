@@ -17,7 +17,6 @@
 package builder
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -25,7 +24,6 @@ import (
 	"go.farcloser.world/core/units"
 
 	"go.farcloser.world/lepton/cmd/lepton/helpers"
-	"go.farcloser.world/lepton/leptonic/errs"
 	"go.farcloser.world/lepton/pkg/api/options"
 	"go.farcloser.world/lepton/pkg/cmd/builder"
 )
@@ -67,8 +65,8 @@ func pruneOptions(cmd *cobra.Command, _ []string) (*options.BuilderPrune, error)
 			msg = "This will remove any dangling build cache."
 		}
 
-		if confirmed, err := helpers.Confirm(cmd, fmt.Sprintf("WARNING! %s.", msg)); err != nil || !confirmed {
-			return nil, errors.Join(errs.ErrCancelled, err)
+		if err := helpers.Confirm(cmd, fmt.Sprintf("WARNING! %s.", msg)); err != nil {
+			return nil, err
 		}
 	}
 

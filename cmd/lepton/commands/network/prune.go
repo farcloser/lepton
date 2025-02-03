@@ -17,9 +17,6 @@
 package network
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/spf13/cobra"
 
 	"go.farcloser.world/lepton/cmd/lepton/helpers"
@@ -45,39 +42,42 @@ func pruneCommand() *cobra.Command {
 	return cmd
 }
 
+func pruneOptions(cmd *cobra.Command, _ []string) (*options.NetworkPrune, error) {
+	force, err := cmd.Flags().GetBool("force")
+	if err != nil {
+		return nil, err
+	}
+
+	if !force {
+		msg := "This will remove all custom networks not used by at least one container."
+		if err := helpers.Confirm(cmd, msg); err != nil {
+			return nil, err
+		}
+	}
+
+	return &options.NetworkPrune{
+		NetworkDriversToKeep: NetworkDriversToKeep,
+		Force:                force,
+	}, nil
+}
+
 func pruneAction(cmd *cobra.Command, args []string) error {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return err
 	}
-	force, err := cmd.Flags().GetBool("force")
+
+	opts, err := pruneOptions(cmd, args)
 	if err != nil {
 		return err
-	}
-
-	if !force {
-		var confirm string
-		msg := "This will remove all custom networks not used by at least one container."
-		msg += "\nAre you sure you want to continue? [y/N] "
-
-		fmt.Fprintf(cmd.OutOrStdout(), "WARNING! %s", msg)
-		fmt.Fscanf(cmd.InOrStdin(), "%s", &confirm)
-
-		if strings.ToLower(confirm) != "y" {
-			return nil
-		}
-	}
-
-	opts := &options.NetworkPrune{
-		NetworkDriversToKeep: NetworkDriversToKeep,
-		Stdout:               cmd.OutOrStdout(),
 	}
 
 	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
 	if err != nil {
 		return err
 	}
+
 	defer cancel()
 
-	return network.Prune(ctx, cli, globalOptions, opts)
+	return network.Prune(ctx, cli, cmd.OutOrStdout(), globalOptions, opts)
 }

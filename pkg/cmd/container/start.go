@@ -29,7 +29,7 @@ import (
 )
 
 // Start starts a list of `containers`. If attach is true, it only starts a single container.
-func Start(ctx context.Context, client *containerd.Client, reqs []string, options options.ContainerStart) error {
+func Start(ctx context.Context, client *containerd.Client, reqs []string, options *options.ContainerStart) error {
 	if options.Attach && len(reqs) > 1 {
 		return errors.New("you cannot start and attach multiple containers at once")
 	}

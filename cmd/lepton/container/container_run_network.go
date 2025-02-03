@@ -42,11 +42,11 @@ func loadNetworkFlags(cmd *cobra.Command) (options.ContainerNetwork, error) {
 		networkSet = true
 	}
 	if cmd.Flags().Lookup("net").Changed {
-		net, err := cmd.Flags().GetStringSlice("net")
+		netFlag, err := cmd.Flags().GetStringSlice("net")
 		if err != nil {
 			return netOpts, err
 		}
-		netSlice = append(netSlice, net...)
+		netSlice = append(netSlice, netFlag...)
 		networkSet = true
 	}
 

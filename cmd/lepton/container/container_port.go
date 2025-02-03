@@ -32,7 +32,7 @@ import (
 )
 
 func PortCommand() *cobra.Command {
-	var portCommand = &cobra.Command{
+	return &cobra.Command{
 		Use:               "port [flags] CONTAINER [PRIVATE_PORT[/PROTO]]",
 		Args:              cobra.RangeArgs(1, 2),
 		Short:             "List port mappings or a specific mapping for the container",
@@ -41,7 +41,6 @@ func PortCommand() *cobra.Command {
 		SilenceUsage:      true,
 		SilenceErrors:     true,
 	}
-	return portCommand
 }
 
 func portAction(cmd *cobra.Command, args []string) error {

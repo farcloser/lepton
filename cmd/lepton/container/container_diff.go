@@ -44,7 +44,7 @@ import (
 )
 
 func DiffCommand() *cobra.Command {
-	var diffCommand = &cobra.Command{
+	return &cobra.Command{
 		Use:               "diff [CONTAINER]",
 		Short:             "Inspect changes to files or directories on a container's filesystem",
 		Args:              cobra.MinimumNArgs(1),
@@ -53,7 +53,6 @@ func DiffCommand() *cobra.Command {
 		SilenceUsage:      true,
 		SilenceErrors:     true,
 	}
-	return diffCommand
 }
 
 func diffOptions(cmd *cobra.Command, _ []string) (options.ContainerDiff, error) {

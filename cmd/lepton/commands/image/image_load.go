@@ -27,7 +27,7 @@ import (
 )
 
 func LoadCommand() *cobra.Command {
-	var loadCommand = &cobra.Command{
+	var cmd = &cobra.Command{
 		Use:           "load",
 		Args:          cobra.NoArgs,
 		Short:         "Load an image from a tar archive or STDIN",
@@ -37,20 +37,17 @@ func LoadCommand() *cobra.Command {
 		SilenceErrors: true,
 	}
 
-	loadCommand.Flags().StringP("input", "i", "", "Read from tar archive file, instead of STDIN")
-	loadCommand.Flags().BoolP("quiet", "q", false, "Suppress the load output")
+	cmd.Flags().StringP("input", "i", "", "Read from tar archive file, instead of STDIN")
+	cmd.Flags().BoolP("quiet", "q", false, "Suppress the load output")
+	cmd.Flags().StringSlice("platform", []string{}, "Import content for a specific platform")
+	cmd.Flags().Bool("all-platforms", false, "Import content for all platforms")
 
-	// #region platform flags
-	// platform is defined as StringSlice, not StringArray, to allow specifying "--platform=amd64,arm64"
-	loadCommand.Flags().StringSlice("platform", []string{}, "Import content for a specific platform")
-	loadCommand.RegisterFlagCompletionFunc("platform", completion.Platforms)
-	loadCommand.Flags().Bool("all-platforms", false, "Import content for all platforms")
-	// #endregion
+	_ = cmd.RegisterFlagCompletionFunc("platform", completion.Platforms)
 
-	return loadCommand
+	return cmd
 }
 
-func processLoadCommandFlags(cmd *cobra.Command) (options.ImageLoad, error) {
+func loadOptions(cmd *cobra.Command) (options.ImageLoad, error) {
 	input, err := cmd.Flags().GetString("input")
 	if err != nil {
 		return options.ImageLoad{}, err
@@ -83,7 +80,7 @@ func processLoadCommandFlags(cmd *cobra.Command) (options.ImageLoad, error) {
 }
 
 func loadAction(cmd *cobra.Command, args []string) error {
-	options, err := processLoadCommandFlags(cmd)
+	options, err := loadOptions(cmd)
 	if err != nil {
 		return err
 	}

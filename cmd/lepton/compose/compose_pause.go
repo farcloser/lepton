@@ -28,7 +28,7 @@ import (
 )
 
 func pauseCommand() *cobra.Command {
-	var composePauseCommand = &cobra.Command{
+	return &cobra.Command{
 		Use:                   "pause [SERVICE...]",
 		Short:                 fmt.Sprintf("Pause all processes within containers of service(s). They can be unpaused with %s compose unpause", version.RootName),
 		RunE:                  pauseAction,
@@ -36,7 +36,6 @@ func pauseCommand() *cobra.Command {
 		SilenceErrors:         true,
 		DisableFlagsInUseLine: true,
 	}
-	return composePauseCommand
 }
 
 func pauseAction(cmd *cobra.Command, args []string) error {

@@ -17,9 +17,6 @@
 package volume
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/spf13/cobra"
 
 	"go.farcloser.world/lepton/cmd/lepton/helpers"
@@ -29,7 +26,7 @@ import (
 )
 
 func pruneCommand() *cobra.Command {
-	volumePruneCommand := &cobra.Command{
+	cmd := &cobra.Command{
 		Use:           "prune [flags]",
 		Short:         "Remove all unused local volumes",
 		Args:          cobra.NoArgs,
@@ -37,9 +34,11 @@ func pruneCommand() *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
-	volumePruneCommand.Flags().BoolP("all", "a", false, "Remove all unused volumes, not just anonymous ones")
-	volumePruneCommand.Flags().BoolP("force", "f", false, "Do not prompt for confirmation")
-	return volumePruneCommand
+
+	cmd.Flags().BoolP("all", "a", false, "Remove all unused volumes, not just anonymous ones")
+	cmd.Flags().BoolP("force", "f", false, "Do not prompt for confirmation")
+
+	return cmd
 }
 
 func pruneOptions(cmd *cobra.Command, _ []string) (*options.VolumePrune, error) {
@@ -53,9 +52,15 @@ func pruneOptions(cmd *cobra.Command, _ []string) (*options.VolumePrune, error) 
 		return nil, err
 	}
 
+	if !force {
+		msg := "WARNING! This will remove all local volumes not used by at least one container."
+		if err := helpers.Confirm(cmd, msg); err != nil {
+			return nil, err
+		}
+	}
+
 	return &options.VolumePrune{
-		All:   all,
-		Force: force,
+		All: all,
 	}, nil
 }
 
@@ -70,22 +75,11 @@ func pruneAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	if !opts.Force {
-		var confirm string
-		msg := "This will remove all local volumes not used by at least one container."
-		msg += "\nAre you sure you want to continue? [y/N] "
-		fmt.Fprintf(cmd.OutOrStdout(), "WARNING! %s", msg)
-		fmt.Fscanf(cmd.InOrStdin(), "%s", &confirm)
-
-		if strings.ToLower(confirm) != "y" {
-			return nil
-		}
-	}
-
 	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
 	if err != nil {
 		return err
 	}
+
 	defer cancel()
 
 	return volume.Prune(ctx, cli, cmd.OutOrStdout(), globalOptions, opts)

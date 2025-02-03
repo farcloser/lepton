@@ -26,15 +26,17 @@ import (
 )
 
 func pullCommand() *cobra.Command {
-	var composePullCommand = &cobra.Command{
+	var cmd = &cobra.Command{
 		Use:           "pull [flags] [SERVICE...]",
 		Short:         "Pull service images",
 		RunE:          pullAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
-	composePullCommand.Flags().BoolP("quiet", "q", false, "Pull without printing progress information")
-	return composePullCommand
+
+	cmd.Flags().BoolP("quiet", "q", false, "Pull without printing progress information")
+
+	return cmd
 }
 
 func pullAction(cmd *cobra.Command, args []string) error {

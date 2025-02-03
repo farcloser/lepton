@@ -27,29 +27,32 @@ import (
 )
 
 func removeCommand() *cobra.Command {
-	volumeRmCommand := &cobra.Command{
+	cmd := &cobra.Command{
 		Use:               "rm [flags] VOLUME [VOLUME...]",
 		Aliases:           []string{"remove"},
 		Short:             "Remove one or more volumes",
 		Long:              "NOTE: You cannot remove a volume that is in use by a container.",
 		Args:              cobra.MinimumNArgs(1),
 		RunE:              removeAction,
-		ValidArgsFunction: volumeRmShellComplete,
+		ValidArgsFunction: completion.VolumeNames,
 		SilenceUsage:      true,
 		SilenceErrors:     true,
 	}
-	volumeRmCommand.Flags().BoolP("force", "f", false, "(unimplemented yet)")
-	return volumeRmCommand
+
+	cmd.Flags().BoolP("force", "f", false, "(unimplemented yet)")
+
+	return cmd
 }
 
-func removeOptions(cmd *cobra.Command, _ []string) (*options.VolumeRemove, error) {
-	force, err := cmd.Flags().GetBool("force")
+func removeOptions(cmd *cobra.Command, args []string) (*options.VolumeRemove, error) {
+	// TODO: implement force
+	_, err := cmd.Flags().GetBool("force")
 	if err != nil {
 		return nil, err
 	}
 
 	return &options.VolumeRemove{
-		Force: force,
+		NamesList: args,
 	}, nil
 }
 
@@ -68,12 +71,8 @@ func removeAction(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+
 	defer cancel()
 
-	return volume.Remove(ctx, cli, cmd.OutOrStdout(), args, globalOptions, opts)
-}
-
-func volumeRmShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-	// show volume names
-	return completion.VolumeNames(cmd)
+	return volume.Remove(ctx, cli, cmd.OutOrStdout(), globalOptions, opts)
 }

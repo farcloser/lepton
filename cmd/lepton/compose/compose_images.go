@@ -39,16 +39,18 @@ import (
 )
 
 func imagesCommand() *cobra.Command {
-	var composeImagesCommand = &cobra.Command{
+	var cmd = &cobra.Command{
 		Use:           "images [flags] [SERVICE...]",
 		Short:         "List images used by created containers in services",
 		RunE:          imagesAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
-	composeImagesCommand.Flags().String("format", "", "Format the output. Supported values: [json]")
-	composeImagesCommand.Flags().BoolP("quiet", "q", false, "Only show numeric image IDs")
-	return composeImagesCommand
+
+	cmd.Flags().String("format", "", "Format the output. Supported values: [json]")
+	cmd.Flags().BoolP("quiet", "q", false, "Only show numeric image IDs")
+
+	return cmd
 }
 
 func imagesAction(cmd *cobra.Command, args []string) error {

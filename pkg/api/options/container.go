@@ -291,9 +291,6 @@ type ContainerPause struct {
 
 // ContainerPrune specifies options for `(container) prune`.
 type ContainerPrune struct {
-	Stdout io.Writer
-	// GOptions is the global options
-	GOptions *Global
 }
 
 // ContainerUnpauseOptions specifies options for `(container) unpause`.

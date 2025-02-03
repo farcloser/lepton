@@ -38,7 +38,7 @@ For encryption and decryption, use 'nerdctl image (encrypt|decrypt)' command.
 
 // imageConvertCommand is from https://github.com/containerd/stargz-snapshotter/blob/d58f43a8235e46da73fb94a1a35280cb4d607b2c/cmd/ctr-remote/commands/convert.go
 func convertCommand() *cobra.Command {
-	imageConvertCommand := &cobra.Command{
+	cmd := &cobra.Command{
 		Use:               "convert [flags] <source_ref> <target_ref>...",
 		Short:             "convert an image",
 		Long:              imageConvertHelp,
@@ -49,33 +49,21 @@ func convertCommand() *cobra.Command {
 		SilenceErrors:     true,
 	}
 
-	imageConvertCommand.Flags().String("format", "", "Format the output using the given Go template, e.g, 'json'")
+	cmd.Flags().String("format", "", "Format the output using the given Go template, e.g, 'json'")
+	cmd.Flags().Bool("zstd", false, "Convert legacy tar(.gz) layers to zstd. Should be used in conjunction with '--oci'")
+	cmd.Flags().Int("zstd-compression-level", 3, "zstd compression level")
+	cmd.Flags().Bool("zstdchunked", false, "Convert legacy tar(.gz) layers to zstd:chunked for lazy pulling. Should be used in conjunction with '--oci'")
+	cmd.Flags().String("zstdchunked-record-in", "", "Read 'ctr-remote optimize --record-out=<FILE>' record file (EXPERIMENTAL)")
+	cmd.Flags().Int("zstdchunked-compression-level", 3, "zstd:chunked compression level") // SpeedDefault; see also https://pkg.go.dev/github.com/klauspost/compress/zstd#EncoderLevel
+	cmd.Flags().Int("zstdchunked-chunk-size", 0, "zstd:chunked chunk size")
+	cmd.Flags().Bool("uncompress", false, "Convert tar.gz layers to uncompressed tar layers")
+	cmd.Flags().Bool("oci", false, "Convert Docker media types to OCI media types")
+	cmd.Flags().StringSlice("platform", []string{}, "Convert content for a specific platform")
+	cmd.Flags().Bool("all-platforms", false, "Convert content for all platforms")
 
-	// #region zstd flags
-	imageConvertCommand.Flags().Bool("zstd", false, "Convert legacy tar(.gz) layers to zstd. Should be used in conjunction with '--oci'")
-	imageConvertCommand.Flags().Int("zstd-compression-level", 3, "zstd compression level")
-	// #endregion
+	_ = cmd.RegisterFlagCompletionFunc("platform", completion.Platforms)
 
-	// #region zstd:chunked flags
-	imageConvertCommand.Flags().Bool("zstdchunked", false, "Convert legacy tar(.gz) layers to zstd:chunked for lazy pulling. Should be used in conjunction with '--oci'")
-	imageConvertCommand.Flags().String("zstdchunked-record-in", "", "Read 'ctr-remote optimize --record-out=<FILE>' record file (EXPERIMENTAL)")
-	imageConvertCommand.Flags().Int("zstdchunked-compression-level", 3, "zstd:chunked compression level") // SpeedDefault; see also https://pkg.go.dev/github.com/klauspost/compress/zstd#EncoderLevel
-	imageConvertCommand.Flags().Int("zstdchunked-chunk-size", 0, "zstd:chunked chunk size")
-	// #endregion
-
-	// #region generic flags
-	imageConvertCommand.Flags().Bool("uncompress", false, "Convert tar.gz layers to uncompressed tar layers")
-	imageConvertCommand.Flags().Bool("oci", false, "Convert Docker media types to OCI media types")
-	// #endregion
-
-	// #region platform flags
-	// platform is defined as StringSlice, not StringArray, to allow specifying "--platform=amd64,arm64"
-	imageConvertCommand.Flags().StringSlice("platform", []string{}, "Convert content for a specific platform")
-	imageConvertCommand.RegisterFlagCompletionFunc("platform", completion.Platforms)
-	imageConvertCommand.Flags().Bool("all-platforms", false, "Convert content for all platforms")
-	// #endregion
-
-	return imageConvertCommand
+	return cmd
 }
 
 func convertOptions(cmd *cobra.Command, _ []string) (options.ImageConvert, error) {

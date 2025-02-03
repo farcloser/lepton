@@ -33,7 +33,7 @@ import (
 )
 
 func TopCommand() *cobra.Command {
-	var topCommand = &cobra.Command{
+	var cmd = &cobra.Command{
 		Use:               "top CONTAINER [ps OPTIONS]",
 		Args:              cobra.MinimumNArgs(1),
 		Short:             "Display the running processes of a container",
@@ -42,8 +42,10 @@ func TopCommand() *cobra.Command {
 		SilenceUsage:      true,
 		SilenceErrors:     true,
 	}
-	topCommand.Flags().SetInterspersed(false)
-	return topCommand
+
+	cmd.Flags().SetInterspersed(false)
+
+	return cmd
 }
 
 func topAction(cmd *cobra.Command, args []string) error {

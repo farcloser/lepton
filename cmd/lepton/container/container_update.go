@@ -58,7 +58,7 @@ type updateResourceOptions struct {
 }
 
 func UpdateCommand() *cobra.Command {
-	var updateCommand = &cobra.Command{
+	var cmd = &cobra.Command{
 		Use:               "update [flags] CONTAINER [CONTAINER, ...]",
 		Args:              cobra.MinimumNArgs(1),
 		Short:             "Update one or more running containers",
@@ -67,12 +67,8 @@ func UpdateCommand() *cobra.Command {
 		SilenceUsage:      true,
 		SilenceErrors:     true,
 	}
-	updateCommand.Flags().SetInterspersed(false)
-	setUpdateFlags(updateCommand)
-	return updateCommand
-}
 
-func setUpdateFlags(cmd *cobra.Command) {
+	cmd.Flags().SetInterspersed(false)
 	cmd.Flags().Float64("cpus", 0.0, "Number of CPUs")
 	cmd.Flags().Uint64("cpu-period", 0, "Limit CPU CFS (Completely Fair Scheduler) period")
 	cmd.Flags().Int64("cpu-quota", -1, "Limit CPU CFS (Completely Fair Scheduler) quota")
@@ -86,9 +82,12 @@ func setUpdateFlags(cmd *cobra.Command) {
 	cmd.Flags().Int64("pids-limit", -1, "Tune container pids limit (set -1 for unlimited)")
 	cmd.Flags().Uint16("blkio-weight", 0, "Block IO (relative weight), between 10 and 1000, or 0 to disable (default 0)")
 	cmd.Flags().String("restart", "no", `Restart policy to apply when a container exits (implemented values: "no"|"always|on-failure:n|unless-stopped")`)
-	cmd.RegisterFlagCompletionFunc("restart", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+
+	_ = cmd.RegisterFlagCompletionFunc("restart", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return []string{"no", "always", "on-failure", "unless-stopped"}, cobra.ShellCompDirectiveNoFileComp
 	})
+
+	return cmd
 }
 
 func updateAction(cmd *cobra.Command, args []string) error {
@@ -101,7 +100,7 @@ func updateAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	defer cancel()
-	options, err := getUpdateOption(cmd, globalOptions)
+	opts, err := getUpdateOption(cmd, globalOptions)
 	if err != nil {
 		return err
 	}
@@ -111,7 +110,7 @@ func updateAction(cmd *cobra.Command, args []string) error {
 			if found.MatchCount > 1 {
 				return fmt.Errorf("multiple IDs found with provided prefix: %s", found.Req)
 			}
-			err = updateContainer(ctx, cli, found.Container.ID(), options, cmd)
+			err = updateContainer(ctx, cli, found.Container.ID(), opts, cmd)
 			return err
 		},
 	}
@@ -120,22 +119,22 @@ func updateAction(cmd *cobra.Command, args []string) error {
 }
 
 func getUpdateOption(cmd *cobra.Command, globalOptions *options.Global) (updateResourceOptions, error) {
-	var options updateResourceOptions
+	var opts updateResourceOptions
 	cpus, err := cmd.Flags().GetFloat64("cpus")
 	if err != nil {
-		return options, err
+		return opts, err
 	}
 	cpuPeriod, err := cmd.Flags().GetUint64("cpu-period")
 	if err != nil {
-		return options, err
+		return opts, err
 	}
 	cpuQuota, err := cmd.Flags().GetInt64("cpu-quota")
 	if err != nil {
-		return options, err
+		return opts, err
 	}
 	if cpuQuota != -1 || cpuPeriod != 0 {
 		if cpus > 0.0 {
-			return options, errors.New("cpus and quota/period should be used separately")
+			return opts, errors.New("cpus and quota/period should be used separately")
 		}
 	}
 	if cpus > 0.0 {
@@ -144,21 +143,21 @@ func getUpdateOption(cmd *cobra.Command, globalOptions *options.Global) (updateR
 	}
 	shares, err := cmd.Flags().GetUint64("cpu-shares")
 	if err != nil {
-		return options, err
+		return opts, err
 	}
 	memStr, err := cmd.Flags().GetString("memory")
 	if err != nil {
-		return options, err
+		return opts, err
 	}
 	memSwap, err := cmd.Flags().GetString("memory-swap")
 	if err != nil {
-		return options, err
+		return opts, err
 	}
 	var mem64 int64
 	if memStr != "" {
 		mem64, err = units.RAMInBytes(memStr)
 		if err != nil {
-			return options, fmt.Errorf("failed to parse memory bytes %q: %w", memStr, err)
+			return opts, fmt.Errorf("failed to parse memory bytes %q: %w", memStr, err)
 		}
 	}
 	var memSwap64 int64
@@ -168,10 +167,10 @@ func getUpdateOption(cmd *cobra.Command, globalOptions *options.Global) (updateR
 		} else {
 			memSwap64, err = units.RAMInBytes(memSwap)
 			if err != nil {
-				return options, fmt.Errorf("failed to parse memory-swap bytes %q: %w", memSwap, err)
+				return opts, fmt.Errorf("failed to parse memory-swap bytes %q: %w", memSwap, err)
 			}
 			if mem64 > 0 && memSwap64 > 0 && memSwap64 < mem64 {
-				return options, errors.New("minimum memoryswap limit should be larger than memory limit, see usage")
+				return opts, errors.New("minimum memoryswap limit should be larger than memory limit, see usage")
 			}
 		}
 	} else {
@@ -182,51 +181,51 @@ func getUpdateOption(cmd *cobra.Command, globalOptions *options.Global) (updateR
 	}
 	memReserve, err := cmd.Flags().GetString("memory-reservation")
 	if err != nil {
-		return options, err
+		return opts, err
 	}
 	var memReserve64 int64
 	if memReserve != "" {
 		memReserve64, err = units.RAMInBytes(memReserve)
 		if err != nil {
-			return options, fmt.Errorf("failed to parse memory bytes %q: %w", memReserve, err)
+			return opts, fmt.Errorf("failed to parse memory bytes %q: %w", memReserve, err)
 		}
 	}
 	if mem64 > 0 && memReserve64 > 0 && mem64 < memReserve64 {
-		return options, errors.New("minimum memory limit can not be less than memory reservation limit, see usage")
+		return opts, errors.New("minimum memory limit can not be less than memory reservation limit, see usage")
 	}
 
 	kernelMemStr, err := cmd.Flags().GetString("kernel-memory")
 	if err != nil {
-		return options, err
+		return opts, err
 	}
 	if kernelMemStr != "" && cmd.Flag("kernel-memory").Changed {
 		log.L.Warnf("The --kernel-memory flag is no longer supported. This flag is a noop.")
 	}
 	cpuset, err := cmd.Flags().GetString("cpuset-cpus")
 	if err != nil {
-		return options, err
+		return opts, err
 	}
 	cpusetMems, err := cmd.Flags().GetString("cpuset-mems")
 	if err != nil {
-		return options, err
+		return opts, err
 	}
 	pidsLimit, err := cmd.Flags().GetInt64("pids-limit")
 	if err != nil {
-		return options, err
+		return opts, err
 	}
 	blkioWeight, err := cmd.Flags().GetUint16("blkio-weight")
 	if err != nil {
-		return options, err
+		return opts, err
 	}
 	if blkioWeight != 0 && !infoutil.BlockIOWeight(globalOptions.CgroupManager) {
-		return options, errors.New("kernel support for cgroup blkio weight missing, weight discarded")
+		return opts, errors.New("kernel support for cgroup blkio weight missing, weight discarded")
 	}
 	if blkioWeight > 0 && blkioWeight < 10 || blkioWeight > 1000 {
-		return options, errors.New("range of blkio weight is from 10 to 1000")
+		return opts, errors.New("range of blkio weight is from 10 to 1000")
 	}
 
 	if runtime.GOOS == "linux" {
-		options = updateResourceOptions{
+		opts = updateResourceOptions{
 			CPUPeriod:          cpuPeriod,
 			CPUQuota:           cpuQuota,
 			CPUShares:          shares,
@@ -239,7 +238,7 @@ func getUpdateOption(cmd *cobra.Command, globalOptions *options.Global) (updateR
 			BlkioWeight:        blkioWeight,
 		}
 	}
-	return options, nil
+	return opts, nil
 }
 
 func updateContainer(ctx context.Context, cli *client.Client, id string, opts updateResourceOptions, cmd *cobra.Command) (retErr error) {
@@ -409,6 +408,6 @@ func copySpec(spec *specs.Spec) (*specs.Spec, error) {
 	return &copySpec, nil
 }
 
-func updateShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+func updateShellComplete(cmd *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
 	return completion.ContainerNames(cmd, nil)
 }

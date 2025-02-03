@@ -36,7 +36,7 @@ import (
 	image2 "go.farcloser.world/lepton/cmd/lepton/commands/image"
 	"go.farcloser.world/lepton/cmd/lepton/commands/namespace"
 	"go.farcloser.world/lepton/cmd/lepton/commands/network"
-	login2 "go.farcloser.world/lepton/cmd/lepton/commands/registry"
+	"go.farcloser.world/lepton/cmd/lepton/commands/registry"
 	"go.farcloser.world/lepton/cmd/lepton/commands/system"
 	"go.farcloser.world/lepton/cmd/lepton/commands/volume"
 	"go.farcloser.world/lepton/cmd/lepton/completion"
@@ -278,7 +278,7 @@ Config file ($%s_TOML): %s
 		container.DiffCommand(),
 		container.RestartCommand(),
 		container.KillCommand(),
-		container.RmCommand(),
+		container.RemoveCommand(),
 		container.PauseCommand(),
 		container.UnpauseCommand(),
 		container.CommitCommand(),
@@ -291,13 +291,13 @@ Config file ($%s_TOML): %s
 		builder.BuildCommand(),
 
 		// #region Image management
-		image2.ImagesCommand(),
+		image2.ListCommand(),
 		image2.PullCommand(),
 		image2.PushCommand(),
 		image2.LoadCommand(),
 		image2.SaveCommand(),
 		image2.TagCommand(),
-		image2.RmiCommand(),
+		image2.RemoveCommand(),
 		image2.HistoryCommand(),
 		// #endregion
 
@@ -318,6 +318,7 @@ Config file ($%s_TOML): %s
 		container.Command(),
 		image2.Command(),
 		network.Command(),
+		registry.Command(),
 		volume.Command(),
 		system.Command(),
 		namespace.Command(),
@@ -328,16 +329,16 @@ Config file ($%s_TOML): %s
 		internal.Command(),
 
 		// login
-		login2.LoginCommand(),
+		registry.LoginCommand(),
 
 		// Logout
-		login2.LogoutCommand(),
+		registry.LogoutCommand(),
 
 		// Compose
 		compose.Command(),
 	)
 	addApparmorCommand(rootCmd)
-	container.AddCpCommand(rootCmd)
+	container.AddCopyCommand(rootCmd)
 
 	// add aliasToBeInherited to subCommand(s) InheritedFlags
 	for _, subCmd := range rootCmd.Commands() {
