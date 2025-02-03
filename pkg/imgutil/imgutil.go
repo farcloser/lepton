@@ -321,7 +321,6 @@ func ReadManifest(ctx context.Context, img containerd.Image) (*specs.Manifest, *
 		// We can't access the private `img.platform` variable.
 		// So, we find the manifest object by comparing the config desc.
 		for _, maniDesc := range idx.Manifests {
-			maniDesc := maniDesc
 			// ignore non-nil err
 			if b, err := content.ReadBlob(ctx, cs, maniDesc); err == nil {
 				var mani specs.Manifest

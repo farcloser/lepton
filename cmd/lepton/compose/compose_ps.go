@@ -180,7 +180,6 @@ func psAction(cmd *cobra.Command, args []string) error {
 	containersPrintable := make([]composeContainerPrintable, len(containers))
 	eg, ctx := errgroup.WithContext(ctx)
 	for i, container := range containers {
-		i, container := i, container
 		eg.Go(func() error {
 			var p composeContainerPrintable
 			var err error
@@ -366,14 +365,14 @@ func statusForFilter(ctx context.Context, c client.Container) string {
 	if err != nil {
 		return string(client.Unknown)
 	}
-	labels, err := c.Labels(ctx)
+	lbls, err := c.Labels(ctx)
 	if err != nil {
 		return string(client.Unknown)
 	}
 
 	switch s := status.Status; s {
 	case client.Stopped:
-		if labels[restart.StatusLabel] == string(client.Running) && restart.Reconcile(status, labels) {
+		if lbls[restart.StatusLabel] == string(client.Running) && restart.Reconcile(status, lbls) {
 			return "restarting"
 		}
 		return "exited"

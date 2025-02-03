@@ -52,20 +52,20 @@ func killAction(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	options := options.ContainerKill{
+	opts := options.ContainerKill{
 		GOptions:   globalOptions,
 		KillSignal: killSignal,
 		Stdout:     cmd.OutOrStdout(),
 		Stderr:     cmd.ErrOrStderr(),
 	}
 
-	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), opts.GOptions.Namespace, opts.GOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	return container.Kill(ctx, cli, args, options)
+	return container.Kill(ctx, cli, args, opts)
 }
 
 func killShellComplete(cmd *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {

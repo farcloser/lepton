@@ -186,7 +186,6 @@ func generateMountOpts(ctx context.Context, client *containerd.Client, ensuredIm
 		if runtime.GOOS == "linux" {
 			defer unmounter(tempDir)
 			for _, m := range mounts {
-				m := m
 				if m.Type == "bind" && userns.RunningInUserNS() {
 					// For https://github.com/containerd/nerdctl/issues/2056
 					unpriv, err := mountutil.UnprivilegedMountFlags(m.Source)

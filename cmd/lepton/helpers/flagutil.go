@@ -18,34 +18,60 @@ package helpers
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
 
 	"go.farcloser.world/containers/security/cgroups"
 
 	"go.farcloser.world/lepton/pkg/api/options"
+	"go.farcloser.world/lepton/pkg/buildkitutil"
 )
 
 func ProcessImageVerifyOptions(cmd *cobra.Command, _ []string) (opt options.ImageVerify, err error) {
 	if opt.Provider, err = cmd.Flags().GetString("verify"); err != nil {
 		return
 	}
+
 	if opt.CosignKey, err = cmd.Flags().GetString("cosign-key"); err != nil {
 		return
 	}
+
 	if opt.CosignCertificateIdentity, err = cmd.Flags().GetString("cosign-certificate-identity"); err != nil {
 		return
 	}
+
 	if opt.CosignCertificateIdentityRegexp, err = cmd.Flags().GetString("cosign-certificate-identity-regexp"); err != nil {
 		return
 	}
+
 	if opt.CosignCertificateOidcIssuer, err = cmd.Flags().GetString("cosign-certificate-oidc-issuer"); err != nil {
 		return
 	}
+
 	if opt.CosignCertificateOidcIssuerRegexp, err = cmd.Flags().GetString("cosign-certificate-oidc-issuer-regexp"); err != nil {
 		return
 	}
+
 	return
+}
+
+func ProcessBuildkitHostOption(cmd *cobra.Command, namespace string) (string, error) {
+	if cmd.Flags().Changed("buildkit-host") || os.Getenv("BUILDKIT_HOST") != "" {
+		// If address is explicitly specified, use it.
+		buildkitHost, err := cmd.Flags().GetString("buildkit-host")
+		if err != nil {
+			return "", err
+		}
+
+		if err = buildkitutil.PingBKDaemon(buildkitHost); err != nil {
+			return "", err
+		}
+
+		return buildkitHost, nil
+	}
+
+	return buildkitutil.GetBuildkitHost(namespace)
 }
 
 func ProcessRootCmdFlags(cmd *cobra.Command) (*options.Global, error) {
@@ -53,62 +79,77 @@ func ProcessRootCmdFlags(cmd *cobra.Command) (*options.Global, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	debugFull, err := cmd.Flags().GetBool("debug-full")
 	if err != nil {
 		return nil, err
 	}
+
 	address, err := cmd.Flags().GetString("address")
 	if err != nil {
 		return nil, err
 	}
+
 	namespace, err := cmd.Flags().GetString("namespace")
 	if err != nil {
 		return nil, err
 	}
+
 	snapshotter, err := cmd.Flags().GetString("snapshotter")
 	if err != nil {
 		return nil, err
 	}
+
 	cniPath, err := cmd.Flags().GetString("cni-path")
 	if err != nil {
 		return nil, err
 	}
+
 	cniConfigPath, err := cmd.Flags().GetString("cni-netconfpath")
 	if err != nil {
 		return nil, err
 	}
+
 	dataRoot, err := cmd.Flags().GetString("data-root")
 	if err != nil {
 		return nil, err
 	}
+
 	cgroupManager, err := cmd.Flags().GetString("cgroup-manager")
 	if err != nil {
 		return nil, err
 	}
+
 	insecureRegistry, err := cmd.Flags().GetBool("insecure-registry")
 	if err != nil {
 		return nil, err
 	}
+
 	hostsDir, err := cmd.Flags().GetStringSlice("hosts-dir")
 	if err != nil {
 		return nil, err
 	}
+
 	experimental, err := cmd.Flags().GetBool("experimental")
 	if err != nil {
 		return nil, err
 	}
+
 	hostGatewayIP, err := cmd.Flags().GetString("host-gateway-ip")
 	if err != nil {
 		return nil, err
 	}
+
 	bridgeIP, err := cmd.Flags().GetString("bridge-ip")
 	if err != nil {
 		return nil, err
 	}
+
 	kubeHideDupe, err := cmd.Flags().GetBool("kube-hide-dupe")
 	if err != nil {
 		return nil, err
 	}
+
 	return &options.Global{
 		Debug:            debug,
 		DebugFull:        debugFull,
@@ -134,9 +175,11 @@ func RequireExperimental(feature string) func(cmd *cobra.Command, args []string)
 		if err != nil {
 			return err
 		}
+
 		if !globalOptions.Experimental {
 			return fmt.Errorf("%s is experimental feature, you should enable experimental config", feature)
 		}
+
 		return nil
 	}
 }

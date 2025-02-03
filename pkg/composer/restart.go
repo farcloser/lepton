@@ -56,7 +56,6 @@ func (c *Composer) restartContainers(ctx context.Context, containers []container
 
 	var rsWG sync.WaitGroup
 	for _, container := range containers {
-		container := container
 		rsWG.Add(1)
 		go func() {
 			defer rsWG.Done()

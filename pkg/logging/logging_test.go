@@ -108,7 +108,7 @@ func TestLoggingProcessAdapter(t *testing.T) {
 func generateRandomString(size int) string {
 	characters := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	var sb strings.Builder
-	for i := 0; i < size; i++ {
+	for range size {
 		sb.WriteByte(characters[rand.Intn(len(characters))])
 	}
 	return sb.String()

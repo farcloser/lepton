@@ -59,7 +59,7 @@ func listOptions(cmd *cobra.Command) (*options.NamespaceList, error) {
 	}, nil
 }
 
-func listAction(cmd *cobra.Command, args []string) error {
+func listAction(cmd *cobra.Command, _ []string) error {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return err

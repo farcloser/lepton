@@ -63,7 +63,6 @@ func (c *Composer) stopContainers(ctx context.Context, containers []containerd.C
 
 	var rmWG sync.WaitGroup
 	for _, container := range containers {
-		container := container
 		rmWG.Add(1)
 		go func() {
 			defer rmWG.Done()
@@ -87,8 +86,6 @@ func (c *Composer) stopContainers(ctx context.Context, containers []containerd.C
 func (c *Composer) stopContainersFromParsedServices(ctx context.Context, containers map[string]serviceparser.Container) {
 	var rmWG sync.WaitGroup
 	for id, container := range containers {
-		id := id
-		container := container
 		rmWG.Add(1)
 		go func() {
 			defer rmWG.Done()

@@ -51,7 +51,7 @@ func registerImgcryptFlags(cmd *cobra.Command, encrypt bool) {
 	_ = cmd.RegisterFlagCompletionFunc("platform", completion.Platforms)
 }
 
-func cryptOptions(cmd *cobra.Command, _args []string, encrypt bool) (options.ImageCrypt, error) {
+func cryptOptions(cmd *cobra.Command, _ []string, encrypt bool) (options.ImageCrypt, error) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return options.ImageCrypt{}, err

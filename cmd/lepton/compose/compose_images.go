@@ -138,7 +138,6 @@ func printComposeImages(ctx context.Context, cmd *cobra.Command, containers []cl
 	imagePrintables := make([]composeImagePrintable, len(containers))
 	eg, ctx := errgroup.WithContext(ctx)
 	for i, c := range containers {
-		i, c := i, c
 		eg.Go(func() error {
 			info, err := c.Info(ctx, client.WithoutRefreshedMetadata)
 			if err != nil {

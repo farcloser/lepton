@@ -104,21 +104,21 @@ func logsOptions(cmd *cobra.Command, _ []string) (options.ContainerLogs, error) 
 }
 
 func logsAction(cmd *cobra.Command, args []string) error {
-	options, err := logsOptions(cmd, args)
+	opts, err := logsOptions(cmd, args)
 	if err != nil {
 		return err
 	}
 
-	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), opts.GOptions.Namespace, opts.GOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	return container.Logs(ctx, cli, args[0], options)
+	return container.Logs(ctx, cli, args[0], opts)
 }
 
-func logsShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+func logsShellComplete(cmd *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
 	// show container names (TODO: only show containers with logs)
 	return completion.ContainerNames(cmd, nil)
 }

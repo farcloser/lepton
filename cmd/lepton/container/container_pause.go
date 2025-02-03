@@ -51,21 +51,21 @@ func pauseOptions(cmd *cobra.Command, _ []string) (options.ContainerPause, error
 }
 
 func pauseAction(cmd *cobra.Command, args []string) error {
-	options, err := pauseOptions(cmd, args)
+	opts, err := pauseOptions(cmd, args)
 	if err != nil {
 		return err
 	}
 
-	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), opts.GOptions.Namespace, opts.GOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	return container.Pause(ctx, cli, args, options)
+	return container.Pause(ctx, cli, args, opts)
 }
 
-func pauseShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+func pauseShellComplete(cmd *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
 	// show running container names
 	statusFilterFn := func(st client.ProcessStatus) bool {
 		return st == client.Running

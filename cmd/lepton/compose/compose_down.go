@@ -41,7 +41,7 @@ func downCommand() *cobra.Command {
 	return cmd
 }
 
-func downAction(cmd *cobra.Command, args []string) error {
+func downAction(cmd *cobra.Command, _ []string) error {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return err

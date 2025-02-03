@@ -123,7 +123,7 @@ func execOptions(cmd *cobra.Command, _ []string) (options.ContainerExec, error) 
 }
 
 func execAction(cmd *cobra.Command, args []string) error {
-	options, err := execOptions(cmd, args)
+	opts, err := execOptions(cmd, args)
 	if err != nil {
 		return err
 	}
@@ -135,16 +135,16 @@ func execAction(cmd *cobra.Command, args []string) error {
 		args = newArg
 	}
 
-	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), opts.GOptions.Namespace, opts.GOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	return container.Exec(ctx, cli, args, options)
+	return container.Exec(ctx, cli, args, opts)
 }
 
-func execShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+func execShellComplete(cmd *cobra.Command, args []string, _ string) ([]string, cobra.ShellCompDirective) {
 	if len(args) == 0 {
 		// show running container names
 		statusFilterFn := func(st client.ProcessStatus) bool {

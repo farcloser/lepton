@@ -284,7 +284,7 @@ func parseGPUOpt(value string) (oci.SpecOpts, error) {
 		gpuOpts = append(gpuOpts, nvidia.WithDeviceUUIDs(req.DeviceIDs...))
 	} else if req.Count > 0 {
 		var devices []int
-		for i := 0; i < req.Count; i++ {
+		for i := range req.Count {
 			devices = append(devices, i)
 		}
 		gpuOpts = append(gpuOpts, nvidia.WithDevices(devices...))

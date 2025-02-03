@@ -88,16 +88,16 @@ func ProcessImageInspectOptions(cmd *cobra.Command, platform *string) (options.I
 }
 
 func inspectAction(cmd *cobra.Command, args []string) error {
-	options, err := ProcessImageInspectOptions(cmd, nil)
+	opts, err := ProcessImageInspectOptions(cmd, nil)
 	if err != nil {
 		return err
 	}
 
-	cli, ctx, cancel, err := clientutil.NewClientWithPlatform(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address, options.Platform)
+	cli, ctx, cancel, err := clientutil.NewClientWithPlatform(cmd.Context(), opts.GOptions.Namespace, opts.GOptions.Address, opts.Platform)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	return image.Inspect(ctx, cli, args, options)
+	return image.Inspect(ctx, cli, args, opts)
 }

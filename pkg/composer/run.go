@@ -228,7 +228,6 @@ func (c *Composer) runServices(ctx context.Context, parsedServices []*servicepar
 	)
 
 	for _, ps := range parsedServices {
-		ps := ps
 		services = append(services, ps.Unparsed.Name)
 
 		if len(ps.Containers) != 1 {

@@ -211,12 +211,12 @@ func TestCreateSuccess(t *testing.T) {
 					ExitCode: 0,
 					Errors:   nil,
 					Output: func(stdout string, info string, t *testing.T) {
-						var expect []api.Namespace
-						err := json.Unmarshal([]byte(stdout), &expect)
+						var expected []api.Namespace
+						err := json.Unmarshal([]byte(stdout), &expected)
 						assert.NilError(t, err, info)
-						assert.Assert(t, len(expect) != 0, info)
-						assert.Equal(t, expect[0].Name, data.Get("namespace"), info)
-						assert.Equal(t, len(expect[0].Labels), 0, info)
+						assert.Assert(t, len(expected) != 0, info)
+						assert.Equal(t, expected[0].Name, data.Get("namespace"), info)
+						assert.Equal(t, len(expected[0].Labels), 0, info)
 					},
 				}
 			},
@@ -230,11 +230,11 @@ func TestCreateSuccess(t *testing.T) {
 					ExitCode: 0,
 					Errors:   nil,
 					Output: func(stdout string, info string, t *testing.T) {
-						var expect []api.Namespace
-						err := json.Unmarshal([]byte(stdout), &expect)
+						var expected []api.Namespace
+						err := json.Unmarshal([]byte(stdout), &expected)
 						assert.NilError(t, err, info)
 						var found string
-						for _, n := range expect {
+						for _, n := range expected {
 							if n.Name == data.Get("namespace") {
 								found = n.Name
 							}
@@ -261,11 +261,11 @@ func TestCreateSuccess(t *testing.T) {
 					ExitCode: 0,
 					Errors:   nil,
 					Output: func(stdout string, info string, t *testing.T) {
-						var expect []api.Namespace
-						err := json.Unmarshal([]byte(stdout), &expect)
+						var expected []api.Namespace
+						err := json.Unmarshal([]byte(stdout), &expected)
 						assert.NilError(t, err, info)
 						var found string
-						for _, n := range expect {
+						for _, n := range expected {
 							if n.Name == data.Get("namespace") {
 								found = n.Name
 							}

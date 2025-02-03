@@ -199,7 +199,6 @@ func TestLogsWithForegroundContainers(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tc := tc
 		func(_ *testing.T) {
 			containerName := tid + "-" + tc.name
 			var cmdArgs []string

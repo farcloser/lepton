@@ -19,7 +19,6 @@ package builder
 import (
 	"errors"
 	"fmt"
-	"os"
 	"strconv"
 	"strings"
 
@@ -29,7 +28,6 @@ import (
 	"go.farcloser.world/lepton/cmd/lepton/helpers"
 	"go.farcloser.world/lepton/leptonic/services/containerd"
 	"go.farcloser.world/lepton/pkg/api/options"
-	"go.farcloser.world/lepton/pkg/buildkitutil"
 	"go.farcloser.world/lepton/pkg/cmd/builder"
 	"go.farcloser.world/lepton/pkg/strutil"
 )
@@ -256,23 +254,6 @@ func buildOptions(cmd *cobra.Command, args []string) (*options.BuilderBuild, err
 	}, nil
 }
 
-func GetBuildkitHostOption(cmd *cobra.Command, namespace string) (string, error) {
-	if cmd.Flags().Changed("buildkit-host") || os.Getenv("BUILDKIT_HOST") != "" {
-		// If address is explicitly specified, use it.
-		buildkitHost, err := cmd.Flags().GetString("buildkit-host")
-		if err != nil {
-			return "", err
-		}
-
-		if err = buildkitutil.PingBKDaemon(buildkitHost); err != nil {
-			return "", err
-		}
-
-		return buildkitHost, nil
-	}
-	return buildkitutil.GetBuildkitHost(namespace)
-}
-
 func buildAction(cmd *cobra.Command, args []string) error {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
@@ -284,7 +265,7 @@ func buildAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	opts.BuildKitHost, err = GetBuildkitHostOption(cmd, globalOptions.Namespace)
+	opts.BuildKitHost, err = helpers.ProcessBuildkitHostOption(cmd, globalOptions.Namespace)
 	if err != nil {
 		return err
 	}
@@ -299,7 +280,7 @@ func buildAction(cmd *cobra.Command, args []string) error {
 	return builder.Build(ctx, cli, globalOptions, opts)
 }
 
-// canonicalizeAttest is from https://github.com/docker/buildx/blob/v0.12/util/buildflags/attests.go##L13-L21
+// canonicalizeAttest is from https://github.com/docker/buildx/blob/v0.12/util/buildflags/attests.go#L13-L21
 func canonicalizeAttest(attestType string, in string) string {
 	if in == "" {
 		return ""

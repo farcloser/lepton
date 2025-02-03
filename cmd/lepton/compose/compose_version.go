@@ -46,7 +46,7 @@ func versionCommand() *cobra.Command {
 	return cmd
 }
 
-func versionAction(cmd *cobra.Command, args []string) error {
+func versionAction(cmd *cobra.Command, _ []string) error {
 	short, err := cmd.Flags().GetBool("short")
 	if err != nil {
 		return err

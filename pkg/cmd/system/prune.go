@@ -18,7 +18,6 @@ package system
 
 import (
 	"context"
-	"fmt"
 	"io"
 
 	containerd "github.com/containerd/containerd/v2/client"
@@ -58,20 +57,13 @@ func Prune(ctx context.Context, client *containerd.Client, output io.Writer, glo
 	}
 
 	if opts.BuildKitHost != "" {
-		prunedObjects, err := builder.Prune(ctx, globalOptions, &options.BuilderPrune{
+		err := builder.Prune(ctx, output, globalOptions, &options.BuilderPrune{
 			Stderr:       opts.Stderr,
 			All:          opts.All,
 			BuildKitHost: opts.BuildKitHost,
 		})
 		if err != nil {
 			return err
-		}
-
-		if len(prunedObjects) > 0 {
-			fmt.Fprintln(output, "Deleted build cache objects:")
-			for _, item := range prunedObjects {
-				fmt.Fprintln(output, item.ID)
-			}
 		}
 	}
 

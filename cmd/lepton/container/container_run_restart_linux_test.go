@@ -81,7 +81,7 @@ func TestRunRestart(t *testing.T) {
 		maxRetry = 30
 		sleep    = 3 * time.Second
 	)
-	for i := 0; i < maxRetry; i++ {
+	for i := range maxRetry {
 		t.Logf("(retry %d) ps -a: %q", i, base.Cmd("ps", "-a").Run().Combined())
 		err := check(1)
 		if err == nil {

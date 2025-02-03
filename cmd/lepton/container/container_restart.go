@@ -68,16 +68,16 @@ func restartOptions(cmd *cobra.Command, _ []string) (options.ContainerRestart, e
 }
 
 func restartAction(cmd *cobra.Command, args []string) error {
-	options, err := restartOptions(cmd, args)
+	opts, err := restartOptions(cmd, args)
 	if err != nil {
 		return err
 	}
 
-	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOption.Namespace, options.GOption.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), opts.GOption.Namespace, opts.GOption.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	return container.Restart(ctx, cli, args, options)
+	return container.Restart(ctx, cli, args, opts)
 }

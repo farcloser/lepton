@@ -392,7 +392,6 @@ func TestRunSigProxy(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			stdout, sigIntRecieved, timedOut := runSigProxy(t, tc.args...)
 			errorMsg := fmt.Sprintf("%s failed;\nExpected: '%s'\nActual: '%s'", tc.name, tc.expectedOut, stdout)

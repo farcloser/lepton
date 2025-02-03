@@ -75,7 +75,7 @@ func saveOptions(cmd *cobra.Command, _ []string) (options.ImageSave, error) {
 }
 
 func saveAction(cmd *cobra.Command, args []string) error {
-	options, err := saveOptions(cmd, args)
+	opts, err := saveOptions(cmd, args)
 	if err != nil {
 		return err
 	}
@@ -94,15 +94,15 @@ func saveAction(cmd *cobra.Command, args []string) error {
 	} else if out, ok := output.(*os.File); ok && term.IsTerminal(out.Fd()) {
 		return errors.New("cowardly refusing to save to a terminal. Use the -o flag or redirect")
 	}
-	options.Stdout = output
+	opts.Stdout = output
 
-	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), opts.GOptions.Namespace, opts.GOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	if err = image.Save(ctx, cli, args, options); err != nil && outputPath != "" {
+	if err = image.Save(ctx, cli, args, opts); err != nil && outputPath != "" {
 		os.Remove(outputPath)
 	}
 	return err

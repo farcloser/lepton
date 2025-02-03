@@ -22,7 +22,7 @@ import (
 	"go.farcloser.world/containers/security/cgroups"
 )
 
-func CgroupManagerNames(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+func CgroupManagerNames(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
 	availableManagers := cgroups.AvailableManagers()
 	candidates := make([]string, len(availableManagers))
 	for i, manager := range availableManagers {

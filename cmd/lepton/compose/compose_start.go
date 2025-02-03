@@ -95,7 +95,6 @@ func startAction(cmd *cobra.Command, args []string) error {
 func startContainers(ctx context.Context, cli *client.Client, containers []client.Container) error {
 	eg, ctx := errgroup.WithContext(ctx)
 	for _, c := range containers {
-		c := c
 		eg.Go(func() error {
 			if cStatus, err := containerutil.ContainerStatus(ctx, c); err != nil {
 				// NOTE: NotFound doesn't mean that container hasn't started.

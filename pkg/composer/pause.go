@@ -44,7 +44,6 @@ func (c *Composer) Pause(ctx context.Context, services []string, writer io.Write
 
 	eg, ctx := errgroup.WithContext(ctx)
 	for _, container := range containers {
-		container := container
 		eg.Go(func() error {
 			if err := containerutil.Pause(ctx, c.client, container.ID()); err != nil {
 				return err
@@ -80,7 +79,6 @@ func (c *Composer) Unpause(ctx context.Context, services []string, writer io.Wri
 
 	eg, ctx := errgroup.WithContext(ctx)
 	for _, container := range containers {
-		container := container
 		eg.Go(func() error {
 			if err := containerutil.Unpause(ctx, c.client, container.ID()); err != nil {
 				return err

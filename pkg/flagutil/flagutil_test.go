@@ -255,7 +255,6 @@ func TestValidateEnv(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.value, func(t *testing.T) {
 			actual, err := withOSEnv([]string{tc.value})
 			if tc.err == nil {

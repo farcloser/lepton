@@ -183,12 +183,12 @@ func TestReadLogsLimitsWithTimestamps(t *testing.T) {
 
 	count := 10000
 
-	for i := 0; i < count; i++ {
+	for i := range count {
 		tmpfile.WriteString(fmt.Sprintf(logLineFmt, i))
 	}
 	tmpfile.WriteString(logLineNewLine)
 
-	for i := 0; i < count; i++ {
+	for i := range count {
 		tmpfile.WriteString(fmt.Sprintf(logLineFmt, i))
 	}
 	tmpfile.WriteString(logLineNewLine)
@@ -267,7 +267,7 @@ func TestReadRotatedLog(t *testing.T) {
 	// Let ReadLogs start.
 	time.Sleep(50 * time.Millisecond)
 
-	for line := 0; line < 10; line++ {
+	for line := range 10 {
 		// Write the first three lines to log file
 		now := time.Now().Format(time.RFC3339Nano)
 		if line%2 == 0 {

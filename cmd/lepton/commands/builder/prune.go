@@ -21,8 +21,6 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"go.farcloser.world/core/units"
-
 	"go.farcloser.world/lepton/cmd/lepton/helpers"
 	"go.farcloser.world/lepton/pkg/api/options"
 	"go.farcloser.world/lepton/pkg/cmd/builder"
@@ -65,7 +63,7 @@ func pruneOptions(cmd *cobra.Command, _ []string) (*options.BuilderPrune, error)
 			msg = "This will remove any dangling build cache."
 		}
 
-		if err := helpers.Confirm(cmd, fmt.Sprintf("WARNING! %s.", msg)); err != nil {
+		if err = helpers.Confirm(cmd, fmt.Sprintf("WARNING! %s.", msg)); err != nil {
 			return nil, err
 		}
 	}
@@ -88,23 +86,10 @@ func pruneAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	opts.BuildKitHost, err = GetBuildkitHostOption(cmd, globalOptions.Namespace)
+	opts.BuildKitHost, err = helpers.ProcessBuildkitHostOption(cmd, globalOptions.Namespace)
 	if err != nil {
 		return err
 	}
 
-	prunedObjects, err := builder.Prune(cmd.Context(), globalOptions, opts)
-	if err != nil {
-		return err
-	}
-
-	var totalReclaimedSpace int64
-
-	for _, prunedObject := range prunedObjects {
-		totalReclaimedSpace += prunedObject.Size
-	}
-
-	_, err = fmt.Fprintf(cmd.OutOrStdout(), "Total:  %s\n", units.BytesSize(float64(totalReclaimedSpace)))
-
-	return err
+	return builder.Prune(cmd.Context(), cmd.OutOrStdout(), globalOptions, opts)
 }

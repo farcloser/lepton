@@ -79,14 +79,15 @@ func ParseAddress(s string) (net.IP, uint16, error) {
 	}
 
 	ipBytes := make([]byte, len(split[0])/2) // 4 bytes (8 chars) or 16 bytes (32 chars)
-	for i := 0; i < len(split[0])/8; i++ {
+	for i := range len(split[0]) / 8 {
 		quartet := split[0][8*i : 8*(i+1)]
 		quartetLE, err := hex.DecodeString(quartet) // surprisingly little endian, per 4 bytes
 		if err != nil {
 			return nil, 0, fmt.Errorf("unparsable address %q: unparsable quartet %q: %w", s, quartet, err)
 		}
-		for j := 0; j < len(quartetLE); j++ {
-			ipBytes[4*i+len(quartetLE)-1-j] = quartetLE[j]
+		ln := len(quartetLE)
+		for j := range ln {
+			ipBytes[4*i+ln-1-j] = quartetLE[j]
 		}
 	}
 	ip := net.IP(ipBytes)

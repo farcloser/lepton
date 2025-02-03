@@ -72,7 +72,7 @@ func topAction(cmd *cobra.Command, args []string) error {
 
 }
 
-func topShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+func topShellComplete(cmd *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
 	// show running container names
 	statusFilterFn := func(st client.ProcessStatus) bool {
 		return st == client.Running

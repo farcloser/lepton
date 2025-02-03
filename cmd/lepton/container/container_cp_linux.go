@@ -171,6 +171,6 @@ type cpFileSpec struct {
 	Path      string
 }
 
-func copyShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+func copyShellComplete(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
 	return nil, cobra.ShellCompDirectiveFilterFileExt
 }

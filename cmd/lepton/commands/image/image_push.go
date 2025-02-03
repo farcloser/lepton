@@ -101,19 +101,19 @@ func pushOptions(cmd *cobra.Command, args []string) (options.ImagePush, error) {
 }
 
 func pushAction(cmd *cobra.Command, args []string) error {
-	options, err := pushOptions(cmd, args)
+	opts, err := pushOptions(cmd, args)
 	if err != nil {
 		return err
 	}
 	rawRef := args[0]
 
-	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), opts.GOptions.Namespace, opts.GOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	return image.Push(ctx, cli, rawRef, options)
+	return image.Push(ctx, cli, rawRef, opts)
 }
 
 func pushShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {

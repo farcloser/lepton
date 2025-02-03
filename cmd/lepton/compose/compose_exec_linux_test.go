@@ -221,7 +221,7 @@ services:
 	})
 
 	// try 5 times to ensure that results are stable
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		for _, j := range []string{"1", "2", "3"} {
 			name := fmt.Sprintf("%s-svc0-%s", projectName, j)
 			host := fmt.Sprintf("%s.%s_default", name, projectName)

@@ -44,19 +44,19 @@ func tagAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	options := options.ImageTag{
+	opts := options.ImageTag{
 		GOptions: globalOptions,
 		Source:   args[0],
 		Target:   args[1],
 	}
 
-	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), opts.GOptions.Namespace, opts.GOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	return image.Tag(ctx, cli, options)
+	return image.Tag(ctx, cli, opts)
 }
 
 func tagShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {

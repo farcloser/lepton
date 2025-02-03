@@ -68,12 +68,12 @@ func diffOptions(cmd *cobra.Command, _ []string) (options.ContainerDiff, error) 
 }
 
 func diffAction(cmd *cobra.Command, args []string) error {
-	options, err := diffOptions(cmd, args)
+	opts, err := diffOptions(cmd, args)
 	if err != nil {
 		return err
 	}
 
-	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), opts.GOptions.Namespace, opts.GOptions.Address)
 	if err != nil {
 		return err
 	}
@@ -93,11 +93,11 @@ func diffAction(cmd *cobra.Command, args []string) error {
 			for _, change := range changes {
 				switch change.Kind {
 				case fs.ChangeKindAdd:
-					fmt.Fprintln(options.Stdout, "A", change.Path)
+					fmt.Fprintln(opts.Stdout, "A", change.Path)
 				case fs.ChangeKindModify:
-					fmt.Fprintln(options.Stdout, "C", change.Path)
+					fmt.Fprintln(opts.Stdout, "C", change.Path)
 				case fs.ChangeKindDelete:
-					fmt.Fprintln(options.Stdout, "D", change.Path)
+					fmt.Fprintln(opts.Stdout, "D", change.Path)
 				default:
 				}
 			}
@@ -224,7 +224,7 @@ func appendChanges(changes []fs.Change, fsChange fs.Change) []fs.Change {
 	return append(changes, fsChange)
 }
 
-func diffShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+func diffShellComplete(cmd *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
 	// show container names
 	return completion.ContainerNames(cmd, nil)
 }

@@ -353,7 +353,6 @@ func TestRunWithJournaldLogDriver(t *testing.T) {
 		},
 	}
 	for _, tc := range testCases {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			found := 0
 			check := func(log poll.LogT) poll.Result {
@@ -485,9 +484,9 @@ COPY --from=builder /go/src/logger/logger /
 	defer base.Cmd("container", "rm", "-f", containerName).AssertOK()
 
 	inspectedContainer := base.InspectContainer(containerName)
-	bytes, err := os.ReadFile(filepath.Join(os.TempDir(), fmt.Sprintf("%s_%s.log", inspectedContainer.ID, "stdout")))
+	output, err := os.ReadFile(filepath.Join(os.TempDir(), fmt.Sprintf("%s_%s.log", inspectedContainer.ID, "stdout")))
 	assert.NilError(t, err)
-	log := string(bytes)
+	log := string(output)
 	assert.Check(t, strings.Contains(log, "foo"))
 	assert.Check(t, strings.Contains(log, "bar"))
 }
@@ -649,7 +648,6 @@ func TestRunAttachFlag(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			actualOut := tc.testFunc(t, tc.testStr, tc.args)
 			errorMsg := fmt.Sprintf("%s failed;\nExpected: '%s'\nActual: '%s'", tc.name, tc.expectedOut, actualOut)

@@ -137,7 +137,6 @@ func (c *Composer) createService(ctx context.Context, ps *serviceparser.Service,
 	recreate := opt.recreateStrategy()
 	var runEG errgroup.Group
 	for _, container := range ps.Containers {
-		container := container
 		runEG.Go(func() error {
 			_, err := c.createServiceContainer(ctx, ps, container, recreate)
 			if err != nil {

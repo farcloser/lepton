@@ -126,21 +126,21 @@ func listOptions(cmd *cobra.Command, args []string) (*options.ImageList, error) 
 }
 
 func imagesAction(cmd *cobra.Command, args []string) error {
-	options, err := listOptions(cmd, args)
+	opts, err := listOptions(cmd, args)
 	if err != nil {
 		return err
 	}
-	if !options.All {
-		options.All = true
+	if !opts.All {
+		opts.All = true
 	}
 
-	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), options.GOptions.Namespace, options.GOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), opts.GOptions.Namespace, opts.GOptions.Address)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	return image.ListCommandHandler(ctx, cli, options)
+	return image.ListCommandHandler(ctx, cli, opts)
 }
 
 func imagesShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
