@@ -35,6 +35,7 @@ func UnknownSubcommandAction(cmd *cobra.Command, args []string) error {
 	if len(args) == 0 {
 		return cmd.Help()
 	}
+
 	// The output mimics https://github.com/spf13/cobra/blob/v1.2.1/command.go#L647-L662
 	msg := fmt.Sprintf("unknown subcommand %q for %q", args[0], cmd.Name())
 	if suggestions := cmd.SuggestionsFor(args[0]); len(suggestions) > 0 {
@@ -43,6 +44,7 @@ func UnknownSubcommandAction(cmd *cobra.Command, args []string) error {
 			msg += fmt.Sprintf("\t%v\n", s)
 		}
 	}
+
 	return errors.New(msg)
 }
 
@@ -52,6 +54,7 @@ func IsExactArgs(number int) cobra.PositionalArgs {
 		if len(args) == number {
 			return nil
 		}
+
 		return fmt.Errorf(
 			"%q requires exactly %d %s.\nSee '%s --help'.\n\nUsage:  %s\n\n%s",
 			cmd.CommandPath(),
@@ -69,13 +72,16 @@ func AddStringFlag(cmd *cobra.Command, name string, aliases []string, value stri
 	if env != "" {
 		usage = fmt.Sprintf("%s [$%s]", usage, env)
 	}
+
 	if envV, ok := os.LookupEnv(env); ok {
 		value = envV
 	}
+
 	aliasesUsage := "Alias of --" + name
 	p := new(string)
 	flags := cmd.Flags()
 	flags.StringVar(p, name, value, usage)
+
 	for _, a := range aliases {
 		if len(a) == 1 {
 			// pflag doesn't support short-only flags, so we have to register long one as well here
@@ -92,6 +98,7 @@ func GlobalFlags(cmd *cobra.Command) (string, []string) {
 		log.L.WithError(err).Warnf("cannot call os.Executable(), assuming the executable to be %q", os.Args[0])
 		args0 = os.Args[0]
 	}
+
 	if len(os.Args) < 2 {
 		return args0, nil
 	}
@@ -99,6 +106,7 @@ func GlobalFlags(cmd *cobra.Command) (string, []string) {
 	rootCmd := cmd.Root()
 	flagSet := rootCmd.Flags()
 	args := []string{}
+
 	flagSet.VisitAll(func(f *pflag.Flag) {
 		key := f.Name
 		val := f.Value.String()
@@ -106,6 +114,7 @@ func GlobalFlags(cmd *cobra.Command) (string, []string) {
 			args = append(args, "--"+key+"="+val)
 		}
 	})
+
 	return args0, args
 }
 
@@ -115,12 +124,15 @@ func AddPersistentStringArrayFlag(cmd *cobra.Command, name string, aliases, nonP
 	if env != "" {
 		usage = fmt.Sprintf("%s [$%s]", usage, env)
 	}
+
 	if envV, ok := os.LookupEnv(env); ok {
 		value = []string{envV}
 	}
+
 	aliasesUsage := "Alias of --" + name
 	p := new([]string)
 	flags := cmd.Flags()
+
 	for _, a := range nonPersistentAliases {
 		if len(a) == 1 {
 			// pflag doesn't support short-only flags, so we have to register long one as well here
@@ -132,6 +144,7 @@ func AddPersistentStringArrayFlag(cmd *cobra.Command, name string, aliases, nonP
 
 	persistentFlags := cmd.PersistentFlags()
 	persistentFlags.StringArrayVar(p, name, value, usage)
+
 	for _, a := range aliases {
 		if len(a) == 1 {
 			// pflag doesn't support short-only flags, so we have to register long one as well here
@@ -148,15 +161,18 @@ func AddPersistentStringFlag(cmd *cobra.Command, name string, aliases, localAlia
 	if env != "" {
 		usage = fmt.Sprintf("%s [$%s]", usage, env)
 	}
+
 	if envV, ok := os.LookupEnv(env); ok {
 		value = envV
 	}
+
 	aliasesUsage := "Alias of --" + name
 	p := new(string)
 
 	// flags is full set of flag(s)
 	// flags can redefine alias already used in subcommands
 	flags := cmd.Flags()
+
 	for _, a := range aliases {
 		if len(a) == 1 {
 			// pflag doesn't support short-only flags, so we have to register long one as well here
@@ -171,6 +187,7 @@ func AddPersistentStringFlag(cmd *cobra.Command, name string, aliases, localAlia
 
 	// localFlags are local to the rootCmd
 	localFlags := cmd.LocalFlags()
+
 	for _, a := range localAliases {
 		if len(a) == 1 {
 			// pflag doesn't support short-only flags, so we have to register long one as well here
@@ -183,6 +200,7 @@ func AddPersistentStringFlag(cmd *cobra.Command, name string, aliases, localAlia
 	// persistentFlags cannot redefine alias already used in subcommands
 	persistentFlags := cmd.PersistentFlags()
 	persistentFlags.StringVar(p, name, value, usage)
+
 	for _, a := range persistentAliases {
 		if len(a) == 1 {
 			// pflag doesn't support short-only flags, so we have to register long one as well here
@@ -199,6 +217,7 @@ func AddPersistentBoolFlag(cmd *cobra.Command, name string, aliases, nonPersiste
 	if env != "" {
 		usage = fmt.Sprintf("%s [$%s]", usage, env)
 	}
+
 	if envV, ok := os.LookupEnv(env); ok {
 		var err error
 		value, err = strconv.ParseBool(envV)
@@ -206,9 +225,11 @@ func AddPersistentBoolFlag(cmd *cobra.Command, name string, aliases, nonPersiste
 			log.L.WithError(err).Warnf("Invalid boolean value for `%s`", env)
 		}
 	}
+
 	aliasesUsage := "Alias of --" + name
 	p := new(bool)
 	flags := cmd.Flags()
+
 	for _, a := range nonPersistentAliases {
 		if len(a) == 1 {
 			// pflag doesn't support short-only flags, so we have to register long one as well here
@@ -220,6 +241,7 @@ func AddPersistentBoolFlag(cmd *cobra.Command, name string, aliases, nonPersiste
 
 	persistentFlags := cmd.PersistentFlags()
 	persistentFlags.BoolVar(p, name, value, usage)
+
 	for _, a := range aliases {
 		if len(a) == 1 {
 			// pflag doesn't support short-only flags, so we have to register long one as well here

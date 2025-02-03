@@ -20,7 +20,6 @@ import (
 	"github.com/containerd/log"
 	"github.com/spf13/cobra"
 
-	"go.farcloser.world/lepton/cmd/lepton/commands/builder"
 	"go.farcloser.world/lepton/cmd/lepton/commands/network"
 	"go.farcloser.world/lepton/cmd/lepton/helpers"
 	"go.farcloser.world/lepton/leptonic/services/containerd"
@@ -103,7 +102,7 @@ func pruneAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	buildkitHost, err := builder.GetBuildkitHostOption(cmd, globalOptions.Namespace)
+	buildkitHost, err := helpers.ProcessBuildkitHostOption(cmd, globalOptions.Namespace)
 	if err != nil {
 		log.L.WithError(err).Warn("BuildKit is not running. Build caches will not be pruned.")
 		buildkitHost = ""

@@ -34,6 +34,7 @@ func debugCommand() *cobra.Command {
 		Use:           "debug",
 		Short:         "Debug Dockerfile",
 		PreRunE:       helpers.RequireExperimental("`builder debug`"),
+		Args:          cobra.MinimumNArgs(1),
 		RunE:          debugAction,
 		SilenceUsage:  true,
 		SilenceErrors: true,
@@ -49,40 +50,23 @@ func debugCommand() *cobra.Command {
 	return cmd
 }
 
-func debugAction(cmd *cobra.Command, args []string) error {
-	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
-	if err != nil {
-		return err
-	}
-	if len(args) < 1 {
-		return errors.Join(errs.ErrInvalidArgument, errors.New("context needs to be specified"))
-	}
-
-	buildgBinary, err := exec.LookPath("buildg")
-	if err != nil {
-		return errors.Join(errs.ErrSystemFailure, err)
-	}
-
+func debugOptions(cmd *cobra.Command, _ []string) ([]string, error) {
 	buildgArgs := []string{"debug"}
 
-	if globalOptions.Debug {
-		buildgArgs = append([]string{"--debug"}, buildgArgs...)
-	}
-
 	if file, err := cmd.Flags().GetString("file"); err != nil {
-		return errors.Join(errs.ErrInvalidArgument, err)
+		return nil, errors.Join(errs.ErrInvalidArgument, err)
 	} else if file != "" {
 		buildgArgs = append(buildgArgs, "--file="+file)
 	}
 
 	if target, err := cmd.Flags().GetString("target"); err != nil {
-		return errors.Join(errs.ErrInvalidArgument, err)
+		return nil, errors.Join(errs.ErrInvalidArgument, err)
 	} else if target != "" {
 		buildgArgs = append(buildgArgs, "--target="+target)
 	}
 
 	if buildArgsValue, err := cmd.Flags().GetStringArray("build-arg"); err != nil {
-		return errors.Join(errs.ErrInvalidArgument, err)
+		return nil, errors.Join(errs.ErrInvalidArgument, err)
 	} else if len(buildArgsValue) > 0 {
 		for _, v := range buildArgsValue {
 			arr := strings.Split(v, "=")
@@ -95,19 +79,19 @@ func debugAction(cmd *cobra.Command, args []string) error {
 			} else if len(arr) > 1 && len(arr[0]) > 0 {
 				buildgArgs = append(buildgArgs, "--build-arg="+v)
 			} else {
-				return errors.Join(errs.ErrInvalidArgument, fmt.Errorf("invalid build arg %q", v))
+				return nil, errors.Join(errs.ErrInvalidArgument, fmt.Errorf("invalid build arg %q", v))
 			}
 		}
 	}
 
 	if imageValue, err := cmd.Flags().GetString("image"); err != nil {
-		return errors.Join(errs.ErrInvalidArgument, err)
+		return nil, errors.Join(errs.ErrInvalidArgument, err)
 	} else if imageValue != "" {
 		buildgArgs = append(buildgArgs, "--image="+imageValue)
 	}
 
 	if sshValue, err := cmd.Flags().GetStringArray("ssh"); err != nil {
-		return errors.Join(errs.ErrInvalidArgument, err)
+		return nil, errors.Join(errs.ErrInvalidArgument, err)
 	} else if len(sshValue) > 0 {
 		for _, v := range sshValue {
 			buildgArgs = append(buildgArgs, "--ssh="+v)
@@ -115,11 +99,34 @@ func debugAction(cmd *cobra.Command, args []string) error {
 	}
 
 	if secretValue, err := cmd.Flags().GetStringArray("secret"); err != nil {
-		return errors.Join(errs.ErrInvalidArgument, err)
+		return nil, errors.Join(errs.ErrInvalidArgument, err)
 	} else if len(secretValue) > 0 {
 		for _, v := range secretValue {
 			buildgArgs = append(buildgArgs, "--secret="+v)
 		}
+	}
+
+	return buildgArgs, nil
+}
+
+func debugAction(cmd *cobra.Command, args []string) error {
+	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
+	if err != nil {
+		return err
+	}
+
+	buildgBinary, err := exec.LookPath("buildg")
+	if err != nil {
+		return errors.Join(errs.ErrFailedPrecondition, err)
+	}
+
+	buildgArgs, err := debugOptions(cmd, args)
+	if err != nil {
+		return err
+	}
+
+	if globalOptions.Debug {
+		buildgArgs = append([]string{"--debug"}, buildgArgs...)
 	}
 
 	buildgCmd := exec.Command(buildgBinary, append(buildgArgs, args[0])...)
