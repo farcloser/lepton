@@ -33,17 +33,17 @@ import (
 	"go.farcloser.world/core/filesystem"
 
 	"go.farcloser.world/lepton/cmd/lepton/commands/builder"
-	image2 "go.farcloser.world/lepton/cmd/lepton/commands/image"
+	"go.farcloser.world/lepton/cmd/lepton/commands/compose"
+	"go.farcloser.world/lepton/cmd/lepton/commands/container"
+	"go.farcloser.world/lepton/cmd/lepton/commands/image"
+	"go.farcloser.world/lepton/cmd/lepton/commands/inspect"
 	"go.farcloser.world/lepton/cmd/lepton/commands/namespace"
 	"go.farcloser.world/lepton/cmd/lepton/commands/network"
 	"go.farcloser.world/lepton/cmd/lepton/commands/registry"
 	"go.farcloser.world/lepton/cmd/lepton/commands/system"
 	"go.farcloser.world/lepton/cmd/lepton/commands/volume"
 	"go.farcloser.world/lepton/cmd/lepton/completion"
-	"go.farcloser.world/lepton/cmd/lepton/compose"
-	"go.farcloser.world/lepton/cmd/lepton/container"
 	"go.farcloser.world/lepton/cmd/lepton/helpers"
-	"go.farcloser.world/lepton/cmd/lepton/inspect"
 	"go.farcloser.world/lepton/cmd/lepton/internal"
 	"go.farcloser.world/lepton/pkg/config"
 	ncdefaults "go.farcloser.world/lepton/pkg/defaults"
@@ -288,14 +288,14 @@ Config file ($%s_TOML): %s
 		builder.BuildCommand(),
 
 		// #region Image management
-		image2.ListCommand(),
-		image2.PullCommand(),
-		image2.PushCommand(),
-		image2.LoadCommand(),
-		image2.SaveCommand(),
-		image2.TagCommand(),
-		image2.RemoveCommand(),
-		image2.HistoryCommand(),
+		image.ListCommand(),
+		image.PullCommand(),
+		image.PushCommand(),
+		image.LoadCommand(),
+		image.SaveCommand(),
+		image.TagCommand(),
+		image.RemoveCommand(),
+		image.HistoryCommand(),
 		// #endregion
 
 		// #region System
@@ -313,7 +313,7 @@ Config file ($%s_TOML): %s
 
 		// #region helpers.Management
 		container.Command(),
-		image2.Command(),
+		image.Command(),
 		network.Command(),
 		registry.Command(),
 		volume.Command(),
