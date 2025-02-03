@@ -189,8 +189,6 @@ func baseTestRunPort(t *testing.T, nginxImage string, nginxIndexHTMLSnippet stri
 
 	tID := testutil.Identifier(t)
 	for i, tc := range testCases {
-		i := i
-		tc := tc
 		tcName := fmt.Sprintf("%+v", tc)
 		t.Run(tcName, func(t *testing.T) {
 			testContainerName := fmt.Sprintf("%s-%d", tID, i)

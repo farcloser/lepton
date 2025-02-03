@@ -113,7 +113,6 @@ func TestLoginPersistence(t *testing.T) {
 		}
 
 		for _, tc := range testCases {
-			tc := tc
 			t.Run("Server "+tc.auth, func(t *testing.T) {
 				t.Parallel()
 

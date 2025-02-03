@@ -102,7 +102,6 @@ func TestRunInternetConnectivity(t *testing.T) {
 		},
 	}
 	for _, tc := range testCases {
-		tc := tc // IMPORTANT
 		name := "default"
 		if len(tc.args) > 0 {
 			name = strings.Join(tc.args, "_")
@@ -210,8 +209,6 @@ func TestRunPortWithNoHostPort(t *testing.T) {
 	}
 	tID := testutil.Identifier(t)
 	for i, tc := range testCases {
-		i := i
-		tc := tc
 		tcName := fmt.Sprintf("%+v", tc)
 		t.Run(tcName, func(t *testing.T) {
 			testContainerName := fmt.Sprintf("%s-%d", tID, i)
@@ -286,8 +283,6 @@ func TestUniqueHostPortAssignement(t *testing.T) {
 	tID := testutil.Identifier(t)
 
 	for i, tc := range testCases {
-		i := i
-		tc := tc
 		tcName := fmt.Sprintf("%+v", tc)
 		t.Run(tcName, func(t *testing.T) {
 			testContainerName1 := fmt.Sprintf("%s-%d-1", tID, i)
@@ -444,8 +439,6 @@ func TestRunContainerWithStaticIP(t *testing.T) {
 	}
 	tID := testutil.Identifier(t)
 	for i, tc := range testCases {
-		i := i
-		tc := tc
 		tcName := fmt.Sprintf("%+v", tc)
 		t.Run(tcName, func(t *testing.T) {
 			testContainerName := fmt.Sprintf("%s-%d", tID, i)
@@ -721,8 +714,6 @@ func TestRunContainerWithStaticIP6(t *testing.T) {
 	}
 	tID := testutil.Identifier(t)
 	for i, tc := range testCases {
-		i := i
-		tc := tc
 		tcName := fmt.Sprintf("%+v", tc)
 		t.Run(tcName, func(t *testing.T) {
 			testContainerName := fmt.Sprintf("%s-%d", tID, i)

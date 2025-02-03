@@ -180,7 +180,6 @@ func psAction(cmd *cobra.Command, args []string) error {
 	containersPrintable := make([]composeContainerPrintable, len(containers))
 	eg, ctx := errgroup.WithContext(ctx)
 	for i, container := range containers {
-		i, container := i, container
 		eg.Go(func() error {
 			var p composeContainerPrintable
 			var err error

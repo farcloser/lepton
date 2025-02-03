@@ -353,7 +353,6 @@ func TestRunWithJournaldLogDriver(t *testing.T) {
 		},
 	}
 	for _, tc := range testCases {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			found := 0
 			check := func(log poll.LogT) poll.Result {
@@ -649,7 +648,6 @@ func TestRunAttachFlag(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			actualOut := tc.testFunc(t, tc.testStr, tc.args)
 			errorMsg := fmt.Sprintf("%s failed;\nExpected: '%s'\nActual: '%s'", tc.name, tc.expectedOut, actualOut)

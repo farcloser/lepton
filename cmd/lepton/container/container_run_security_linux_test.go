@@ -105,7 +105,6 @@ func TestRunCap(t *testing.T) {
 		},
 	}
 	for _, tc := range testCases {
-		tc := tc // IMPORTANT
 		name := "default"
 		if len(tc.args) > 0 {
 			name = strings.Join(tc.args, "_")
@@ -139,7 +138,6 @@ func TestRunSecurityOptSeccomp(t *testing.T) {
 		},
 	}
 	for _, tc := range testCases {
-		tc := tc // IMPORTANT
 		name := "default"
 		if len(tc.args) > 0 {
 			name = strings.Join(tc.args, "_")

@@ -38,7 +38,6 @@ func (c *Composer) Kill(ctx context.Context, opts KillOptions, services []string
 	}
 	eg, ctx := errgroup.WithContext(ctx)
 	for _, container := range containers {
-		container := container
 		eg.Go(func() error {
 			args := []string{"kill", "-s", opts.Signal, container.ID()}
 			if err := c.runCliCmd(ctx, args...); err != nil {

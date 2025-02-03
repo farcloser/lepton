@@ -30,8 +30,6 @@ func TestRunUserName(t *testing.T) {
 		"ContainerUser":          "ContainerUser",
 	}
 	for userStr, expected := range testCases {
-		userStr := userStr
-		expected := expected
 		t.Run(userStr, func(t *testing.T) {
 			t.Parallel()
 			cmd := []string{"run", "--rm"}

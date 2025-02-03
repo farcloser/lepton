@@ -130,7 +130,6 @@ func TestRemoteSnapshotterOpts(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		sn := tt.name
 		t.Run(sn, func(t *testing.T) {
 			rc := getAndApplyRemoteOpts(t, sn)

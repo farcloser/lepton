@@ -76,7 +76,6 @@ func usage(c *cobra.Command) error {
 
 	var managementCommands, nonManagementCommands []*cobra.Command
 	for _, f := range c.Commands() {
-		f := f
 		if f.Hidden {
 			continue
 		}
