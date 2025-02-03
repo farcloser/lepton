@@ -20,8 +20,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 
-	containerd "github.com/containerd/containerd/v2/client"
+	"github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/content"
 	"github.com/containerd/containerd/v2/core/images"
 	"github.com/containerd/containerd/v2/core/images/converter"
@@ -47,55 +48,58 @@ func layerDescs(ctx context.Context, provider content.Provider, imageTarget spec
 	return descs, err
 }
 
-func Crypt(ctx context.Context, client *containerd.Client, srcRawRef, targetRawRef string, encrypt bool, options options.ImageCrypt) error {
+func Crypt(ctx context.Context, encrypt bool, cli *client.Client, output io.Writer, globalOptions *options.Global, opts options.ImageCrypt) error {
 	var convertOpts = []converter.Opt{}
-	if srcRawRef == "" || targetRawRef == "" {
+	if opts.SourceRef == "" || opts.DestinationRef == "" {
 		return errors.New("src and target image need to be specified")
 	}
 
-	parsedRerefence, err := reference.Parse(srcRawRef)
+	parsedRerefence, err := reference.Parse(opts.SourceRef)
 	if err != nil {
 		return err
 	}
 	srcRef := parsedRerefence.String()
 
-	parsedRerefence, err = reference.Parse(targetRawRef)
+	parsedRerefence, err = reference.Parse(opts.DestinationRef)
 	if err != nil {
 		return err
 	}
 	targetRef := parsedRerefence.String()
 
-	platMC, err := platformutil.NewMatchComparer(options.AllPlatforms, options.Platforms)
+	platMC, err := platformutil.NewMatchComparer(opts.AllPlatforms, opts.Platforms)
 	if err != nil {
 		return err
 	}
 	convertOpts = append(convertOpts, converter.WithPlatform(platMC))
 
-	imgcryptFlags, err := parseImgcryptFlags(options, encrypt)
+	imgcryptFlags, err := parseImgcryptFlags(opts, encrypt)
 	if err != nil {
 		return err
 	}
 
-	srcImg, err := client.ImageService().Get(ctx, srcRef)
+	srcImg, err := cli.ImageService().Get(ctx, srcRef)
 	if err != nil {
 		return err
 	}
-	layerDescs, err := layerDescs(ctx, client.ContentStore(), srcImg.Target, platMC)
+
+	descs, err := layerDescs(ctx, cli.ContentStore(), srcImg.Target, platMC)
 	if err != nil {
 		return err
 	}
+
 	layerFilter := func(desc specs.Descriptor) bool {
 		return true
 	}
 	var convertFunc converter.ConvertFunc
+
 	if encrypt {
-		cc, err := parsehelpers.CreateCryptoConfig(imgcryptFlags, layerDescs)
+		cc, err := parsehelpers.CreateCryptoConfig(imgcryptFlags, descs)
 		if err != nil {
 			return err
 		}
 		convertFunc = encryption.GetImageEncryptConverter(&cc, layerFilter)
 	} else {
-		cc, err := parsehelpers.CreateDecryptCryptoConfig(imgcryptFlags, layerDescs)
+		cc, err := parsehelpers.CreateDecryptCryptoConfig(imgcryptFlags, descs)
 		if err != nil {
 			return err
 		}
@@ -106,11 +110,16 @@ func Crypt(ctx context.Context, client *containerd.Client, srcRawRef, targetRawR
 	convertOpts = append(convertOpts, converter.WithIndexConvertFunc(convertFunc))
 
 	// converter.Convert() gains the lease by itself
-	newImg, err := converter.Convert(ctx, client, targetRef, srcRef, convertOpts...)
+	newImg, err := converter.Convert(ctx, cli, targetRef, srcRef, convertOpts...)
 	if err != nil {
 		return err
 	}
-	fmt.Fprintln(options.Stdout, newImg.Target.Digest.String())
+
+	_, err = fmt.Fprintln(output, newImg.Target.Digest.String())
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

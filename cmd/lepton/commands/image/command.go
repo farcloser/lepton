@@ -35,7 +35,6 @@ func Command() *cobra.Command {
 
 	cmd.AddCommand(
 		builder.BuildCommand(),
-		// commitCommand is in "container", not in "image"
 		listCommand(),
 		HistoryCommand(),
 		PullCommand(),

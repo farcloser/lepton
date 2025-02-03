@@ -44,7 +44,7 @@ func convertCommand() *cobra.Command {
 		Long:              imageConvertHelp,
 		Args:              cobra.MinimumNArgs(2),
 		RunE:              convertAction,
-		ValidArgsFunction: imageConvertShellComplete,
+		ValidArgsFunction: completion.ImageNames,
 		SilenceUsage:      true,
 		SilenceErrors:     true,
 	}
@@ -66,110 +66,96 @@ func convertCommand() *cobra.Command {
 	return cmd
 }
 
-func convertOptions(cmd *cobra.Command, _ []string) (options.ImageConvert, error) {
-	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
-	if err != nil {
-		return options.ImageConvert{}, err
-	}
+func convertOptions(cmd *cobra.Command, args []string) (*options.ImageConvert, error) {
 	format, err := cmd.Flags().GetString("format")
 	if err != nil {
-		return options.ImageConvert{}, err
+		return nil, err
 	}
 
-	// #region zstd flags
 	zstd, err := cmd.Flags().GetBool("zstd")
 	if err != nil {
-		return options.ImageConvert{}, err
+		return nil, err
 	}
+
 	zstdCompressionLevel, err := cmd.Flags().GetInt("zstd-compression-level")
 	if err != nil {
-		return options.ImageConvert{}, err
+		return nil, err
 	}
-	// #endregion
 
-	// #region zstd:chunked flags
 	zstdchunked, err := cmd.Flags().GetBool("zstdchunked")
 	if err != nil {
-		return options.ImageConvert{}, err
+		return nil, err
 	}
+
 	zstdChunkedCompressionLevel, err := cmd.Flags().GetInt("zstdchunked-compression-level")
 	if err != nil {
-		return options.ImageConvert{}, err
+		return nil, err
 	}
+
 	zstdChunkedChunkSize, err := cmd.Flags().GetInt("zstdchunked-chunk-size")
 	if err != nil {
-		return options.ImageConvert{}, err
+		return nil, err
 	}
+
 	zstdChunkedRecordIn, err := cmd.Flags().GetString("zstdchunked-record-in")
 	if err != nil {
-		return options.ImageConvert{}, err
+		return nil, err
 	}
-	// #endregion
 
-	// #region generic flags
 	uncompress, err := cmd.Flags().GetBool("uncompress")
 	if err != nil {
-		return options.ImageConvert{}, err
+		return nil, err
 	}
+
 	oci, err := cmd.Flags().GetBool("oci")
 	if err != nil {
-		return options.ImageConvert{}, err
+		return nil, err
 	}
-	// #endregion
 
-	// #region platform flags
 	platforms, err := cmd.Flags().GetStringSlice("platform")
 	if err != nil {
-		return options.ImageConvert{}, err
+		return nil, err
 	}
+
 	allPlatforms, err := cmd.Flags().GetBool("all-platforms")
 	if err != nil {
-		return options.ImageConvert{}, err
+		return nil, err
 	}
-	// #endregion
-	return options.ImageConvert{
-		GOptions: globalOptions,
-		Format:   format,
-		// #region zstd flags
-		Zstd:                 zstd,
-		ZstdCompressionLevel: zstdCompressionLevel,
-		// #endregion
-		// #region zstd:chunked flags
+
+	return &options.ImageConvert{
+		SourceRef:                   args[0],
+		DestinationRef:              args[1],
+		Format:                      format,
+		Zstd:                        zstd,
+		ZstdCompressionLevel:        zstdCompressionLevel,
 		ZstdChunked:                 zstdchunked,
 		ZstdChunkedCompressionLevel: zstdChunkedCompressionLevel,
 		ZstdChunkedChunkSize:        zstdChunkedChunkSize,
 		ZstdChunkedRecordIn:         zstdChunkedRecordIn,
-		// #endregion
-		// #region generic flags
-		Uncompress: uncompress,
-		Oci:        oci,
-		// #endregion
-		// #region platform flags
-		Platforms:    platforms,
-		AllPlatforms: allPlatforms,
-		// #endregion
-		Stdout: cmd.OutOrStdout(),
+		Uncompress:                  uncompress,
+		Oci:                         oci,
+		Platforms:                   platforms,
+		AllPlatforms:                allPlatforms,
 	}, nil
 }
 
 func convertAction(cmd *cobra.Command, args []string) error {
+	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
+	if err != nil {
+		return err
+	}
+
 	opts, err := convertOptions(cmd, args)
 	if err != nil {
 		return err
 	}
-	srcRawRef := args[0]
-	destRawRef := args[1]
 
-	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), opts.GOptions.Namespace, opts.GOptions.Address)
+	cli, ctx, cancel, err := containerd.NewClient(cmd.Context(), globalOptions.Namespace, globalOptions.Address)
 	if err != nil {
 		return err
 	}
+
 	defer cancel()
 
-	return image.Convert(ctx, cli, srcRawRef, destRawRef, opts)
-}
-
-func imageConvertShellComplete(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-	// show image names
-	return completion.ImageNames(cmd, args, toComplete)
+	return image.Convert(ctx, cli, cmd.OutOrStdout(), globalOptions, opts)
 }

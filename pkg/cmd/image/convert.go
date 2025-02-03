@@ -42,40 +42,40 @@ import (
 	"go.farcloser.world/lepton/pkg/platformutil"
 )
 
-func Convert(ctx context.Context, client *containerd.Client, srcRawRef, targetRawRef string, options options.ImageConvert) error {
+func Convert(ctx context.Context, client *containerd.Client, output io.Writer, globalOptions *options.Global, opts *options.ImageConvert) error {
 	var (
 		convertOpts = []converter.Opt{}
 	)
-	if srcRawRef == "" || targetRawRef == "" {
+	if opts.SourceRef == "" || opts.DestinationRef == "" {
 		return errors.New("src and target image need to be specified")
 	}
 
-	parsedReference, err := reference.Parse(srcRawRef)
+	parsedReference, err := reference.Parse(opts.SourceRef)
 	if err != nil {
 		return err
 	}
 	srcRef := parsedReference.String()
 
-	parsedReference, err = reference.Parse(targetRawRef)
+	parsedReference, err = reference.Parse(opts.DestinationRef)
 	if err != nil {
 		return err
 	}
 	targetRef := parsedReference.String()
 
-	platMC, err := platformutil.NewMatchComparer(options.AllPlatforms, options.Platforms)
+	platMC, err := platformutil.NewMatchComparer(opts.AllPlatforms, opts.Platforms)
 	if err != nil {
 		return err
 	}
 	convertOpts = append(convertOpts, converter.WithPlatform(platMC))
 
 	// Ensure all the layers are here: https://github.com/containerd/nerdctl/issues/3425
-	err = EnsureAllContent(ctx, client, srcRef, options.GOptions)
+	err = EnsureAllContent(ctx, client, srcRef, globalOptions)
 	if err != nil {
 		return err
 	}
 
-	zstdOpts := options.Zstd
-	zstdchunked := options.ZstdChunked
+	zstdOpts := opts.Zstd
+	zstdchunked := opts.ZstdChunked
 
 	if zstdOpts || zstdchunked {
 		convertCount := 0
@@ -93,13 +93,13 @@ func Convert(ctx context.Context, client *containerd.Client, srcRawRef, targetRa
 		var convertType string
 		switch {
 		case zstdOpts:
-			convertFunc, err = getZstdConverter(options)
+			convertFunc, err = getZstdConverter(opts)
 			if err != nil {
 				return err
 			}
 			convertType = "zstd"
 		case zstdchunked:
-			convertFunc, err = getZstdchunkedConverter(options)
+			convertFunc, err = getZstdchunkedConverter(globalOptions, opts)
 			if err != nil {
 				return err
 			}
@@ -107,19 +107,19 @@ func Convert(ctx context.Context, client *containerd.Client, srcRawRef, targetRa
 		}
 
 		convertOpts = append(convertOpts, converter.WithLayerConvertFunc(convertFunc))
-		if !options.Oci {
+		if !opts.Oci {
 			log.G(ctx).Warnf("option --%s should be used in conjunction with --oci", convertType)
 		}
-		if options.Uncompress {
+		if opts.Uncompress {
 			return fmt.Errorf("option --%s conflicts with --uncompress", convertType)
 		}
 	}
 
-	if options.Uncompress {
+	if opts.Uncompress {
 		convertOpts = append(convertOpts, converter.WithLayerConvertFunc(uncompress.LayerConvertFunc))
 	}
 
-	if options.Oci {
+	if opts.Oci {
 		convertOpts = append(convertOpts, converter.WithDockerToOCI(true))
 	}
 
@@ -132,26 +132,26 @@ func Convert(ctx context.Context, client *containerd.Client, srcRawRef, targetRa
 		Image: newImg.Name + "@" + newImg.Target.Digest.String(),
 	}
 
-	return printConvertedImage(options.Stdout, options, res)
+	return printConvertedImage(output, opts, res)
 }
 
-func getZstdConverter(options options.ImageConvert) (converter.ConvertFunc, error) {
-	return converterutil.ZstdLayerConvertFunc(options)
+func getZstdConverter(options *options.ImageConvert) (converter.ConvertFunc, error) {
+	return converterutil.ZstdLayerConvertFunc(*options)
 }
 
-func getZstdchunkedConverter(options options.ImageConvert) (converter.ConvertFunc, error) {
+func getZstdchunkedConverter(globalOptions *options.Global, opts *options.ImageConvert) (converter.ConvertFunc, error) {
 
 	esgzOpts := []estargz.Option{
-		estargz.WithChunkSize(options.ZstdChunkedChunkSize),
+		estargz.WithChunkSize(opts.ZstdChunkedChunkSize),
 	}
 
-	if options.ZstdChunkedRecordIn != "" {
-		if !options.GOptions.Experimental {
+	if opts.ZstdChunkedRecordIn != "" {
+		if !globalOptions.Experimental {
 			return nil, errors.New("zstdchunked-record-in requires experimental mode to be enabled")
 		}
 
 		log.L.Warn("--zstdchunked-record-in flag is experimental and subject to change")
-		paths, err := readPathsFromRecordFile(options.ZstdChunkedRecordIn)
+		paths, err := readPathsFromRecordFile(opts.ZstdChunkedRecordIn)
 		if err != nil {
 			return nil, err
 		}
@@ -159,7 +159,7 @@ func getZstdchunkedConverter(options options.ImageConvert) (converter.ConvertFun
 		var ignored []string
 		esgzOpts = append(esgzOpts, estargz.WithAllowPrioritizeNotFound(&ignored))
 	}
-	return zstdchunkedconvert.LayerConvertFuncWithCompressionLevel(zstd.EncoderLevelFromZstd(options.ZstdChunkedCompressionLevel), esgzOpts...), nil
+	return zstdchunkedconvert.LayerConvertFuncWithCompressionLevel(zstd.EncoderLevelFromZstd(opts.ZstdChunkedCompressionLevel), esgzOpts...), nil
 }
 
 func readPathsFromRecordFile(filename string) ([]string, error) {
@@ -184,7 +184,7 @@ func readPathsFromRecordFile(filename string) ([]string, error) {
 	return paths, nil
 }
 
-func printConvertedImage(stdout io.Writer, options options.ImageConvert, img converterutil.ConvertedImageInfo) error {
+func printConvertedImage(stdout io.Writer, options *options.ImageConvert, img converterutil.ConvertedImageInfo) error {
 	switch options.Format {
 	case formatter.FormatJSON:
 		b, err := json.MarshalIndent(img, "", "    ")
