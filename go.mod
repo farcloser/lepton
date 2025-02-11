@@ -10,7 +10,7 @@ go 1.23.0
 require (
 	github.com/Microsoft/go-winio v0.6.2
 	github.com/Microsoft/hcsshim v0.12.9
-	github.com/compose-spec/compose-go/v2 v2.4.7
+	github.com/compose-spec/compose-go/v2 v2.4.8
 	github.com/containerd/console v1.0.4
 	github.com/containerd/containerd/api v1.8.0
 	github.com/containerd/containerd/v2 v2.0.2
