@@ -47,6 +47,9 @@ var (
 
 	Hostname = Prefix + "hostname"
 
+	// Domainname
+	Domainname = Prefix + "domainname"
+
 	// ExtraHosts are HostIPs to appended to /etc/hosts
 	ExtraHosts = Prefix + "extraHosts"
 

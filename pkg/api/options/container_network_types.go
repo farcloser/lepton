@@ -32,6 +32,8 @@ type ContainerNetwork struct {
 	IP6Address string
 	// Hostname set container host name
 	Hostname string
+	// Domainname specifies the container's domain name
+	Domainname string
 	// DNSServers set custom DNS servers
 	DNSServers []string
 	// DNSResolvConfOptions set DNS options
