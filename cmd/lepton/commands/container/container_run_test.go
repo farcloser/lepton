@@ -151,7 +151,7 @@ func TestRunEnvFile(t *testing.T) {
 	base.Env = append(base.Env, "HOST_ENV=ENV-IN-HOST")
 
 	tID := testutil.Identifier(t)
-	file1, err := os.CreateTemp("", tID)
+	file1, err := os.CreateTemp(t.TempDir(), tID)
 	assert.NilError(base.T, err)
 	path1 := file1.Name()
 	defer file1.Close()
@@ -159,7 +159,7 @@ func TestRunEnvFile(t *testing.T) {
 	err = os.WriteFile(path1, []byte("# this is a comment line\nTESTKEY1=TESTVAL1"), 0o666)
 	assert.NilError(base.T, err)
 
-	file2, err := os.CreateTemp("", tID)
+	file2, err := os.CreateTemp(t.TempDir(), tID)
 	assert.NilError(base.T, err)
 	path2 := file2.Name()
 	defer file2.Close()
