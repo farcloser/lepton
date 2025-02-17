@@ -272,6 +272,9 @@ type ContainerStop struct {
 	// Timeout specifies how long to wait after sending a SIGTERM and before sending a SIGKILL.
 	// If it's nil, the default is 10 seconds.
 	Timeout *time.Duration
+
+	// singal to send to the container, before sending sigkill
+	Signal string
 }
 
 // ContainerRestart specifies options for `(container) restart`.
