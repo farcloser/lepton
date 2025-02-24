@@ -17,9 +17,10 @@
 package container
 
 import (
+	"testing"
+
 	"go.farcloser.world/tigron/expect"
 	"go.farcloser.world/tigron/test"
-	"testing"
 
 	"go.farcloser.world/lepton/pkg/testutil"
 	"go.farcloser.world/lepton/pkg/testutil/nerdtest"

@@ -18,10 +18,6 @@ package container
 
 import (
 	"fmt"
-	"go.farcloser.world/lepton/pkg/testutil/nerdtest"
-	"go.farcloser.world/tigron/expect"
-	"go.farcloser.world/tigron/require"
-	"go.farcloser.world/tigron/test"
 	"os/exec"
 	"runtime"
 	"strings"
@@ -31,7 +27,12 @@ import (
 	"gotest.tools/v3/assert"
 	"gotest.tools/v3/icmd"
 
+	"go.farcloser.world/tigron/expect"
+	"go.farcloser.world/tigron/require"
+	"go.farcloser.world/tigron/test"
+
 	"go.farcloser.world/lepton/pkg/testutil"
+	"go.farcloser.world/lepton/pkg/testutil/nerdtest"
 )
 
 func TestLogs(t *testing.T) {
