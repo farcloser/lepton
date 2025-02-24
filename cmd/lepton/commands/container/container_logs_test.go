@@ -18,6 +18,10 @@ package container
 
 import (
 	"fmt"
+	"go.farcloser.world/lepton/pkg/testutil/nerdtest"
+	"go.farcloser.world/tigron/expect"
+	"go.farcloser.world/tigron/require"
+	"go.farcloser.world/tigron/test"
 	"os/exec"
 	"runtime"
 	"strings"
@@ -160,63 +164,85 @@ func TestLogsWithFailingContainer(t *testing.T) {
 }
 
 func TestLogsWithForegroundContainers(t *testing.T) {
-	t.Parallel()
-	if runtime.GOOS == "windows" {
-		t.Skip("dual logging is not supported on Windows")
-	}
-	base := testutil.NewBase(t)
-	tid := testutil.Identifier(t)
+	testCase := nerdtest.Setup()
+	// dual logging is not supported on Windows
+	testCase.Require = require.Not(require.Windows)
 
-	// unbuffer(1) emulates tty, which is required by `run -t`.
-	// unbuffer(1) can be installed with `apt-get install expect`.
-	unbuffer := []string{"unbuffer"}
+	testCase.Run(t)
 
-	testCases := []struct {
-		name  string
-		flags []string
-		tty   bool
-	}{
+	testCase.SubTests = []*test.Case{
 		{
-			name:  "foreground",
-			flags: nil,
-			tty:   false,
+			Description: "foreground",
+			Cleanup: func(data test.Data, helpers test.Helpers) {
+				helpers.Anyhow("rm", "-f", data.Identifier())
+			},
+			Setup: func(data test.Data, helpers test.Helpers) {
+				helpers.Ensure("run", "--name", data.Identifier(), testutil.CommonImage, "sh", "-euxc", "echo foo; echo bar")
+			},
+			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
+				return helpers.Command("logs", data.Identifier())
+			},
+			Expected: test.Expects(0, nil, expect.All(
+				expect.Contains("foo"),
+				expect.Contains("bar"),
+				expect.DoesNotContain("baz"),
+			)),
 		},
 		{
-			name:  "interactive",
-			flags: []string{"-i"},
-			tty:   false,
+			Description: "interactive",
+			Cleanup: func(data test.Data, helpers test.Helpers) {
+				helpers.Anyhow("rm", "-f", data.Identifier())
+			},
+			Setup: func(data test.Data, helpers test.Helpers) {
+				helpers.Ensure("run", "-i", "--name", data.Identifier(), testutil.CommonImage, "sh", "-euxc", "echo foo; echo bar")
+			},
+			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
+				return helpers.Command("logs", data.Identifier())
+			},
+			Expected: test.Expects(0, nil, expect.All(
+				expect.Contains("foo"),
+				expect.Contains("bar"),
+				expect.DoesNotContain("baz"),
+			)),
 		},
 		{
-			name:  "PTY",
-			flags: []string{"-t"},
-			tty:   true,
+			Description: "PTY",
+			Cleanup: func(data test.Data, helpers test.Helpers) {
+				helpers.Anyhow("rm", "-f", data.Identifier())
+			},
+			Setup: func(data test.Data, helpers test.Helpers) {
+				cmd := helpers.Command("run", "-t", "--name", data.Identifier(), testutil.CommonImage, "sh", "-euxc", "echo foo; echo bar")
+				cmd.WithPseudoTTY()
+				cmd.Run(&test.Expected{ExitCode: 0})
+			},
+			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
+				return helpers.Command("logs", data.Identifier())
+			},
+			Expected: test.Expects(0, nil, expect.All(
+				expect.Contains("foo"),
+				expect.Contains("bar"),
+				expect.DoesNotContain("baz"),
+			)),
 		},
 		{
-			name:  "interactivePTY",
-			flags: []string{"-i", "-t"},
-			tty:   true,
+			Description: "interactivePTY",
+			Cleanup: func(data test.Data, helpers test.Helpers) {
+				helpers.Anyhow("rm", "-f", data.Identifier())
+			},
+			Setup: func(data test.Data, helpers test.Helpers) {
+				cmd := helpers.Command("run", "-i", "-t", "--name", data.Identifier(), testutil.CommonImage, "sh", "-euxc", "echo foo; echo bar")
+				cmd.WithPseudoTTY()
+				cmd.Run(&test.Expected{ExitCode: 0})
+			},
+			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
+				return helpers.Command("logs", data.Identifier())
+			},
+			Expected: test.Expects(0, nil, expect.All(
+				expect.Contains("foo"),
+				expect.Contains("bar"),
+				expect.DoesNotContain("baz"),
+			)),
 		},
-	}
-
-	for _, tc := range testCases {
-		func(_ *testing.T) {
-			containerName := tid + "-" + tc.name
-			var cmdArgs []string
-			defer base.Cmd("rm", "-f", containerName).Run()
-			cmdArgs = append(cmdArgs, "run", "--name", containerName)
-			cmdArgs = append(cmdArgs, tc.flags...)
-			cmdArgs = append(cmdArgs, testutil.CommonImage, "sh", "-euxc", "echo foo; echo bar")
-
-			if tc.tty {
-				base.CmdWithHelper(unbuffer, cmdArgs...).AssertOK()
-			} else {
-				base.Cmd(cmdArgs...).AssertOK()
-			}
-
-			base.Cmd("logs", containerName).AssertOutContains("foo")
-			base.Cmd("logs", containerName).AssertOutContains("bar")
-			base.Cmd("logs", containerName).AssertOutNotContains("baz")
-		}(t)
 	}
 }
 
