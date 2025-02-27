@@ -104,8 +104,8 @@ type Container struct {
 	Image          string
 	ResolvConfPath string
 	HostnamePath   string
-	// TODO: HostsPath      string
-	LogPath string
+	HostsPath      string
+	LogPath        string
 	// Unimplemented: Node            *ContainerNode `json:",omitempty"` // Node is only propagated by Docker Swarm standalone API
 	Name         string
 	RestartCount int
@@ -254,6 +254,8 @@ func ContainerFromNative(n *native.Container) (*Container, error) {
 				c.ResolvConfPath = mount.Source
 			} else if mount.Destination == "/etc/hostname" {
 				c.HostnamePath = mount.Source
+			} else if mount.Destination == "/etc/hosts" {
+				c.HostsPath = mount.Source
 			}
 		}
 		hostname = sp.Hostname
@@ -270,6 +272,10 @@ func ContainerFromNative(n *native.Container) (*Container, error) {
 		c.LogPath = filepath.Join(stateDir, n.ID+"-json.log")
 		if _, err := os.Stat(c.LogPath); err != nil {
 			c.LogPath = ""
+		}
+		hostsPath := filepath.Join(stateDir, "hosts")
+		if _, err := os.Stat(hostsPath); err == nil {
+			c.HostsPath = hostsPath
 		}
 	}
 
