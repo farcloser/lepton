@@ -18,68 +18,34 @@ package builder
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
-	"os/exec"
 
 	"go.farcloser.world/core/units"
 
+	"go.farcloser.world/lepton/leptonic/services/builder"
 	"go.farcloser.world/lepton/pkg/api/options"
-	"go.farcloser.world/lepton/pkg/buildkitutil"
 )
 
 // Prune will prune all build cache.
 func Prune(ctx context.Context, output io.Writer, _ *options.Global, opts *options.BuilderPrune) error {
-	buildctlBinary, err := buildkitutil.BuildctlBinary()
+	result, err := builder.Prune(ctx, opts.Stderr, opts.BuildKitHost, opts.All)
 	if err != nil {
 		return err
 	}
 
-	buildctlArgs := buildkitutil.BuildctlBaseArgs(opts.BuildKitHost)
-	buildctlArgs = append(buildctlArgs, "prune", "--format={{json .}}")
-
-	if opts.All {
-		buildctlArgs = append(buildctlArgs, "--all")
-	}
-
-	buildctlCmd := exec.Command(buildctlBinary, buildctlArgs...)
-
-	buildctlCmd.Stderr = opts.Stderr
-	stdout, err := buildctlCmd.StdoutPipe()
-	if err != nil {
-		return fmt.Errorf("faild to get stdout piper for %v: %w", buildctlCmd.Args, err)
-	}
-
-	defer stdout.Close()
-
-	if err = buildctlCmd.Start(); err != nil {
-		return fmt.Errorf("faild to start %v: %w", buildctlCmd.Args, err)
-	}
-
-	dec := json.NewDecoder(stdout)
-	result := make([]buildkitutil.UsageInfo, 0)
-
-	for {
-		var v buildkitutil.UsageInfo
-		if err := dec.Decode(&v); err == io.EOF {
-			break
-		} else if err != nil {
-			return fmt.Errorf("faild to decode output from %v: %w", buildctlCmd.Args, err)
-		}
-		result = append(result, v)
-	}
-
-	if err = buildctlCmd.Wait(); err != nil {
-		return fmt.Errorf("faild to wait for %v to complete: %w", buildctlCmd.Args, err)
-	}
-
 	var totalReclaimedSpace int64
-
 	if len(result) > 0 {
-		fmt.Fprintln(output, "Deleted build cache objects:")
+		_, err = fmt.Fprintln(output, "Deleted build cache objects:")
+		if err != nil {
+			return err
+		}
+
 		for _, item := range result {
-			fmt.Fprintln(output, item.ID)
+			_, err = fmt.Fprintln(output, item.ID)
+			if err != nil {
+				return err
+			}
 			totalReclaimedSpace += item.Size
 		}
 	}

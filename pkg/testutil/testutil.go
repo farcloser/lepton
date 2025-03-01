@@ -42,10 +42,10 @@ import (
 	"go.farcloser.world/core/version/semver"
 
 	"go.farcloser.world/lepton/leptonic/api"
+	"go.farcloser.world/lepton/leptonic/buildkit"
 	"go.farcloser.world/lepton/leptonic/emulation"
 	"go.farcloser.world/lepton/leptonic/platforms"
 	"go.farcloser.world/lepton/leptonic/rootlesskit"
-	"go.farcloser.world/lepton/pkg/buildkitutil"
 	"go.farcloser.world/lepton/pkg/imgutil"
 	"go.farcloser.world/lepton/pkg/infoutil"
 	"go.farcloser.world/lepton/pkg/inspecttypes/dockercompat"
@@ -654,7 +654,7 @@ func DockerIncompatible(t testing.TB) {
 
 func RequiresBuild(t testing.TB) {
 	if GetTarget() == Nerdctl || GetTarget() == Nerdishctl {
-		buildkitHost, err := buildkitutil.GetBuildkitHost(Namespace)
+		buildkitHost, err := buildkit.GetBuildkitHost(Namespace)
 		if err != nil {
 			t.Skipf("test requires buildkitd: %+v", err)
 		}
@@ -676,22 +676,6 @@ func RequireExecPlatform(t testing.TB, ss ...string) {
 			msg += fmt.Sprintf(": %v", err)
 		}
 		t.Skip(msg)
-	}
-}
-
-func RequireDaemonVersion(b *Base, constraint string) {
-	b.T.Helper()
-	c, err := semver.NewConstraint(constraint)
-	if err != nil {
-		b.T.Fatal(err)
-	}
-	info := b.Info()
-	sv, err := semver.NewVersion(info.ServerVersion)
-	if err != nil {
-		b.T.Skip(err)
-	}
-	if !c.Check(sv) {
-		b.T.Skipf("version %v does not satisfy constraints %v", sv, c)
 	}
 }
 

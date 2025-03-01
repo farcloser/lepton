@@ -24,8 +24,8 @@ import (
 
 	"go.farcloser.world/containers/security/cgroups"
 
+	"go.farcloser.world/lepton/leptonic/buildkit"
 	"go.farcloser.world/lepton/pkg/api/options"
-	"go.farcloser.world/lepton/pkg/buildkitutil"
 )
 
 func ProcessImageVerifyOptions(cmd *cobra.Command, _ []string) (opt options.ImageVerify, err error) {
@@ -64,14 +64,14 @@ func ProcessBuildkitHostOption(cmd *cobra.Command, namespace string) (string, er
 			return "", err
 		}
 
-		if err = buildkitutil.PingBKDaemon(buildkitHost); err != nil {
+		if err = buildkit.PingBKDaemon(buildkitHost); err != nil {
 			return "", err
 		}
 
 		return buildkitHost, nil
 	}
 
-	return buildkitutil.GetBuildkitHost(namespace)
+	return buildkit.GetBuildkitHost(namespace)
 }
 
 func ProcessRootCmdFlags(cmd *cobra.Command) (*options.Global, error) {

@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package buildkitutil
+package buildkit
 
 func getBuildkitHostCandidates(namespace string) ([]string, error) {
 	return []string{"npipe:////./pipe/buildkitd"}, nil

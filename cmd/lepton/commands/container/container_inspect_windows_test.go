@@ -26,6 +26,8 @@ import (
 )
 
 func TestInspectProcessContainerContainsLabel(t *testing.T) {
+	t.Parallel()
+
 	testContainer := testutil.Identifier(t)
 
 	base := testutil.NewBase(t)
@@ -41,6 +43,8 @@ func TestInspectProcessContainerContainsLabel(t *testing.T) {
 }
 
 func TestInspectHyperVContainerContainsLabel(t *testing.T) {
+	t.Parallel()
+
 	if !testtooling.HyperVSupported() {
 		t.Skip("HyperV is not enabled, skipping test")
 	}

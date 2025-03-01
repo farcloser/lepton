@@ -26,6 +26,8 @@ import (
 )
 
 func TestComposeDownRemoveUsedNetwork(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 
 	var (
@@ -62,6 +64,8 @@ services:
 }
 
 func TestComposeDownRemoveOrphans(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 
 	var (

@@ -1,5 +1,7 @@
 # Lepton
 
+<!> testing notes: export CONTAINERD_NAMESPACE=lepton-test; ./extras/rootless/containerd-rootless-setuptool.sh install-buildkit-containerd
+
 lepton is an experimental containerd cli.
 
 Requires:

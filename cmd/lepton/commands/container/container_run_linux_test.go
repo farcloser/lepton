@@ -46,6 +46,8 @@ import (
 )
 
 func TestRunCustomRootfs(t *testing.T) {
+	t.Parallel()
+
 	testutil.DockerIncompatible(t)
 	// FIXME: root issue is undiagnosed and this is very likely a containerd bug
 	// It appears that in certain conditions, the proxy content store info method will fail on the layer of the image
@@ -82,6 +84,7 @@ func prepareCustomRootfs(base *testutil.Base, imageName string) string {
 
 func TestRunShmSize(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	const shmSize = "32m"
 
@@ -90,6 +93,7 @@ func TestRunShmSize(t *testing.T) {
 
 func TestRunShmSizeIPCShareable(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	const shmSize = "32m"
 
@@ -100,6 +104,7 @@ func TestRunShmSizeIPCShareable(t *testing.T) {
 
 func TestRunIPCShareableRemoveMount(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	container := testutil.Identifier(t)
 
@@ -109,6 +114,7 @@ func TestRunIPCShareableRemoveMount(t *testing.T) {
 
 func TestRunIPCContainerNotExists(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 
 	container := testutil.Identifier(t)
@@ -122,6 +128,7 @@ func TestRunIPCContainerNotExists(t *testing.T) {
 
 func TestRunShmSizeIPCContainer(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 
 	const shmSize = "32m"
@@ -135,6 +142,7 @@ func TestRunShmSizeIPCContainer(t *testing.T) {
 
 func TestRunIPCContainer(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 
 	const shmSize = "32m"
@@ -148,6 +156,7 @@ func TestRunIPCContainer(t *testing.T) {
 
 func TestRunPidHost(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	pid := os.Getpid()
 
@@ -156,6 +165,7 @@ func TestRunPidHost(t *testing.T) {
 
 func TestRunUtsHost(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 
 	// Was thinking of os.ReadLink("/proc/1/ns/uts")
@@ -171,6 +181,7 @@ func TestRunUtsHost(t *testing.T) {
 
 func TestRunPidContainer(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 
 	sharedContainerResult := base.Cmd("run", "-d", testutil.AlpineImage, "sleep", nerdtest.Infinity).Run()
@@ -183,6 +194,7 @@ func TestRunPidContainer(t *testing.T) {
 
 func TestRunIpcHost(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	testFilePath := filepath.Join("/dev/shm",
 		fmt.Sprintf("%s-%d-%s", testutil.Identifier(t), os.Geteuid(), base.Target))
@@ -194,6 +206,8 @@ func TestRunIpcHost(t *testing.T) {
 }
 
 func TestRunAddHost(t *testing.T) {
+	t.Parallel()
+
 	// Not parallelizable (https://github.com/containerd/nerdctl/issues/1127)
 	base := testutil.NewBase(t)
 	base.Cmd("run", "--rm", "--add-host", "testing.example.com:10.0.0.1", testutil.AlpineImage, "cat", "/etc/hosts").AssertOutWithFunc(func(stdout string) error {
@@ -265,6 +279,7 @@ func TestRunAddHostWithCustomHostGatewayIP(t *testing.T) {
 
 func TestRunUlimit(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	ulimit := "nofile=622:622"
 	ulimit2 := "nofile=622:722"
@@ -278,6 +293,7 @@ func TestRunUlimit(t *testing.T) {
 
 func TestRunWithInit(t *testing.T) {
 	t.Parallel()
+
 	testutil.DockerIncompatible(t)
 	testutil.RequireExecutable(t, "tini-custom")
 	base := testutil.NewBase(t)
@@ -311,6 +327,7 @@ func TestRunWithInit(t *testing.T) {
 
 func TestRunTTY(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 
 	const sttyPartialOutput = "speed 38400 baud"
@@ -329,6 +346,7 @@ func TestRunTTY(t *testing.T) {
 
 func runSigProxy(t *testing.T, args ...string) (string, bool, bool) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	testContainerName := testutil.Identifier(t)
 	defer base.Cmd("rm", "-f", testContainerName).Run()
@@ -362,6 +380,7 @@ func runSigProxy(t *testing.T, args ...string) (string, bool, bool) {
 }
 
 func TestRunSigProxy(t *testing.T) {
+	t.Parallel()
 
 	type testCase struct {
 		name        string
@@ -401,6 +420,8 @@ func TestRunSigProxy(t *testing.T) {
 }
 
 func TestRunWithFluentdLogDriver(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	tempDirectory := t.TempDir()
 	err := os.Chmod(tempDirectory, 0o777)
@@ -430,6 +451,8 @@ func TestRunWithFluentdLogDriver(t *testing.T) {
 }
 
 func TestRunWithFluentdLogDriverWithLogOpt(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	tempDirectory := t.TempDir()
 	err := os.Chmod(tempDirectory, 0o777)
@@ -459,10 +482,11 @@ func TestRunWithFluentdLogDriverWithLogOpt(t *testing.T) {
 }
 
 func TestRunWithOOMScoreAdj(t *testing.T) {
+	t.Parallel()
+
 	if rootlessutil.IsRootless() {
 		t.Skip("test skipped for rootless containers.")
 	}
-	t.Parallel()
 	base := testutil.NewBase(t)
 	var score = "-42"
 
@@ -489,6 +513,7 @@ func TestRunWithDetachKeys(t *testing.T) {
 			// if !nerdtest.IsDocker() {
 			nerdtest.EnsureContainerStarted(helpers, data.Identifier())
 			// }
+			// ctrl+a and ctrl+b (see https://en.wikipedia.org/wiki/C0_and_C1_control_codes)
 			_, err := f.Write([]byte{1, 2})
 			return err
 		})
@@ -513,6 +538,8 @@ func TestRunWithDetachKeys(t *testing.T) {
 }
 
 func TestRunWithTtyAndDetached(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	imageName := testutil.CommonImage
 	withoutTtyContainerName := "without-terminal-" + testutil.Identifier(t)
@@ -556,6 +583,7 @@ func TestIssue3568(t *testing.T) {
 			// if !nerdtest.IsDocker() {
 			nerdtest.EnsureContainerStarted(helpers, data.Identifier())
 			// }
+			// ctrl+a and ctrl+b (see https://en.wikipedia.org/wiki/C0_and_C1_control_codes)
 			_, err := f.Write([]byte{1, 2})
 			return err
 		})

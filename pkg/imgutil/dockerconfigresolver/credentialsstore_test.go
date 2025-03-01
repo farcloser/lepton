@@ -30,7 +30,8 @@ import (
 )
 
 func createTempDir(t *testing.T, mode os.FileMode) string {
-	tmpDir, err := os.MkdirTemp(t.TempDir(), "docker-config")
+	tmpDir := filepath.Join(t.TempDir(), "docker-config")
+	err := os.MkdirAll(tmpDir, mode)
 	if err != nil {
 		t.Fatal(err)
 	}

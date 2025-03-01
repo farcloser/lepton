@@ -24,6 +24,8 @@ import (
 )
 
 func TestComposeCreate(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	var dockerComposeYAML = fmt.Sprintf(`
 version: '3.1'
@@ -48,6 +50,8 @@ services:
 }
 
 func TestComposeCreateDependency(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	var dockerComposeYAML = fmt.Sprintf(`
 version: '3.1'
@@ -75,6 +79,8 @@ services:
 }
 
 func TestComposeCreatePull(t *testing.T) {
+	// Cannot be parallelized as-is
+	// t.Parallel()
 
 	base := testutil.NewBase(t)
 	var dockerComposeYAML = fmt.Sprintf(`
@@ -104,6 +110,8 @@ services:
 }
 
 func TestComposeCreateBuild(t *testing.T) {
+	t.Parallel()
+
 	const imageSvc0 = "composebuild_svc0"
 
 	dockerComposeYAML := fmt.Sprintf(`
