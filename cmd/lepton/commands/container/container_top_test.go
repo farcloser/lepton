@@ -70,7 +70,6 @@ func TestTop(t *testing.T) {
 }
 
 func TestTopHyperVContainer(t *testing.T) {
-
 	testCase := nerdtest.Setup()
 
 	testCase.Require = nerdtest.HyperV

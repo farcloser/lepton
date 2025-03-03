@@ -172,18 +172,19 @@ up:
 
 install-dev-tools:
 	$(call title, $@)
-	# golangci: v1.62.2
+	# golangci: v1.64.5
 	# git-validation: main from 2023/11
 	# ltag: v0.2.5
 	# go-licenses: v2.0.0-alpha.1
 	# goimports-reviser: v3.8.2
 	@cd $(MAKEFILE_DIR) \
-		&& go install github.com/golangci/golangci-lint/cmd/golangci-lint@89476e7a1eaa0a8a06c17343af960a5fd9e7edb7 \
+		&& go install github.com/golangci/golangci-lint/cmd/golangci-lint@0a603e49e5e9870f5f9f2035bcbe42cd9620a9d5 \
 		&& go install github.com/vbatts/git-validation@679e5cad8c50f1605ab3d8a0a947aaf72fb24c07 \
 		&& go install github.com/kunalkushwaha/ltag@b0cfa33e4cc9383095dc584d3990b62c95096de0 \
 		&& go install github.com/google/go-licenses/v2@d01822334fba5896920a060f762ea7ecdbd086e8 \
 		&& go install github.com/incu6us/goimports-reviser/v3@f034195cc8a7ffc7cc70d60aa3a25500874eaf04 \
 		&& go install gotest.tools/gotestsum@ac6dad9c7d87b969004f7749d1942938526c9716
+	@echo "Remember to add GOROOT/bin to your path"
 	$(call footer, $@)
 
 test-unit:
@@ -244,19 +245,10 @@ artifacts: clean
 	GOOS=linux GOARCH=arm64       make -C $(CURDIR) -f $(MAKEFILE_DIR)/Makefile binaries
 	tar $(TAR_OWNER0_FLAGS) $(TAR_FLATTEN_FLAGS) -czvf $(CURDIR)/_output/$(BINARY)-$(VERSION_TRIMMED)-linux-arm64.tar.gz   $(CURDIR)/_output/$(BINARY) $(MAKEFILE_DIR)/extras/rootless/*
 
-	GOOS=linux GOARCH=arm GOARM=7 make -C $(CURDIR) -f $(MAKEFILE_DIR)/Makefile binaries
-	tar $(TAR_OWNER0_FLAGS) $(TAR_FLATTEN_FLAGS) -czvf $(CURDIR)/_output/$(BINARY)-$(VERSION_TRIMMED)-linux-arm-v7.tar.gz  $(CURDIR)/_output/$(BINARY) $(MAKEFILE_DIR)/extras/rootless/*
-
-	GOOS=linux GOARCH=ppc64le     make -C $(CURDIR) -f $(MAKEFILE_DIR)/Makefile binaries
-	tar $(TAR_OWNER0_FLAGS) $(TAR_FLATTEN_FLAGS) -czvf $(CURDIR)/_output/$(BINARY)-$(VERSION_TRIMMED)-linux-ppc64le.tar.gz $(CURDIR)/_output/$(BINARY) $(MAKEFILE_DIR)/extras/rootless/*
-
-	GOOS=linux GOARCH=riscv64     make -C $(CURDIR) -f $(MAKEFILE_DIR)/Makefile binaries
-	tar $(TAR_OWNER0_FLAGS) $(TAR_FLATTEN_FLAGS) -czvf $(CURDIR)/_output/$(BINARY)-$(VERSION_TRIMMED)-linux-riscv64.tar.gz $(CURDIR)/_output/$(BINARY) $(MAKEFILE_DIR)/extras/rootless/*
-
-	GOOS=linux GOARCH=s390x       make -C $(CURDIR) -f $(MAKEFILE_DIR)/Makefile binaries
-	tar $(TAR_OWNER0_FLAGS) $(TAR_FLATTEN_FLAGS) -czvf $(CURDIR)/_output/$(BINARY)-$(VERSION_TRIMMED)-linux-s390x.tar.gz   $(CURDIR)/_output/$(BINARY) $(MAKEFILE_DIR)/extras/rootless/*
-
 	GOOS=windows GOARCH=amd64     make -C $(CURDIR) -f $(MAKEFILE_DIR)/Makefile binaries
+	tar $(TAR_OWNER0_FLAGS) $(TAR_FLATTEN_FLAGS) -czvf $(CURDIR)/_output/$(BINARY)-$(VERSION_TRIMMED)-windows-amd64.tar.gz $(CURDIR)/_output/$(BINARY).exe
+
+	GOOS=windows GOARCH=arm64     make -C $(CURDIR) -f $(MAKEFILE_DIR)/Makefile binaries
 	tar $(TAR_OWNER0_FLAGS) $(TAR_FLATTEN_FLAGS) -czvf $(CURDIR)/_output/$(BINARY)-$(VERSION_TRIMMED)-windows-amd64.tar.gz $(CURDIR)/_output/$(BINARY).exe
 
 	rm -f $(CURDIR)/_output/$(BINARY) $(CURDIR)/_output/$(BINARY).exe
@@ -276,7 +268,7 @@ artifacts: clean
 	artifacts \
 	\
 	lint lint-commits lint-go lint-go-all lint-headers lint-imports lint-licenses lint-licenses-all lint-mod lint-shell lint-yaml \
-	install-linters \
+	install-dev-tools \
 	fix fix-go fix-go-all fix-imports fix-mod \
 	update \
 	test test-unit race-unit bench-unit \

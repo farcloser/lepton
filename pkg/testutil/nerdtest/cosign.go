@@ -14,22 +14,34 @@
    limitations under the License.
 */
 
-package container
+package nerdtest
 
 import (
-	"testing"
+	"os"
+	"path/filepath"
 
-	"go.farcloser.world/lepton/pkg/testutil"
+	"gotest.tools/v3/assert"
+
+	"go.farcloser.world/tigron/test"
 )
 
-func TestUpdateContainer(t *testing.T) {
-	t.Parallel()
+type CosignKeyPair struct {
+	PublicKey  string
+	PrivateKey string
+}
 
-	testutil.DockerIncompatible(t)
-	testContainerName := testutil.Identifier(t)
-	base := testutil.NewBase(t)
-	base.Cmd("run", "-d", "--name", testContainerName, testutil.CommonImage, "sleep", "infinity").AssertOK()
-	defer base.Cmd("rm", "-f", testContainerName).Run()
-	base.Cmd("update", "--memory", "999999999", "--restart", "123", testContainerName).AssertFail()
-	base.Cmd("inspect", "--mode=native", testContainerName).AssertOutNotContains(`"limit": 999999999,`)
+func NewCosignKeyPair(data test.Data, helpers test.Helpers) *CosignKeyPair {
+	dir, err := os.MkdirTemp(data.TempDir(), "cosign")
+	assert.NilError(helpers.T(), err)
+
+	cmd := helpers.Custom("cosign", "generate-key-pair")
+	cmd.WithCwd(dir)
+	cmd.Run(&test.Expected{
+		ExitCode: 0,
+	})
+
+	return &CosignKeyPair{
+		PublicKey:  filepath.Join(dir, "cosign.pub"),
+		PrivateKey: filepath.Join(dir, "cosign.key"),
+	}
 }

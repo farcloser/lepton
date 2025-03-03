@@ -21,7 +21,7 @@
    NOTICE: https://github.com/docker/cli/blob/v20.10.9/NOTICE
 */
 
-package buildkitutil
+package buildkit
 
 import (
 	"bytes"
@@ -175,10 +175,10 @@ func WriteTempDockerfile(rc io.Reader) (dockerfileDir string, err error) {
 	return dockerfileDir, nil
 }
 
-// BuildKitFile returns the values for the following buildctl args
+// File returns the values for the following buildctl args
 // --localfilename=dockerfile={absDir}
 // --opt=filename={file}
-func BuildKitFile(dir, inputfile string) (absDir string, file string, err error) {
+func File(dir, inputfile string) (absDir string, file string, err error) {
 	file = inputfile
 	if file == "" || file == "." {
 		file = DefaultDockerfileName

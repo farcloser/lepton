@@ -37,6 +37,7 @@ import (
 
 func TestRunCgroupV2(t *testing.T) {
 	t.Parallel()
+
 	if cgroups.Version() != cgroups.Version2 {
 		t.Skip("test requires cgroup v2")
 	}
@@ -131,6 +132,8 @@ func TestRunCgroupV2(t *testing.T) {
 }
 
 func TestRunDevice(t *testing.T) {
+	t.Parallel()
+
 	if os.Geteuid() != 0 || userns.RunningInUserNS() {
 		t.Skip("test requires the root in the initial user namespace")
 	}
@@ -174,6 +177,7 @@ func TestRunDevice(t *testing.T) {
 
 func TestParseDevice(t *testing.T) {
 	t.Parallel()
+
 	type testCase struct {
 		s                     string
 		expectedDevPath       string
@@ -238,6 +242,7 @@ func TestParseDevice(t *testing.T) {
 
 func TestRunCgroupConf(t *testing.T) {
 	t.Parallel()
+
 	if cgroups.Version() != cgroups.Version2 {
 		t.Skip("test requires cgroup v2")
 	}
@@ -257,6 +262,7 @@ func TestRunCgroupConf(t *testing.T) {
 
 func TestRunCgroupParent(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	info := base.Info()
 	switch info.CgroupDriver {
@@ -310,6 +316,7 @@ func TestRunCgroupParent(t *testing.T) {
 
 func TestRunBlkioWeightCgroupV2(t *testing.T) {
 	t.Parallel()
+
 	if cgroups.Version() != cgroups.Version2 {
 		t.Skip("test requires cgroup v2")
 	}

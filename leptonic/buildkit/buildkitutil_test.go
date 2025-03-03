@@ -21,7 +21,7 @@
    NOTICE: https://github.com/docker/cli/blob/v20.10.9/NOTICE
 */
 
-package buildkitutil
+package buildkit
 
 import (
 	"os"
@@ -142,16 +142,16 @@ func TestBuildKitFile(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.prepare(t)
-			gotAbsDir, gotFile, err := BuildKitFile(tt.args.dir, tt.args.inputfile)
+			gotAbsDir, gotFile, err := File(tt.args.dir, tt.args.inputfile)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("BuildKitFile() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("File() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if gotAbsDir != tt.wantAbsDir {
-				t.Errorf("BuildKitFile() gotAbsDir = %v, want %v", gotAbsDir, tt.wantAbsDir)
+				t.Errorf("File() gotAbsDir = %v, want %v", gotAbsDir, tt.wantAbsDir)
 			}
 			if gotFile != tt.wantFile {
-				t.Errorf("BuildKitFile() gotFile = %v, want %v", gotFile, tt.wantFile)
+				t.Errorf("File() gotFile = %v, want %v", gotFile, tt.wantFile)
 			}
 
 			entry, err := os.ReadDir(tmp)

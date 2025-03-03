@@ -35,6 +35,8 @@ import (
 )
 
 func TestStopStart(t *testing.T) {
+	t.Parallel()
+
 	const (
 		hostPort = 8080
 	)
@@ -78,6 +80,7 @@ func TestStopStart(t *testing.T) {
 
 func TestStopWithStopSignal(t *testing.T) {
 	t.Parallel()
+
 	// There may be issues with logs in Docker.
 	// This test is flaky with Docker. Might be related to https://github.com/containerd/nerdctl/pull/3557
 	base := testutil.NewBase(t)
@@ -98,6 +101,8 @@ echo "signal quit"`).AssertOK()
 }
 
 func TestStopCleanupForwards(t *testing.T) {
+	t.Parallel()
+
 	const (
 		hostPort          = 9999
 		testContainerName = "ngx"

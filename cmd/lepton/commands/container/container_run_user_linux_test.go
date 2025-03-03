@@ -24,6 +24,7 @@ import (
 
 func TestRunUserGID(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	testCases := map[string]string{
 		"":       "root bin daemon sys adm disk wheel floppy dialout tape video",
@@ -46,6 +47,7 @@ func TestRunUserGID(t *testing.T) {
 
 func TestRunUmask(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	testutil.DockerIncompatible(t)
 	base.Cmd("run", "--rm", "--umask", "0200", testutil.AlpineImage, "sh", "-c", "umask").AssertOutContains("0200")
@@ -53,6 +55,7 @@ func TestRunUmask(t *testing.T) {
 
 func TestRunAddGroup(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	testCases := []struct {
 		user     string
@@ -122,6 +125,7 @@ func TestRunAddGroup(t *testing.T) {
 // Equates to https://github.com/containerd/containerd/commit/286a01f350a2298b4fdd7e2a0b31c04db3937ea8
 func TestRunAddGroup_CVE_2023_25173(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	testCases := []struct {
 		user     string

@@ -24,16 +24,22 @@ import (
 )
 
 func TestComposeVersion(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	base.ComposeCmd("version").AssertOutContains("Compose version ")
 }
 
 func TestComposeVersionShort(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	base.ComposeCmd("version", "--short").AssertOK()
 }
 
 func TestComposeVersionJson(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	base.ComposeCmd("version", "--format", formatter.FormatJSON).AssertOutContains("{\"version\":\"")
 }
