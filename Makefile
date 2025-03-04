@@ -18,15 +18,18 @@
 # Licensed under the Apache License, Version 2.0
 # -----------------------------------------------------------------------------
 
+##########################
+# Configuration
+##########################
+PACKAGE := go.farcloser.world/lepton
+ORG_PREFIXES := go.farcloser.world
+
 DOCKER ?= docker
 GO ?= go
 GOOS ?= $(shell $(GO) env GOOS)
 ifeq ($(GOOS),windows)
 	BIN_EXT := .exe
 endif
-
-PACKAGE := go.farcloser.world/lepton
-BINARY := lepton
 
 # distro builders might wanna override these
 PREFIX  ?= /usr/local
@@ -38,20 +41,22 @@ GO_BUILD_LDFLAGS ?= -s -w
 GO_BUILD_FLAGS ?=
 export GO_BUILD=CGO_ENABLED=0 GOOS=$(GOOS) $(GO) -C $(MAKEFILE_DIR) build -ldflags "$(GO_BUILD_LDFLAGS) $(VERBOSE_FLAG) -X $(PACKAGE)/pkg/version.Version=$(VERSION) -X $(PACKAGE)/pkg/version.Revision=$(REVISION) -X $(PACKAGE)/pkg/version.RootName=$(BINARY)"
 
-# Variables
-COMPANY_PREFIXES := "go.farcloser.world"
-
+BINARY ?= lepton
 MAKEFILE_DIR := $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
-VERSION ?= $(shell git -C $(MAKEFILE_DIR) describe --match 'v[0-9]*' --dirty='.m' --always --tags)
+VERSION ?= $(shell git -C $(MAKEFILE_DIR) describe --match 'v[0-9]*' --dirty='.m' --always --tags 2>/dev/null || echo "no_git_information")
 VERSION_TRIMMED := $(VERSION:v%=%)
-REVISION ?= $(shell git -C $(MAKEFILE_DIR) rev-parse HEAD)$(shell if ! git -C $(MAKEFILE_DIR) diff --no-ext-diff --quiet --exit-code; then echo .m; fi)
+REVISION ?= $(shell git -C $(MAKEFILE_DIR) rev-parse HEAD 2>/dev/null || echo "no_git_information")$(shell if ! git -C $(MAKEFILE_DIR) diff --no-ext-diff --quiet --exit-code 2>/dev/null; then echo .m; fi)
+LINT_COMMIT_RANGE ?= main..HEAD
+GO_BUILD_LDFLAGS ?= -s -w
+GO_BUILD_FLAGS ?=
 
+##########################
+# Helpers
+##########################
 ifdef VERBOSE
 	VERBOSE_FLAG := -v
 	VERBOSE_FLAG_LONG := --verbose
 endif
-
-LINT_COMMIT_RANGE ?= main..HEAD
 
 ifndef DC_NO_FANCY
     NC := \033[0m
@@ -61,13 +66,12 @@ ifndef DC_NO_FANCY
     RED := \033[1;31m
 endif
 
-# Helpers
 recursive_wildcard=$(wildcard $1$2) $(foreach e,$(wildcard $1*),$(call recursive_wildcard,$e/,$2))
 
 define title
-	@printf "$(GREEN)----------------------------------------------------------------------------------------------------\n"
-	@printf "$(GREEN)%*s\n" $$(( ( $(shell echo "☆ $(1) ☆" | wc -c ) + 100 ) / 2 )) "☆ $(1) ☆"
-	@printf "$(GREEN)----------------------------------------------------------------------------------------------------\n$(ORANGE)"
+	@printf "$(GREEN)____________________________________________________________________________________________________\n"
+	@printf "$(GREEN)%*s\n" $$(( ( $(shell echo "⚛️$(1) ⚛️" | wc -c ) + 100 ) / 2 )) "⚛️$(1) ⚛️"
+	@printf "$(GREEN)____________________________________________________________________________________________________\n$(ORANGE)"
 endef
 
 define footer
@@ -77,13 +81,14 @@ endef
 
 # Tasks
 lint: lint-go-all lint-imports lint-yaml lint-shell lint-commits lint-mod lint-licenses-all lint-headers
-test: test-unit race-unit bench-unit
-unit: test-unit race-unit bench-unit
+test: test-unit test-unit-race test-unit-bench
+unit: test-unit test-unit-race test-unit-bench
 fix: fix-mod fix-imports fix-go-all
 
 lint-go:
 	$(call title, $@)
-	@cd $(MAKEFILE_DIR) && golangci-lint run --max-issues-per-linter=0 --max-same-issues=0 --sort-results $(VERBOSE_FLAG_LONG) ./...
+	@cd $(MAKEFILE_DIR) \
+		&& golangci-lint run $(VERBOSE_FLAG_LONG) ./...
 	$(call footer, $@)
 
 #	&& GOOS=darwin make lint-go
@@ -97,12 +102,13 @@ lint-go-all:
 lint-imports:
 	$(call title, $@)
 	@cd $(MAKEFILE_DIR) \
-		&& ./hack/make-lint-imports.sh
+		&& goimports-reviser -recursive -list-diff -set-exit-status -output stdout -company-prefixes "$(ORG_PREFIXES)"  ./...
 	$(call footer, $@)
 
 lint-yaml:
 	$(call title, $@)
-	@cd $(MAKEFILE_DIR) && yamllint .
+	@cd $(MAKEFILE_DIR) \
+		&& yamllint .
 	$(call footer, $@)
 
 lint-shell: $(call recursive_wildcard,$(MAKEFILE_DIR)/,*.sh)
@@ -110,25 +116,33 @@ lint-shell: $(call recursive_wildcard,$(MAKEFILE_DIR)/,*.sh)
 	@shellcheck -a -x $^
 	$(call footer, $@)
 
+# See https://github.com/andyfeller/gh-ssh-allowed-signers for automation to retrieve contributors keys
 lint-commits:
 	$(call title, $@)
-	@cd $(MAKEFILE_DIR) && git-validation $(VERBOSE_FLAG) -run DCO,short-subject,dangling-whitespace -range "$(LINT_COMMIT_RANGE)"
+	@cd $(MAKEFILE_DIR) \
+		&& git config --add gpg.ssh.allowedSignersFile hack/allowed_signers \
+		&& git-validation $(VERBOSE_FLAG) -run DCO,short-subject,dangling-whitespace -range "$(LINT_COMMIT_RANGE)"
 	$(call footer, $@)
 
 lint-headers:
 	$(call title, $@)
-	@cd $(MAKEFILE_DIR) && ltag -t "./hack/headers" --check -v
+	@cd $(MAKEFILE_DIR) \
+		&& ltag -t "./hack/headers" --check -v
 	$(call footer, $@)
 
 lint-mod:
 	$(call title, $@)
-	@cd $(MAKEFILE_DIR) && go mod tidy --diff
+	@cd $(MAKEFILE_DIR) \
+		&& go mod tidy --diff
 	$(call footer, $@)
 
 lint-licenses:
 	$(call title, $@)
 	@cd $(MAKEFILE_DIR) \
-		&& ./hack/make-lint-licenses.sh
+		&& go-licenses check --include_tests --allowed_licenses=Apache-2.0,BSD-2-Clause,BSD-3-Clause,MIT \
+		  --ignore gotest.tools \
+		  --ignore github.com/multiformats/go-base36 \
+		  ./...
 	$(call footer, $@)
 
 #	&& GOOS=darwin make lint-licenses
@@ -148,14 +162,16 @@ fix-go:
 fix-go-all:
 	$(call title, $@)
 	@cd $(MAKEFILE_DIR) \
+		&& GOOS=darwin make fix-go \
 		&& GOOS=linux make fix-go \
+		&& GOOS=freebsd make fix-go \
 		&& GOOS=windows make fix-go
 	$(call footer, $@)
 
 fix-imports:
 	$(call title, $@)
 	@cd $(MAKEFILE_DIR) \
-		&& goimports-reviser -company-prefixes $(COMPANY_PREFIXES) ./...
+		&& goimports-reviser -company-prefixes $(ORG_PREFIXES) ./...
 	$(call footer, $@)
 
 fix-mod:
@@ -172,13 +188,13 @@ up:
 
 install-dev-tools:
 	$(call title, $@)
-	# golangci: v1.62.2
+	# golangci: v1.64.5
 	# git-validation: main from 2023/11
 	# ltag: v0.2.5
 	# go-licenses: v2.0.0-alpha.1
 	# goimports-reviser: v3.8.2
 	@cd $(MAKEFILE_DIR) \
-		&& go install github.com/golangci/golangci-lint/cmd/golangci-lint@89476e7a1eaa0a8a06c17343af960a5fd9e7edb7 \
+		&& go install github.com/golangci/golangci-lint/cmd/golangci-lint@0a603e49e5e9870f5f9f2035bcbe42cd9620a9d5 \
 		&& go install github.com/vbatts/git-validation@679e5cad8c50f1605ab3d8a0a947aaf72fb24c07 \
 		&& go install github.com/kunalkushwaha/ltag@b0cfa33e4cc9383095dc584d3990b62c95096de0 \
 		&& go install github.com/google/go-licenses/v2@d01822334fba5896920a060f762ea7ecdbd086e8 \
@@ -191,15 +207,35 @@ test-unit:
 	@go test $(VERBOSE_FLAG) -count 1 $(MAKEFILE_DIR)/pkg/...
 	$(call footer, $@)
 
-bench-unit:
+test-unit-bench:
 	$(call title, $@)
 	@go test $(VERBOSE_FLAG) -count 1 $(MAKEFILE_DIR)/pkg/... -bench=.
 	$(call footer, $@)
 
-race-unit:
+test-unit-race:
 	$(call title, $@)
 	@go test $(VERBOSE_FLAG) -count 1 $(MAKEFILE_DIR)/pkg/... -race
 	$(call footer, $@)
+
+UBUNTU_VERSION ?= 24.04
+CONTAINERD_VERSION ?= v2.0.3
+
+build-integration:
+	$(call title, $@)
+	$(DOCKER) rm -f buildkitd-make-builder 2>/dev/null
+	$(DOCKER) run -d -v $(shell pwd):/src --name buildkitd-make-builder --privileged moby/buildkit:latest
+	$(DOCKER) exec buildkitd-make-builder sh -c -- 'cd /src; buildctl build \\\
+		--opt build-arg:UBUNTU_VERSION="$(UBUNTU_VERSION)" \\\
+		--opt build-arg:CONTAINERD_VERSION="$(CONTAINERD_VERSION)" \\\
+		--opt platform="linux/arm64" \\\
+		--import-cache type=local,src="$(HOME)/bk-cache-$keyed" \\\
+		--opt target="assembly-runtime" \\\
+		--frontend=dockerfile.v0 \\\
+		--local dockerfile=. \\\
+		--local context=. \\\
+'
+	$(call footer, $@)
+
 
 ############################################
 all: binaries
@@ -278,6 +314,6 @@ artifacts: clean
 	lint lint-commits lint-go lint-go-all lint-headers lint-imports lint-licenses lint-licenses-all lint-mod lint-shell lint-yaml \
 	install-linters \
 	fix fix-go fix-go-all fix-imports fix-mod \
-	update \
-	test test-unit race-unit bench-unit \
+	up \
+	test test-unit test-unit-race test-unit-bench \
 	unit
