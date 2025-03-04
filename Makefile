@@ -18,15 +18,18 @@
 # Licensed under the Apache License, Version 2.0
 # -----------------------------------------------------------------------------
 
+##########################
+# Configuration
+##########################
+PACKAGE := go.farcloser.world/lepton
+ORG_PREFIXES := go.farcloser.world
+
 DOCKER ?= docker
 GO ?= go
 GOOS ?= $(shell $(GO) env GOOS)
 ifeq ($(GOOS),windows)
 	BIN_EXT := .exe
 endif
-
-PACKAGE := go.farcloser.world/lepton
-BINARY := lepton
 
 # distro builders might wanna override these
 PREFIX  ?= /usr/local
@@ -38,14 +41,18 @@ GO_BUILD_LDFLAGS ?= -s -w
 GO_BUILD_FLAGS ?=
 export GO_BUILD=CGO_ENABLED=0 GOOS=$(GOOS) $(GO) -C $(MAKEFILE_DIR) build -ldflags "$(GO_BUILD_LDFLAGS) $(VERBOSE_FLAG) -X $(PACKAGE)/pkg/version.Version=$(VERSION) -X $(PACKAGE)/pkg/version.Revision=$(REVISION) -X $(PACKAGE)/pkg/version.RootName=$(BINARY)"
 
-ORG_PREFIXES := "go.farcloser.world"
-
+BINARY ?= lepton
 MAKEFILE_DIR := $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
-VERSION ?= $(shell git -C $(MAKEFILE_DIR) describe --match 'v[0-9]*' --dirty='.m' --always --tags)
+VERSION ?= $(shell git -C $(MAKEFILE_DIR) describe --match 'v[0-9]*' --dirty='.m' --always --tags 2>/dev/null || echo "no_git_information")
 VERSION_TRIMMED := $(VERSION:v%=%)
-REVISION ?= $(shell git -C $(MAKEFILE_DIR) rev-parse HEAD)$(shell if ! git -C $(MAKEFILE_DIR) diff --no-ext-diff --quiet --exit-code; then echo .m; fi)
+REVISION ?= $(shell git -C $(MAKEFILE_DIR) rev-parse HEAD 2>/dev/null || echo "no_git_information")$(shell if ! git -C $(MAKEFILE_DIR) diff --no-ext-diff --quiet --exit-code 2>/dev/null; then echo .m; fi)
 LINT_COMMIT_RANGE ?= main..HEAD
+GO_BUILD_LDFLAGS ?= -s -w
+GO_BUILD_FLAGS ?=
 
+##########################
+# Helpers
+##########################
 ifdef VERBOSE
 	VERBOSE_FLAG := -v
 	VERBOSE_FLAG_LONG := --verbose
@@ -59,7 +66,6 @@ ifndef DC_NO_FANCY
     RED := \033[1;31m
 endif
 
-# Helpers
 recursive_wildcard=$(wildcard $1$2) $(foreach e,$(wildcard $1*),$(call recursive_wildcard,$e/,$2))
 
 define title
@@ -133,7 +139,10 @@ lint-mod:
 lint-licenses:
 	$(call title, $@)
 	@cd $(MAKEFILE_DIR) \
-		&& ./hack/make-lint-licenses.sh
+		&& go-licenses check --include_tests --allowed_licenses=Apache-2.0,BSD-2-Clause,BSD-3-Clause,MIT \
+		  --ignore gotest.tools \
+		  --ignore github.com/multiformats/go-base36 \
+		  ./...
 	$(call footer, $@)
 
 #	&& GOOS=darwin make lint-licenses
@@ -179,13 +188,13 @@ up:
 
 install-dev-tools:
 	$(call title, $@)
-	# golangci: v1.62.2
+	# golangci: v1.64.5
 	# git-validation: main from 2023/11
 	# ltag: v0.2.5
 	# go-licenses: v2.0.0-alpha.1
 	# goimports-reviser: v3.8.2
 	@cd $(MAKEFILE_DIR) \
-		&& go install github.com/golangci/golangci-lint/cmd/golangci-lint@89476e7a1eaa0a8a06c17343af960a5fd9e7edb7 \
+		&& go install github.com/golangci/golangci-lint/cmd/golangci-lint@0a603e49e5e9870f5f9f2035bcbe42cd9620a9d5 \
 		&& go install github.com/vbatts/git-validation@679e5cad8c50f1605ab3d8a0a947aaf72fb24c07 \
 		&& go install github.com/kunalkushwaha/ltag@b0cfa33e4cc9383095dc584d3990b62c95096de0 \
 		&& go install github.com/google/go-licenses/v2@d01822334fba5896920a060f762ea7ecdbd086e8 \
@@ -207,6 +216,26 @@ test-unit-race:
 	$(call title, $@)
 	@go test $(VERBOSE_FLAG) -count 1 $(MAKEFILE_DIR)/pkg/... -race
 	$(call footer, $@)
+
+UBUNTU_VERSION ?= 24.04
+CONTAINERD_VERSION ?= v2.0.3
+
+build-integration:
+	$(call title, $@)
+	$(DOCKER) rm -f buildkitd-make-builder 2>/dev/null
+	$(DOCKER) run -d -v $(shell pwd):/src --name buildkitd-make-builder --privileged moby/buildkit:latest
+	$(DOCKER) exec buildkitd-make-builder sh -c -- 'cd /src; buildctl build \\\
+		--opt build-arg:UBUNTU_VERSION="$(UBUNTU_VERSION)" \\\
+		--opt build-arg:CONTAINERD_VERSION="$(CONTAINERD_VERSION)" \\\
+		--opt platform="linux/arm64" \\\
+		--import-cache type=local,src="$(HOME)/bk-cache-$keyed" \\\
+		--opt target="assembly-runtime" \\\
+		--frontend=dockerfile.v0 \\\
+		--local dockerfile=. \\\
+		--local context=. \\\
+'
+	$(call footer, $@)
+
 
 ############################################
 all: binaries

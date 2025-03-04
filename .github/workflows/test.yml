@@ -35,14 +35,23 @@ jobs:
           fetch-depth: 1
       - name: "Expose GitHub Runtime variables for gha"
         uses: crazy-max/ghaction-github-runtime@b3a9207c0e1ef41f4cf215303c976869d0c2c1c4  # v3.0.0
-      - name: "Build dependencies for the integration test environment image"
+#      - name: "Build dependencies for the integration test environment image"
+#        run: |
+#          time docker buildx create --name with-gha --use
+#          time docker buildx build \
+#            --output=type=docker \
+#            --target assembly-runtime --build-arg CONTAINERD_VERSION=${CONTAINERD_VERSION} .
+
+#            --cache-to type=gha,mode=max,scope=test-integration-cache \
+#            --cache-from type=gha,scope=test-integration-cache \
+
+      - name: "Build dependencies for the integration test environment image (2)"
         run: |
-          docker buildx create --name with-gha --use
-          docker buildx build \
-            --output=type=docker \
-            --cache-to type=gha,mode=max,scope=${ARCH}-${CONTAINERD_VERSION} \
-            --cache-from type=gha,scope=${ARCH}-${CONTAINERD_VERSION} \
-            --target build-dependencies --build-arg CONTAINERD_VERSION=${CONTAINERD_VERSION} .
+          time make build-integration
+
+      - name: "Build dependencies for the integration test environment image (3)"
+        run: |
+          exit 1
 
   test-unit:
     # FIXME:
@@ -113,7 +122,7 @@ jobs:
           docker buildx create --name with-gha --use
           docker buildx build \
             --output=type=docker \
-            --cache-from type=gha,scope=${ARCH}-${CONTAINERD_VERSION} \
+            --cache-from type=gha,scope=test-integration-cache \
             -t test-integration --target test-integration --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} --build-arg CONTAINERD_VERSION=${CONTAINERD_VERSION} .
       - name: "Remove snap loopback devices (conflicts with our loopback devices in TestRunDevice)"
         run: |
@@ -171,7 +180,7 @@ jobs:
           docker buildx create --name with-gha --use
           docker buildx build \
             --output=type=docker \
-            --cache-from type=gha,scope=${ARCH}-${CONTAINERD_VERSION} \
+            --cache-from type=gha,scope=test-integration-cache \
             -t test-integration --target test-integration --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} --build-arg CONTAINERD_VERSION=${CONTAINERD_VERSION} .
       - name: "Remove snap loopback devices (conflicts with our loopback devices in TestRunDevice)"
         run: |
@@ -257,8 +266,8 @@ jobs:
           docker buildx create --name with-gha --use
           docker buildx build \
             --output=type=docker \
-            --cache-from type=gha,scope=${ARCH}-${CONTAINERD_VERSION} \
-            -t ${TEST_TARGET} --target ${TEST_TARGET} --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} --build-arg CONTAINERD_VERSION=${CONTAINERD_VERSION} --build-arg ROOTLESSKIT_VERSION=${ROOTLESSKIT_VERSION} .
+            --cache-from type=gha,scope=test-integration-cache \
+            -t test-integration --target ${TEST_TARGET} --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} --build-arg CONTAINERD_VERSION=${CONTAINERD_VERSION} --build-arg ROOTLESSKIT_VERSION=${ROOTLESSKIT_VERSION} .
       - name: "Disable BuildKit for RootlessKit v1 (workaround for issue #622)"
         run: |
           # https://github.com/containerd/nerdctl/issues/622
@@ -268,9 +277,9 @@ jobs:
           fi
           echo "WORKAROUND_ISSUE_622=${WORKAROUND_ISSUE_622}" >> "$GITHUB_ENV"
       - name: "Test (network driver=slirp4netns, port driver=builtin)"
-        run: docker run -t --rm --privileged -e WORKAROUND_ISSUE_622=${WORKAROUND_ISSUE_622} ${TEST_TARGET} /test-integration-rootless.sh ./hack/test-integration.sh -test.only-flaky=false
+        run: docker run -t --rm --privileged -e WORKAROUND_ISSUE_622=${WORKAROUND_ISSUE_622} test-integration /test-integration-rootless.sh ./hack/test-integration.sh -test.only-flaky=false
       - name: "Test (network driver=slirp4netns, port driver=builtin) (flaky)"
-        run: docker run -t --rm --privileged -e WORKAROUND_ISSUE_622=${WORKAROUND_ISSUE_622} ${TEST_TARGET} /test-integration-rootless.sh ./hack/test-integration.sh -test.only-flaky=true
+        run: docker run -t --rm --privileged -e WORKAROUND_ISSUE_622=${WORKAROUND_ISSUE_622} test-integration /test-integration-rootless.sh ./hack/test-integration.sh -test.only-flaky=true
 
   build:
     timeout-minutes: 5

@@ -69,6 +69,7 @@ ENV TERM="xterm"
 ENV LANG="C.UTF-8"
 ENV LC_ALL="C.UTF-8"
 ENV TZ="America/Los_Angeles"
+ARG BINARY_NAME
 RUN apt-get update -qq && apt-get install -qq --no-install-recommends \
   ca-certificates
 
@@ -182,6 +183,7 @@ ENV TERM="xterm"
 ENV LANG="C.UTF-8"
 ENV LC_ALL="C.UTF-8"
 ENV TZ="America/Los_Angeles"
+ARG BINARY_NAME
 # fuse3 is required by stargz snapshotter
 RUN apt-get update -qq && apt-get install -qq --no-install-recommends \
   ca-certificates \
@@ -311,20 +313,20 @@ RUN --mount=target=/src,type=cache,from=dependencies-download-buildg,source=/src
   xx-go --wrap && \
   CMD_DESTDIR=/out make buildg install
 
-# nerdctl is retrieved from the local context
-FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-nerdctl
+# cli binary is built from the local context
+FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-cli
 COPY . /src
 RUN  --mount=target=/root/go/pkg/mod,type=cache \
   go mod download
-COPY docs /out/share/doc/nerdctl/docs
-RUN { echo "# nerdctl (full distribution)"; echo "- nerdctl: $(git describe --tags)"; } \
+COPY docs /out/share/doc/"$BINARY_NAME"/docs
+RUN { echo "# "$BINARY_NAME" (full distribution)"; echo "- "$BINARY_NAME": $(git describe --tags)"; } \
   > /metadata/VERSION
 
-FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-build-nerdctl
+FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-build-cli
 ARG TARGETARCH
 ENV GOPROXY=off
 RUN  --mount=target=/root/go/pkg/mod,type=cache \
-     --mount=target=/src,type=cache,from=dependencies-download-nerdctl,source=/src,sharing=locked \
+     --mount=target=/src,type=cache,from=dependencies-download-cli,source=/src,sharing=locked \
   BINDIR=/out/bin make binaries install
 
 # dependencies-download will retrieve all dependencies that are not compiled from source and used in binary form
@@ -435,7 +437,7 @@ COPY --from=ghcr.io/sigstore/cosign/cosign:v2.2.3@sha256:8fc9cad121611e8479f65f7
 ########################################################################################################################
 # assembly-release-assets is single platform, and prepares the non-architecture dependent files for the full release
 FROM --platform=$BUILDPLATFORM tooling-builder AS assembly-release-assets
-RUN mkdir -p /out/lib/systemd/system /out/share/doc/nerdctl-full
+RUN mkdir -p /out/lib/systemd/system /out/share/doc/"$BINARY_NAME"-full
 COPY --from=dependencies-build-containerd /containerd.service /out/lib/systemd/system/containerd.service
 # NOTE: github.com/moby/buildkit/examples/systemd is not included in BuildKit v0.8.x, will be included in v0.9.x
 # FIXME: now that we are at buildkit 0.20+, do we want to move over to their example systemd file?
@@ -444,27 +446,27 @@ RUN cd /out/lib/systemd/system && \
   sed -E "${sedcomm}" containerd.service > buildkit.service && \
   echo "" >> buildkit.service && \
   echo "# This file was converted from containerd.service, with \`sed -E '${sedcomm}'\`" >> buildkit.service
-COPY --from=dependencies-download-nerdctl /out/share /out/share
-RUN --mount=target=/metadata,type=cache,from=dependencies-download-nerdctl,source=/metadata \
-    cat /metadata/VERSION > /out/share/doc/nerdctl-full/README.md
+COPY --from=dependencies-download-cli /out/share /out/share
+RUN --mount=target=/metadata,type=cache,from=dependencies-download-cli,source=/metadata \
+    cat /metadata/VERSION > /out/share/doc/"$BINARY_NAME"-full/README.md
 RUN --mount=target=/metadata,type=cache,from=dependencies-download-containerd,source=/metadata \
-    cat /metadata/VERSION >> /out/share/doc/nerdctl-full/README.md
+    cat /metadata/VERSION >> /out/share/doc/"$BINARY_NAME"-full/README.md
 RUN --mount=target=/metadata,type=cache,from=dependencies-download-runc,source=/metadata \
-    cat /metadata/VERSION >> /out/share/doc/nerdctl-full/README.md
+    cat /metadata/VERSION >> /out/share/doc/"$BINARY_NAME"-full/README.md
 RUN --mount=target=/metadata,type=cache,from=dependencies-download-bypass4netns,source=/metadata \
-    cat /metadata/VERSION >> /out/share/doc/nerdctl-full/README.md
+    cat /metadata/VERSION >> /out/share/doc/"$BINARY_NAME"-full/README.md
 RUN --mount=target=/metadata,type=cache,from=dependencies-download-imgcrypt,source=/metadata \
-    cat /metadata/VERSION >> /out/share/doc/nerdctl-full/README.md
+    cat /metadata/VERSION >> /out/share/doc/"$BINARY_NAME"-full/README.md
 RUN --mount=target=/metadata,type=cache,from=dependencies-download-buildg,source=/metadata \
-    cat /metadata/VERSION >> /out/share/doc/nerdctl-full/README.md
+    cat /metadata/VERSION >> /out/share/doc/"$BINARY_NAME"-full/README.md
 RUN --mount=target=/metadata,type=cache,from=dependencies-download,source=/metadata \
-    cat /metadata/VERSION >> /out/share/doc/nerdctl-full/README.md
+    cat /metadata/VERSION >> /out/share/doc/"$BINARY_NAME"-full/README.md
 RUN --mount=target=/metadata/LICENSE,type=cache,from=dependencies-download,source=/metadata/LICENSE \
-  echo "" >> /out/share/doc/nerdctl-full/README.md && \
-  echo "## License" >> /out/share/doc/nerdctl-full/README.md && \
-  cat /metadata/LICENSE >>  /out/share/doc/nerdctl-full/README.md && \
-  echo "- bin/{runc,bypass4netns,bypass4netnsd}: Apache License 2.0, statically linked with libseccomp ([LGPL 2.1](https://github.com/seccomp/libseccomp/blob/main/LICENSE), source code available at https://github.com/seccomp/libseccomp/)" >> /out/share/doc/nerdctl-full/README.md && \
-  echo "- Other files: [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)" >> /out/share/doc/nerdctl-full/README.md
+  echo "" >> /out/share/doc/"$BINARY_NAME"-full/README.md && \
+  echo "## License" >> /out/share/doc/"$BINARY_NAME"-full/README.md && \
+  cat /metadata/LICENSE >>  /out/share/doc/"$BINARY_NAME"-full/README.md && \
+  echo "- bin/{runc,bypass4netns,bypass4netnsd}: Apache License 2.0, statically linked with libseccomp ([LGPL 2.1](https://github.com/seccomp/libseccomp/blob/main/LICENSE), source code available at https://github.com/seccomp/libseccomp/)" >> /out/share/doc/"$BINARY_NAME"-full/README.md && \
+  echo "- Other files: [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)" >> /out/share/doc/"$BINARY_NAME"-full/README.md
 
 # assembly-release is multi-architecture, and is the stage assembling all assets for full-release
 # Once done, shasums will be generated and stuffed in to produce the full release
@@ -475,7 +477,7 @@ COPY --from=dependencies-build-bypass4netns /out /
 COPY --from=dependencies-build-imgcrypt /out /
 COPY --from=dependencies-build-buildg /out /
 COPY --from=dependencies-download /out /
-COPY --from=dependencies-build-nerdctl /out /
+COPY --from=dependencies-build-cli /out /
 COPY --from=assembly-release-assets /out /
 
 # assembly-shasum prepares the shasum file from above
@@ -486,7 +488,7 @@ RUN --mount=target=/src,type=cache,from=assembly-release,source=/ \
   chown -R 0:0 /out
 
 # assembly-runtime is the basis for the test integration environment
-# this stage purposedly does NOT depend on nerdctl, so, it should be highly cacheable
+# this stage purposedly does NOT depend on the cli, so, it should be highly cacheable
 FROM tooling-runtime AS assembly-runtime
 ARG BUILDPLATFORM
 # FIXME: finish removing unbuffer from the test codebase and then remove expect
@@ -503,7 +505,7 @@ RUN apt-get install -qq --no-install-recommends \
 # Add go
 ENV PATH="/root/go/bin:/usr/local/go/bin:$PATH"
 COPY --from=tooling-downloader-golang /out/usr/local/$BUILDPLATFORM /usr/local
-# Add all needed dependencies, but not nerdctl yet to avoid busting cache
+# Add all needed dependencies, but not the cli yet to avoid busting cache
 COPY --from=dependencies-build-containerd /out /usr/local
 COPY --from=dependencies-build-runc /out /usr/local
 COPY --from=dependencies-build-bypass4netns /out /usr/local
@@ -526,7 +528,7 @@ RUN mkdir -p -m 0755 /etc/cni
 VOLUME /var/lib/containerd
 VOLUME /var/lib/buildkit
 VOLUME /var/lib/containerd-stargz-grpc
-VOLUME /var/lib/nerdctl
+VOLUME /var/lib/"$BINARY_NAME"
 VOLUME /tmp
 
 ########################################################################################################################
@@ -536,17 +538,17 @@ VOLUME /tmp
 # release-full is the final stage producing the -full releases, including SHASUM
 FROM assembly-release AS release-full
 # Stuff in the shasums
-COPY --from=assembly-shasum /out/SHA256SUMS /share/doc/nerdctl-full/SHA256SUMS
+COPY --from=assembly-shasum /out/SHA256SUMS /share/doc/"$BINARY_NAME"-full/SHA256SUMS
 
 # test-integration is the final stage for the integration testing environment
-# it is multi-architecture, and not fully cacheable, as changing anything in nerdctl will invalidate cache here
+# it is multi-architecture, and not fully cacheable, as changing anything in the cli will invalidate cache here
 FROM assembly-runtime AS test-integration
 ARG TARGETARCH
 WORKDIR /src
 # Copy config and service files
 COPY ./Dockerfile.d/etc_containerd_config.toml /etc/containerd/config.toml
 COPY ./Dockerfile.d/etc_buildkit_buildkitd.toml /etc/buildkit/buildkitd.toml
-COPY ./Dockerfile.d/test-integration-buildkit-nerdctl-test.service /usr/local/lib/systemd/system/
+COPY ./Dockerfile.d/test-integration-buildkit-test.service /usr/local/lib/systemd/system/
 COPY ./Dockerfile.d/test-integration-soci-snapshotter.service /usr/local/lib/systemd/system/
 # using test integration containerd config
 COPY ./Dockerfile.d/test-integration-etc_containerd_config.toml /etc/containerd/config.toml
@@ -554,7 +556,7 @@ RUN perl -pi -e 's/multi-user.target/docker-entrypoint.target/g' /usr/local/lib/
 # install ipfs service. avoid using 5001(api)/8080(gateway) which are reserved by tests.
 RUN systemctl enable containerd  \
     buildkit \
-    test-integration-buildkit-nerdctl-test  \
+    test-integration-buildkit-test  \
     test-integration-soci-snapshotter
 # Copy mod cache to save a few download cycles
 # FIXME: does not seem to work as expected
@@ -562,13 +564,13 @@ RUN  --mount=target=/tmp/mod,type=cache \
   mkdir -p /root/go/pkg; cp -aR /tmp/mod /root/go/pkg/mod
 # Install dev tools
 COPY Makefile .
-RUN NO_COLOR=true make install-dev-tools
-# Add nerdctl binary and source
-COPY --from=dependencies-download-nerdctl /src /src
-COPY --from=dependencies-build-nerdctl /out /usr/local
+RUN NO_COLOR=true make install-dev-tools; chmod -R a+rx /root/go/bin
+# Add binary and source
+COPY --from=dependencies-download-cli /src /src
+COPY --from=dependencies-build-cli /out /usr/local
 # Install shell completion
 RUN mkdir -p /etc/bash_completion.d && \
-  nerdctl completion bash >/etc/bash_completion.d/nerdctl
+  "$BINARY_NAME" completion bash >/etc/bash_completion.d/"$BINARY_NAME"
 CMD ["./hack/test-integration.sh"]
 
 # test-integration-rootless
