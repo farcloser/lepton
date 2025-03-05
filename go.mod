@@ -56,7 +56,7 @@ require (
 	go.farcloser.world/tigron v0.2.1-0.20250214224952-35e5a985ec63
 	go.uber.org/mock v0.5.0
 	golang.org/x/crypto v0.35.0
-	golang.org/x/net v0.35.0
+	golang.org/x/net v0.36.0
 	golang.org/x/sync v0.11.0
 	golang.org/x/sys v0.30.0
 	golang.org/x/term v0.29.0
