@@ -1,9 +1,4 @@
-name: lint
-
-# Note: this currently does not run on Windows environments, as mingw/make does mess up the path
-# preventing golangci-lint from finding go.
-# Also note that the arm runner does not come with yamllint installed.
-# This does not matter much for now, as lint tasks are designed to execute for all required OS/ARCH targets.
+name: build
 
 on:
   push:
@@ -11,15 +6,17 @@ on:
       - main
       - 'release/**'
   pull_request:
+    paths-ignore:
+      - '**.md'
 
 jobs:
   env:
     uses: ./.github/workflows/environment.yml
 
-  lint:
+  build:
     needs: env
     timeout-minutes: ${{ fromJSON(needs.env.outputs.TIMEOUT_SHORT) }}
-    name: go ${{ matrix.go}} | ${{ matrix.runner }}
+    name: go ${{ matrix.go }} | ${{ matrix.runner }}
     runs-on: ${{ matrix.runner }}
     defaults:
       run:
@@ -29,21 +26,26 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - runner: ${{ needs.env.outputs.RUNNER_LINUX_STABLE }}
+          - runner: ${{ needs.env.outputs.RUNNER_WINDOWS_STABLE }}
             go: ${{ needs.env.outputs.GO_STABLE }}
+          - runner: ${{ needs.env.outputs.RUNNER_LINUX_AMD64_STABLE }}
+            go: ${{ needs.env.outputs.GO_STABLE }}
+          - runner: ${{ needs.env.outputs.RUNNER_LINUX_ARM64_STABLE }}
+            go: ${{ needs.env.outputs.GO_STABLE }}
+          - runner: ${{ needs.env.outputs.RUNNER_WINDOWS_CANARY }}
+            go: ${{ needs.env.outputs.GO_CANARY }}
           - runner: ${{ needs.env.outputs.RUNNER_LINUX_CANARY }}
             go: ${{ needs.env.outputs.GO_CANARY }}
 
     steps:
       - name: "Clone"
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
-        with:
-          fetch-depth: 100
       - name: "Setup"
         uses: ./.github/actions/node
         with:
           go: ${{ matrix.go }}
-      - name: "Linting"
+      - name: "Building"
         run: |
-          export LINT_COMMIT_RANGE="$(jq -r '.after + "..HEAD"' ${GITHUB_EVENT_PATH})"
-          make lint
+          GOOS=linux GOARCH=amd64 make build
+          GOOS=linux GOARCH=arm64 make build
+          GOOS=windows make build
