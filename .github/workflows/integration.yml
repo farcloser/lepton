@@ -10,126 +10,70 @@ on:
       - '**.md'
 
 env:
-  SHORT_TIMEOUT: 5
+  TIMEOUT_SHORT: 5
   LONG_TIMEOUT: 60
 
 jobs:
-  # This job builds the dependency target of the test docker image for all supported architectures and cache it in GHA
   build-dependencies:
-    timeout-minutes: 15
-    name: dependencies |  ${{ matrix.containerd }} | ${{ matrix.arch }}
-    runs-on: "${{ matrix.runner }}"
+    timeout-minutes: 30
+    name: dependencies
+    runs-on: ubuntu-24.04
+    steps:
+      - name: "Clone"
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - name: "Expose GitHub Runtime variables for gha"
+        uses: crazy-max/ghaction-github-runtime@b3a9207c0e1ef41f4cf215303c976869d0c2c1c4  # v3.0.0
+      - name: "Build all targets"
+        run: |
+          env
+          echo timeout
+          echo ${{ vars.TIMEOUT_SHORT }}
+          echo timeout
+          echo ${{ vars }}
+          export BUILDKIT_CACHE_FROM=type=gha,scope=build-integration
+          export BUILDKIT_CACHE_TO=type=gha,mode=max,scope=build-integration
+          export BUILDKIT_PLATFORM=linux/amd64,linux/arm64
+          make build-image-target
+
+          export UBUNTU_VERSION=22.04
+          export CONTAINERD_VERSION=v1.6.36
+          export BUILDKIT_PLATFORM=linux/amd64
+          make build-image-target
+
+  test-integration:
+    needs: build-dependencies
+    timeout-minutes: 30
+    name: rootful | ${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
       matrix:
         include:
           - runner: ubuntu-24.04
-            containerd: v2.0.2
             arch: amd64
-    env:
-      CONTAINERD_VERSION: "${{ matrix.containerd }}"
-      ARCH: "${{ matrix.arch }}"
+          - runner: ubuntu-24.04-arm
+            arch: arm64
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
-        with:
-          fetch-depth: 1
-      - name: "Expose GitHub Runtime variables for gha"
-        uses: crazy-max/ghaction-github-runtime@b3a9207c0e1ef41f4cf215303c976869d0c2c1c4  # v3.0.0
-      - name: "Build dependencies for the integration test environment image"
-        run: |
-          docker buildx create --name with-gha --use
-          docker buildx build \
-            --output=type=docker \
-            --cache-to type=gha,mode=max,scope=${ARCH}-${CONTAINERD_VERSION} \
-            --cache-from type=gha,scope=${ARCH}-${CONTAINERD_VERSION} \
-            --target build-dependencies --build-arg CONTAINERD_VERSION=${CONTAINERD_VERSION} .
-
-  test-unit:
-    # FIXME:
-    # Supposed to work: https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/evaluate-expressions-in-workflows-and-actions#example-returning-a-json-data-type
-    # Apparently does not
-    # timeout-minutes: ${{ fromJSON(env.SHORT_TIMEOUT) }}
-    timeout-minutes: 10
-    name: unit | ${{ matrix.goos }}
-    runs-on: "${{ matrix.os }}"
-    defaults:
-      run:
-        shell: bash
-    strategy:
-      matrix:
-        include:
-          - os: windows-2022
-            goos: windows
-          - os: ubuntu-24.04
-            goos: linux
-    steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
-        with:
-          fetch-depth: 1
-      - name: "Install go"
-        uses: ./.github/actions/install-go
-        with:
-          strategy: latest-stable
-      - if: ${{ matrix.goos=='windows' }}
+      - name: "Clone"
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
-        with:
-          repository: containerd/containerd
-          ref: v1.7.25
-          path: containerd
-          fetch-depth: 1
-      - if: ${{ matrix.goos=='windows' }}
-        name: "Set up CNI"
-        working-directory: containerd
-        run: GOPATH=$(go env GOPATH) script/setup/install-cni-windows
-      - name: "Run unit tests"
-        run: make test-unit
-
-  test-integration:
-    needs: build-dependencies
-    timeout-minutes: 30
-    name: rootful | ${{ matrix.containerd }} | ${{ matrix.runner }}
-    runs-on: "${{ matrix.runner }}"
-    strategy:
-      fail-fast: false
-      matrix:
-        # ubuntu-20.04: cgroup v1, ubuntu-22.04 and later: cgroup v2
-        include:
-          - ubuntu: 24.04
-            containerd: v2.0.2
-            runner: "ubuntu-24.04"
-            arch: amd64
-    env:
-      CONTAINERD_VERSION: "${{ matrix.containerd }}"
-      ARCH: "${{ matrix.arch }}"
-      UBUNTU_VERSION: "${{ matrix.ubuntu }}"
-    steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
-        with:
-          fetch-depth: 1
       - name: "Expose GitHub Runtime variables for gha"
         uses: crazy-max/ghaction-github-runtime@b3a9207c0e1ef41f4cf215303c976869d0c2c1c4  # v3.0.0
       - name: "Prepare integration test environment"
         run: |
-          docker buildx create --name with-gha --use
-          docker buildx build \
-            --output=type=docker \
-            --cache-from type=gha,scope=${ARCH}-${CONTAINERD_VERSION} \
-            -t test-integration --target test-integration --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} --build-arg CONTAINERD_VERSION=${CONTAINERD_VERSION} .
+          export BUILDKIT_CACHE_FROM=type=gha,scope=build-integration
+          export BUILDKIT_CACHE_TO=
+          export BUILDKIT_TARGET=test-integration
+          make build-image-target
       - name: "Remove snap loopback devices (conflicts with our loopback devices in TestRunDevice)"
         run: |
           sudo systemctl disable --now snapd.service snapd.socket
           sudo apt-get purge -y snapd
           sudo losetup -Dv
           sudo losetup -lv
-      - name: "Register QEMU (tonistiigi/binfmt)"
+      - name: "Register QEMU"
         run: |
-          # `--install all` will only install emulation for architectures that cannot be natively executed
-          # Since some arm64 platforms do provide native fallback execution for 32 bits,
-          # armv7 emulation may or may not be installed, causing variance in the result of `uname -m`.
-          # To avoid that, we explicitly list the architectures we do want emulation for.
           docker run --privileged --rm tonistiigi/binfmt --install linux/amd64
           docker run --privileged --rm tonistiigi/binfmt --install linux/arm64
-          docker run --privileged --rm tonistiigi/binfmt --install linux/arm/v7
       - name: "Run integration tests"
         run: docker run -t --rm --privileged test-integration ./hack/test-integration.sh -test.only-flaky=false
       - name: "Run integration tests (flaky)"
@@ -153,8 +97,6 @@ jobs:
       UBUNTU_VERSION: "${{ matrix.ubuntu }}"
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
-        with:
-          fetch-depth: 1
       - name: Enable ipv4 and ipv6 forwarding
         run: |
           sudo sysctl -w net.ipv6.conf.all.forwarding=1
@@ -171,7 +113,7 @@ jobs:
           docker buildx create --name with-gha --use
           docker buildx build \
             --output=type=docker \
-            --cache-from type=gha,scope=${ARCH}-${CONTAINERD_VERSION} \
+            --cache-from type=gha,scope=test-integration-cache \
             -t test-integration --target test-integration --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} --build-arg CONTAINERD_VERSION=${CONTAINERD_VERSION} .
       - name: "Remove snap loopback devices (conflicts with our loopback devices in TestRunDevice)"
         run: |
@@ -179,15 +121,10 @@ jobs:
           sudo apt-get purge -y snapd
           sudo losetup -Dv
           sudo losetup -lv
-      - name: "Register QEMU (tonistiigi/binfmt)"
+      - name: "Register QEMU"
         run: |
-          # `--install all` will only install emulation for architectures that cannot be natively executed
-          # Since some arm64 platforms do provide native fallback execution for 32 bits,
-          # armv7 emulation may or may not be installed, causing variance in the result of `uname -m`.
-          # To avoid that, we explicitly list the architectures we do want emulation for.
           docker run --privileged --rm tonistiigi/binfmt --install linux/amd64
           docker run --privileged --rm tonistiigi/binfmt --install linux/arm64
-          docker run --privileged --rm tonistiigi/binfmt --install linux/arm/v7
       - name: "Run integration tests"
         # The nested IPv6 network inside docker and qemu is complex and needs a bunch of sysctl config.
         # Therefore, it's hard to debug why the IPv6 tests fail in such an isolation layer.
@@ -239,17 +176,10 @@ jobs:
           EOT
           sudo systemctl restart apparmor.service
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
-        with:
-          fetch-depth: 1
-      - name: "Register QEMU (tonistiigi/binfmt)"
+      - name: "Register QEMU"
         run: |
-          # `--install all` will only install emulation for architectures that cannot be natively executed
-          # Since some arm64 platforms do provide native fallback execution for 32 bits,
-          # armv7 emulation may or may not be installed, causing variance in the result of `uname -m`.
-          # To avoid that, we explicitly list the architectures we do want emulation for.
           docker run --privileged --rm tonistiigi/binfmt --install linux/amd64
           docker run --privileged --rm tonistiigi/binfmt --install linux/arm64
-          docker run --privileged --rm tonistiigi/binfmt --install linux/arm/v7
       - name: "Expose GitHub Runtime variables for gha"
         uses: crazy-max/ghaction-github-runtime@b3a9207c0e1ef41f4cf215303c976869d0c2c1c4  # v3.0.0
       - name: "Prepare (network driver=slirp4netns, port driver=builtin)"
@@ -257,8 +187,8 @@ jobs:
           docker buildx create --name with-gha --use
           docker buildx build \
             --output=type=docker \
-            --cache-from type=gha,scope=${ARCH}-${CONTAINERD_VERSION} \
-            -t ${TEST_TARGET} --target ${TEST_TARGET} --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} --build-arg CONTAINERD_VERSION=${CONTAINERD_VERSION} --build-arg ROOTLESSKIT_VERSION=${ROOTLESSKIT_VERSION} .
+            --cache-from type=gha,scope=test-integration-cache \
+            -t test-integration --target ${TEST_TARGET} --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} --build-arg CONTAINERD_VERSION=${CONTAINERD_VERSION} --build-arg ROOTLESSKIT_VERSION=${ROOTLESSKIT_VERSION} .
       - name: "Disable BuildKit for RootlessKit v1 (workaround for issue #622)"
         run: |
           # https://github.com/containerd/nerdctl/issues/622
@@ -268,27 +198,9 @@ jobs:
           fi
           echo "WORKAROUND_ISSUE_622=${WORKAROUND_ISSUE_622}" >> "$GITHUB_ENV"
       - name: "Test (network driver=slirp4netns, port driver=builtin)"
-        run: docker run -t --rm --privileged -e WORKAROUND_ISSUE_622=${WORKAROUND_ISSUE_622} ${TEST_TARGET} /test-integration-rootless.sh ./hack/test-integration.sh -test.only-flaky=false
+        run: docker run -t --rm --privileged -e WORKAROUND_ISSUE_622=${WORKAROUND_ISSUE_622} test-integration /test-integration-rootless.sh ./hack/test-integration.sh -test.only-flaky=false
       - name: "Test (network driver=slirp4netns, port driver=builtin) (flaky)"
-        run: docker run -t --rm --privileged -e WORKAROUND_ISSUE_622=${WORKAROUND_ISSUE_622} ${TEST_TARGET} /test-integration-rootless.sh ./hack/test-integration.sh -test.only-flaky=true
-
-  build:
-    timeout-minutes: 5
-    name: "build | ${{ matrix.go-version }}"
-    runs-on: ubuntu-24.04
-    strategy:
-      matrix:
-        go-version: ["old-stable", "latest-stable"]
-    steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
-        with:
-          fetch-depth: 1
-      - name: "Install go"
-        uses: ./.github/actions/install-go
-        with:
-          strategy: ${{ matrix.go-version }}
-      - name: "build"
-        run: make binaries
+        run: docker run -t --rm --privileged -e WORKAROUND_ISSUE_622=${WORKAROUND_ISSUE_622} test-integration /test-integration-rootless.sh ./hack/test-integration.sh -test.only-flaky=true
 
   test-integration-windows:
     timeout-minutes: 30
@@ -298,26 +210,28 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
-        with:
-          fetch-depth: 1
+      - name: "Clone"
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
       - name: "Install go"
         uses: ./.github/actions/install-go
-      - run: go install ./cmd/lepton
-      - run: go install -v gotest.tools/gotestsum@v1
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
-        with:
-          repository: containerd/containerd
-          ref: v1.7.25
-          path: containerd
-          fetch-depth: 1
+      - name: "Install dev-tools"
+        uses: ./.github/actions/install-dev-tools
+      # TODO: cache these
       - name: "Set up CNI"
-        working-directory: containerd
-        run: GOPATH=$(go env GOPATH) script/setup/install-cni-windows
+        run: GOPATH=$(go env GOPATH) ./hack/provisioning/windows/cni.sh
       - name: "Set up containerd"
         env:
-          ctrdVersion: 1.7.25
-        run: powershell hack/configure-windows-ci.ps1
+          ctrdVersion: 2.0.3
+        run: powershell ./hack/provisioning/windows/containerd.ps1
+
+      - name: "Build and install cli"
+        run: |
+          go install ./cmd/lepton
+          which lepton
+          which lepton.exe
+          ls -lA ~/go/bin
+          make build
+          ls -lA _output
       - name: "Run integration tests"
         run: ./hack/test-integration.sh -test.only-flaky=false
       - name: "Run integration tests (flaky)"

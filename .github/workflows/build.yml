@@ -1,4 +1,4 @@
-name: lint
+name: build
 
 on:
   push:
@@ -6,10 +6,12 @@ on:
       - main
       - 'release/**'
   pull_request:
+    paths-ignore:
+      - '**.md'
 
 jobs:
-  lint:
-    name: go ${{ matrix.go}}
+  build:
+    name: go ${{ matrix.go }}
     runs-on: ${{ vars.RUNNER_LINUX_STABLE }}
     timeout-minutes: ${{ vars.TIMEOUT_SHORT }}
     defaults:
@@ -19,20 +21,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - go: ${{ vars.GO_CANARY }}
-          - go: ${{ vars.GO_STABLE }}
+        go: [stable, canary]
 
     steps:
       - name: "Checkout project"
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
-        with:
-          fetch-depth: 100
       - name: "Setup node"
         uses: ./.github/actions/node
         with:
           go: ${{ matrix.go }}
-      - name: "Run linters"
+      - name: "Build"
         run: |
-          export LINT_COMMIT_RANGE="$(jq -r '.after + "..HEAD"' ${GITHUB_EVENT_PATH})"
-          make lint
+          GOOS=linux GOARCH=amd64 make build
+          GOOS=linux GOARCH=arm64 make build
+          GOOS=windows GOARCH=amd64 make build
+          GOOS=windows GOARCH=arm64 make build
