@@ -1,0 +1,45 @@
+name: unit
+
+on:
+  push:
+    branches:
+      - main
+      - 'release/**'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+
+jobs:
+  unit:
+    name: go ${{ matrix.go }} | ${{ matrix.runner }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: ${{ vars.TIMEOUT_SHORT }}
+    defaults:
+      run:
+        shell: bash
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ${{ vars.RUNNER_WINDOWS_CANARY }}
+            go: ${{ vars.GO_CANARY }}
+          - runner: ${{ vars.RUNNER_LINUX_CANARY }}
+            go: ${{ vars.GO_CANARY }}
+          - runner: ${{ vars.RUNNER_WINDOWS_STABLE }}
+            go: ${{ vars.GO_STABLE }}
+          - runner: ${{ vars.RUNNER_LINUX_STABLE }}
+            go: ${{ vars.GO_STABLE }}
+
+    steps:
+      - name: "Checkout project"
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - name: "Setup node"
+        uses: ./.github/actions/node
+        with:
+          go: ${{ matrix.go }}
+      - if: ${{ contains(env.RUNNER_OS, 'windows') }}
+        name: "Setup CNI"
+        run: GOPATH=$(go env GOPATH) ./hack/provisioning/windows/cni.sh
+      - name: "Run unit tests"
+        run: make test-unit
