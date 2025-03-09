@@ -317,7 +317,7 @@ networks:
   default:
     ipam:
       config:
-        - subnet: 10.1.100.0/24
+        - subnet: 10.43.100.0/24
 `, testutil.AlpineImage)
 
 	comp := testutil.NewComposeDir(t, dockerComposeYAML)
@@ -328,7 +328,8 @@ networks:
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "up", "-d").AssertOK()
 	defer base.ComposeCmd("-f", comp.YAMLFullPath(), "down", "-v").Run()
 
-	base.Cmd("inspect", "-f", `{{json .NetworkSettings.Networks }}`, serviceparser.DefaultContainerName(projectName, "foo", "1")).AssertOutContains("10.1.100.")
+	base.Cmd("inspect", "-f", `{{json .NetworkSettings.Networks }}`,
+		serviceparser.DefaultContainerName(projectName, "foo", "1")).AssertOutContains("10.43.100.")
 }
 
 func TestComposeUpRemoveOrphans(t *testing.T) {

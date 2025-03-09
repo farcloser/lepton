@@ -1,0 +1,65 @@
+name: Shared environment
+
+on:
+  workflow_call:
+    outputs:
+      GO_OLD:
+        description: "oldest tested golang version"
+        value: "1.23"
+      GO_STABLE:
+        description: "main supported golang version"
+        value: "1.24"
+      GO_CANARY:
+        description: "canary golang version"
+        value: canary
+      RUNNER_WINDOWS_OLD:
+        description: "windows old runner"
+        value: windows-2019
+      RUNNER_WINDOWS_STABLE:
+        description: "windows stable runner"
+        value: windows-2022
+      RUNNER_WINDOWS_CANARY:
+        description: "windows canary runner"
+        value: windows-2025
+      RUNNER_LINUX_OLD:
+        description: "linux old runner"
+        value: ubuntu-22.04
+      RUNNER_LINUX_STABLE:
+        description: "linux stable runner"
+        value: ubuntu-24.04
+      RUNNER_LINUX_AMD64_STABLE:
+        description: "linux amd64 stable runner"
+        value: ubuntu-24.04
+      RUNNER_LINUX_ARM64_STABLE:
+        description: "linux arm64 stable runner"
+        value: ubuntu-24.04-arm
+      RUNNER_LINUX_CANARY:
+        description: "linux canary runner"
+        value: ubuntu-24.04
+      RUNNER_MACOS_OLD:
+        description: "macos old runner"
+        value: macos-13
+      RUNNER_MACOS_STABLE:
+        description: "macos stable runner"
+        value: macos-14
+      RUNNER_MACOS_CANARY:
+        description: "macos canary runner"
+        value: macos-15
+      TIMEOUT_SHORT:
+        description: "short timeout"
+        value: "10"
+      TIMEOUT_LONG:
+        description: "long timeout"
+        value: "40"
+      GITHUB_TOKEN:
+        description: "Github token"
+        value: ""
+
+jobs:
+  blank:
+    name: "Setting-up environment"
+    runs-on: ubuntu-24.04
+    steps:
+      - run: |
+          echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> "$GITHUB_ENV"
+          echo "Environment setup complete"

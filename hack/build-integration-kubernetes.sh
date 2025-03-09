@@ -21,7 +21,7 @@ readonly root
 # shellcheck source=/dev/null
 . "$root/scripts/lib.sh"
 
-GO_VERSION=1.23
+GO_VERSION=1.24
 KIND_VERSION=v0.24.0
 CNI_PLUGINS_VERSION=v1.5.1
 
@@ -32,15 +32,6 @@ _rootful=
 configure::rootful(){
   log::debug "Configuring rootful to: ${1:+true}"
   _rootful="${1:+true}"
-}
-
-install::kind(){
-  local version="$1"
-  local temp
-  temp="$(fs::mktemp "install")"
-
-  http::get "$temp"/kind "https://kind.sigs.k8s.io/dl/$version/kind-linux-${GOARCH:-amd64}"
-  host::install "$temp"/kind
 }
 
 # shellcheck disable=SC2120
@@ -91,13 +82,13 @@ main(){
   configure::rootful "${ROOTFUL:-}"
 
   log::info "Installing host dependencies if necessary"
-  host::require kind 2>/dev/null || install::kind "$KIND_VERSION"
+  host::require kind 2>/dev/null
   host::require kubectl 2>/dev/null || install::kubectl
 
   # Build cli to use for kind
   make build
-  PATH="$(pwd)"/_output:"$PATH"
   ln -s "$(pwd)"/_output/lepton "$(pwd)"/_output/nerdctl
+  PATH=$(pwd)/_output:"$PATH"
   export PATH
 
   # Add CNI plugins
@@ -105,6 +96,7 @@ main(){
 
   # Hack to get go into kind control plane
   exec::cli rm -f go-kind 2>/dev/null || true
+  # FIXME: 429. Get rid of this and use straight golang install instead
   exec::cli run -d --quiet --name go-kind golang:"$GO_VERSION" sleep Inf
   exec::cli cp go-kind:/usr/local/go /tmp/go
   exec::cli rm -f go-kind

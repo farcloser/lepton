@@ -1,0 +1,80 @@
+name: "Install: buildkitd"
+
+description: "A simple action installing buildkitd"
+
+inputs:
+  version:
+    default: "stable"
+    description: "buildkitd version"
+  namespace:
+    default: "default"
+    description: "containerd namespace"
+
+runs:
+  using: composite
+  steps:
+    - name: "Environment"
+      shell: bash
+      run: |
+        # Get matching buildkit
+        args=(curl --proto '=https' --tlsv1.2 -fsSL -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28")
+        [ "${GITHUB_TOKEN:-}" == "" ] && {
+          echo "GITHUB_TOKEN is not set - you might face rate limitations with the Github API"
+        } || args+=(-H "Authorization: Bearer $GITHUB_TOKEN")
+        if [ "${{ inputs.version }}" == stable ]; then
+          version="$("${args[@]}" https://api.github.com/repos/moby/buildkit/tags | jq -rc .[0].name)"
+        else
+          version="$("${args[@]}" https://api.github.com/repos/moby/buildkit/tags | jq -rc 'map(select(.name | startswith("${{ inputs.version }}")).[0].name')"
+        fi
+
+        # Get the arch
+        arch=$(echo "$RUNNER_ARCH" | sed -E "s/(X86|X64)/amd64/" | sed -E "s/(ARM|ARM64)/arm64/")
+
+        # Get the os
+        os=$(echo "$RUNNER_OS" | tr '[:upper:]' '[:lower:]' | sed -E "s/macos/darwin/")
+
+        filename="$version/buildkit-$version.$os-$arch.tar.gz"
+
+        # Save the filename to be used as cache key.
+        echo "ACTION_INSTALL_BUILDKITD_FILENAME=$filename" >> "$GITHUB_ENV"
+
+        # Ensure destination is here
+        mkdir -p ~/opt/buildkit
+
+        echo "BUILDKIT_HOST=unix://$HOME/buildkitd-${{ inputs.namespace }}.sock" >>  "$GITHUB_ENV"
+
+    - name: Enable cache
+      uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf  # v4.2.2
+      id: cache
+      with:
+        path: ~/opt/buildkit
+        key: action-install-buildkitd-${{ env.ACTION_INSTALL_BUILDKITD_FILENAME }}
+
+    - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+      name: "Install buildkit"
+      shell: bash
+      continue-on-error: false
+      run: |
+        cd ~/opt/buildkit
+        curl -fsSL --proto '=https' --tlsv1.2 https://github.com/moby/buildkit/releases/download/"$ACTION_INSTALL_BUILDKITD_FILENAME" | tar xz
+
+    - name: "Configure GHA"
+      uses: crazy-max/ghaction-github-runtime@b3a9207c0e1ef41f4cf215303c976869d0c2c1c4  # v3.0.0
+
+    - name: "Start buildkitd"
+      shell: bash
+      run: |
+        sudo ln -s "$HOME"/opt/buildkit/bin/* /usr/local/bin/
+        sudo -E buildkitd \
+          --oci-worker=false \
+          --containerd-worker=true \
+          --addr="$BUILDKIT_HOST" \
+          --root="$HOME/buildkit-root-${{ inputs.namespace }}" \
+          --containerd-worker-namespace="${{ inputs.namespace }}" \
+          --containerd-worker-snapshotter=overlayfs \
+          --containerd-worker-net=host &
+
+        while ! sudo -E buildctl debug workers; do
+          echo "Waiting for buildkitd..."
+          sleep 1
+        done
