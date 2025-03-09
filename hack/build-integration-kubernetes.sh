@@ -95,7 +95,7 @@ main(){
   host::require kubectl 2>/dev/null || install::kubectl
 
   # Build cli to use for kind
-  make binaries
+  make build
   PATH="$(pwd)"/_output:"$PATH"
   ln -s "$(pwd)"/_output/lepton "$(pwd)"/_output/nerdctl
   export PATH

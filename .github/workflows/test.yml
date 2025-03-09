@@ -288,7 +288,7 @@ jobs:
         with:
           strategy: ${{ matrix.go-version }}
       - name: "build"
-        run: make binaries
+        run: make build
 
   test-integration-windows:
     timeout-minutes: 30
