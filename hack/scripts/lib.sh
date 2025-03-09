@@ -40,6 +40,8 @@ readonly LOG_STYLE_INFO=( setaf "$LOG_COLOR_GREEN" )
 readonly LOG_STYLE_WARNING=( setaf "$LOG_COLOR_YELLOW" )
 readonly LOG_STYLE_ERROR=( setaf "$LOG_COLOR_RED" )
 
+_log_level=2
+
 _log::log(){
   local level
   local style
@@ -50,7 +52,7 @@ _log::log(){
   numeric_level="$(printf "LOG_LEVEL_%s" "$level")"
   style="LOG_STYLE_${level}[@]"
 
-  [ "${!numeric_level}" -ge "$LOG_LEVEL" ] || return 0
+  [ "${!numeric_level}" -ge "$_log_level" ] || return 0
 
   [ ! "$TERM" ] || [ ! -t 2 ] || >&2 tput "${!style}" 2>/dev/null || true
   >&2 printf "[%s] %s: %s\n" "$(date 2>/dev/null || true)" "$(printf "%s" "$level" | tr '[:lower:]' '[:upper:]')" "$message"
@@ -62,7 +64,7 @@ log::init(){
   # Default log to warning if unspecified
   _ll="$(printf "LOG_LEVEL_%s" "${LOG_LEVEL:-warning}" | tr '[:lower:]' '[:upper:]')"
   # Default to 3 (warning) if unrecognized
-  LOG_LEVEL="${!_ll:-3}"
+  _log_level="${!_ll:-3}"
 }
 
 log::debug(){
