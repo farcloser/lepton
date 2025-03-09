@@ -44,7 +44,7 @@ func TestSystemPrune(t *testing.T) {
 				helpers.Ensure("network", "create", data.Identifier())
 				helpers.Ensure("volume", "create", data.Identifier())
 				anonIdentifier := helpers.Capture("volume", "create")
-				helpers.Ensure("run", "-v", data.Identifier()+":/volume",
+				helpers.Ensure("run", "--quiet", "-v", data.Identifier()+":/volume",
 					"--net", data.Identifier(), "--name", data.Identifier(), testutil.CommonImage)
 
 				data.Set("anonIdentifier", anonIdentifier)

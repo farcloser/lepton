@@ -67,7 +67,7 @@ func TestRunCustomRootfs(t *testing.T) {
 }
 
 func prepareCustomRootfs(base *testutil.Base, imageName string) string {
-	base.Cmd("pull", imageName).AssertOK()
+	base.Cmd("pull", "--quiet", imageName).AssertOK()
 	tmpDir, err := os.MkdirTemp(base.T.TempDir(), "test-save")
 	assert.NilError(base.T, err)
 	defer os.RemoveAll(tmpDir)

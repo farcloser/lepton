@@ -201,7 +201,7 @@ func TestIssue2993(t *testing.T) {
 			Setup: func(data test.Data, helpers test.Helpers) {
 				dataRoot := data.TempDir()
 
-				helpers.Ensure("run", "--data-root", dataRoot, "--name", data.Identifier(), "-d", testutil.AlpineImage, "sleep", nerdtest.Infinity)
+				helpers.Ensure("run", "--quiet", "--data-root", dataRoot, "--name", data.Identifier(), "-d", testutil.AlpineImage, "sleep", nerdtest.Infinity)
 
 				h := getAddrHash(defaults.DefaultAddress)
 				dataStore := filepath.Join(dataRoot, h)
@@ -248,7 +248,7 @@ func TestIssue2993(t *testing.T) {
 			Setup: func(data test.Data, helpers test.Helpers) {
 				dataRoot := data.TempDir()
 
-				helpers.Ensure("run", "--data-root", dataRoot, "--name", data.Identifier(), "-d", testutil.AlpineImage, "sleep", nerdtest.Infinity)
+				helpers.Ensure("run", "--quiet", "--data-root", dataRoot, "--name", data.Identifier(), "-d", testutil.AlpineImage, "sleep", nerdtest.Infinity)
 
 				h := getAddrHash(defaults.DefaultAddress)
 				dataStore := filepath.Join(dataRoot, h)

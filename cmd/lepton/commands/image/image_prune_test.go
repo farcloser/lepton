@@ -121,7 +121,7 @@ func TestImagePrune(t *testing.T) {
 				imgList := helpers.Capture("images")
 				assert.Assert(t, strings.Contains(imgList, "<none>"), "Missing <none>")
 				assert.Assert(t, strings.Contains(imgList, identifier), "Missing "+identifier)
-				helpers.Ensure("run", "--name", identifier, identifier)
+				helpers.Ensure("run", "--quiet", "--name", identifier, identifier)
 			},
 			Command: test.Command("image", "prune", "--force", "--all"),
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {

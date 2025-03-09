@@ -34,9 +34,9 @@ func TestWait(t *testing.T) {
 	}
 
 	testCase.Setup = func(data test.Data, helpers test.Helpers) {
-		helpers.Ensure("run", "-d", "--name", data.Identifier("1"), testutil.CommonImage)
-		helpers.Ensure("run", "-d", "--name", data.Identifier("2"), testutil.CommonImage, "sleep", "1")
-		helpers.Ensure("run", "-d", "--name", data.Identifier("3"), testutil.CommonImage, "sh", "-euxc", "sleep 5; exit 123")
+		helpers.Ensure("run", "--quiet", "-d", "--name", data.Identifier("1"), testutil.CommonImage)
+		helpers.Ensure("run", "--quiet", "-d", "--name", data.Identifier("2"), testutil.CommonImage, "sleep", "1")
+		helpers.Ensure("run", "--quiet", "-d", "--name", data.Identifier("3"), testutil.CommonImage, "sh", "-euxc", "sleep 5; exit 123")
 	}
 
 	testCase.Command = func(data test.Data, helpers test.Helpers) test.TestableCommand {

@@ -53,7 +53,7 @@ func TestRemove(t *testing.T) {
 				require.Not(nerdtest.Docker),
 			),
 			Setup: func(data test.Data, helpers test.Helpers) {
-				helpers.Ensure("run", "--pull", "always", "--name", data.Identifier(), testutil.CommonImage)
+				helpers.Ensure("run", "--quiet", "--pull", "always", "--name", data.Identifier(), testutil.CommonImage)
 			},
 			Cleanup: func(data test.Data, helpers test.Helpers) {
 				helpers.Anyhow("rm", "-f", data.Identifier())
@@ -75,7 +75,7 @@ func TestRemove(t *testing.T) {
 			Description: "Remove image with stopped container - with -f",
 			NoParallel:  true,
 			Setup: func(data test.Data, helpers test.Helpers) {
-				helpers.Ensure("run", "--pull", "always", "--name", data.Identifier(), testutil.CommonImage)
+				helpers.Ensure("run", "--quiet", "--pull", "always", "--name", data.Identifier(), testutil.CommonImage)
 			},
 			Cleanup: func(data test.Data, helpers test.Helpers) {
 				helpers.Anyhow("rm", "-f", data.Identifier())
@@ -98,7 +98,7 @@ func TestRemove(t *testing.T) {
 				require.Not(nerdtest.Docker),
 			),
 			Setup: func(data test.Data, helpers test.Helpers) {
-				helpers.Ensure("run", "--pull", "always", "-d", "--name", data.Identifier(), testutil.CommonImage, "sleep", nerdtest.Infinity)
+				helpers.Ensure("run", "--quiet", "--pull", "always", "-d", "--name", data.Identifier(), testutil.CommonImage, "sleep", nerdtest.Infinity)
 			},
 			Cleanup: func(data test.Data, helpers test.Helpers) {
 				helpers.Anyhow("rm", "-f", data.Identifier())
@@ -123,7 +123,7 @@ func TestRemove(t *testing.T) {
 				require.Not(nerdtest.Docker),
 			),
 			Setup: func(data test.Data, helpers test.Helpers) {
-				helpers.Ensure("run", "--pull", "always", "-d", "--name", data.Identifier(), testutil.CommonImage, "sleep", nerdtest.Infinity)
+				helpers.Ensure("run", "--quiet", "--pull", "always", "-d", "--name", data.Identifier(), testutil.CommonImage, "sleep", nerdtest.Infinity)
 
 				img := nerdtest.InspectImage(helpers, testutil.CommonImage)
 				repoName, _ := imgutil.ParseRepoTag(testutil.CommonImage)
@@ -152,7 +152,7 @@ func TestRemove(t *testing.T) {
 			Description: "Remove image with created container - without -f",
 			NoParallel:  true,
 			Setup: func(data test.Data, helpers test.Helpers) {
-				helpers.Ensure("create", "--pull", "always", "--name", data.Identifier(), testutil.CommonImage, "sleep", nerdtest.Infinity)
+				helpers.Ensure("create", "--quiet", "--pull", "always", "--name", data.Identifier(), testutil.CommonImage, "sleep", nerdtest.Infinity)
 			},
 			Cleanup: func(data test.Data, helpers test.Helpers) {
 				helpers.Anyhow("rm", "-f", data.Identifier())
@@ -175,7 +175,7 @@ func TestRemove(t *testing.T) {
 			NoParallel:  true,
 			Setup: func(data test.Data, helpers test.Helpers) {
 				helpers.Ensure("pull", "--quiet", testutil.NginxAlpineImage)
-				helpers.Ensure("create", "--pull", "always", "--name", data.Identifier(), testutil.CommonImage, "sleep", nerdtest.Infinity)
+				helpers.Ensure("create", "--quiet", "--pull", "always", "--name", data.Identifier(), testutil.CommonImage, "sleep", nerdtest.Infinity)
 				helpers.Ensure("rmi", testutil.NginxAlpineImage)
 			},
 			Cleanup: func(data test.Data, helpers test.Helpers) {
@@ -204,7 +204,7 @@ func TestRemove(t *testing.T) {
 				nerdtest.CGroup,
 			),
 			Setup: func(data test.Data, helpers test.Helpers) {
-				helpers.Ensure("run", "--pull", "always", "-d", "--name", data.Identifier(), testutil.CommonImage, "sleep", nerdtest.Infinity)
+				helpers.Ensure("run", "--quiet", "--pull", "always", "-d", "--name", data.Identifier(), testutil.CommonImage, "sleep", nerdtest.Infinity)
 				helpers.Ensure("pause", data.Identifier())
 			},
 			Cleanup: func(data test.Data, helpers test.Helpers) {
@@ -231,7 +231,7 @@ func TestRemove(t *testing.T) {
 				require.Not(nerdtest.Docker),
 			),
 			Setup: func(data test.Data, helpers test.Helpers) {
-				helpers.Ensure("run", "--pull", "always", "-d", "--name", data.Identifier(), testutil.CommonImage, "sleep", nerdtest.Infinity)
+				helpers.Ensure("run", "--quiet", "--pull", "always", "-d", "--name", data.Identifier(), testutil.CommonImage, "sleep", nerdtest.Infinity)
 				helpers.Ensure("pause", data.Identifier())
 
 				img := nerdtest.InspectImage(helpers, testutil.CommonImage)
@@ -264,7 +264,7 @@ func TestRemove(t *testing.T) {
 				require.Not(nerdtest.Docker),
 			),
 			Setup: func(data test.Data, helpers test.Helpers) {
-				helpers.Ensure("run", "--pull", "always", "-d", "--name", data.Identifier(), testutil.CommonImage, "sleep", nerdtest.Infinity)
+				helpers.Ensure("run", "--quiet", "--pull", "always", "-d", "--name", data.Identifier(), testutil.CommonImage, "sleep", nerdtest.Infinity)
 				helpers.Ensure("kill", data.Identifier())
 			},
 			Cleanup: func(data test.Data, helpers test.Helpers) {
@@ -287,7 +287,7 @@ func TestRemove(t *testing.T) {
 			Description: "Remove image with killed container - with -f",
 			NoParallel:  true,
 			Setup: func(data test.Data, helpers test.Helpers) {
-				helpers.Ensure("run", "--pull", "always", "-d", "--name", data.Identifier(), testutil.CommonImage, "sleep", nerdtest.Infinity)
+				helpers.Ensure("run", "--quiet", "--pull", "always", "-d", "--name", data.Identifier(), testutil.CommonImage, "sleep", nerdtest.Infinity)
 				helpers.Ensure("kill", data.Identifier())
 			},
 			Cleanup: func(data test.Data, helpers test.Helpers) {

@@ -34,7 +34,7 @@ import (
 func TestCreate(t *testing.T) {
 	testCase := nerdtest.Setup()
 	testCase.Setup = func(data test.Data, helpers test.Helpers) {
-		helpers.Ensure("create", "--name", data.Identifier("container"), testutil.CommonImage, "echo", "foo")
+		helpers.Ensure("create", "--quiet", "--name", data.Identifier("container"), testutil.CommonImage, "echo", "foo")
 		data.Set("cID", data.Identifier("container"))
 	}
 	testCase.Cleanup = func(data test.Data, helpers test.Helpers) {
@@ -78,7 +78,7 @@ func TestCreateHyperVContainer(t *testing.T) {
 	testCase.Require = nerdtest.HyperV
 
 	testCase.Setup = func(data test.Data, helpers test.Helpers) {
-		helpers.Ensure("create", "--isolation", "hyperv", "--name", data.Identifier("container"), testutil.CommonImage, "echo", "foo")
+		helpers.Ensure("create", "--quiet", "--isolation", "hyperv", "--name", data.Identifier("container"), testutil.CommonImage, "echo", "foo")
 		data.Set("cID", data.Identifier("container"))
 	}
 
