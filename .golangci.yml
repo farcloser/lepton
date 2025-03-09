@@ -1,6 +1,18 @@
 ---
+output:
+  sort-results: true
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+
+  # FIXME
+  exclude-rules:
+    - linters:
+        - revive
+      text: "unused-parameter"
+
 run:
-  # If it is explicitly set to 0 (i.e. not the default) then golangci-lint will automatically set the value to match Linux container CPU quota.
   concurrency: 0
   timeout: 5m
   issues-exit-code: 2
@@ -8,29 +20,29 @@ run:
   modules-download-mode: readonly
   allow-parallel-runners: true
   allow-serial-runners: true
-  # FIXME @apostasie: it does not seem to read go.mod... so, for now, duplicating here
-  go: '1.23'
 
 linters:
   disable-all: false
   enable-all: true
   disable:
-    # I like namedreturns occasionally
-    - nonamedreturns
-    # Deprecated
-    - exportloopref
-    # Too annoying
-    - exhaustruct  # this is fine without, usually
-    - funlen  # somewhat ridiculous
-    - cyclop  # who cares! :D
-    - godox  # just leave it alone
-    # TODO(apostasie) Temporary out until we wrap up all of them
-    - wrapcheck
+    # Opting-out
+    - nonamedreturns  # named returns are occasionally useful
+    - exhaustruct  # does not serve much of a purpose
+    - funlen  # not interested
+    - cyclop  # not interested much
+    - godox  # having these are useful
 
-    # We us go-imports instead
-    - gci
+    # Duplicating
+    - gci  # we use go-imports instead
+
+    # Deprecated
+    - tenv
+
+    # Temporarily disabling
+    - usetesting
 
     # To be enabled
+    - wrapcheck
     - wsl
     - nlreturn
     - gochecknoglobals
@@ -63,6 +75,10 @@ linters:
     - maintidx
 
 linters-settings:
+  staticcheck:
+    checks:
+      - "all"
+
   gocritic:
     disabled-checks:
       - appendAssign
@@ -98,6 +114,12 @@ linters-settings:
           - pkg: "github.com/Microsoft/hcsshim"
           - pkg: "github.com/Microsoft/go-winio"
           # - pkg: "github.com/vishvananda"
+      no-patent:
+        files:
+          - "$all"
+        deny:
+          - pkg: "github.com/hashicorp/golang-lru/arc/v2"
+            desc: "patented (https://github.com/hashicorp/golang-lru/blob/arc/v2.0.7/arc/arc.go#L18)"
 
       pkg:
         files:
@@ -107,9 +129,3 @@ linters-settings:
             desc: "pkg must not depend on cobra or pflag"
           - pkg: "go.farcloser.world/lepton/cmd"
             desc: "pkg must not depend on cmd files"
-
-issues:
-  exclude-rules:
-    - linters:
-        - revive
-      text: "unused-parameter"
