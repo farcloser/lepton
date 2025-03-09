@@ -160,7 +160,7 @@ func strSlicesEqual(a, b []string) bool {
 }
 
 func TestBuild(t *testing.T) {
-	file, err := os.CreateTemp("", "")
+	file, err := os.CreateTemp(t.TempDir(), "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -182,7 +182,7 @@ func TestBuild(t *testing.T) {
 }
 
 func TestBuildWithZeroLengthDomainSearch(t *testing.T) {
-	file, err := os.CreateTemp("", "")
+	file, err := os.CreateTemp(t.TempDir(), "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -207,7 +207,7 @@ func TestBuildWithZeroLengthDomainSearch(t *testing.T) {
 }
 
 func TestBuildWithNoOptions(t *testing.T) {
-	file, err := os.CreateTemp("", "")
+	file, err := os.CreateTemp(t.TempDir(), "")
 	if err != nil {
 		t.Fatal(err)
 	}
