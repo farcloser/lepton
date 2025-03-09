@@ -118,7 +118,7 @@ jobs:
       - name: "Remove snap loopback devices (conflicts with our loopback devices in TestRunDevice)"
         run: |
           sudo systemctl disable --now snapd.service snapd.socket
-          sudo apt-get purge -y snapd
+          sudo apt-get purge -qq snapd
           sudo losetup -Dv
           sudo losetup -lv
       - name: "Register QEMU (tonistiigi/binfmt)"
@@ -176,7 +176,7 @@ jobs:
       - name: "Remove snap loopback devices (conflicts with our loopback devices in TestRunDevice)"
         run: |
           sudo systemctl disable --now snapd.service snapd.socket
-          sudo apt-get purge -y snapd
+          sudo apt-get purge -qq snapd
           sudo losetup -Dv
           sudo losetup -lv
       - name: "Register QEMU (tonistiigi/binfmt)"

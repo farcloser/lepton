@@ -223,7 +223,7 @@ COPY --from=build-full /out /
 
 FROM ubuntu:${UBUNTU_VERSION} AS base
 ARG BINARY_NAME
-RUN apt-get update -qq && apt-get install -qq -y --no-install-recommends \
+RUN apt-get update -qq && apt-get install -qq --no-install-recommends \
     apparmor \
     bash-completion \
     ca-certificates curl \
