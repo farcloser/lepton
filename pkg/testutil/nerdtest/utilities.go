@@ -104,6 +104,7 @@ func InspectImage(helpers test.Helpers, name string) dockercompat.Image {
 }
 
 const (
+	// Note: in some very slow setups (EL8/lima on nerdctl CI), this might not be enough and might be increased to 20
 	maxRetry = 10
 	sleep    = time.Second
 )
