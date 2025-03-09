@@ -50,7 +50,7 @@ else
 	systemctl --user restart containerd.service
 	containerd-rootless-setuptool.sh install-bypass4netnsd
 	# Once ssh-ed, we lost the Dockerfile working dir, so, get back in the checkout
-	cd /go/src/go.farcloser.world/lepton
+	cd /src
 	# We also lose the PATH (and SendEnv=PATH would require sshd config changes)
-	exec env PATH="/usr/local/go/bin:$PATH" "$@"
+	exec env PATH="/root/go/bin:/usr/local/go/bin:$PATH" "$@"
 fi

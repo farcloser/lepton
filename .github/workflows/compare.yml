@@ -1,0 +1,93 @@
+name: compare
+
+on:
+  push:
+    branches:
+      - main
+      - 'release/**'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+
+jobs:
+  env:
+    uses: ./.github/workflows/environment.yml
+
+#  docker:
+#    needs: env
+#    timeout-minutes: ${{ fromJSON(needs.env.outputs.TIMEOUT_LONG) }}
+#    name: docker
+#    runs-on: ubuntu-24.04
+#    defaults:
+#      run:
+#        shell: bash
+#    steps:
+#      - name: "Clone"
+#        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+#      - name: "Build"
+#        run: |
+#          time docker buildx build --target test-integration --output type=image .
+#          docker images
+
+  nerdctl:
+    needs: env
+    timeout-minutes: ${{ fromJSON(needs.env.outputs.TIMEOUT_LONG) }}
+    name: nerdy
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: "Clone"
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - name: "Configure buildkit GHA"
+        uses: crazy-max/ghaction-github-runtime@b3a9207c0e1ef41f4cf215303c976869d0c2c1c4  # v3.0.0
+      - name: "Build"
+        run: |
+          #        # Build the cli and install it
+          #        # If this does not work, we are not going to be able to run tests anyhow
+          #        make build
+          #        sudo make install
+
+          cd
+          curl -OfsSL https://github.com/moby/buildkit/releases/download/v0.20.1/buildkit-v0.20.1.linux-amd64.tar.gz
+          # TODO: build lepton
+          curl -OfsSL https://github.com/containerd/nerdctl/releases/download/v2.0.3/nerdctl-full-2.0.3-linux-amd64.tar.gz
+          tar -xf nerdctl-full-2.0.3-linux-amd64.tar.gz
+          export PATH=$HOME/bin:$PATH
+
+          export BUILDKIT_HOST=unix://$HOME/buildkitd.sock 
+ 
+          sudo ./bin/buildkitd --oci-worker=false --containerd-worker=true \
+            --addr="$BUILDKIT_HOST" \
+            --root=$HOME/buildkit-root \
+            --containerd-worker-namespace=default \
+            --containerd-worker-snapshotter=overlayfs \
+            --containerd-worker-net=host &
+
+          sleep 10
+          cd -
+
+          export BUILDKIT_CACHE_FROM=type=gha,scope=build-integration
+          export BUILDKIT_CACHE_TO=type=gha,scope=build-integration,compression=zstd,mode=max
+          time sudo -E $HOME/bin/buildctl build \
+            --opt platform="linux/amd64" \
+            --frontend=dockerfile.v0 \
+            --import-cache="$BUILDKIT_CACHE_FROM" \
+            --export-cache="$BUILDKIT_CACHE_TO" \
+            --output=type=image,name=test-integration \
+            --opt target="test-integration" \
+            --local dockerfile=$(pwd) \
+            --local context=$(pwd)
+
+          sudo killall buildkitd || echo FaIl
+          sudo systemctl disable --now snapd.service snapd.socket
+          sudo apt-get purge -y snapd
+          sudo losetup -Dv
+          sudo losetup -lv
+          sudo $HOME/bin/nerdctl run --privileged --rm tonistiigi/binfmt --install linux/amd64 || echo FAIL
+          sudo $HOME/bin/nerdctl run --privileged --rm tonistiigi/binfmt --install linux/arm64 || echo FAIL2
+
+          sudo apt-get install -qq expect
+          #          sudo unbuffer $HOME/bin/nerdctl run -t --rm --privileged test-integration ./hack/test-integration.sh -test.only-flaky=false || echo FAIL3
+          sudo unbuffer ctr run -t --net-host --rm --env LEPTON_BRIDGE_IP=10.42.100.1/24 --privileged test-integration blah /docker-entrypoint.sh ./hack/test-integration.sh -test.only-flaky=false
