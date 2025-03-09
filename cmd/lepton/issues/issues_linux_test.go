@@ -53,7 +53,7 @@ func TestIssue3425(t *testing.T) {
 				Setup: func(data test.Data, helpers test.Helpers) {
 					identifier := data.Identifier()
 					helpers.Ensure("image", "pull", testutil.CommonImage)
-					helpers.Ensure("run", "-d", "--name", identifier, testutil.CommonImage)
+					helpers.Ensure("run", "--quiet", "-d", "--name", identifier, testutil.CommonImage)
 					helpers.Ensure("image", "rm", "-f", testutil.CommonImage)
 					helpers.Ensure("image", "pull", testutil.CommonImage)
 					helpers.Ensure("tag", testutil.CommonImage, fmt.Sprintf("localhost:%d/%s", reg.Port, identifier))
@@ -74,7 +74,7 @@ func TestIssue3425(t *testing.T) {
 				Setup: func(data test.Data, helpers test.Helpers) {
 					identifier := data.Identifier()
 					helpers.Ensure("image", "pull", testutil.CommonImage)
-					helpers.Ensure("run", "-d", "--name", identifier, testutil.CommonImage, "touch", "/something")
+					helpers.Ensure("run", "--quiet", "-d", "--name", identifier, testutil.CommonImage, "touch", "/something")
 					helpers.Ensure("image", "rm", "-f", testutil.CommonImage)
 					helpers.Ensure("image", "pull", testutil.CommonImage)
 					helpers.Ensure("commit", identifier, fmt.Sprintf("localhost:%d/%s", reg.Port, identifier))
@@ -93,7 +93,7 @@ func TestIssue3425(t *testing.T) {
 				Require:     nerdtest.Private,
 				Setup: func(data test.Data, helpers test.Helpers) {
 					helpers.Ensure("image", "pull", testutil.CommonImage)
-					helpers.Ensure("run", "-d", "--name", data.Identifier(), testutil.CommonImage)
+					helpers.Ensure("run", "--quiet", "-d", "--name", data.Identifier(), testutil.CommonImage)
 					helpers.Ensure("image", "rm", "-f", testutil.CommonImage)
 					helpers.Ensure("image", "pull", testutil.CommonImage)
 				},
@@ -114,7 +114,7 @@ func TestIssue3425(t *testing.T) {
 				),
 				Setup: func(data test.Data, helpers test.Helpers) {
 					helpers.Ensure("image", "pull", testutil.CommonImage)
-					helpers.Ensure("run", "-d", "--name", data.Identifier(), testutil.CommonImage)
+					helpers.Ensure("run", "--quiet", "-d", "--name", data.Identifier(), testutil.CommonImage)
 					helpers.Ensure("image", "rm", "-f", testutil.CommonImage)
 					helpers.Ensure("image", "pull", testutil.CommonImage)
 				},

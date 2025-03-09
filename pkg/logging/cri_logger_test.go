@@ -36,7 +36,7 @@ import (
 )
 
 func TestReadLogs(t *testing.T) {
-	file, err := os.CreateTemp("", "TestFollowLogs")
+	file, err := os.CreateTemp(t.TempDir(), "TestFollowLogs")
 	if err != nil {
 		t.Fatalf("unable to create temp file")
 	}
@@ -174,7 +174,7 @@ func TestReadLogsLimitsWithTimestamps(t *testing.T) {
 	logLineFmt := "2022-10-29T16:10:22.592603036-05:00 stdout P %v\n"
 	logLineNewLine := "2022-10-29T16:10:22.592603036-05:00 stdout F \n"
 
-	tmpfile, err := os.CreateTemp("", "log.*.txt")
+	tmpfile, err := os.CreateTemp(t.TempDir(), "log.*.txt")
 	if err != nil {
 		t.Fatalf("unable to create temp file")
 	}

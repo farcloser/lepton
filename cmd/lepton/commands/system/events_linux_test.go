@@ -32,7 +32,7 @@ import (
 func testEventFilterExecutor(data test.Data, helpers test.Helpers) test.TestableCommand {
 	cmd := helpers.Command("events", "--filter", data.Get("filter"), "--format", formatter.FormatJSON)
 	cmd.Background(1 * time.Second)
-	helpers.Ensure("run", "--rm", testutil.CommonImage)
+	helpers.Ensure("run", "--quiet", "--rm", testutil.CommonImage)
 	return cmd
 }
 

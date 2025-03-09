@@ -59,7 +59,7 @@ func TestVolumeRemove(t *testing.T) {
 
 			Setup: func(data test.Data, helpers test.Helpers) {
 				helpers.Ensure("volume", "create", data.Identifier())
-				helpers.Ensure("run", "-v", data.Identifier()+":/volume",
+				helpers.Ensure("run", "--quiet", "-v", data.Identifier()+":/volume",
 					"--name", data.Identifier(), testutil.CommonImage)
 			},
 
@@ -78,7 +78,7 @@ func TestVolumeRemove(t *testing.T) {
 			Description: "busy anonymous volume should fail",
 
 			Setup: func(data test.Data, helpers test.Helpers) {
-				helpers.Ensure("run", "-v", "/volume", "--name", data.Identifier(), testutil.CommonImage)
+				helpers.Ensure("run", "--quiet", "-v", "/volume", "--name", data.Identifier(), testutil.CommonImage)
 				// Inspect the container and find the anonymous volume id
 				inspect := nerdtest.InspectContainer(helpers, data.Identifier())
 				var anonName string
@@ -109,7 +109,7 @@ func TestVolumeRemove(t *testing.T) {
 
 			Setup: func(data test.Data, helpers test.Helpers) {
 				helpers.Ensure("volume", "create", data.Identifier())
-				helpers.Ensure("run", "-v", data.Identifier()+":/volume", "--name", data.Identifier(), testutil.CommonImage)
+				helpers.Ensure("run", "--quiet", "-v", data.Identifier()+":/volume", "--name", data.Identifier(), testutil.CommonImage)
 				helpers.Ensure("rm", "-f", data.Identifier())
 			},
 
@@ -155,7 +155,7 @@ func TestVolumeRemove(t *testing.T) {
 			Setup: func(data test.Data, helpers test.Helpers) {
 				helpers.Ensure("volume", "create", data.Identifier())
 				helpers.Ensure("volume", "create", data.Identifier("busy"))
-				helpers.Ensure("run", "-v", data.Identifier("busy")+":/volume", "--name", data.Identifier(), testutil.CommonImage)
+				helpers.Ensure("run", "--quiet", "-v", data.Identifier("busy")+":/volume", "--name", data.Identifier(), testutil.CommonImage)
 			},
 
 			Cleanup: func(data test.Data, helpers test.Helpers) {
@@ -207,7 +207,7 @@ func TestVolumeRemove(t *testing.T) {
 
 			Setup: func(data test.Data, helpers test.Helpers) {
 				helpers.Ensure("volume", "create", data.Identifier("busy"))
-				helpers.Ensure("run", "-v", data.Identifier("busy")+":/volume", "--name", data.Identifier(), testutil.CommonImage)
+				helpers.Ensure("run", "--quiet", "-v", data.Identifier("busy")+":/volume", "--name", data.Identifier(), testutil.CommonImage)
 			},
 
 			Cleanup: func(data test.Data, helpers test.Helpers) {

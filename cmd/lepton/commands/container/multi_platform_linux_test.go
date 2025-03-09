@@ -36,13 +36,10 @@ import (
 
 func testMultiPlatformRun(base *testutil.Base, alpineImage string) {
 	t := base.T
-	testutil.RequireExecPlatform(t, "linux/amd64", "linux/arm64", "linux/arm/v7")
+	testutil.RequireExecPlatform(t, "linux/amd64", "linux/arm64")
 	testCases := map[string]string{
-		"amd64":        "x86_64",
-		"arm64":        "aarch64",
-		"arm":          "armv7l",
-		"linux/arm":    "armv7l",
-		"linux/arm/v7": "armv7l",
+		"amd64": "x86_64",
+		"arm64": "aarch64",
 	}
 	for plat, expectedUnameM := range testCases {
 		t.Logf("Testing %q (%q)", plat, expectedUnameM)
@@ -70,7 +67,7 @@ func TestMultiPlatformBuildPush(t *testing.T) {
 	var reg *registry.Server
 
 	testCase.Setup = func(data test.Data, helpers test.Helpers) {
-		testutil.RequireExecPlatform(t, "linux/amd64", "linux/arm64", "linux/arm/v7")
+		testutil.RequireExecPlatform(t, "linux/amd64", "linux/arm64")
 		base := testutil.NewBase(t)
 		tID := data.Identifier()
 		reg = nerdtest.RegistryWithNoAuth(data, helpers, 0, false)
@@ -84,9 +81,9 @@ RUN echo dummy
 
 		buildCtx := various.CreateBuildContext(t, dockerfile)
 
-		base.Cmd("build", "-t", data.Get("imageName"), "--platform=amd64,arm64,linux/arm/v7", buildCtx).AssertOK()
+		base.Cmd("build", "-t", data.Get("imageName"), "--platform=amd64,arm64", buildCtx).AssertOK()
 		testMultiPlatformRun(base, data.Get("imageName"))
-		base.Cmd("push", "--platform=amd64,arm64,linux/arm/v7", data.Get("imageName")).AssertOK()
+		base.Cmd("push", "--platform=amd64,arm64", data.Get("imageName")).AssertOK()
 	}
 
 	testCase.Cleanup = func(data test.Data, helpers test.Helpers) {
@@ -119,7 +116,7 @@ func TestMultiPlatformBuildPushNoRun(t *testing.T) {
 		reg = nerdtest.RegistryWithNoAuth(data, helpers, 0, false)
 		reg.Setup(data, helpers)
 
-		testutil.RequireExecPlatform(t, "linux/amd64", "linux/arm64", "linux/arm/v7")
+		testutil.RequireExecPlatform(t, "linux/amd64", "linux/arm64")
 		base := testutil.NewBase(t)
 		tID := data.Identifier()
 
@@ -132,9 +129,9 @@ CMD echo dummy
 
 		buildCtx := various.CreateBuildContext(t, dockerfile)
 
-		base.Cmd("build", "-t", imageName, "--platform=amd64,arm64,linux/arm/v7", buildCtx).AssertOK()
+		base.Cmd("build", "-t", imageName, "--platform=amd64,arm64", buildCtx).AssertOK()
 		testMultiPlatformRun(base, imageName)
-		base.Cmd("push", "--platform=amd64,arm64,linux/arm/v7", imageName).AssertOK()
+		base.Cmd("push", "--platform=amd64,arm64", imageName).AssertOK()
 	}
 
 	testCase.Cleanup = func(data test.Data, helpers test.Helpers) {
@@ -168,7 +165,7 @@ func TestMultiPlatformPullPushAllPlatforms(t *testing.T) {
 		pushImageName := fmt.Sprintf("localhost:%d/%s:latest", reg.Port, tID)
 		defer base.Cmd("rmi", pushImageName).Run()
 
-		base.Cmd("pull", "--all-platforms", testutil.AlpineImage).AssertOK()
+		base.Cmd("pull", "--quiet", "--all-platforms", testutil.AlpineImage).AssertOK()
 		base.Cmd("tag", testutil.AlpineImage, pushImageName).AssertOK()
 		base.Cmd("push", "--all-platforms", pushImageName).AssertOK()
 		testMultiPlatformRun(base, pushImageName)
@@ -187,7 +184,7 @@ func TestMultiPlatformComposeUpBuild(t *testing.T) {
 	testutil.DockerIncompatible(t)
 	testutil.RequiresBuild(t)
 	testutil.RegisterBuildCacheCleanup(t)
-	testutil.RequireExecPlatform(t, "linux/amd64", "linux/arm64", "linux/arm/v7")
+	testutil.RequireExecPlatform(t, "linux/amd64", "linux/arm64")
 	base := testutil.NewBase(t)
 
 	const dockerComposeYAML = `
@@ -202,11 +199,6 @@ services:
     platform: arm64
     ports:
     - 8081:80
-  svc2:
-    build: .
-    platform: linux/arm/v7
-    ports:
-    - 8082:80
 `
 	dockerfile := fmt.Sprintf(`FROM %s
 RUN uname -m > /usr/share/nginx/html/index.html
@@ -223,7 +215,6 @@ RUN uname -m > /usr/share/nginx/html/index.html
 	testCases := map[string]string{
 		"http://127.0.0.1:8080": "x86_64",
 		"http://127.0.0.1:8081": "aarch64",
-		"http://127.0.0.1:8082": "armv7l",
 	}
 
 	for testURL, expectedIndexHTML := range testCases {

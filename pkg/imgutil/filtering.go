@@ -323,7 +323,7 @@ func matchesAllLabels(imageCfgLabels map[string]string, filterLabels map[string]
 func matchesReferences(image images.Image, referencePatterns []string) (bool, error) {
 	var matches int
 
-	// Containerd returns ":" for dangling untagged images
+	// Containerd returns ":" for dangling untagged images - see https://github.com/containerd/nerdctl/issues/3852
 	if image.Name == ":" {
 		return false, nil
 	}

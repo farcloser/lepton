@@ -131,7 +131,7 @@ func TestRunWithTtyAndDetached(t *testing.T) {
 
 	testCase.Setup = func(data test.Data, helpers test.Helpers) {
 		// with -t, success, the container should run with tty support.
-		helpers.Ensure("run", "-d", "-t", "--name", data.Identifier("with-terminal"), testutil.CommonImage, "cmd", "/c", "echo", "Hello, World with TTY!")
+		helpers.Ensure("run", "--quiet", "-d", "-t", "--name", data.Identifier("with-terminal"), testutil.CommonImage, "cmd", "/c", "echo", "Hello, World with TTY!")
 	}
 
 	testCase.Cleanup = func(data test.Data, helpers test.Helpers) {

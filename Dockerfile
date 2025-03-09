@@ -20,7 +20,7 @@
 ARG BINARY_NAME=lepton
 
 # Basic deps
-ARG CONTAINERD_VERSION=v2.0.2
+ARG CONTAINERD_VERSION=v2.0.3
 ARG RUNC_VERSION=v1.2.4
 ARG CNI_PLUGINS_VERSION=v1.6.2
 
@@ -107,7 +107,7 @@ RUN apk add --no-cache make git curl
 RUN git config --global advice.detachedHead false
 
 FROM build-base AS build-minimal
-RUN BINDIR=/out/bin make binaries install
+RUN BINDIR=/out/bin make build install
 # We do not set CMD to `go test` here, because it requires systemd
 
 FROM build-base AS build-dependencies
@@ -214,7 +214,7 @@ ARG BINARY_NAME
 COPY . /go/src/go.farcloser.world/lepton
 RUN { echo "# ${BINARY_NAME} (full distribution)"; echo "- ${BINARY_NAME}: $(cd /go/src/go.farcloser.world/lepton && git describe --tags)"; cat /out/share/doc/${BINARY_NAME}-full/README.md; } > /out/share/doc/${BINARY_NAME}-full/README.md.new; mv /out/share/doc/${BINARY_NAME}-full/README.md.new /out/share/doc/${BINARY_NAME}-full/README.md
 WORKDIR /go/src/go.farcloser.world/lepton
-RUN BINDIR=/out/bin make binaries install
+RUN BINDIR=/out/bin make build install
 COPY README.md /out/share/doc/${BINARY_NAME}/
 COPY docs /out/share/doc/${BINARY_NAME}/docs
 
@@ -223,7 +223,7 @@ COPY --from=build-full /out /
 
 FROM ubuntu:${UBUNTU_VERSION} AS base
 ARG BINARY_NAME
-RUN apt-get update -qq && apt-get install -qq -y --no-install-recommends \
+RUN apt-get update -qq && apt-get install -qq --no-install-recommends \
     apparmor \
     bash-completion \
     ca-certificates curl \

@@ -41,7 +41,7 @@ func TestCommit(t *testing.T) {
 			},
 			Setup: func(data test.Data, helpers test.Helpers) {
 				identifier := data.Identifier()
-				helpers.Ensure("run", "-d", "--name", identifier, testutil.CommonImage, "sleep", nerdtest.Infinity)
+				helpers.Ensure("run", "--quiet", "-d", "--name", identifier, testutil.CommonImage, "sleep", nerdtest.Infinity)
 				helpers.Ensure("exec", identifier, "sh", "-euxc", `echo hello-test-commit > /foo`)
 			},
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
@@ -66,7 +66,7 @@ func TestCommit(t *testing.T) {
 			},
 			Setup: func(data test.Data, helpers test.Helpers) {
 				identifier := data.Identifier()
-				helpers.Ensure("run", "-d", "--name", identifier, testutil.CommonImage, "sleep", nerdtest.Infinity)
+				helpers.Ensure("run", "--quiet", "-d", "--name", identifier, testutil.CommonImage, "sleep", nerdtest.Infinity)
 				nerdtest.EnsureContainerStarted(helpers, identifier)
 				helpers.Ensure("exec", identifier, "sh", "-euxc", `echo hello-test-commit > /foo`)
 			},

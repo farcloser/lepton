@@ -37,7 +37,7 @@ func TestVolumePrune(t *testing.T) {
 
 		helpers.Ensure("volume", "create", namedBusy)
 		helpers.Ensure("volume", "create", namedDangling)
-		helpers.Ensure("run", "--name", data.Identifier(),
+		helpers.Ensure("run", "--quiet", "--name", data.Identifier(),
 			"-v", namedBusy+":/namedbusyvolume",
 			"-v", anonIDBusy+":/anonbusyvolume", testutil.CommonImage)
 

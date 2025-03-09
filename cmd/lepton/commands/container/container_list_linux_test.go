@@ -62,7 +62,7 @@ func preparePsTestContainer(t *testing.T, identity string, keepAlive bool) (*tes
 	tearDown()
 	t.Cleanup(tearDown)
 
-	base.Cmd("pull", testutil.CommonImage).AssertOK()
+	base.Cmd("pull", "--quiet", testutil.CommonImage).AssertOK()
 	base.Cmd("network", "create", testContainerName).AssertOK()
 
 	// A container can have multiple labels.

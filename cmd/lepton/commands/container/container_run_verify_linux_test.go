@@ -69,7 +69,7 @@ CMD ["echo", "build-test-string"]
 
 		helpers.Ensure("build", "-t", testImageRef, buildCtx)
 		helpers.Ensure("push", testImageRef, "--sign=cosign", "--cosign-key="+keyPair.PrivateKey)
-		helpers.Ensure("run", "--rm", "--verify=cosign", "--cosign-key="+keyPair.PublicKey, testImageRef)
+		helpers.Ensure("run", "--quiet", "--rm", "--verify=cosign", "--cosign-key="+keyPair.PublicKey, testImageRef)
 
 		return helpers.Command("run", "--rm", "--verify=cosign", "--cosign-key=dummy", testImageRef)
 	}

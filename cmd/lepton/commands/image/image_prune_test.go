@@ -40,6 +40,12 @@ func TestImagePrune(t *testing.T) {
 	// Cannot use a custom namespace with buildkitd right now, so, no parallel it is
 	testCase.NoParallel = true
 	testCase.Cleanup = func(data test.Data, helpers test.Helpers) {
+		// Stop and remove all running containers. This is to ensure we can remove all
+		contList := strings.TrimSpace(helpers.Capture("ps", "-aq"))
+		if contList != "" {
+			helpers.Ensure(append([]string{"rm", "-f"}, strings.Split(contList, "\n")...)...)
+		}
+
 		// We need to delete everything here for prune to make any sense
 		imgList := strings.TrimSpace(helpers.Capture("images", "--no-trunc", "-aq"))
 		if imgList != "" {
@@ -121,7 +127,7 @@ func TestImagePrune(t *testing.T) {
 				imgList := helpers.Capture("images")
 				assert.Assert(t, strings.Contains(imgList, "<none>"), "Missing <none>")
 				assert.Assert(t, strings.Contains(imgList, identifier), "Missing "+identifier)
-				helpers.Ensure("run", "--name", identifier, identifier)
+				helpers.Ensure("run", "--quiet", "--name", identifier, identifier)
 			},
 			Command: test.Command("image", "prune", "--force", "--all"),
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {

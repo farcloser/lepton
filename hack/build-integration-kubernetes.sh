@@ -50,7 +50,7 @@ install::kubectl(){
   local temp
   temp="$(fs::mktemp "install")"
 
-  http::get "$temp"/kubectl "https://storage.googleapis.com/kubernetes-release/release/$version/bin/linux/${GOARCH:-amd64}/kubectl"
+  http::get "$temp"/kubectl "https://dl.k8s.io/release/$version/bin/linux/${GOARCH:-amd64}/kubectl"
   host::install "$temp"/kubectl
 }
 
@@ -95,7 +95,7 @@ main(){
   host::require kubectl 2>/dev/null || install::kubectl
 
   # Build cli to use for kind
-  make binaries
+  make build
   PATH="$(pwd)"/_output:"$PATH"
   ln -s "$(pwd)"/_output/lepton "$(pwd)"/_output/nerdctl
   export PATH

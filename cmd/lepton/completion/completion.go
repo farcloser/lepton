@@ -195,10 +195,5 @@ func Platforms(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCom
 		"amd64",
 		"arm64",
 		"riscv64",
-		"ppc64le",
-		"s390x",
-		"386",
-		"arm",          // alias of "linux/arm/v7"
-		"linux/arm/v6", // "arm/v6" is invalid (interpreted as OS="arm", Arch="v7")
 	}, cobra.ShellCompDirectiveNoFileComp
 }

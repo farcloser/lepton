@@ -25,6 +25,7 @@ import (
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/core/images"
 	"github.com/containerd/log"
+	"github.com/containerd/platforms"
 
 	"go.farcloser.world/containers/reference"
 	"go.farcloser.world/containers/specs"
@@ -37,7 +38,7 @@ import (
 	"go.farcloser.world/lepton/pkg/platformutil"
 )
 
-func EnsureAllContent(ctx context.Context, client *containerd.Client, srcName string, options *options.Global) error {
+func EnsureAllContent(ctx context.Context, client *containerd.Client, srcName string, platMC platforms.MatchComparer, options *options.Global) error {
 	// Get the image from the srcName
 	imageService := client.ImageService()
 	img, err := imageService.Get(ctx, srcName)
@@ -51,9 +52,11 @@ func EnsureAllContent(ctx context.Context, client *containerd.Client, srcName st
 	imagesList, _ := read(ctx, provider, snapshotter, img.Target)
 	// Iterate through the list
 	for _, i := range imagesList {
-		err = ensureOne(ctx, client, srcName, img.Target, i.platform, options)
-		if err != nil {
-			return err
+		if platMC.Match(i.platform) {
+			err = ensureOne(ctx, client, srcName, img.Target, i.platform, options)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
