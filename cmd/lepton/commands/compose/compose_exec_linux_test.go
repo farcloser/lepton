@@ -30,6 +30,8 @@ import (
 )
 
 func TestComposeExec(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	var dockerComposeYAML = fmt.Sprintf(`
 version: '3.1'
@@ -59,6 +61,8 @@ services:
 }
 
 func TestComposeExecWithEnv(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	var dockerComposeYAML = fmt.Sprintf(`
 version: '3.1'
@@ -124,6 +128,8 @@ services:
 }
 
 func TestComposeExecWithUser(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	var dockerComposeYAML = fmt.Sprintf(`
 version: '3.1'
@@ -162,6 +168,8 @@ services:
 }
 
 func TestComposeExecTTY(t *testing.T) {
+	t.Parallel()
+
 	// `-i` in `compose run & exec` is only supported in compose v2.
 	base := testutil.NewBase(t)
 
@@ -196,6 +204,8 @@ services:
 }
 
 func TestComposeExecWithIndex(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	var dockerComposeYAML = fmt.Sprintf(`
 version: '3.1'

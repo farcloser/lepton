@@ -31,22 +31,26 @@ import (
 )
 
 func TestContainerInspectContainsPortConfig(t *testing.T) {
+	t.Parallel()
+
 	testContainer := testutil.Identifier(t)
 
 	base := testutil.NewBase(t)
 	defer base.Cmd("rm", "-f", testContainer).Run()
 
-	base.Cmd("run", "-d", "--name", testContainer, "-p", "8080:80", testutil.NginxAlpineImage).AssertOK()
+	base.Cmd("run", "-d", "--name", testContainer, "-p", "9080:80", testutil.NginxAlpineImage).AssertOK()
 	inspect := base.InspectContainer(testContainer)
 	inspect80TCP := (*inspect.NetworkSettings.Ports)["80/tcp"]
 	expected := nat.PortBinding{
 		HostIP:   "0.0.0.0",
-		HostPort: "8080",
+		HostPort: "9080",
 	}
 	assert.Equal(base.T, expected, inspect80TCP[0])
 }
 
 func TestContainerInspectContainsMounts(t *testing.T) {
+	t.Parallel()
+
 	testContainer := testutil.Identifier(t)
 
 	base := testutil.NewBase(t)
@@ -145,6 +149,7 @@ func TestContainerInspectContainsMounts(t *testing.T) {
 
 func TestContainerInspectContainsLabel(t *testing.T) {
 	t.Parallel()
+
 	testContainer := testutil.Identifier(t)
 
 	base := testutil.NewBase(t)
@@ -160,8 +165,9 @@ func TestContainerInspectContainsLabel(t *testing.T) {
 }
 
 func TestContainerInspectContainsInternalLabel(t *testing.T) {
-	testutil.DockerIncompatible(t)
 	t.Parallel()
+
+	testutil.DockerIncompatible(t)
 	testContainer := testutil.Identifier(t)
 
 	base := testutil.NewBase(t)
@@ -180,6 +186,7 @@ func TestContainerInspectContainsInternalLabel(t *testing.T) {
 
 func TestContainerInspectState(t *testing.T) {
 	t.Parallel()
+
 	testContainer := testutil.Identifier(t)
 	base := testutil.NewBase(t)
 

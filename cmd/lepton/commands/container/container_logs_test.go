@@ -32,12 +32,13 @@ import (
 
 func TestLogs(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	containerName := testutil.Identifier(t)
 	const expected = `foo
 bar`
 
-	defer base.Cmd("rm", containerName).Run()
+	defer base.Cmd("rm", "-f", containerName).Run()
 	base.Cmd("run", "-d", "--name", containerName, testutil.CommonImage,
 		"sh", "-euxc", "echo foo; echo bar").AssertOK()
 
@@ -72,6 +73,7 @@ bar`
 // streams for containers using the jsonfile logging driver:
 func TestLogsOutStreamsSeparated(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	containerName := testutil.Identifier(t)
 
@@ -86,6 +88,7 @@ func TestLogsOutStreamsSeparated(t *testing.T) {
 func TestLogsWithInheritedFlags(t *testing.T) {
 	// Seen flaky with Docker
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	for k, v := range base.Args {
 		if strings.HasPrefix(v, "--namespace=") {
@@ -111,14 +114,14 @@ func TestLogsWithInheritedFlags(t *testing.T) {
 }
 
 func TestLogsOfJournaldDriver(t *testing.T) {
+	t.Parallel()
+
 	testutil.RequireExecutable(t, "journalctl")
 	journalctl, _ := exec.LookPath("journalctl")
 	res := icmd.RunCmd(icmd.Command(journalctl, "-xe"))
 	if res.ExitCode != 0 {
 		t.Skip("current user is not allowed to access journal logs - presumably not a member of adm")
 	}
-
-	t.Parallel()
 	base := testutil.NewBase(t)
 	containerName := testutil.Identifier(t)
 
@@ -146,6 +149,7 @@ func TestLogsOfJournaldDriver(t *testing.T) {
 
 func TestLogsWithFailingContainer(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	containerName := testutil.Identifier(t)
 	defer base.Cmd("rm", containerName).Run()
@@ -161,6 +165,7 @@ func TestLogsWithFailingContainer(t *testing.T) {
 
 func TestLogsWithForegroundContainers(t *testing.T) {
 	t.Parallel()
+
 	if runtime.GOOS == "windows" {
 		t.Skip("dual logging is not supported on Windows")
 	}
@@ -221,6 +226,8 @@ func TestLogsWithForegroundContainers(t *testing.T) {
 }
 
 func TestTailFollowRotateLogs(t *testing.T) {
+	t.Parallel()
+
 	// FIXME this is flaky by nature... 2 lines is arbitrary, 10000 ms is arbitrary, and both are some sort of educated
 	// guess that things will mostly always kinda work maybe...
 	// Furthermore, parallelizing will put pressure on the daemon which might be even slower in answering, increasing

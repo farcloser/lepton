@@ -28,6 +28,7 @@ import (
 
 func TestRunMountVolume(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	tID := testutil.Identifier(t)
 	rwDir, err := os.MkdirTemp(t.TempDir(), "rw")
@@ -81,6 +82,8 @@ func TestRunMountVolume(t *testing.T) {
 }
 
 func TestRunMountVolumeInspect(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	testContainer := testutil.Identifier(t)
 	testVolume := testutil.Identifier(t)
@@ -177,6 +180,7 @@ func TestRunMountVolumeInspect(t *testing.T) {
 
 func TestRunMountAnonymousVolume(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	base.Cmd("run", "--rm", "-v", "TestVolume:C:/mnt", testutil.CommonImage).AssertOK()
 
@@ -189,6 +193,7 @@ func TestRunMountAnonymousVolume(t *testing.T) {
 
 func TestRunMountRelativePath(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	base.Cmd("run", "--rm", "-v", "./mnt:C:/mnt1", testutil.CommonImage, "cmd").AssertOK()
 
@@ -199,12 +204,14 @@ func TestRunMountRelativePath(t *testing.T) {
 
 func TestRunMountNamedPipeVolume(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	base.Cmd("run", "--rm", "-v", `\\.\pipe\containerd-containerd`, testutil.CommonImage).AssertFail()
 }
 
 func TestRunMountVolumeSpec(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	base.Cmd("run", "--rm", "-v", `InvalidPathC:\TestVolume:C:\Mount`, testutil.CommonImage).AssertFail()
 	base.Cmd("run", "--rm", "-v", `C:\TestVolume:C:\Mount:ro,rw:boot`, testutil.CommonImage).AssertFail()

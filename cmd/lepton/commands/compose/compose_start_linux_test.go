@@ -26,6 +26,8 @@ import (
 )
 
 func TestComposeStart(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	var dockerComposeYAML = fmt.Sprintf(`
 version: '3.1'
@@ -59,6 +61,8 @@ services:
 }
 
 func TestComposeStartFailWhenServicePause(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	switch base.Info().CgroupDriver {
 	case cgroups.NoneManager, "":

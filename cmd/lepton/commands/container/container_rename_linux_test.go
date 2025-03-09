@@ -25,6 +25,7 @@ import (
 
 func TestRename(t *testing.T) {
 	t.Parallel()
+
 	testContainerName := testutil.Identifier(t)
 	base := testutil.NewBase(t)
 
@@ -40,6 +41,7 @@ func TestRename(t *testing.T) {
 
 func TestRenameUpdateHosts(t *testing.T) {
 	t.Parallel()
+
 	testutil.DockerIncompatible(t)
 	testContainerName := testutil.Identifier(t)
 	base := testutil.NewBase(t)

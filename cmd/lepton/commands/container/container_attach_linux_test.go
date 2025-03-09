@@ -57,6 +57,7 @@ func TestAttach(t *testing.T) {
 	testCase.Setup = func(data test.Data, helpers test.Helpers) {
 		cmd := helpers.Command("run", "--rm", "-it", "--name", data.Identifier(), testutil.CommonImage)
 		cmd.WithPseudoTTY(func(f *os.File) error {
+			// ctrl+p and ctrl+q (see https://en.wikipedia.org/wiki/C0_and_C1_control_codes)
 			_, err := f.Write([]byte{16, 17})
 			return err
 		})
@@ -78,6 +79,7 @@ func TestAttach(t *testing.T) {
 			// Interestingly, and unlike with run, on attach, docker (like nerdctl) ALSO needs a pause so that the
 			// container can read stdin before we detach
 			time.Sleep(time.Second)
+			// ctrl+p and ctrl+q (see https://en.wikipedia.org/wiki/C0_and_C1_control_codes)
 			_, err := f.Write([]byte{16, 17})
 
 			return err
@@ -140,6 +142,7 @@ func TestAttachDetachKeys(t *testing.T) {
 			// Interestingly, and unlike with run, on attach, docker (like nerdctl) ALSO needs a pause so that the
 			// container can read stdin before we detach
 			time.Sleep(time.Second)
+			// ctrl+a and ctrl+b (see https://en.wikipedia.org/wiki/C0_and_C1_control_codes)
 			_, err := f.Write([]byte{1, 2})
 
 			return err
@@ -177,6 +180,7 @@ func TestAttachForAutoRemovedContainer(t *testing.T) {
 	testCase.Setup = func(data test.Data, helpers test.Helpers) {
 		cmd := helpers.Command("run", "--rm", "-it", "--detach-keys=ctrl-a,ctrl-b", "--name", data.Identifier(), testutil.CommonImage)
 		cmd.WithPseudoTTY(func(f *os.File) error {
+			// ctrl+a and ctrl+b (see https://en.wikipedia.org/wiki/C0_and_C1_control_codes)
 			_, err := f.Write([]byte{1, 2})
 			return err
 		})

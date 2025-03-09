@@ -58,6 +58,7 @@ const (
 
 func TestRunCap(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 
 	// allCaps varies depending on the target version and the kernel version.
@@ -120,6 +121,7 @@ func TestRunCap(t *testing.T) {
 
 func TestRunSecurityOptSeccomp(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	type testCase struct {
 		args    []string
@@ -170,6 +172,8 @@ func TestRunSecurityOptSeccomp(t *testing.T) {
 }
 
 func TestRunApparmor(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	defaultProfile := base.Target + "-default"
 	if !apparmor.Enabled() || (!apparmor.CanLoadProfile() && !apparmor.CanApplyProfile(defaults.AppArmorProfileName)) {
@@ -189,12 +193,16 @@ func TestRunApparmor(t *testing.T) {
 
 // TestRunSeccompCapSysPtrace tests https://github.com/containerd/nerdctl/issues/976
 func TestRunSeccompCapSysPtrace(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	base.Cmd("run", "--rm", "--cap-add", "sys_ptrace", testutil.AlpineImage, "sh", "-euxc", "apk add -q strace && strace true").AssertOK()
 	// Docker/Moby 's seccomp profile allows ptrace(2) by default, but containerd does not (yet): https://github.com/containerd/containerd/issues/6802
 }
 
 func TestRunSystemPathsUnconfined(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 
 	const findmnt = "`apk add -q findmnt && findmnt -R /proc && findmnt -R /sys`"
@@ -250,6 +258,8 @@ func TestRunSystemPathsUnconfined(t *testing.T) {
 }
 
 func TestRunPrivileged(t *testing.T) {
+	t.Parallel()
+
 	// docker does not support --privileged-without-host-devices
 	testutil.DockerIncompatible(t)
 

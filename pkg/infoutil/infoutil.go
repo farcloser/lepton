@@ -34,7 +34,7 @@ import (
 	"go.farcloser.world/containers/security/cgroups"
 	"go.farcloser.world/core/version/semver"
 
-	"go.farcloser.world/lepton/pkg/buildkitutil"
+	"go.farcloser.world/lepton/leptonic/buildkit"
 	"go.farcloser.world/lepton/pkg/inspecttypes/dockercompat"
 	"go.farcloser.world/lepton/pkg/inspecttypes/native"
 	"go.farcloser.world/lepton/pkg/version"
@@ -193,7 +193,7 @@ func ServerSemVer(ctx context.Context, client *containerd.Client) (*semver.Versi
 }
 
 func buildctlVersion() dockercompat.ComponentVersion {
-	buildctlBinary, err := buildkitutil.BuildctlBinary()
+	buildctlBinary, err := buildkit.BuildctlBinary()
 	if err != nil {
 		log.L.Warnf("unable to determine buildctl version: %s", err.Error())
 		return dockercompat.ComponentVersion{Name: "buildctl"}

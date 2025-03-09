@@ -24,67 +24,92 @@ import (
 
 	"gotest.tools/v3/assert"
 
+	"go.farcloser.world/tigron/expect"
+	"go.farcloser.world/tigron/test"
+
 	"go.farcloser.world/lepton/pkg/testutil"
 	"go.farcloser.world/lepton/pkg/testutil/nerdtest"
 )
 
 func TestComposeConfig(t *testing.T) {
-	base := testutil.NewBase(t)
-
-	var dockerComposeYAML = `
+	dockerComposeYAML := `
 services:
   hello:
     image: alpine:3.13
 `
+	testCase := nerdtest.Setup()
 
-	comp := testutil.NewComposeDir(t, dockerComposeYAML)
-	defer comp.CleanUp()
+	testCase.Setup = func(data test.Data, helpers test.Helpers) {
+		err := os.WriteFile(filepath.Join(data.TempDir(), "compose.yaml"), []byte(dockerComposeYAML), 0o600)
+		assert.NilError(t, err)
+		data.Set("compyaml", filepath.Join(data.TempDir(), "compose.yaml"))
+	}
 
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "config").AssertOutContains("hello:")
-}
+	testCase.SubTests = []*test.Case{
+		{
+			Description: "config contains service name",
+			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
+				return helpers.Command("compose", "-f", data.Get("compyaml"), "config")
+			},
+			Expected: test.Expects(0, nil, expect.Contains("hello:")),
+		},
+		{
+			Description: "config --services is exactly service name",
+			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
+				return helpers.Command("compose", "-f", data.Get("compyaml"), "config", "--services")
+			},
+			Expected: test.Expects(0, nil, expect.Equals("hello\n")),
+		},
+		{
+			Description: "config --hash=* contains service name",
+			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
+				return helpers.Command("compose", "-f", data.Get("compyaml"), "config", "--hash=*")
+			},
+			Expected: test.Expects(0, nil, expect.Contains("hello")),
+		},
+	}
 
-func TestComposeConfigWithPrintService(t *testing.T) {
-	base := testutil.NewBase(t)
-
-	var dockerComposeYAML = `
-services:
-  hello1:
-    image: alpine:3.13
-`
-
-	comp := testutil.NewComposeDir(t, dockerComposeYAML)
-	defer comp.CleanUp()
-
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "config", "--services").AssertOutExactly("hello1\n")
+	testCase.Run(t)
 }
 
 func TestComposeConfigWithPrintServiceHash(t *testing.T) {
-	base := testutil.NewBase(t)
-
-	var dockerComposeYAML = `
+	dockerComposeYAML := `
 services:
-  hello1:
+  hello:
     image: alpine:%s
 `
+	testCase := nerdtest.Setup()
 
-	comp := testutil.NewComposeDir(t, fmt.Sprintf(dockerComposeYAML, "3.13"))
-	defer comp.CleanUp()
+	testCase.Setup = func(data test.Data, helpers test.Helpers) {
+		err := os.WriteFile(filepath.Join(data.TempDir(), "compose.yaml"), []byte(fmt.Sprintf(dockerComposeYAML, "3.13")), 0o600)
 
-	// `--hash=*` is broken in Docker Compose v2.23.0: https://github.com/docker/compose/issues/11145
-	if nerdtest.IsNotDocker() {
-		base.ComposeCmd("-f", comp.YAMLFullPath(), "config", "--hash=*").AssertOutContains("hello1")
+		hash := helpers.Capture("compose", "-f", filepath.Join(data.TempDir(), "compose.yaml"), "config", "--hash=hello")
+		assert.NilError(t, err)
+		data.Set("hash", hash)
+
+		err = os.WriteFile(filepath.Join(data.TempDir(), "compose.yaml"), []byte(fmt.Sprintf(dockerComposeYAML, "3.14")), 0o600)
+		assert.NilError(t, err)
 	}
 
-	hash := base.ComposeCmd("-f", comp.YAMLFullPath(), "config", "--hash=hello1").Out()
+	testCase.Command = func(data test.Data, helpers test.Helpers) test.TestableCommand {
+		return helpers.Command("compose", "-f", filepath.Join(data.TempDir(), "compose.yaml"), "config", "--hash=hello")
+	}
 
-	newComp := testutil.NewComposeDir(t, fmt.Sprintf(dockerComposeYAML, "3.14"))
-	defer newComp.CleanUp()
+	testCase.Expected = func(data test.Data, helpers test.Helpers) *test.Expected {
+		return &test.Expected{
+			ExitCode: 0,
+			Output: func(stdout string, info string, t *testing.T) {
+				assert.Assert(t, data.Get("hash") != stdout, info)
+			},
+		}
+	}
 
-	newHash := base.ComposeCmd("-f", newComp.YAMLFullPath(), "config", "--hash=hello1").Out()
-	assert.Assert(t, hash != newHash)
+	testCase.Run(t)
 }
 
 func TestComposeConfigWithMultipleFile(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 
 	var dockerComposeYAML = `
@@ -113,6 +138,8 @@ services:
 }
 
 func TestComposeConfigWithComposeFileEnv(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 
 	var dockerComposeYAML = `
@@ -138,22 +165,30 @@ services:
 }
 
 func TestComposeConfigWithEnvFile(t *testing.T) {
-	base := testutil.NewBase(t)
-
-	const dockerComposeYAML = `
+	dockerComposeYAML := `
 services:
   hello:
     image: ${image}
 `
 
-	comp := testutil.NewComposeDir(t, dockerComposeYAML)
-	defer comp.CleanUp()
-
-	envFile := filepath.Join(comp.Dir(), "env")
-	const envFileContent = `
+	envFileContent := `
 image: hello-world
 `
-	assert.NilError(t, os.WriteFile(envFile, []byte(envFileContent), 0o644))
 
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "--env-file", envFile, "config").AssertOutContains("image: hello-world")
+	testCase := nerdtest.Setup()
+
+	testCase.Setup = func(data test.Data, helpers test.Helpers) {
+		err := os.WriteFile(filepath.Join(data.TempDir(), "compose.yaml"), []byte(dockerComposeYAML), 0o600)
+		assert.NilError(t, err)
+		err = os.WriteFile(filepath.Join(data.TempDir(), "env"), []byte(envFileContent), 0o600)
+		assert.NilError(t, err)
+	}
+
+	testCase.Command = func(data test.Data, helpers test.Helpers) test.TestableCommand {
+		return helpers.Command("compose", "-f", filepath.Join(data.TempDir(), "compose.yaml"), "--env-file", filepath.Join(data.TempDir(), "env"), "config")
+	}
+
+	testCase.Expected = test.Expects(0, nil, expect.Contains("image: hello-world"))
+
+	testCase.Run(t)
 }
