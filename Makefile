@@ -98,7 +98,7 @@ REMAKE := make -C $(CURDIR) -f $(MAKEFILE_DIR)/Makefile
 ##########################
 
 # Tasks
-lint: lint-go-all lint-imports lint-yaml lint-shell lint-commits lint-mod lint-licenses-all lint-headers
+lint: lint-go-all lint-imports lint-commits lint-mod lint-licenses-all lint-headers lint-shell lint-yaml
 
 fix: fix-mod fix-imports fix-go-all
 
