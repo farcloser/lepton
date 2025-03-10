@@ -55,10 +55,7 @@ func (cd *ComposeDir) CleanUp() {
 }
 
 func NewComposeDir(t testing.TB, dockerComposeYAML string) *ComposeDir {
-	tmpDir, err := os.MkdirTemp("", "compose-test")
-	if err != nil {
-		t.Fatal(err)
-	}
+	tmpDir := t.TempDir()
 	cd := &ComposeDir{
 		t:            t,
 		dir:          tmpDir,

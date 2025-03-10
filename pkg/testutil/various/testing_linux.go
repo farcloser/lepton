@@ -27,8 +27,6 @@ import (
 	"testing"
 	"time"
 
-	"gotest.tools/v3/assert"
-
 	"go.farcloser.world/lepton/pkg/testutil"
 	"go.farcloser.world/lepton/pkg/testutil/nettestutil"
 )
@@ -56,8 +54,7 @@ type JweKeyPair struct {
 
 func NewJWEKeyPair(t testing.TB) *JweKeyPair {
 	testutil.RequireExecutable(t, "openssl")
-	td, err := os.MkdirTemp(t.TempDir(), "jwe-key-pair")
-	assert.NilError(t, err)
+	td := t.TempDir()
 	prv := filepath.Join(td, "mykey.pem")
 	pub := filepath.Join(td, "mypubkey.pem")
 	cmds := [][]string{
@@ -98,8 +95,7 @@ type CosignKeyPair struct {
 }
 
 func NewCosignKeyPair(t testing.TB, path string, password string) *CosignKeyPair {
-	td, err := os.MkdirTemp(t.TempDir(), path)
-	assert.NilError(t, err)
+	td := t.TempDir()
 
 	cmd := exec.Command("cosign", "generate-key-pair")
 	cmd.Dir = td

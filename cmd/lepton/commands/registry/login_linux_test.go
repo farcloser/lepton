@@ -75,7 +75,7 @@ func (ag *Client) GetConfigPath() string {
 
 func (ag *Client) Run(base *testutil.Base, host string) *testutil.Cmd {
 	if ag.configPath == "" {
-		ag.configPath, _ = os.MkdirTemp(base.T.TempDir(), "docker-config")
+		ag.configPath = base.T.TempDir()
 	}
 	args := []string{"login"}
 	if nerdtest.IsNotDocker() {

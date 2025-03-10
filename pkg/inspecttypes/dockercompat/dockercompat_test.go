@@ -35,12 +35,8 @@ import (
 )
 
 func TestContainerFromNative(t *testing.T) {
-	tempStateDir, err := os.MkdirTemp(t.TempDir(), "rw")
-	if err != nil {
-		t.Fatal(err)
-	}
+	tempStateDir := t.TempDir()
 	os.WriteFile(filepath.Join(tempStateDir, "resolv.conf"), []byte(""), 0o644)
-	defer os.RemoveAll(tempStateDir)
 
 	testcase := []struct {
 		name     string
@@ -299,12 +295,8 @@ func TestContainerFromNative(t *testing.T) {
 }
 
 func TestNetworkSettingsFromNative(t *testing.T) {
-	tempStateDir, err := os.MkdirTemp(t.TempDir(), "rw")
-	if err != nil {
-		t.Fatal(err)
-	}
+	tempStateDir := t.TempDir()
 	os.WriteFile(filepath.Join(tempStateDir, "resolv.conf"), []byte(""), 0o644)
-	defer os.RemoveAll(tempStateDir)
 
 	testcase := []struct {
 		name     string

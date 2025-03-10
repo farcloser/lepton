@@ -362,17 +362,12 @@ func TestRunMountBindMode(t *testing.T) {
 	base := testutil.NewBase(t)
 
 	tmpDir1 := t.TempDir()
-	defer os.RemoveAll(tmpDir1)
 	tmpDir1Mnt := filepath.Join(tmpDir1, "mnt")
 	if err := os.MkdirAll(tmpDir1Mnt, 0o700); err != nil {
 		t.Fatal(err)
 	}
 
-	tmpDir2, err := os.MkdirTemp(t.TempDir(), "ro")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(tmpDir2)
+	tmpDir2 := t.TempDir()
 
 	if err := mobymount.Mount(tmpDir2, tmpDir1Mnt, "none", "bind,ro"); err != nil {
 		t.Fatal(err)
@@ -425,18 +420,12 @@ func TestRunVolumeBindMode(t *testing.T) {
 	base := testutil.NewBase(t)
 
 	tmpDir1 := t.TempDir()
-	defer os.RemoveAll(tmpDir1)
 	tmpDir1Mnt := filepath.Join(tmpDir1, "mnt")
 	if err := os.MkdirAll(tmpDir1Mnt, 0o700); err != nil {
 		t.Fatal(err)
 	}
 
-	tmpDir2, err := os.MkdirTemp(t.TempDir(), "ro")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(tmpDir2)
-
+	tmpDir2 := t.TempDir()
 	if err := mobymount.Mount(tmpDir2, tmpDir1Mnt, "none", "bind,ro"); err != nil {
 		t.Fatal(err)
 	}
@@ -543,10 +532,7 @@ func TestRunBindMountPropagation(t *testing.T) {
 
 		t.Logf("Running test propagation case %s", propagationName)
 
-		rwDir, err := os.MkdirTemp(t.TempDir(), "rw")
-		if err != nil {
-			t.Fatal(err)
-		}
+		rwDir := t.TempDir()
 
 		containerName := tID + "-" + propagationName
 		containerNameReplica := containerName + "-replica"

@@ -36,6 +36,7 @@ import (
 )
 
 func TestReadLogs(t *testing.T) {
+	//nolint:usetesting
 	file, err := os.CreateTemp("", "TestFollowLogs")
 	if err != nil {
 		t.Fatalf("unable to create temp file")

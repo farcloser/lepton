@@ -38,9 +38,6 @@ linters:
     # Deprecated
     - tenv
 
-    # Temporarily disabling
-    - usetesting
-
     # To be enabled
     - wrapcheck
     - wsl
