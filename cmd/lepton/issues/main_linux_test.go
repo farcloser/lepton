@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package issues
+package issues_test
 
 import (
 	"testing"

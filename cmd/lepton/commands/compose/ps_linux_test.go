@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package compose
+package compose_test
 
 import (
 	"encoding/json"
@@ -25,6 +25,7 @@ import (
 
 	"gotest.tools/v3/assert"
 
+	"go.farcloser.world/lepton/cmd/lepton/commands/compose"
 	"go.farcloser.world/lepton/pkg/formatter"
 	"go.farcloser.world/lepton/pkg/tabutil"
 	"go.farcloser.world/lepton/pkg/testutil"
@@ -153,7 +154,7 @@ volumes:
 	assertHandler := func(svc string, count int, fields ...string) func(stdout string) error {
 		return func(stdout string) error {
 			// 1. check json output can be unmarshalled back to printables.
-			var printables []composeContainerPrintable
+			var printables []compose.ContainerPrintable
 			if err := json.Unmarshal([]byte(stdout), &printables); err != nil {
 				return fmt.Errorf("[service: %s]failed to unmarshal json output from `compose ps`: %s", svc, stdout)
 			}

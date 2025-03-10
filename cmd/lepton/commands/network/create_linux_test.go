@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package network
+package network_test
 
 import (
 	"net"

@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package container
+package container_test
 
 import (
 	"fmt"

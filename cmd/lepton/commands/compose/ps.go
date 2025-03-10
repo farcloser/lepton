@@ -59,7 +59,7 @@ func psCommand() *cobra.Command {
 	return cmd
 }
 
-type composeContainerPrintable struct {
+type ContainerPrintable struct {
 	ID       string
 	Name     string
 	Image    string
@@ -177,11 +177,11 @@ func psAction(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	containersPrintable := make([]composeContainerPrintable, len(containers))
+	containersPrintable := make([]ContainerPrintable, len(containers))
 	eg, ctx := errgroup.WithContext(ctx)
 	for i, container := range containers {
 		eg.Go(func() error {
-			var p composeContainerPrintable
+			var p ContainerPrintable
 			var err error
 			if format == formatter.FormatJSON {
 				p, err = composeContainerPrintableJSON(ctx, container)
@@ -233,16 +233,16 @@ func psAction(cmd *cobra.Command, args []string) error {
 	return w.Flush()
 }
 
-// composeContainerPrintableTab constructs composeContainerPrintable with fields
+// composeContainerPrintableTab constructs ContainerPrintable with fields
 // only for console output.
-func composeContainerPrintableTab(ctx context.Context, container client.Container) (composeContainerPrintable, error) {
+func composeContainerPrintableTab(ctx context.Context, container client.Container) (ContainerPrintable, error) {
 	info, err := container.Info(ctx, client.WithoutRefreshedMetadata)
 	if err != nil {
-		return composeContainerPrintable{}, err
+		return ContainerPrintable{}, err
 	}
 	spec, err := container.Spec(ctx)
 	if err != nil {
-		return composeContainerPrintable{}, err
+		return ContainerPrintable{}, err
 	}
 	status := formatter.ContainerStatus(ctx, container)
 	if status == "Up" {
@@ -250,10 +250,10 @@ func composeContainerPrintableTab(ctx context.Context, container client.Containe
 	}
 	image, err := container.Image(ctx)
 	if err != nil {
-		return composeContainerPrintable{}, err
+		return ContainerPrintable{}, err
 	}
 
-	return composeContainerPrintable{
+	return ContainerPrintable{
 		Name:    info.Labels[labels.Name],
 		Image:   image.Metadata().Name,
 		Command: formatter.InspectContainerCommandTrunc(spec),
@@ -263,16 +263,16 @@ func composeContainerPrintableTab(ctx context.Context, container client.Containe
 	}, nil
 }
 
-// composeContainerPrintableJSON constructs composeContainerPrintable with fields
+// composeContainerPrintableJSON constructs ContainerPrintable with fields
 // only for json output and compatible docker output.
-func composeContainerPrintableJSON(ctx context.Context, container client.Container) (composeContainerPrintable, error) {
+func composeContainerPrintableJSON(ctx context.Context, container client.Container) (ContainerPrintable, error) {
 	info, err := container.Info(ctx, client.WithoutRefreshedMetadata)
 	if err != nil {
-		return composeContainerPrintable{}, err
+		return ContainerPrintable{}, err
 	}
 	spec, err := container.Spec(ctx)
 	if err != nil {
-		return composeContainerPrintable{}, err
+		return ContainerPrintable{}, err
 	}
 
 	var (
@@ -293,10 +293,10 @@ func composeContainerPrintableJSON(ctx context.Context, container client.Contain
 	}
 	image, err := container.Image(ctx)
 	if err != nil {
-		return composeContainerPrintable{}, err
+		return ContainerPrintable{}, err
 	}
 
-	return composeContainerPrintable{
+	return ContainerPrintable{
 		ID:         container.ID(),
 		Name:       info.Labels[labels.Name],
 		Image:      image.Metadata().Name,
