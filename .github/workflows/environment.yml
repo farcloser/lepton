@@ -57,7 +57,7 @@ on:
 
 jobs:
   blank:
-    name: "Setting-up environment"
+    name: " "
     runs-on: ubuntu-24.04
     steps:
       - run: |

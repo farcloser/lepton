@@ -17,22 +17,26 @@ jobs:
     needs: env
     timeout-minutes: ${{ fromJSON(needs.env.outputs.TIMEOUT_LONG) }}
     name: dependencies
-    runs-on: ${{ needs.env.outputs.RUNNER_LINUX_STABLE }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ${{ needs.env.outputs.RUNNER_LINUX_AMD64_STABLE }}
+          - runner: ${{ needs.env.outputs.RUNNER_LINUX_ARM64_STABLE }}
     steps:
       - name: "Clone"
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
-      - name: "Setup"
-        uses: ./.github/actions/node
-        with:
-          go: ${{ matrix.go }}
+      #- name: "Setup"
+      #  uses: ./.github/actions/node
       - name: "Buildkit"
         uses: ./.github/actions/install-buildkit
       - name: "Build base dependencies for all targets"
         run: |
           # FIXME: get rid of this nonsense
-          docker run --net none --privileged --rm tonistiigi/binfmt --install linux/arm64
+          # docker run --net none --privileged --rm tonistiigi/binfmt --install linux/arm64
+          #  --opt platform="linux/amd64,linux/arm64" \
           time sudo -E buildctl build \
-            --opt platform="linux/amd64,linux/arm64" \
             --frontend=dockerfile.v0 \
             --import-cache="type=gha,scope=build-integration" \
             --export-cache="type=gha,scope=build-integration,compression=zstd,mode=max" \

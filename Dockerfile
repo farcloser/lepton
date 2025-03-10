@@ -97,7 +97,6 @@ RUN apt-get install -qq --no-install-recommends \
 # Finally note that we are retrieving both architectures we are currently supporting (arm64 and amd64) in one stage,
 # and do NOT leverage TARGETARCH, as that would force cross compilation to use a non-native binary in dependent stages.
 FROM --platform=$BUILDPLATFORM tooling-downloader AS tooling-downloader-golang
-ARG BUILDPLATFORM
 ARG GO_VERSION
 # This run does:
 # a. retrieve golang list of versions
@@ -107,7 +106,7 @@ ARG GO_VERSION
 # Consuming stages later on can just COPY --from=tooling-downloader-golang /out/usr/local/$BUILDPLATFORM /usr/local
 # to get native go for their current execution platform
 # Note that though we dynamically retrieve GOOS here, we only support linux
-RUN os="${BUILDPLATFORM%%/*}"; \
+RUN os=linux; \
     all_versions="$(curl -fsSL --proto '=https' --tlsv1.2 "https://go.dev/dl/?mode=json&include=all")"; \
     candidates="$(case "$GO_VERSION" in \
       canary) condition=".stable==false" ;; \
@@ -493,9 +492,6 @@ RUN apt-get install -qq --no-install-recommends \
   uidmap \
   openssh-server \
   openssh-client >/dev/null
-# Add go
-ENV PATH="/root/go/bin:/usr/local/go/bin:$PATH"
-COPY --from=tooling-downloader-golang /out/usr/local/$TARGETPLATFORM /usr/local
 # Add all needed dependencies, but not the cli yet to avoid busting cache
 COPY --from=dependencies-build-containerd /out /usr/local
 COPY --from=dependencies-build-runc /out /usr/local
@@ -516,6 +512,9 @@ RUN cd /usr/local/lib/systemd/system && \
 # Final preparations
 RUN cp /usr/local/bin/tini /usr/local/bin/tini-custom
 RUN mkdir -p -m 0755 /etc/cni
+# Add go
+ENV PATH="/root/go/bin:/usr/local/go/bin:$PATH"
+COPY --from=tooling-downloader-golang /out/usr/local/$TARGETPLATFORM /usr/local
 VOLUME /var/lib/containerd
 VOLUME /var/lib/buildkit
 VOLUME /var/lib/containerd-stargz-grpc
