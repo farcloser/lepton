@@ -1,75 +1,71 @@
-name: "Go install"
-description: "This action will install go (currently supported version by default). Operator may optionally require the `strategy` input:
- - 'canary', for the latest RC/beta
- - 'latest-stable', for the latest patch release for the currently supported version (this is normally the default, unless nerdctl is lagging)
- - 'old-stable' for the latest patch release of the minimum minor go version nerdctl is supporting"
+name: "Install: go"
+
+description: "A simple action installing go, with caching"
+
+# Note: tlsv1.2 is necessary to work on windows-2019
+
 inputs:
-  cache-dependency-path:
-    description: 'Used to specify the path to a dependency file - go.sum'
-  strategy:
-    default: ""
-    description: "You may set this to `canary`, `latest-stable`, or `old-stable`. Otherwise defauls to the explicitly supported version."
-  # These below are technically not input variables (that we expect people to specific or change).
-  # We are just abusing the system here for convenience, since a composite action does not let you define env.
-  # This here is the one, central location where we would update go versions when there is a newly supported go version.
-  _current:
-    default: "1.23.5"
-    description: "What we consider the current blessed go version (typically the latest patch release of the last major.minor version)"
-  _stable:
-    default: "1.23.x"
-    description: "The latest major.minor version we support"
-  _old_stable:
-    default: "1.23.x"
-    description: "The minimum major.minor go version that we still support"
+  version:
+    default: "stable"
+    description: "1.24 (latest patch release on the branch), 1.24.1 (specific patch release), \
+    stable (latest stable release), canary (latest alpha/beta/RC release)"
 
 runs:
   using: composite
   steps:
-    - name: "Set GO_VERSION environment variable from user strategy"
+    - name: "Environment setup"
       shell: bash
       run: |
-        golang::canary(){
-          # Enable extended globbing features to use advanced pattern matching
-          shopt -s extglob
-          # Get latest golang version and split it in components
-          norm=()
-          while read -r line; do
-            line_trimmed="${line//+([[:space:]])/}"
-            norm+=("$line_trimmed")
-          done < \
-            <(sed -E 's/^go([0-9]+)[.]([0-9]+)([.]([0-9]+))?(([a-z]+)([0-9]+))?/\1.\2\n\4\n\6\n\7/i' \
-              <(curl -fsSL "https://go.dev/dl/?mode=json&include=all" | jq -rc .[0].version) \
-            )
-          # Serialize version, making sure we have a patch version, and separate possible rcX into .rc-X
-          [ "${norm[1]}" != "" ] || norm[1]="0"
-          norm[1]=".${norm[1]}"
-          [ "${norm[2]}" == "" ] || norm[2]="-${norm[2]}"
-          [ "${norm[3]}" == "" ] || norm[3]=".${norm[3]}"
-          # Save it
-          IFS=
-          echo "GO_VERSION=${norm[*]}" >> "$GITHUB_ENV"
-        }
+        # Get the selector from the input
+        case "${{ inputs.version }}" in
+          "stable" | "") selector=.stable==true ;;
+          "canary") selector=.stable==false ;;
+          *) selector=".version | startswith(\"go${{ inputs.version }}\")" ;;
+        esac
 
-        if [ "${{ inputs.strategy }}" == "canary" ]; then
-          golang::canary
-        elif [ "${{ inputs.strategy }}" == "latest-stable" ]; then
-          echo "GO_VERSION=${{ inputs._stable }}" >> "$GITHUB_ENV"
-        elif [ "${{ inputs.strategy }}" == "old-stable" ]; then
-          echo "GO_VERSION=${{ inputs._old_stable }}" >> "$GITHUB_ENV"
-        else
-          echo "GO_VERSION=${{ inputs._current }}" >> "$GITHUB_ENV"
-        fi
-    - name: "Setup Go"
-      uses: actions/setup-go@3041bf56c941b39c61721a86cd11f3bb1338122a  # v5.2.0
+        # Retrieve the files for the requested version
+        files="$(curl -fsSL --proto "=https" --tlsv1.2 "https://go.dev/dl/?mode=json&include=all" | jq -rc 'map(select('"$selector"'))[0].files')"
+
+        # Get the arch
+        arch=$(echo "$RUNNER_ARCH" | sed -E "s/(X86|X64)/amd64/" | sed -E "s/(ARM|ARM64)/arm64/")
+
+        # Get the os
+        os=$(echo "$RUNNER_OS" | tr '[:upper:]' '[:lower:]' | sed -E "s/macos/darwin/")
+
+        # Get the filename for that os and arch
+        filename="$(jq -rc 'map(select(.os=="'"$os"'" and .arch=="'"$arch"'"))[0].filename' <<<"$files")"
+
+        # Save the filename to be used as cache key.
+        echo "ACTION_INSTALL_GO_FILENAME=$filename" >> "$GITHUB_ENV"
+
+        # Configure the path
+        echo "PATH=$HOME/opt/go/bin:$HOME/go/bin:$PATH" >> "$GITHUB_ENV"
+
+        # Ensure destination is here
+        mkdir -p ~/opt
+
+    - name: "Enable cache: go"
+      uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf  # v4.2.2
+      id: cache
       with:
-        go-version: ${{ env.GO_VERSION }}
-        cache-dependency-path: ${{ inputs.cache-dependency-path }}
-        # See https://github.com/containerd/nerdctl/issues/3733
-        # GitHub cache is very limited. We currently depend on it for the (more important) build dependencies caching.
-        # Disabling this here will slow down the setup a bit.
-        cache: false
-    - name: "Cleanup go version string"
+        path: ~/opt/go
+        key: action-install-go-${{ env.ACTION_INSTALL_GO_FILENAME }}
+
+    - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+      name: "Install: go"
       shell: bash
-      # Remove possible trailing .x
+      continue-on-error: false
       run: |
-        echo "GO_VERSION=${GO_VERSION%.x*}" >> "$GITHUB_ENV"
+        cd ~/opt
+        curl -O -fsSL --proto '=https' --tlsv1.2 https://go.dev/dl/"$ACTION_INSTALL_GO_FILENAME"
+        [ "${ACTION_INSTALL_GO_FILENAME##*.}" = zip ] && unzip "$ACTION_INSTALL_GO_FILENAME" >/dev/null || tar xzf "$ACTION_INSTALL_GO_FILENAME"
+        rm -f "$ACTION_INSTALL_GO_FILENAME"
+
+    - name: "Enable cache: go mod"
+      uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf  # v4.2.2
+      id: cache-gomod
+      with:
+        path: ~/go/pkg/mod
+        key: action-cache-gomod-${{ hashFiles('**/go.*') }}
+        restore-keys: |
+          action-cache-gomod-

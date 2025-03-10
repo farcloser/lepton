@@ -1,0 +1,98 @@
+name: integration
+
+on:
+  push:
+    branches:
+      - main
+      - 'release/**'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+
+jobs:
+  env:
+    uses: ./.github/workflows/environment.yml
+
+  build-dependencies:
+    needs: env
+    timeout-minutes: ${{ fromJSON(needs.env.outputs.TIMEOUT_LONG) }}
+    name: dependencies
+    runs-on: ${{ needs.env.outputs.RUNNER_LINUX_STABLE }}
+    steps:
+      - name: "Clone"
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - name: "Setup"
+        uses: ./.github/actions/node
+        with:
+          go: ${{ matrix.go }}
+      - name: "Buildkit"
+        uses: ./.github/actions/install-buildkit
+      - name: "Build base dependencies for all targets"
+        run: |
+          # FIXME: get rid of this nonsense
+          docker run --net none --privileged --rm tonistiigi/binfmt --install linux/arm64
+          time sudo -E buildctl build \
+            --opt platform="linux/amd64,linux/arm64" \
+            --frontend=dockerfile.v0 \
+            --import-cache="type=gha,scope=build-integration" \
+            --export-cache="type=gha,scope=build-integration,compression=zstd,mode=max" \
+            --opt target="assembly-runtime" \
+            --local dockerfile=$(pwd) \
+            --local context=$(pwd)
+
+  test-integration:
+    needs:
+      - env
+      - build-dependencies
+    timeout-minutes: ${{ fromJSON(needs.env.outputs.TIMEOUT_LONG) }}
+    name: rootful | ${{ matrix.runner }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ${{ needs.env.outputs.RUNNER_LINUX_AMD64_STABLE }}
+          - runner: ${{ needs.env.outputs.RUNNER_LINUX_ARM64_STABLE }}
+    steps:
+      - name: "Clone"
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      # FIXME: remove - only necessary if we build lepton
+      - name: "Setup"
+        uses: ./.github/actions/node
+        with:
+          go: ${{ matrix.go }}
+      - name: "Buildkit"
+        uses: ./.github/actions/install-buildkit
+      - name: "Prepare integration test environment"
+        run: |
+          time sudo -E buildctl build \
+            --frontend=dockerfile.v0 \
+            --import-cache="type=gha,scope=build-integration" \
+            --output=type=image,name=test-integration \
+            --opt target="test-integration" \
+            --local dockerfile=$(pwd) \
+            --local context=$(pwd)
+      - name: "Remove snap loopback devices (conflicts with our loopback devices in TestRunDevice)"
+        run: |
+          sudo systemctl disable --now snapd.service snapd.socket
+          sudo apt-get purge -y snapd
+          sudo losetup -Dv
+          sudo losetup -lv
+          sudo apt-get install -qq expect
+
+          # FIXME: replace by a fixed version download
+          make build
+          sudo make install
+
+          sudo lepton run --net none --privileged --rm tonistiigi/binfmt --install linux/amd64 || true
+          sudo lepton run --net none --privileged --rm tonistiigi/binfmt --install linux/arm64 || true
+      - name: "Run integration tests"
+        run: |
+          # FIXME: we should delete on container shutdown instead
+          sudo ip link delete lepton0 2>/dev/null || true
+          sudo unbuffer lepton run -t --net host --rm --env LEPTON_BRIDGE_IP=10.42.100.1/24 --privileged test-integration ./hack/test-integration.sh -test.only-flaky=false
+      - name: "Run integration tests (flaky)"
+        run: |
+          # FIXME: we should delete on container shutdown instead
+          sudo ip link delete lepton0 2>/dev/null || true
+          sudo unbuffer lepton run -t --net host --rm --env LEPTON_BRIDGE_IP=10.42.100.1/24 --privileged test-integration ./hack/test-integration.sh -test.only-flaky=true

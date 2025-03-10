@@ -16,7 +16,8 @@ on:
       - '**.yml'
 
 env:
-  SHORT_TIMEOUT: 5
+  # Note: most short runs are way below 5, except windows, which is very slow and cache hit 5+ with cold cache
+  TIMEOUT_SHORT: 10
   LONG_TIMEOUT: 60
 
 jobs:
@@ -25,24 +26,20 @@ jobs:
     name: docker
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
-        with:
-          fetch-depth: 1
+      - name: "Clone"
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
       - name: "Install go"
         uses: ./.github/actions/install-go
-      - name: "Register QEMU (tonistiigi/binfmt)"
-        run: |
-          # `--install all` will only install emulation for architectures that cannot be natively executed
-          # Since some arm64 platforms do provide native fallback execution for 32 bits,
-          # armv7 emulation may or may not be installed, causing variance in the result of `uname -m`.
-          # To avoid that, we explicitly list the architectures we do want emulation for.
-          docker run --privileged --rm tonistiigi/binfmt --install linux/amd64
-          docker run --privileged --rm tonistiigi/binfmt --install linux/arm64
-          docker run --privileged --rm tonistiigi/binfmt --install linux/arm/v7
-      - name: "Prepare integration test environment"
+      - name: "Install dev-tools"
+        uses: ./.github/actions/install-dev-tools
+      # FIXME: finish migrating unbuffer tests out
+      - name: "Add expect"
         run: |
           sudo apt-get install -qq --no-install-recommends expect
-          go install -v gotest.tools/gotestsum@v1
+      - name: "Register QEMU"
+        run: |
+          docker run --privileged --rm tonistiigi/binfmt --install linux/amd64
+          docker run --privileged --rm tonistiigi/binfmt --install linux/arm64
       - name: "Ensure that the integration test suite is compatible with Docker"
         run: WITH_SUDO=true ./hack/test-integration.sh -test.target=docker
       - name: "Ensure that the IPv6 integration test suite is compatible with Docker"

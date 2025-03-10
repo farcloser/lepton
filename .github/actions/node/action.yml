@@ -1,0 +1,23 @@
+name: "Node"
+
+description: "A compounded action preparing the environment"
+
+inputs:
+  go:
+    required: false
+    default: "stable"
+    description: ""
+
+runs:
+  using: composite
+  steps:
+    - name: "Install: go"
+      uses: ./.github/actions/install-go
+      with:
+        version: ${{ inputs.go }}
+    - name: "Install: dev-tools"
+      uses: ./.github/actions/install-dev-tools
+    - name: "Cache: go mod"
+      shell: bash
+      run: |
+        go mod download
