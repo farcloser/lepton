@@ -18,7 +18,6 @@ package container
 
 import (
 	"fmt"
-	"go.farcloser.world/tigron/expect"
 	"io"
 	"net"
 	"os"
@@ -37,6 +36,7 @@ import (
 	"gotest.tools/v3/icmd"
 
 	"go.farcloser.world/containers/digest"
+	"go.farcloser.world/tigron/expect"
 	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 

@@ -53,7 +53,7 @@ require (
 	github.com/yuchanns/srslog v1.1.0
 	go.farcloser.world/containers v0.1.1-0.20250310001017-14c23cde5749
 	go.farcloser.world/core v0.1.1-0.20250309235229-b34054776a90
-	go.farcloser.world/tigron v0.2.1-0.20250214224952-35e5a985ec63
+	go.farcloser.world/tigron v0.2.1-0.20250310032159-eb67b54dce8c
 	go.uber.org/mock v0.5.0
 	golang.org/x/crypto v0.36.0
 	golang.org/x/net v0.37.0

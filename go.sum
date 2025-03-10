@@ -284,8 +284,8 @@ go.farcloser.world/containers v0.1.1-0.20250310001017-14c23cde5749 h1:c3XVIveCRd
 go.farcloser.world/containers v0.1.1-0.20250310001017-14c23cde5749/go.mod h1:HaCi8BLNhnaQDULhP23NQAXh63zNf+skvQ3TTlO4is4=
 go.farcloser.world/core v0.1.1-0.20250309235229-b34054776a90 h1:2Ct0lh9Jt29aQem/x+7svTL1NG5d5Aw2PAvnV5Q9f10=
 go.farcloser.world/core v0.1.1-0.20250309235229-b34054776a90/go.mod h1:q8BbLDh456ZslcnC5Hj1e/4ojK772D5mHckXHaZ25eA=
-go.farcloser.world/tigron v0.2.1-0.20250214224952-35e5a985ec63 h1:01hDTxesH5oyWuujRfTsQ9+yn+tasjNj42w0ked1qew=
-go.farcloser.world/tigron v0.2.1-0.20250214224952-35e5a985ec63/go.mod h1:GoHYX48VZLL9rYTLZ0oOMUwtklBc+pUMGqmAM0EGSTI=
+go.farcloser.world/tigron v0.2.1-0.20250310032159-eb67b54dce8c h1:Ff2kSTWG3N9uduxFg4fuuLRTMOccEv2WrEHYdUdQ+UI=
+go.farcloser.world/tigron v0.2.1-0.20250310032159-eb67b54dce8c/go.mod h1:AQ+kW7/CF3azKsJTB5ZyPRCTZtwU8fsPScb+BW6IIcs=
 go.opencensus.io v0.24.0 h1:y73uSU6J157QMP2kn2r30vwW1A2W2WFwSCGnAVxeaD0=
 go.opencensus.io v0.24.0/go.mod h1:vNK8G9p7aAivkbmorf4v+7Hgx+Zs0yY+0fOtgBfjQKo=
 go.opentelemetry.io/auto/sdk v1.1.0 h1:cH53jehLUN6UFLY71z+NDOiNJqDdPRaXzTel0sJySYA=
