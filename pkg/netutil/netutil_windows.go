@@ -83,7 +83,7 @@ func (e *CNIEnv) generateIPAM(driver string, subnets []string, gatewayStr, ipRan
 	if err != nil {
 		return nil, err
 	}
-	ipamRange, err := parseIPAMRange(subnet, gatewayStr, ipRangeStr)
+	ipamRange, err := ParseIPAMRange(subnet, gatewayStr, ipRangeStr)
 	if err != nil {
 		return nil, err
 	}

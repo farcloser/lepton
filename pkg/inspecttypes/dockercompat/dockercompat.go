@@ -95,7 +95,7 @@ type ImageMetadata struct {
 	LastTagTime time.Time `json:",omitempty"`
 }
 
-type loggerLogConfig struct {
+type LoggerLogConfig struct {
 	Driver  string            `json:"driver"`
 	Opts    map[string]string `json:"opts,omitempty"`
 	LogURI  string            `json:"-"`
@@ -139,7 +139,7 @@ type Container struct {
 type HostConfig struct {
 	// Binds           []string      // List of volume bindings for this container
 	ContainerIDFile string          // File (path) where the containerId is written
-	LogConfig       loggerLogConfig // Configuration of the logs for this container
+	LogConfig       LoggerLogConfig // Configuration of the logs for this container
 	// NetworkMode     // Network mode to use for the container
 	PortBindings nat.PortMap // Port mapping between the exposed port (container) and the host
 	// RestartPolicy   // Restart policy to be used for the container
@@ -383,7 +383,7 @@ func ContainerFromNative(n *native.Container) (*Container, error) {
 		c.HostConfig.LogConfig.LogURI = nerdctlLoguri
 	}
 	if logConfigJSON, ok := n.Labels[labels.LogConfig]; ok {
-		var logConfig loggerLogConfig
+		var logConfig LoggerLogConfig
 		err := json.Unmarshal([]byte(logConfigJSON), &logConfig)
 		if err != nil {
 			return nil, fmt.Errorf("failed to unmarshal log config: %w", err)
@@ -393,7 +393,7 @@ func ContainerFromNative(n *native.Container) (*Container, error) {
 		c.HostConfig.LogConfig = logConfig
 	} else {
 		// If LogConfig label is not present, set default values
-		c.HostConfig.LogConfig = loggerLogConfig{
+		c.HostConfig.LogConfig = LoggerLogConfig{
 			Driver: "json-file",
 			Opts:   make(map[string]string),
 		}

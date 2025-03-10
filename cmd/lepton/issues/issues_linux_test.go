@@ -16,7 +16,7 @@
 
 // Package issues is meant to document testing for complex scenarios type of issues that cannot simply be ascribed
 // to a specific package.
-package issues
+package issues_test
 
 import (
 	"fmt"

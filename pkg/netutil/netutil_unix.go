@@ -285,7 +285,7 @@ func (e *CNIEnv) parseIPAMRanges(subnets []string, gateway, ipRange string, ipv6
 		if !findIPv4 && subnet.IP.To4() != nil {
 			findIPv4 = true
 		}
-		ipamRange, err := parseIPAMRange(subnet, gateway, ipRange)
+		ipamRange, err := ParseIPAMRange(subnet, gateway, ipRange)
 		if err != nil {
 			return nil, findIPv4, err
 		}

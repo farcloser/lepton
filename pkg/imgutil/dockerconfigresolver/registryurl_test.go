@@ -14,13 +14,14 @@
    limitations under the License.
 */
 
-package dockerconfigresolver
+package dockerconfigresolver_test
 
 import (
 	"testing"
 
 	"gotest.tools/v3/assert"
 
+	"go.farcloser.world/lepton/pkg/imgutil/dockerconfigresolver"
 	"go.farcloser.world/lepton/pkg/version"
 )
 
@@ -34,11 +35,11 @@ func TestURLParsingAndID(t *testing.T) {
 	}{
 		{
 			address: "∞://",
-			error:   ErrUnparsableURL,
+			error:   dockerconfigresolver.ErrUnparsableURL,
 		},
 		{
 			address: "whatever://",
-			error:   ErrUnsupportedScheme,
+			error:   dockerconfigresolver.ErrUnsupportedScheme,
 		},
 		{
 			address:    "",
@@ -181,7 +182,7 @@ func TestURLParsingAndID(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.address, func(t *testing.T) {
-			reg, err := Parse(tc.address)
+			reg, err := dockerconfigresolver.Parse(tc.address)
 			assert.ErrorIs(t, err, tc.error)
 			if err == nil {
 				assert.Equal(t, reg.CanonicalIdentifier(), tc.identifier)

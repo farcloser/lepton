@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package builder
+package builder_test
 
 import (
 	"errors"

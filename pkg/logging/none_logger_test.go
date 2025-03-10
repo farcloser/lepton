@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package logging
+package logging_test
 
 import (
 	"context"
@@ -24,6 +24,8 @@ import (
 
 	"github.com/containerd/containerd/v2/core/runtime/v2/logging"
 	"gotest.tools/v3/assert"
+
+	plogging "go.farcloser.world/lepton/pkg/logging"
 )
 
 func TestNoneLogger(t *testing.T) {
@@ -31,7 +33,7 @@ func TestNoneLogger(t *testing.T) {
 	tmpDir := t.TempDir()
 	ctx := context.Background()
 
-	logger := &NoneLogger{
+	logger := &plogging.NoneLogger{
 		Opts: map[string]string{},
 	}
 

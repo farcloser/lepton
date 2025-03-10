@@ -27,8 +27,6 @@ import (
 	"testing"
 	"time"
 
-	"gotest.tools/v3/assert"
-
 	"go.farcloser.world/lepton/pkg/testutil"
 	"go.farcloser.world/lepton/pkg/testutil/nettestutil"
 )
@@ -56,8 +54,7 @@ type JweKeyPair struct {
 
 func NewJWEKeyPair(t testing.TB) *JweKeyPair {
 	testutil.RequireExecutable(t, "openssl")
-	td, err := os.MkdirTemp(t.TempDir(), "jwe-key-pair")
-	assert.NilError(t, err)
+	td := t.TempDir()
 	prv := filepath.Join(td, "mykey.pem")
 	pub := filepath.Join(td, "mypubkey.pem")
 	cmds := [][]string{
@@ -98,8 +95,7 @@ type CosignKeyPair struct {
 }
 
 func NewCosignKeyPair(t testing.TB, path string, password string) *CosignKeyPair {
-	td, err := os.MkdirTemp(t.TempDir(), path)
-	assert.NilError(t, err)
+	td := t.TempDir()
 
 	cmd := exec.Command("cosign", "generate-key-pair")
 	cmd.Dir = td
@@ -122,13 +118,17 @@ func NewCosignKeyPair(t testing.TB, path string, password string) *CosignKeyPair
 
 func ComposeUp(t *testing.T, base *testutil.Base, dockerComposeYAML string, opts ...string) {
 	comp := testutil.NewComposeDir(t, dockerComposeYAML)
-	defer comp.CleanUp()
+	t.Cleanup(func() {
+		comp.CleanUp()
+	})
 
 	projectName := comp.ProjectName()
 	t.Logf("projectName=%q", projectName)
 
 	base.ComposeCmd(append(append([]string{"-f", comp.YAMLFullPath()}, opts...), "up", "-d")...).AssertOK()
-	defer base.ComposeCmd("-f", comp.YAMLFullPath(), "down", "-v").Run()
+	t.Cleanup(func() {
+		base.ComposeCmd("-f", comp.YAMLFullPath(), "down", "-v").Run()
+	})
 	base.Cmd("volume", "inspect", projectName+"_db").AssertOK()
 	base.Cmd("network", "inspect", projectName+"_default").AssertOK()
 

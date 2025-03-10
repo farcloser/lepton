@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package volume
+package volume_test
 
 import (
 	"strings"

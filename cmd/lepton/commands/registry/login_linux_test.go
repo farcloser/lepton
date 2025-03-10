@@ -18,7 +18,7 @@
 // Local registries, whose IP address falls in the 127.0.0.0/8 range, are automatically marked as insecure as of Docker 1.3.2.
 // It isn't recommended to rely on this, as it may change in the future.
 // "--insecure" means that either the certificates are untrusted, or that the protocol is plain http
-package registry
+package registry_test
 
 import (
 	"fmt"
@@ -75,7 +75,7 @@ func (ag *Client) GetConfigPath() string {
 
 func (ag *Client) Run(base *testutil.Base, host string) *testutil.Cmd {
 	if ag.configPath == "" {
-		ag.configPath, _ = os.MkdirTemp(base.T.TempDir(), "docker-config")
+		ag.configPath = base.T.TempDir()
 	}
 	args := []string{"login"}
 	if nerdtest.IsNotDocker() {

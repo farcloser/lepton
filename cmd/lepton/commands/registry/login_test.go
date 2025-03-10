@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package registry
+package registry_test
 
 import (
 	"testing"

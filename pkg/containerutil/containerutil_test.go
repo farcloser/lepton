@@ -14,11 +14,13 @@
    limitations under the License.
 */
 
-package containerutil
+package containerutil_test
 
 import (
 	"reflect"
 	"testing"
+
+	"go.farcloser.world/lepton/pkg/containerutil"
 )
 
 func TestParseExtraHosts(t *testing.T) {
@@ -68,7 +70,7 @@ func TestParseExtraHosts(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			extraHosts, err := ParseExtraHosts(test.extraHosts, test.hostGateway, test.separator)
+			extraHosts, err := containerutil.ParseExtraHosts(test.extraHosts, test.hostGateway, test.separator)
 			if err != nil && err.Error() != test.expectedErrStr {
 				t.Fatalf("expected '%s', actual '%v'", test.expectedErrStr, err)
 			} else if err == nil && test.expectedErrStr != "" {

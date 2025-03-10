@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package inspect
+package inspect_test
 
 import (
 	"testing"

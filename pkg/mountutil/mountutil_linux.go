@@ -92,7 +92,7 @@ func UnprivilegedMountFlags(path string) ([]string, error) {
 // parseVolumeOptions parses specified optsRaw with using information of
 // the volume type and the src directory when necessary.
 func parseVolumeOptions(vType, src, optsRaw string) ([]string, []oci.SpecOpts, error) {
-	return parseVolumeOptionsWithMountInfo(vType, src, optsRaw, getMountInfo)
+	return ParseVolumeOptionsWithMountInfo(vType, src, optsRaw, getMountInfo)
 }
 
 // getMountInfo gets mount.Info of a directory.
@@ -106,7 +106,7 @@ func getMountInfo(dir string) (mount.Info, error) {
 
 // parseVolumeOptionsWithMountInfo is the testable implementation
 // of parseVolumeOptions.
-func parseVolumeOptionsWithMountInfo(vType, src, optsRaw string, getMountInfoFunc func(string) (mount.Info, error)) ([]string, []oci.SpecOpts, error) {
+func ParseVolumeOptionsWithMountInfo(vType, src, optsRaw string, getMountInfoFunc func(string) (mount.Info, error)) ([]string, []oci.SpecOpts, error) {
 	var (
 		writeModeRawOpts   []string
 		propagationRawOpts []string

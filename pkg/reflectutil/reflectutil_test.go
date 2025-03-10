@@ -14,12 +14,14 @@
    limitations under the License.
 */
 
-package reflectutil
+package reflectutil_test
 
 import (
 	"testing"
 
 	"gotest.tools/v3/assert"
+
+	"go.farcloser.world/lepton/pkg/reflectutil"
 )
 
 func TestUnknownNonEmptyFields(t *testing.T) {
@@ -42,13 +44,13 @@ func TestUnknownNonEmptyFields(t *testing.T) {
 	}
 	assert.DeepEqual(t,
 		[]string{"FooStr", "FooStr3"},
-		UnknownNonEmptyFields(&foo1, "FooBool"))
+		reflectutil.UnknownNonEmptyFields(&foo1, "FooBool"))
 	assert.DeepEqual(t,
 		[]string{"FooStr", "FooStr3"},
-		UnknownNonEmptyFields(foo1, "FooBool"))
+		reflectutil.UnknownNonEmptyFields(foo1, "FooBool"))
 	assert.DeepEqual(t,
 		[]string{"FooStr", "FooStr3"},
-		UnknownNonEmptyFields(&foo1, "FooBool", "FooMap"))
+		reflectutil.UnknownNonEmptyFields(&foo1, "FooBool", "FooMap"))
 
 	foo2 := foo1
 	foo2.FooBoolPtr = &foo1.FooBool
@@ -57,11 +59,11 @@ func TestUnknownNonEmptyFields(t *testing.T) {
 	}
 	assert.DeepEqual(t,
 		[]string{"FooBoolPtr", "FooMap", "FooStr", "FooStr3"},
-		UnknownNonEmptyFields(&foo2, "FooBool"))
+		reflectutil.UnknownNonEmptyFields(&foo2, "FooBool"))
 
 	foo3 := foo1
 	foo3.FooMap = make(map[string]struct{})
 	assert.DeepEqual(t,
 		[]string{"FooStr", "FooStr3"},
-		UnknownNonEmptyFields(&foo3, "FooBool"))
+		reflectutil.UnknownNonEmptyFields(&foo3, "FooBool"))
 }

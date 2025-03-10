@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package namespace
+package namespace_test
 
 import (
 	"encoding/json"

@@ -115,7 +115,7 @@ func handleNpipeToMount(source string) (volumeSpec, error) {
 	return res, nil
 }
 
-func splitVolumeSpec(raw string) ([]string, error) {
+func SplitVolumeSpec(raw string) ([]string, error) {
 	raw = strings.TrimSpace(raw)
 	raw = strings.TrimLeft(raw, ":")
 	if raw == "" {
