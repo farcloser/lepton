@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package apparmor
+package apparmor_test
 
 import (
 	"testing"

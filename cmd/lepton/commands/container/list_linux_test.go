@@ -19,7 +19,6 @@ package container
 import (
 	"errors"
 	"fmt"
-	"os"
 	"slices"
 	"strings"
 	"testing"
@@ -48,10 +47,7 @@ func preparePsTestContainer(t *testing.T, identity string, keepAlive bool) (*tes
 	rwVolName := testContainerName + "-rw"
 
 	// A container can mount named and anonymous volumes
-	rwDir, err := os.MkdirTemp(t.TempDir(), "rw")
-	if err != nil {
-		t.Fatal(err)
-	}
+	rwDir := t.TempDir()
 
 	tearDown := func() {
 		base.Cmd("rm", "-f", testContainerName).AssertOK()

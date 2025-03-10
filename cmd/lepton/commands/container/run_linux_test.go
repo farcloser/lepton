@@ -67,14 +67,11 @@ func TestRunCustomRootfs(t *testing.T) {
 
 func prepareCustomRootfs(base *testutil.Base, imageName string) string {
 	base.Cmd("pull", "--quiet", imageName).AssertOK()
-	tmpDir, err := os.MkdirTemp(base.T.TempDir(), "test-save")
-	assert.NilError(base.T, err)
-	defer os.RemoveAll(tmpDir)
+	tmpDir := base.T.TempDir()
 	archiveTarPath := filepath.Join(tmpDir, "a.tar")
 	base.Cmd("save", "-o", archiveTarPath, imageName).AssertOK()
-	rootfs, err := os.MkdirTemp(base.T.TempDir(), "rootfs")
-	assert.NilError(base.T, err)
-	err = various.ExtractDockerArchive(archiveTarPath, rootfs)
+	rootfs := base.T.TempDir()
+	err := various.ExtractDockerArchive(archiveTarPath, rootfs)
 	assert.NilError(base.T, err)
 	return rootfs
 }

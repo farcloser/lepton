@@ -18,7 +18,6 @@ package container
 
 import (
 	"fmt"
-	"os"
 	"slices"
 	"strings"
 	"testing"
@@ -421,10 +420,7 @@ func TestContainerInspectDevices(t *testing.T) {
 	defer base.Cmd("rm", "-f", testContainer).Run()
 
 	// Create a temporary directory
-	dir, err := os.MkdirTemp(t.TempDir(), "device-dir")
-	if err != nil {
-		t.Fatal(err)
-	}
+	dir := t.TempDir()
 
 	if testutil.GetTarget() == testutil.Docker {
 		dir = "/dev/zero"

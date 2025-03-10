@@ -37,14 +37,8 @@ func TestRunVolume(t *testing.T) {
 	t.Parallel()
 	base := testutil.NewBase(t)
 	tID := testutil.Identifier(t)
-	rwDir, err := os.MkdirTemp(t.TempDir(), "rw")
-	if err != nil {
-		t.Fatal(err)
-	}
-	roDir, err := os.MkdirTemp(t.TempDir(), "ro")
-	if err != nil {
-		t.Fatal(err)
-	}
+	rwDir := t.TempDir()
+	roDir := t.TempDir()
 	rwVolName := tID + "-rw"
 	roVolName := tID + "-ro"
 	for _, v := range []string{rwVolName, roVolName} {
@@ -188,8 +182,7 @@ CMD ["cat", "/mnt/initial_file"]
 	base.Cmd("run", "-v", volName+":/mnt", "--rm", imageName).AssertOutExactly("hi\n")
 
 	// mount bind
-	tmpDir, err := os.MkdirTemp(t.TempDir(), "hostDir")
-	assert.NilError(t, err)
+	tmpDir := t.TempDir()
 
 	base.Cmd("run", "-v", tmpDir+":/mnt", "--rm", imageName).AssertFail()
 }
@@ -307,14 +300,8 @@ func TestRunBindMountBind(t *testing.T) {
 	t.Parallel()
 	base := testutil.NewBase(t)
 	tID := testutil.Identifier(t)
-	rwDir, err := os.MkdirTemp(t.TempDir(), "rw")
-	if err != nil {
-		t.Fatal(err)
-	}
-	roDir, err := os.MkdirTemp(t.TempDir(), "ro")
-	if err != nil {
-		t.Fatal(err)
-	}
+	rwDir := t.TempDir()
+	roDir := t.TempDir()
 
 	containerName := tID
 	defer base.Cmd("rm", "-f", containerName).AssertOK()
@@ -374,10 +361,7 @@ func TestRunMountBindMode(t *testing.T) {
 	t.Parallel()
 	base := testutil.NewBase(t)
 
-	tmpDir1, err := os.MkdirTemp(t.TempDir(), "rw")
-	if err != nil {
-		t.Fatal(err)
-	}
+	tmpDir1 := t.TempDir()
 	defer os.RemoveAll(tmpDir1)
 	tmpDir1Mnt := filepath.Join(tmpDir1, "mnt")
 	if err := os.MkdirAll(tmpDir1Mnt, 0o700); err != nil {
@@ -440,10 +424,7 @@ func TestRunVolumeBindMode(t *testing.T) {
 	t.Parallel()
 	base := testutil.NewBase(t)
 
-	tmpDir1, err := os.MkdirTemp(t.TempDir(), "rw")
-	if err != nil {
-		t.Fatal(err)
-	}
+	tmpDir1 := t.TempDir()
 	defer os.RemoveAll(tmpDir1)
 	tmpDir1Mnt := filepath.Join(tmpDir1, "mnt")
 	if err := os.MkdirAll(tmpDir1Mnt, 0o700); err != nil {
@@ -646,14 +627,8 @@ func TestRunVolumesFrom(t *testing.T) {
 	t.Parallel()
 	base := testutil.NewBase(t)
 	tID := testutil.Identifier(t)
-	rwDir, err := os.MkdirTemp(t.TempDir(), "rw")
-	if err != nil {
-		t.Fatal(err)
-	}
-	roDir, err := os.MkdirTemp(t.TempDir(), "ro")
-	if err != nil {
-		t.Fatal(err)
-	}
+	rwDir := t.TempDir()
+	roDir := t.TempDir()
 	rwVolName := tID + "-rw"
 	roVolName := tID + "-ro"
 	for _, v := range []string{rwVolName, roVolName} {
@@ -699,17 +674,14 @@ func TestBindMountWhenHostFolderDoesNotExist(t *testing.T) {
 	t.Parallel()
 	base := testutil.NewBase(t)
 	containerName := testutil.Identifier(t) + "-host-dir-not-found"
-	hostDir, err := os.MkdirTemp(t.TempDir(), "rw")
-	if err != nil {
-		t.Fatal(err)
-	}
+	hostDir := t.TempDir()
 	defer os.RemoveAll(hostDir)
 	hp := filepath.Join(hostDir, "does-not-exist")
 	base.Cmd("run", "--name", containerName, "-d", "-v", hp+":/tmp", testutil.AlpineImage).AssertOK()
 	base.Cmd("rm", "-f", containerName).AssertOK()
 
 	// Host directory should get created
-	_, err = os.Stat(hp)
+	_, err := os.Stat(hp)
 	assert.NilError(t, err)
 
 	// Test for --mount

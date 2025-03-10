@@ -17,7 +17,6 @@
 package container
 
 import (
-	"os"
 	"testing"
 
 	"gotest.tools/v3/assert"
@@ -30,14 +29,8 @@ func TestRunMountVolume(t *testing.T) {
 	t.Parallel()
 	base := testutil.NewBase(t)
 	tID := testutil.Identifier(t)
-	rwDir, err := os.MkdirTemp(t.TempDir(), "rw")
-	if err != nil {
-		t.Fatal(err)
-	}
-	roDir, err := os.MkdirTemp(t.TempDir(), "ro")
-	if err != nil {
-		t.Fatal(err)
-	}
+	rwDir := t.TempDir()
+	roDir := t.TempDir()
 	rwVolName := tID + "-rw"
 	roVolName := tID + "-ro"
 	for _, v := range []string{rwVolName, roVolName} {
