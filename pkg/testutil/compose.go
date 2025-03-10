@@ -20,6 +20,7 @@ import (
 	"context"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/compose-spec/compose-go/v2/loader"
@@ -47,7 +48,7 @@ func (cd *ComposeDir) Dir() string {
 }
 
 func (cd *ComposeDir) ProjectName() string {
-	return filepath.Base(cd.dir)
+	return strings.ToLower(filepath.Base(cd.dir))
 }
 
 func (cd *ComposeDir) CleanUp() {
@@ -55,7 +56,8 @@ func (cd *ComposeDir) CleanUp() {
 }
 
 func NewComposeDir(t testing.TB, dockerComposeYAML string) *ComposeDir {
-	tmpDir := t.TempDir()
+	//nolint:usetesting
+	tmpDir, _ := os.MkdirTemp(t.TempDir(), "cli-test-compose-")
 	cd := &ComposeDir{
 		t:            t,
 		dir:          tmpDir,

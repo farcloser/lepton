@@ -118,13 +118,17 @@ func NewCosignKeyPair(t testing.TB, path string, password string) *CosignKeyPair
 
 func ComposeUp(t *testing.T, base *testutil.Base, dockerComposeYAML string, opts ...string) {
 	comp := testutil.NewComposeDir(t, dockerComposeYAML)
-	defer comp.CleanUp()
+	t.Cleanup(func() {
+		comp.CleanUp()
+	})
 
 	projectName := comp.ProjectName()
 	t.Logf("projectName=%q", projectName)
 
 	base.ComposeCmd(append(append([]string{"-f", comp.YAMLFullPath()}, opts...), "up", "-d")...).AssertOK()
-	defer base.ComposeCmd("-f", comp.YAMLFullPath(), "down", "-v").Run()
+	t.Cleanup(func() {
+		base.ComposeCmd("-f", comp.YAMLFullPath(), "down", "-v").Run()
+	})
 	base.Cmd("volume", "inspect", projectName+"_db").AssertOK()
 	base.Cmd("network", "inspect", projectName+"_default").AssertOK()
 
