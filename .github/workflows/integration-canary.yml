@@ -15,16 +15,25 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
+  env:
+    uses: ./.github/workflows/environment.yml
+
   linux:
-    runs-on: ubuntu-24.04
+    needs: env
+    timeout-minutes: ${{ fromJSON(needs.env.outputs.TIMEOUT_LONG) }}
     name: linux
-    timeout-minutes: 40
+    runs-on: ${{ needs.env.outputs.RUNNER_LINUX_STABLE }}
+    env:
+      GO_VERSION: canary
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - name: "Clone"
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - name: "Setup"
+        uses: ./.github/actions/node
+        with:
+          go: canary
       - name: "Prepare integration test environment"
         run: |
-          # Get latest canary go version
-          export GO_VERSION=$(make install-go-resolve-version)
           # Build integration image with updated dependencies
           . ./hack/build-integration-canary.sh
           LOG_LEVEL=info canary::build::integration
@@ -36,32 +45,37 @@ jobs:
           sudo losetup -lv
       - name: "Register QEMU"
         run: |
-          docker run --privileged --rm tonistiigi/binfmt --install linux/amd64
-          docker run --privileged --rm tonistiigi/binfmt --install linux/arm64
+          # FIXME: replace by a fixed version download
+          make build
+          sudo make install
+
+          sudo lepton run --net none --privileged --rm tonistiigi/binfmt --install linux/amd64 || true
+          sudo lepton run --net none --privileged --rm tonistiigi/binfmt --install linux/arm64 || true
       - name: "Run integration tests"
         run: docker run -t --rm --privileged test-integration ./hack/test-integration.sh -test.only-flaky=false
       - name: "Run integration tests (flaky)"
         run: docker run -t --rm --privileged test-integration ./hack/test-integration.sh -test.only-flaky=true
 
   windows:
-    timeout-minutes: 30
+    needs: env
+    timeout-minutes: ${{ fromJSON(needs.env.outputs.TIMEOUT_LONG) }}
     name: windows
-    runs-on: windows-2025
+    runs-on: ${{ needs.env.outputs.RUNNER_WINDOWS_CANARY }}
     defaults:
       run:
         shell: bash
     steps:
       - name: "Clone"
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
-      - name: "Install go"
-        uses: ./.github/actions/install-go
+      - name: "Setup"
+        uses: ./.github/actions/node
         with:
-          version: canary
-      - name: "Install dev-tools"
-        uses: ./.github/actions/install-dev-tools
+          go: canary
       # TODO: cache these
-      - name: "Set up CNI"
-        run: GOPATH=$(go env GOPATH) ./hack/provisioning/windows/cni.sh
+      # FIXME: caching? Takes ~30s
+      - name: "Setup CNI"
+        run: |
+          [ "$RUNNER_OS" != Windows ] || GOPATH=$(go env GOPATH) ./hack/provisioning/windows/cni.sh
       - name: "Setup containerd"
         run: |
           # Get latest tagged containerd

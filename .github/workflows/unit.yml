@@ -46,5 +46,4 @@ jobs:
           [ "$RUNNER_OS" != Windows ] || GOPATH=$(go env GOPATH) ./hack/provisioning/windows/cni.sh
       - name: "Unit testing"
         run: |
-          echo $RUNNER_OS
           make test-unit
