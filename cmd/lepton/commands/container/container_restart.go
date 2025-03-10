@@ -39,6 +39,7 @@ func RestartCommand() *cobra.Command {
 	}
 
 	cmd.Flags().UintP("time", "t", 10, "Seconds to wait for stop before killing it")
+	cmd.Flags().StringP("signal", "s", "", "Signal to send to stop the container, before killing it")
 
 	return cmd
 }
@@ -60,10 +61,21 @@ func restartOptions(cmd *cobra.Command, _ []string) (options.ContainerRestart, e
 		timeout = &t
 	}
 
+	var signal string
+	if cmd.Flags().Changed("signal") {
+		// Signal to send to stop the container, before killing it
+		sig, err := cmd.Flags().GetString("signal")
+		if err != nil {
+			return options.ContainerRestart{}, err
+		}
+		signal = sig
+	}
+
 	return options.ContainerRestart{
 		Stdout:  cmd.OutOrStdout(),
 		GOption: globalOptions,
 		Timeout: timeout,
+		Signal:  signal,
 	}, err
 }
 

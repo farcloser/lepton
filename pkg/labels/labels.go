@@ -47,6 +47,9 @@ var (
 
 	Hostname = Prefix + "hostname"
 
+	// Domainname
+	Domainname = Prefix + "domainname"
+
 	// ExtraHosts are HostIPs to appended to /etc/hosts
 	ExtraHosts = Prefix + "extraHosts"
 
@@ -106,4 +109,13 @@ var (
 
 	// ContainerAutoRemove is to check whether the --rm option is specified.
 	ContainerAutoRemove = Prefix + "auto-remove"
+
+	// LogConfig defines the logging configuration passed to the container
+	LogConfig = Prefix + "log-config"
+
+	// HostConfigLabel sets the dockercompat host config values
+	HostConfigLabel = Prefix + "host-config"
+
+	// DNSSettings sets the dockercompat DNS config values
+	DNSSetting = Prefix + "dns"
 )

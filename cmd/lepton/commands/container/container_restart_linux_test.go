@@ -17,11 +17,15 @@
 package container
 
 import (
+	"strconv"
 	"strings"
 	"testing"
 	"time"
 
 	"gotest.tools/v3/assert"
+
+	"go.farcloser.world/tigron/expect"
+	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/pkg/testutil"
 	"go.farcloser.world/lepton/pkg/testutil/nerdtest"
@@ -119,4 +123,41 @@ func TestRestartWithTime(t *testing.T) {
 	assert.Assert(t, pid != newPid)
 	// ensure that stop took at least 5 seconds
 	assert.Assert(t, timePostRestart.Sub(timePreRestart) >= time.Second*5)
+}
+
+func TestRestartWithSignal(t *testing.T) {
+	testCase := nerdtest.Setup()
+
+	testCase.Cleanup = func(data test.Data, helpers test.Helpers) {
+		helpers.Anyhow("rm", "-f", data.Identifier())
+	}
+
+	testCase.Command = func(data test.Data, helpers test.Helpers) test.TestableCommand {
+		cmd := nerdtest.RunSigProxyContainer(nerdtest.SigUsr1, false, nil, data, helpers)
+		// Capture the current pid
+		data.Set("oldpid", strconv.Itoa(nerdtest.InspectContainer(helpers, data.Identifier()).State.Pid))
+		// Send the signal
+		helpers.Ensure("restart", "--signal", "SIGUSR1", data.Identifier())
+		return cmd
+	}
+
+	testCase.Expected = func(data test.Data, helpers test.Helpers) *test.Expected {
+		return &test.Expected{
+			// Check the container did indeed exit
+			ExitCode: 137,
+			Output: expect.All(
+				// Check that we saw SIGUSR1 inside the container
+				expect.Contains(nerdtest.SignalCaught),
+				func(stdout string, info string, t *testing.T) {
+					// Ensure the container was restarted
+					nerdtest.EnsureContainerStarted(helpers, data.Identifier())
+					// Check the new pid is different
+					newpid := strconv.Itoa(nerdtest.InspectContainer(helpers, data.Identifier()).State.Pid)
+					assert.Assert(helpers.T(), newpid != data.Get("oldpid"), info)
+				},
+			),
+		}
+	}
+
+	testCase.Run(t)
 }

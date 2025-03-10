@@ -19,6 +19,9 @@ package container
 import (
 	"testing"
 
+	"go.farcloser.world/tigron/expect"
+	"go.farcloser.world/tigron/test"
+
 	"go.farcloser.world/lepton/pkg/testutil"
 	"go.farcloser.world/lepton/pkg/testutil/nerdtest"
 )
@@ -52,19 +55,57 @@ func TestExecWithUser(t *testing.T) {
 }
 
 func TestExecTTY(t *testing.T) {
-	t.Parallel()
-	base := testutil.NewBase(t)
-
-	testContainer := testutil.Identifier(t)
-	defer base.Cmd("rm", "-f", testContainer).Run()
-	base.Cmd("run", "-d", "--name", testContainer, testutil.CommonImage, "sleep", nerdtest.Infinity).AssertOK()
-
 	const sttyPartialOutput = "speed 38400 baud"
-	// unbuffer(1) emulates tty, which is required by `run -t`.
-	// unbuffer(1) can be installed with `apt-get install expect`.
-	unbuffer := []string{"unbuffer"}
-	base.CmdWithHelper(unbuffer, "exec", "-it", testContainer, "stty").AssertOutContains(sttyPartialOutput)
-	base.CmdWithHelper(unbuffer, "exec", "-t", testContainer, "stty").AssertOutContains(sttyPartialOutput)
-	base.Cmd("exec", "-i", testContainer, "stty").AssertFail()
-	base.Cmd("exec", testContainer, "stty").AssertFail()
+
+	testCase := nerdtest.Setup()
+
+	testCase.Cleanup = func(data test.Data, helpers test.Helpers) {
+		helpers.Ensure("rm", "-f", data.Identifier())
+	}
+
+	testCase.Setup = func(data test.Data, helpers test.Helpers) {
+		helpers.Ensure("run", "-d", "--name", data.Identifier(), testutil.CommonImage, "sleep", nerdtest.Infinity)
+		data.Set("container_name", data.Identifier())
+	}
+
+	testCase.SubTests = []*test.Case{
+		{
+			Description: "stty with -it",
+			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
+				cmd := helpers.Command("exec", "-it", data.Get("container_name"), "stty")
+				cmd.WithPseudoTTY()
+				return cmd
+			},
+			Expected: test.Expects(0, nil, expect.Contains(sttyPartialOutput)),
+		},
+		{
+			Description: "stty with -t",
+			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
+				cmd := helpers.Command("exec", "-t", data.Get("container_name"), "stty")
+				cmd.WithPseudoTTY()
+				return cmd
+			},
+			Expected: test.Expects(0, nil, expect.Contains(sttyPartialOutput)),
+		},
+		{
+			Description: "stty with -i",
+			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
+				cmd := helpers.Command("exec", "-i", data.Get("container_name"), "stty")
+				cmd.WithPseudoTTY()
+				return cmd
+			},
+			Expected: test.Expects(expect.ExitCodeGenericFail, nil, nil),
+		},
+		{
+			Description: "stty without params",
+			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
+				cmd := helpers.Command("exec", data.Get("container_name"), "stty")
+				cmd.WithPseudoTTY()
+				return cmd
+			},
+			Expected: test.Expects(expect.ExitCodeGenericFail, nil, nil),
+		},
+	}
+
+	testCase.Run(t)
 }

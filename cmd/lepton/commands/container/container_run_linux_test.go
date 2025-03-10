@@ -28,12 +28,10 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
-	"syscall"
 	"testing"
 	"time"
 
 	"gotest.tools/v3/assert"
-	"gotest.tools/v3/icmd"
 
 	"go.farcloser.world/tigron/expect"
 	"go.farcloser.world/tigron/test"
@@ -168,6 +166,8 @@ func TestRunUtsHost(t *testing.T) {
 	base.Cmd("run", "--rm", "--uts=host", testutil.AlpineImage, "hostname").AssertOutContains(hostName)
 	// Validate we can't provide a hostname with uts=host
 	base.Cmd("run", "--rm", "--uts=host", "--hostname=foobar", testutil.AlpineImage, "hostname").AssertFail()
+	// Validate we can't provide a domainname with uts=host
+	base.Cmd("run", "--rm", "--uts=host", "--domainname=example.com", testutil.AlpineImage, "hostname").AssertFail()
 }
 
 func TestRunPidContainer(t *testing.T) {
@@ -311,94 +311,117 @@ func TestRunWithInit(t *testing.T) {
 }
 
 func TestRunTTY(t *testing.T) {
-	t.Parallel()
-	base := testutil.NewBase(t)
-
 	const sttyPartialOutput = "speed 38400 baud"
-	// unbuffer(1) emulates tty, which is required by `run -t`.
-	// unbuffer(1) can be installed with `apt-get install expect`.
-	unbuffer := []string{"unbuffer"}
-	base.CmdWithHelper(unbuffer, "run", "--rm", "-it", testutil.CommonImage, "stty").AssertOutContains(sttyPartialOutput)
-	base.CmdWithHelper(unbuffer, "run", "--rm", "-t", testutil.CommonImage, "stty").AssertOutContains(sttyPartialOutput)
-	base.Cmd("run", "--rm", "-i", testutil.CommonImage, "stty").AssertFail()
-	base.Cmd("run", "--rm", testutil.CommonImage, "stty").AssertFail()
 
-	// tests pipe works
-	res := icmd.RunCmd(icmd.Command("unbuffer", "/bin/sh", "-c", fmt.Sprintf("%q run --rm -it %q echo hi | grep hi", base.Binary, testutil.CommonImage)))
-	assert.Equal(t, 0, res.ExitCode, res)
-}
+	testCase := nerdtest.Setup()
 
-func runSigProxy(t *testing.T, args ...string) (string, bool, bool) {
-	t.Parallel()
-	base := testutil.NewBase(t)
-	testContainerName := testutil.Identifier(t)
-	defer base.Cmd("rm", "-f", testContainerName).Run()
-
-	fullArgs := []string{"run"}
-	fullArgs = append(fullArgs, args...)
-	fullArgs = append(fullArgs,
-		"--name",
-		testContainerName,
-		testutil.CommonImage,
-		"sh",
-		"-c",
-		testutil.SigProxyTestScript,
-	)
-
-	result := base.Cmd(fullArgs...).Start()
-	process := result.Cmd.Process
-
-	// Waits until we reach the trap command in the shell script, then sends SIGINT.
-	time.Sleep(3 * time.Second)
-	syscall.Kill(process.Pid, syscall.SIGINT)
-
-	// Waits until SIGINT is sent and responded to, then kills process to avoid timeout
-	time.Sleep(3 * time.Second)
-	process.Kill()
-
-	sigIntRecieved := strings.Contains(result.Stdout(), testutil.SigProxyTrueOut)
-	timedOut := strings.Contains(result.Stdout(), testutil.SigProxyTimeoutMsg)
-
-	return result.Stdout(), sigIntRecieved, timedOut
+	testCase.SubTests = []*test.Case{
+		{
+			Description: "stty with -it",
+			Cleanup: func(data test.Data, helpers test.Helpers) {
+				helpers.Ensure("rm", "-f", data.Identifier())
+			},
+			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
+				cmd := helpers.Command("run", "-it", data.Identifier(), "stty")
+				cmd.WithPseudoTTY()
+				return cmd
+			},
+			Expected: test.Expects(0, nil, expect.Contains(sttyPartialOutput)),
+		},
+		{
+			Description: "stty with -t",
+			Cleanup: func(data test.Data, helpers test.Helpers) {
+				helpers.Ensure("rm", "-f", data.Identifier())
+			},
+			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
+				cmd := helpers.Command("run", "-t", data.Identifier(), "stty")
+				cmd.WithPseudoTTY()
+				return cmd
+			},
+			Expected: test.Expects(0, nil, expect.Contains(sttyPartialOutput)),
+		},
+		{
+			Description: "stty with -i",
+			Cleanup: func(data test.Data, helpers test.Helpers) {
+				helpers.Ensure("rm", "-f", data.Identifier())
+			},
+			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
+				cmd := helpers.Command("run", "-i", data.Identifier(), "stty")
+				cmd.WithPseudoTTY()
+				return cmd
+			},
+			Expected: test.Expects(expect.ExitCodeGenericFail, nil, nil),
+		},
+		{
+			Description: "stty without params",
+			Cleanup: func(data test.Data, helpers test.Helpers) {
+				helpers.Ensure("rm", "-f", data.Identifier())
+			},
+			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
+				cmd := helpers.Command("run", data.Identifier(), "stty")
+				cmd.WithPseudoTTY()
+				return cmd
+			},
+			Expected: test.Expects(expect.ExitCodeGenericFail, nil, nil),
+		},
+	}
 }
 
 func TestRunSigProxy(t *testing.T) {
+	testCase := nerdtest.Setup()
 
-	type testCase struct {
-		name        string
-		args        []string
-		want        bool
-		expectedOut string
-	}
-	testCases := []testCase{
+	testCase.SubTests = []*test.Case{
 		{
-			name:        "SigProxyDefault",
-			args:        []string{},
-			want:        true,
-			expectedOut: testutil.SigProxyTrueOut,
+			Description: "SigProxyDefault",
+
+			Cleanup: func(data test.Data, helpers test.Helpers) {
+				helpers.Anyhow("rm", "-f", data.Identifier())
+			},
+
+			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
+				cmd := nerdtest.RunSigProxyContainer(os.Interrupt, true, nil, data, helpers)
+				err := cmd.Signal(os.Interrupt)
+				assert.NilError(helpers.T(), err)
+				return cmd
+			},
+
+			Expected: test.Expects(0, nil, expect.Contains(nerdtest.SignalCaught)),
 		},
 		{
-			name:        "SigProxyTrue",
-			args:        []string{"--sig-proxy=true"},
-			want:        true,
-			expectedOut: testutil.SigProxyTrueOut,
+			Description: "SigProxyTrue",
+
+			Cleanup: func(data test.Data, helpers test.Helpers) {
+				helpers.Anyhow("rm", "-f", data.Identifier())
+			},
+
+			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
+				cmd := nerdtest.RunSigProxyContainer(os.Interrupt, true, []string{"--sig-proxy=true"}, data, helpers)
+				err := cmd.Signal(os.Interrupt)
+				assert.NilError(helpers.T(), err)
+				return cmd
+			},
+
+			Expected: test.Expects(0, nil, expect.Contains(nerdtest.SignalCaught)),
 		},
 		{
-			name:        "SigProxyFalse",
-			args:        []string{"--sig-proxy=false"},
-			want:        false,
-			expectedOut: "",
+			Description: "SigProxyFalse",
+
+			Cleanup: func(data test.Data, helpers test.Helpers) {
+				helpers.Anyhow("rm", "-f", data.Identifier())
+			},
+
+			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
+				cmd := nerdtest.RunSigProxyContainer(os.Interrupt, true, []string{"--sig-proxy=false"}, data, helpers)
+				err := cmd.Signal(os.Interrupt)
+				assert.NilError(helpers.T(), err)
+				return cmd
+			},
+
+			Expected: test.Expects(127, nil, expect.DoesNotContain(nerdtest.SignalCaught)),
 		},
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			stdout, sigIntRecieved, timedOut := runSigProxy(t, tc.args...)
-			errorMsg := fmt.Sprintf("%s failed;\nExpected: '%s'\nActual: '%s'", tc.name, tc.expectedOut, stdout)
-			assert.Equal(t, false, timedOut, errorMsg)
-			assert.Equal(t, tc.want, sigIntRecieved, errorMsg)
-		})
-	}
+	testCase.Run(t)
 }
 
 func TestRunWithFluentdLogDriver(t *testing.T) {
@@ -490,6 +513,7 @@ func TestRunWithDetachKeys(t *testing.T) {
 			// if !nerdtest.IsDocker() {
 			nerdtest.EnsureContainerStarted(helpers, data.Identifier())
 			// }
+			// ctrl+a and ctrl+b (see https://en.wikipedia.org/wiki/C0_and_C1_control_codes)
 			_, err := f.Write([]byte{1, 2})
 			return err
 		})
@@ -557,6 +581,7 @@ func TestIssue3568(t *testing.T) {
 			// if !nerdtest.IsDocker() {
 			nerdtest.EnsureContainerStarted(helpers, data.Identifier())
 			// }
+			// ctrl+a and ctrl+b (see https://en.wikipedia.org/wiki/C0_and_C1_control_codes)
 			_, err := f.Write([]byte{1, 2})
 			return err
 		})

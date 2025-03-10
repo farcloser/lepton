@@ -183,6 +183,7 @@ Network flags:
 - :whale: `--dns-search`: Set custom DNS search domains
 - :whale: `--dns-opt, --dns-option`: Set DNS options
 - :whale: `-h, --hostname`: Container host name
+- :whale: `--domainname`: Container domain name
 - :whale: `--add-host`: Add a custom host-to-IP mapping (host:ip). `ip` could be a special string `host-gateway`,
 - which will be resolved to the `host-gateway-ip` in nerdctl.toml or global flag.
 - :whale: `--ip`: Specific static IP address(es) to use. Note that unlike docker, nerdctl allows specifying it with the default bridge network.
@@ -309,7 +310,7 @@ Metadata flags:
 
 Logging flags:
 
-- :whale: `--log-driver=(json-file|journald|fluentd|syslog)`: Logging driver for the container (default `json-file`).
+- :whale: `--log-driver=(json-file|journald|fluentd|syslog|none)`: Logging driver for the container (default `json-file`).
   - :whale: `--log-driver=json-file`: The logs are formatted as JSON. The default logging driver for nerdctl.
     - The `json-file` logging driver supports the following logging options:
       - :whale: `--log-opt=max-size=<MAX-SIZE>`: The maximum size of the log before it is rolled. A positive integer plus a modifier representing the unit of measure (k, m, or g). Defaults to unlimited.
@@ -360,6 +361,7 @@ Logging flags:
       - :whale: `--log-opt=tag=<VALUE>`: A string that is appended to the
           `APP-NAME` in the `syslog` message. By default, nerdctl uses the first
           12 characters of the container ID to tag log messages.
+  - :whale:  `--log-driver=none`: Disables logging for the container, preventing log output from being collected.
   - :nerd_face: Accepts a LogURI which is a containerd shim logger. A scheme must be specified for the URI. Example: `nerdctl run -d --log-driver binary:///usr/bin/ctr-journald-shim docker.io/library/hello-world:latest`. An implementation of shim logger can be found at (<https://github.com/containerd/containerd/tree/dbef1d56d7ebc05bc4553d72c419ed5ce025b05d/runtime/v2#logging>)
 
 Shared memory flags:
@@ -406,7 +408,7 @@ Verify flags:
 
 Unimplemented `docker run` flags:
     `--blkio-weight-device`, `--cpu-rt-*`, `--device-*`,
-    `--disable-content-trust`, `--domainname`, `--expose`, `--health-*`, `--isolation`, `--no-healthcheck`,
+    `--disable-content-trust`, `--expose`, `--health-*`, `--isolation`, `--no-healthcheck`,
     `--link*`, `--publish-all`, `--storage-opt`,
     `--userns`, `--volume-driver`
 
@@ -564,6 +566,7 @@ Flags:
 
 - :whale: `-t, --time=SECONDS`: Seconds to wait for stop before killing it (default "10")
   - Tips: If the init process in container is exited after receiving SIGTERM or exited before the time you specified, the container will be exited immediately
+- :whale: `-s, --signal=SIGNAL`: Signal to send to the container (e.g. SIGINT).
 
 ### :whale: nerdctl start
 
@@ -588,6 +591,7 @@ Flags:
 
 - :whale: `-t, --time=SECONDS`: Seconds to wait for stop before killing it (default "10")
   - Tips: If the init process in container is exited after receiving SIGTERM or exited before the time you specified, the container will be exited immediately
+- :whale: `-s, --signal=SIGNAL`: Signal to send to the container (e.g. SIGINT).
 
 ### :whale: nerdctl update
 

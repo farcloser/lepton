@@ -112,7 +112,7 @@ func TestReadRotatedJSONLog(t *testing.T) {
 }
 
 func TestReadJSONLogs(t *testing.T) {
-	file, err := os.CreateTemp(t.TempDir(), "TestFollowLogs")
+	file, err := os.CreateTemp("", "TestFollowLogs")
 	if err != nil {
 		t.Fatalf("unable to create temp file")
 	}

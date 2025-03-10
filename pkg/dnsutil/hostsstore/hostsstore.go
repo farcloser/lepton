@@ -81,6 +81,7 @@ type Meta struct {
 	Hostname   string
 	ExtraHosts map[string]string // host:ip
 	Name       string
+	Domainname string
 }
 
 type Store interface {
@@ -110,16 +111,21 @@ func (x *hostsStore) Acquire(meta Meta) (err error) {
 			return err
 		}
 
-		if err = os.WriteFile(loc, []byte{}, 0o644); err != nil {
-			return errors.Join(errs.ErrSystemFailure, err)
-		}
+		// See https://github.com/containerd/nerdctl/issues/3907
+		// Because of the way we call network manager ContainerNetworkingOpts then SetupNetworking in sequence
+		// we need to make sure we do not overwrite an already allocated hosts file.
+		if _, err = os.Stat(loc); os.IsNotExist(err) {
+			if err = os.WriteFile(loc, []byte{}, 0o644); err != nil {
+				return errors.Join(errs.ErrSystemFailure, err)
+			}
 
-		// os.WriteFile relies on syscall.Open. Unless there are ACLs, the effective mode of the file will be matched
-		// against the current process umask.
-		// See https://www.man7.org/linux/man-pages/man2/open.2.html for details.
-		// Since we must make sure that these files are world readable, explicitly chmod them here.
-		if err = os.Chmod(loc, 0o644); err != nil {
-			err = errors.Join(errs.ErrSystemFailure, err)
+			// os.WriteFile relies on syscall.Open. Unless there are ACLs, the effective mode of the file will be matched
+			// against the current process umask.
+			// See https://www.man7.org/linux/man-pages/man2/open.2.html for details.
+			// Since we must make sure that these files are world readable, explicitly chmod them here.
+			if err = os.Chmod(loc, 0o644); err != nil {
+				err = errors.Join(errs.ErrSystemFailure, err)
+			}
 		}
 
 		var content []byte

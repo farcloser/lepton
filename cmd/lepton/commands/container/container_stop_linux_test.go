@@ -23,9 +23,13 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/coreos/go-iptables/iptables"
 	"gotest.tools/v3/assert"
+
+	"go.farcloser.world/tigron/expect"
+	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/pkg/rootlessutil"
 	"go.farcloser.world/lepton/pkg/testutil"
@@ -77,24 +81,23 @@ func TestStopStart(t *testing.T) {
 }
 
 func TestStopWithStopSignal(t *testing.T) {
-	t.Parallel()
-	// There may be issues with logs in Docker.
-	// This test is flaky with Docker. Might be related to https://github.com/containerd/nerdctl/pull/3557
-	base := testutil.NewBase(t)
-	testContainerName := testutil.Identifier(t)
-	defer base.Cmd("rm", "-f", testContainerName).Run()
+	testCase := nerdtest.Setup()
 
-	base.Cmd("run", "-d", "--stop-signal", "SIGQUIT", "--name", testContainerName, testutil.CommonImage, "sh", "-euxc", `#!/bin/sh
-set -eu
-trap 'quit=1' QUIT
-quit=0
-while [ $quit -ne 1 ]; do
-    printf 'wait quit'
-    sleep 1
-done
-echo "signal quit"`).AssertOK()
-	base.Cmd("stop", testContainerName).AssertOK()
-	base.Cmd("logs", "-f", testContainerName).AssertOutContains("signal quit")
+	testCase.Cleanup = func(data test.Data, helpers test.Helpers) {
+		helpers.Anyhow("rm", "-f", data.Identifier())
+	}
+
+	testCase.Command = func(data test.Data, helpers test.Helpers) test.TestableCommand {
+		cmd := nerdtest.RunSigProxyContainer(nerdtest.SigQuit, false,
+			[]string{"--stop-signal", nerdtest.SigQuit.String()}, data, helpers)
+		helpers.Ensure("stop", data.Identifier())
+		return cmd
+	}
+
+	// Verify that SIGQUIT was sent to the container AND that the container did forcefully exit
+	testCase.Expected = test.Expects(137, nil, expect.Contains(nerdtest.SignalCaught))
+
+	testCase.Run(t)
 }
 
 func TestStopCleanupForwards(t *testing.T) {
@@ -163,4 +166,40 @@ func TestStopCreated(t *testing.T) {
 	setup()
 
 	base.Cmd("stop", tID).AssertOK()
+}
+
+func TestStopWithLongTimeoutAndSIGKILL(t *testing.T) {
+	t.Parallel()
+	base := testutil.NewBase(t)
+	testContainerName := testutil.Identifier(t)
+	defer base.Cmd("rm", "-f", testContainerName).Run()
+
+	// Start a container that sleeps forever
+	base.Cmd("run", "-d", "--name", testContainerName, testutil.CommonImage, "sleep", "Inf").AssertOK()
+
+	// Stop the container with a 5-second timeout and SIGKILL
+	start := time.Now()
+	base.Cmd("stop", "--time=5", "--signal", "SIGKILL", testContainerName).AssertOK()
+	elapsed := time.Since(start)
+
+	// The container should be stopped almost immediately, well before the 5-second timeout
+	assert.Assert(t, elapsed < 5*time.Second, "Container wasn't stopped immediately with SIGKILL")
+}
+
+func TestStopWithTimeout(t *testing.T) {
+	t.Parallel()
+	base := testutil.NewBase(t)
+	testContainerName := testutil.Identifier(t)
+	defer base.Cmd("rm", "-f", testContainerName).Run()
+
+	// Start a container that sleeps forever
+	base.Cmd("run", "-d", "--name", testContainerName, testutil.CommonImage, "sleep", "Inf").AssertOK()
+
+	// Stop the container with a 3-second timeout
+	start := time.Now()
+	base.Cmd("stop", "--time=3", testContainerName).AssertOK()
+	elapsed := time.Since(start)
+
+	// The container should get the SIGKILL before the 10s default timeout
+	assert.Assert(t, elapsed < 10*time.Second, "Container did not respect --timeout flag")
 }

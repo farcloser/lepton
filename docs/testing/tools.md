@@ -43,7 +43,7 @@ func TestMyThing(t *testing.T) {
 
 There are a handful of helpers for "expectations".
 
-You already saw two (`test.Expects` and `test.Contains`):
+You already saw two (`test.Expects` and `expect.Contains`):
 
 First, `test.Expects(exitCode int, errors []error, outputCompare Comparator)`, which is
 convenient to quickly describe what you expect overall.
@@ -59,7 +59,7 @@ any string you want to match.
 `outputCompare` can be either your own comparison function, or
 one of the comparison helper.
 
-Secondly, `test.Contains` - which is a `Comparator`.
+Secondly, `expect.Contains` - which is a `Comparator`.
 
 ### Comparators
 

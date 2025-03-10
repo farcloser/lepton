@@ -100,6 +100,7 @@ func Create(ctx context.Context, client *containerd.Client, args []string, netMa
 		if err := writeCIDFile(opts.CidFile, id); err != nil {
 			return nil, nil, err
 		}
+		internalLabels.cidFile = opts.CidFile
 	}
 	dataStore, err := clientutil.DataStore(opts.GOptions.DataRoot, opts.GOptions.Address)
 	if err != nil {
@@ -223,6 +224,10 @@ func Create(ctx context.Context, client *containerd.Client, args []string, netMa
 		return nil, generateRemoveStateDirFunc(ctx, id, internalLabels), err
 	}
 	internalLabels.logURI = logConfig.LogURI
+	internalLabels.logConfig = logConfig
+	if logConfig.Driver == "" && logConfig.Address == opts.GOptions.Address {
+		internalLabels.logConfig.Driver = "json-file"
+	}
 
 	restartOpts, err := generateRestartOpts(ctx, client, opts.Restart, logConfig.LogURI, opts.InRun)
 	if err != nil {
@@ -266,6 +271,7 @@ func Create(ctx context.Context, client *containerd.Client, args []string, netMa
 	uOpts := generateUserOpts(opts.User)
 	specOpts = append(specOpts, uOpts...)
 	gOpts := generateGroupsOpts(opts.GroupAdd)
+	internalLabels.groupAdd = opts.GroupAdd
 	specOpts = append(specOpts, gOpts...)
 
 	umaskOpts, err := generateUmaskOpts(opts.Umask)
@@ -316,6 +322,8 @@ func Create(ctx context.Context, client *containerd.Client, args []string, netMa
 	internalLabels.extraHosts = extraHosts
 
 	internalLabels.rm = containerutil.EncodeContainerRmOptLabel(opts.Rm)
+
+	internalLabels.blkioWeight = opts.BlkioWeight
 
 	// TODO: abolish internal labels and only use annotations
 	ilOpt, err := withInternalLabels(internalLabels)
@@ -608,21 +616,26 @@ func withStop(stopSignal string, stopTimeout int, ensuredImage *imgutil.EnsuredI
 
 type internalLabels struct {
 	// labels from cmd options
-	namespace  string
-	platform   string
-	extraHosts []string
-	pidFile    string
+	namespace   string
+	platform    string
+	extraHosts  []string
+	pidFile     string
+	blkioWeight uint16
 	// labels from cmd options or automatically set
-	name     string
-	hostname string
+	name       string
+	hostname   string
+	domainname string
 	// automatically generated
 	stateDir string
 	// network
-	networks   []string
-	ipAddress  string
-	ip6Address string
-	ports      []cni.PortMapping
-	macAddress string
+	networks             []string
+	ipAddress            string
+	ip6Address           string
+	ports                []cni.PortMapping
+	macAddress           string
+	dnsServers           []string
+	dnsSearchDomains     []string
+	dnsResolvConfOptions []string
 	// volume
 	mountPoints []*mountutil.Processed
 	anonVolumes []string
@@ -633,17 +646,30 @@ type internalLabels struct {
 	// log
 	logURI string
 	// a label to check whether the --rm option is specified.
-	rm string
+	rm        string
+	logConfig logging.LogConfig
+
+	// a label to chek if --cidfile is set
+	cidFile string
+
+	// label to check if --group-add is set
+	groupAdd []string
+
+	// label for device mapping set by the --device flag
+	deviceMapping []dockercompat.DeviceMapping
 }
 
 // WithInternalLabels sets the internal labels for a container.
 func withInternalLabels(internalLabels internalLabels) (containerd.NewContainerOpts, error) {
 	m := make(map[string]string)
+	var hostConfigLabel dockercompat.HostConfigLabel
+	var dnsSettings dockercompat.DNSSettings
 	m[labels.Namespace] = internalLabels.namespace
 	if internalLabels.name != "" {
 		m[labels.Name] = internalLabels.name
 	}
 	m[labels.Hostname] = internalLabels.hostname
+	m[labels.Domainname] = internalLabels.domainname
 	extraHostsJSON, err := json.Marshal(internalLabels.extraHosts)
 	if err != nil {
 		return nil, err
@@ -664,6 +690,11 @@ func withInternalLabels(internalLabels internalLabels) (containerd.NewContainerO
 	}
 	if internalLabels.logURI != "" {
 		m[labels.LogURI] = internalLabels.logURI
+		logConfigJSON, err := json.Marshal(internalLabels.logConfig)
+		if err != nil {
+			return nil, err
+		}
+		m[labels.LogConfig] = string(logConfigJSON)
 	}
 	if len(internalLabels.anonVolumes) > 0 {
 		anonVolumeJSON, err := json.Marshal(internalLabels.anonVolumes)
@@ -715,17 +746,57 @@ func withInternalLabels(internalLabels internalLabels) (containerd.NewContainerO
 		m[labels.ContainerAutoRemove] = internalLabels.rm
 	}
 
+	if internalLabels.blkioWeight > 0 {
+		hostConfigLabel.BlkioWeight = internalLabels.blkioWeight
+	}
+
+	if internalLabels.cidFile != "" {
+		hostConfigLabel.CidFile = internalLabels.cidFile
+	}
+
+	if len(internalLabels.dnsServers) > 0 {
+		dnsSettings.DNSServers = internalLabels.dnsServers
+	}
+
+	if len(internalLabels.dnsSearchDomains) > 0 {
+		dnsSettings.DNSSearchDomains = internalLabels.dnsSearchDomains
+	}
+
+	if len(internalLabels.dnsResolvConfOptions) > 0 {
+		dnsSettings.DNSResolvConfOptions = internalLabels.dnsResolvConfOptions
+	}
+
+	if len(internalLabels.deviceMapping) > 0 {
+		hostConfigLabel.Devices = append(hostConfigLabel.Devices, internalLabels.deviceMapping...)
+	}
+
+	hostConfigJSON, err := json.Marshal(hostConfigLabel)
+	if err != nil {
+		return nil, err
+	}
+	m[labels.HostConfigLabel] = string(hostConfigJSON)
+
+	dnsSettingsJSON, err := json.Marshal(dnsSettings)
+	if err != nil {
+		return nil, err
+	}
+	m[labels.DNSSetting] = string(dnsSettingsJSON)
+
 	return containerd.WithAdditionalContainerLabels(m), nil
 }
 
 // loadNetOpts loads network options into InternalLabels.
 func (il *internalLabels) loadNetOpts(opts options.ContainerNetwork) {
 	il.hostname = opts.Hostname
+	il.domainname = opts.Domainname
 	il.ports = opts.PortMappings
 	il.ipAddress = opts.IPAddress
 	il.ip6Address = opts.IP6Address
 	il.networks = opts.NetworkSlice
 	il.macAddress = opts.MACAddress
+	il.dnsServers = opts.DNSServers
+	il.dnsSearchDomains = opts.DNSSearchDomains
+	il.dnsResolvConfOptions = opts.DNSResolvConfOptions
 }
 
 func dockercompatMounts(mountPoints []*mountutil.Processed) []dockercompat.MountPoint {
