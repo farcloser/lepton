@@ -14,6 +14,7 @@ on:
 
 jobs:
   env:
+    name: " "
     uses: ./.github/workflows/environment.yml
 
   lint:
@@ -44,6 +45,9 @@ jobs:
         with:
           go: ${{ matrix.go }}
       - name: "Linting"
+        env:
+          VERBOSE: true
+          NO_COLOR: true
         run: |
           export LINT_COMMIT_RANGE="$(jq -r '.after + "..HEAD"' ${GITHUB_EVENT_PATH})"
           make lint

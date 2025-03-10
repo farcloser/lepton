@@ -207,7 +207,7 @@ fix-mod:
 		&& go mod tidy
 	$(call footer, $@)
 
-up:
+fix-up:
 	$(call title, $@)
 	@cd $(MAKEFILE_DIR) \
 		&& go get -u ./...
@@ -216,7 +216,14 @@ up:
 ##########################
 # Development tools installation
 ##########################
-install-dev-tools:
+install-dev-gotestsum:
+	# gotestsum: main (2025-02-08)
+	$(call title, $@)
+	@cd $(MAKEFILE_DIR) \
+		&& go install gotest.tools/gotestsum@c64e7cdde7ee34963b9e1eff7fdc71d91ea7eef0
+	$(call footer, $@)
+
+install-dev-tools: install-dev-gotestsum
 	$(call title, $@)
 	# Updated 2025-03-07
 	# golangci: main (2025-03-06)
@@ -224,7 +231,6 @@ install-dev-tools:
 	# ltag: main (2025-03-04)
 	# go-licenses: v2.0.0-alpha.1 (2024-06-27)
 	# goimports-reviser: main (2025-02-24)
-	# gotestsum: main (2025-02-08)
 	# kubectl: v0.32.2 (2025-02-13)
 	# kind: v0.27.0 (2025-02-14)
 	# FIXME: remove kind - nothing to do here
@@ -234,7 +240,6 @@ install-dev-tools:
 		&& go install github.com/containerd/ltag@66e6a514664ee2d11a470735519fa22b1a9eaabd \
 		&& go install github.com/google/go-licenses/v2@d01822334fba5896920a060f762ea7ecdbd086e8 \
 		&& go install github.com/incu6us/goimports-reviser/v3@fb560c58db94476809ad5d99d4171dc0db4000d2 \
-		&& go install gotest.tools/gotestsum@c64e7cdde7ee34963b9e1eff7fdc71d91ea7eef0 \
 		&& go install sigs.k8s.io/kind@6cb934219ac54aa0ddb1d8313adc05304421ccb6
 	@echo "Remember to add \$$HOME/go/bin to your path"
 	$(call footer, $@)
@@ -299,74 +304,54 @@ build: $(BINARY)
 build-all:
 	GOOS=linux GOARCH=amd64 $(REMAKE) build
 	GOOS=linux GOARCH=arm64 $(REMAKE) build
+	GOOS=linux GOARCH=riscv64 $(REMAKE) build
 	GOOS=windows GOARCH=amd64 $(REMAKE) build
 	GOOS=windows GOARCH=arm64 $(REMAKE) build
 
+# FIXME: revisit helper scripts
+# $^
+# $(MAKEFILE_DIR)/extras/rootless/*
+pack: build
+	$(call title, $@: $(GOOS) $(GOARCH))
+	tar --zstd -cf $(VERBOSE_FLAG) $(CURDIR)/_output/$(BINARY)-$(VERSION_TRIMMED)-$(GOOS)-$(GOARCH).tar.gz $(CURDIR)/_output/$(BINARY)$(BIN_EXT)
+	$(call footer, $@)
 
+pack-all:
+	GOOS=linux GOARCH=amd64 $(REMAKE) pack
+	GOOS=linux GOARCH=arm64 $(REMAKE) pack
+	GOOS=linux GOARCH=riscv64 $(REMAKE) pack
+	GOOS=windows GOARCH=amd64 $(REMAKE) pack
+	GOOS=windows GOARCH=arm64 $(REMAKE) pack
 
-
-############################################
-all: binaries
+clean:
+	$(call title, $@)
+	rm -rf $(CURDIR)/_output/* $(MAKEFILE_DIR)/vendor
+	$(call footer, $@)
 
 install:
-	install -D -m 755 $(CURDIR)/_output/$(BINARY) $(DESTDIR)$(BINDIR)/$(BINARY)
+	install -D -m 755 $(CURDIR)/_output/$(BINARY)$(BIN_EXT) $(DESTDIR)$(BINDIR)/$(BINARY)$(BIN_EXT)
 	install -D -m 755 $(MAKEFILE_DIR)/extras/rootless/containerd-rootless.sh $(DESTDIR)$(BINDIR)/containerd-rootless.sh
 	install -D -m 755 $(MAKEFILE_DIR)/extras/rootless/containerd-rootless-setuptool.sh $(DESTDIR)$(BINDIR)/containerd-rootless-setuptool.sh
-	install -D -m 644 -t $(DESTDIR)$(DOCDIR)/$(BINARY) $(MAKEFILE_DIR)/docs/*.md
-
-# Note that these options will not work on macOS - unless you use gnu-tar instead of tar
-TAR_OWNER0_FLAGS=--owner=0 --group=0
-TAR_FLATTEN_FLAGS=--transform 's/.*\///g'
-
-define make_artifact_full_linux
-	$(DOCKER) build --output type=tar,dest=$(CURDIR)/_output/$(BINARY)-full-$(VERSION_TRIMMED)-linux-$(1).tar --target out-full --platform $(1) --build-arg GO_VERSION -f $(MAKEFILE_DIR)/Dockerfile $(MAKEFILE_DIR)
-	gzip -9 $(CURDIR)/_output/$(BINARY)-full-$(VERSION_TRIMMED)-linux-$(1).tar
-endef
-
-artifacts: clean
-	GOOS=linux GOARCH=amd64       make -C $(CURDIR) -f $(MAKEFILE_DIR)/Makefile binaries
-	tar $(TAR_OWNER0_FLAGS) $(TAR_FLATTEN_FLAGS) -czvf $(CURDIR)/_output/$(BINARY)-$(VERSION_TRIMMED)-linux-amd64.tar.gz   $(CURDIR)/_output/$(BINARY) $(MAKEFILE_DIR)/extras/rootless/*
-
-	GOOS=linux GOARCH=arm64       make -C $(CURDIR) -f $(MAKEFILE_DIR)/Makefile binaries
-	tar $(TAR_OWNER0_FLAGS) $(TAR_FLATTEN_FLAGS) -czvf $(CURDIR)/_output/$(BINARY)-$(VERSION_TRIMMED)-linux-arm64.tar.gz   $(CURDIR)/_output/$(BINARY) $(MAKEFILE_DIR)/extras/rootless/*
-
-	GOOS=linux GOARCH=arm GOARM=7 make -C $(CURDIR) -f $(MAKEFILE_DIR)/Makefile binaries
-	tar $(TAR_OWNER0_FLAGS) $(TAR_FLATTEN_FLAGS) -czvf $(CURDIR)/_output/$(BINARY)-$(VERSION_TRIMMED)-linux-arm-v7.tar.gz  $(CURDIR)/_output/$(BINARY) $(MAKEFILE_DIR)/extras/rootless/*
-
-	GOOS=linux GOARCH=ppc64le     make -C $(CURDIR) -f $(MAKEFILE_DIR)/Makefile binaries
-	tar $(TAR_OWNER0_FLAGS) $(TAR_FLATTEN_FLAGS) -czvf $(CURDIR)/_output/$(BINARY)-$(VERSION_TRIMMED)-linux-ppc64le.tar.gz $(CURDIR)/_output/$(BINARY) $(MAKEFILE_DIR)/extras/rootless/*
-
-	GOOS=linux GOARCH=riscv64     make -C $(CURDIR) -f $(MAKEFILE_DIR)/Makefile binaries
-	tar $(TAR_OWNER0_FLAGS) $(TAR_FLATTEN_FLAGS) -czvf $(CURDIR)/_output/$(BINARY)-$(VERSION_TRIMMED)-linux-riscv64.tar.gz $(CURDIR)/_output/$(BINARY) $(MAKEFILE_DIR)/extras/rootless/*
-
-	GOOS=linux GOARCH=s390x       make -C $(CURDIR) -f $(MAKEFILE_DIR)/Makefile binaries
-	tar $(TAR_OWNER0_FLAGS) $(TAR_FLATTEN_FLAGS) -czvf $(CURDIR)/_output/$(BINARY)-$(VERSION_TRIMMED)-linux-s390x.tar.gz   $(CURDIR)/_output/$(BINARY) $(MAKEFILE_DIR)/extras/rootless/*
-
-	GOOS=windows GOARCH=amd64     make -C $(CURDIR) -f $(MAKEFILE_DIR)/Makefile binaries
-	tar $(TAR_OWNER0_FLAGS) $(TAR_FLATTEN_FLAGS) -czvf $(CURDIR)/_output/$(BINARY)-$(VERSION_TRIMMED)-windows-amd64.tar.gz $(CURDIR)/_output/$(BINARY).exe
-
-	rm -f $(CURDIR)/_output/$(BINARY) $(CURDIR)/_output/$(BINARY).exe
-
-	$(call make_artifact_full_linux,amd64)
-	$(call make_artifact_full_linux,arm64)
-
-	$(GO) -C $(MAKEFILE_DIR) mod vendor
-	tar $(TAR_OWNER0_FLAGS) -czf $(CURDIR)/_output/$(BINARY)-$(VERSION_TRIMMED)-go-mod-vendor.tar.gz $(MAKEFILE_DIR)/go.mod $(MAKEFILE_DIR)/go.sum $(MAKEFILE_DIR)/vendor
 
 .PHONY: \
-	help \
+	lint-go lint-go-all lint-imports lint-yaml lint-shell lint-commits lint-headers lint-mod lint-licenses lint-licenses-all \
+	fix-go fix-go-all fix-imports fix-mod fix-up \
+	install-dev-gotestsum install-dev-tools install-go \
+	test-unit test-unit-bench test-unit-race \
 	$(BINARY) \
-	clean \
-	binaries \
-	install \
-	artifacts \
-	\
-	lint lint-commits lint-go lint-go-all lint-headers lint-imports lint-licenses lint-licenses-all lint-mod lint-shell lint-yaml \
-	install-linters \
-	fix fix-go fix-go-all fix-imports fix-mod \
-	up \
-	test test-unit test-unit-race test-unit-bench \
-	unit
+	build pack install lint fix test unit clean \
+	build-all pack-all
+
+#	install -D -m 644 -t $(DESTDIR)$(DOCDIR)/$(BINARY) $(MAKEFILE_DIR)/docs/*.md
+#define make_artifact_full_linux
+#	$(DOCKER) build --output type=tar,dest=$(CURDIR)/_output/$(BINARY)-full-$(VERSION_TRIMMED)-linux-$(1).tar --target out-full --platform $(GOARCH) -f $(MAKEFILE_DIR)/Dockerfile $(MAKEFILE_DIR)
+#	gzip -9 $(CURDIR)/_output/$(BINARY)-full-$(VERSION_TRIMMED)-linux-$(1).tar
+#endef
+#artifacts: build-all
+#	$(call make_artifact_full_linux,amd64)
+#	$(call make_artifact_full_linux,arm64)
+#
+#	$(GO) -C $(MAKEFILE_DIR) mod vendor
 
 BUILDKIT_CACHE_COMPRESSION ?= zstd
 BUILDKIT_CACHE_KEY ?= default
@@ -378,6 +363,7 @@ CONTAINERD_VERSION ?= v2.0.3
 BUILDKIT_IMAGE ?= moby/buildkit:v0.20.0
 BUILDKIT_PLATFORM ?= linux/$(ARCH)
 BUILDKIT_TARGET ?= assembly-runtime
+
 
 # CI data:
 # Warm:
