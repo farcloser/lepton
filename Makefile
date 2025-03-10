@@ -98,7 +98,7 @@ REMAKE := make -C $(CURDIR) -f $(MAKEFILE_DIR)/Makefile
 ##########################
 
 # Tasks
-lint: lint-go-all lint-imports lint-yaml lint-shell lint-commits lint-mod lint-licenses-all lint-headers
+lint: lint-go-all lint-imports lint-commits lint-mod lint-licenses-all lint-headers lint-shell lint-yaml
 
 fix: fix-mod fix-imports fix-go-all
 
@@ -147,6 +147,12 @@ lint-commits:
 		&& git-validation $(VERBOSE_FLAG) -run DCO,short-subject,dangling-whitespace -range "$(LINT_COMMIT_RANGE)"
 	$(call footer, $@)
 
+lint-headers:
+	$(call title, $@)
+	@cd $(MAKEFILE_DIR) \
+		&& ltag -t "./hack/headers" --check -v
+	$(call footer, $@)
+
 lint-mod:
 	$(call title, $@)
 	@cd $(MAKEFILE_DIR) \
@@ -172,12 +178,6 @@ lint-licenses-all:
 	cd $(MAKEFILE_DIR) \
 		&& GOOS=linux make lint-licenses \
 		&& GOOS=windows make lint-licenses
-	$(call footer, $@)
-
-lint-headers:
-	$(call title, $@)
-	@cd $(MAKEFILE_DIR) \
-		&& ltag -t "./hack/headers" --check -v
 	$(call footer, $@)
 
 ##########################
@@ -228,6 +228,7 @@ install-dev-tools:
 	# gotestsum: main (2025-02-08)
 	# kubectl: v0.32.2 (2025-02-13)
 	# kind: v0.27.0 (2025-02-14)
+	# FIXME: remove kind - nothing to do here
 	@cd $(MAKEFILE_DIR) \
 		&& go install github.com/golangci/golangci-lint/cmd/golangci-lint@c13fd5b7627c436246f36044a575990b5ec75c7d \
 		&& go install github.com/vbatts/git-validation@7b60e35b055dd2eab5844202ffffad51d9c93922 \

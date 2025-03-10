@@ -48,6 +48,7 @@ func Inspect(ctx context.Context, client *containerd.Client, identifiers []strin
 	if options.Mode != "native" && options.Mode != "dockercompat" {
 		return fmt.Errorf("unknown mode %q", options.Mode)
 	}
+
 	// Set a timeout
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
@@ -142,15 +143,17 @@ func Inspect(ctx context.Context, client *containerd.Client, identifiers []strin
 		}
 
 		// Done iterating through candidates. Did we find anything that matches?
-		if validatedImage != nil {
+		if options.Mode == "dockercompat" {
+			if validatedImage == nil {
+				errs = append(errs, fmt.Errorf("no such image: %s", identifier))
+				continue
+			}
 			// Then slap in the repoTags and repoDigests we found from the other candidates
 			validatedImage.RepoTags = append(validatedImage.RepoTags, repoTags...)
 			validatedImage.RepoDigests = append(validatedImage.RepoDigests, repoDigests...)
 			// Store our image
 			// foundImages[validatedDigest] = validatedImage
 			entries = append(entries, validatedImage)
-		} else {
-			errs = append(errs, fmt.Errorf("no such image: %s", identifier))
 		}
 	}
 

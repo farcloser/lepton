@@ -1,5 +1,7 @@
 # Lepton
 
+## TL;DR
+
 lepton is an experimental containerd cli.
 
 Requires:
@@ -12,7 +14,7 @@ Requires:
 
 1. provide a ready-to-use library to easily build cli and applications communicating with containerd
 2. provide a reference cli implementation, comparable to the docker cli or to nerdctl
-3. primary focus is on stability and code quality, not on features
+3. primary focus is on stability, code quality and developer quality of life, not on features
 
 ## Detailed relationship with nerdctl, and current status
 
@@ -36,11 +38,11 @@ better performance, and better concurrency management.
 Lepton started in 2024 as a private project, and was reset as a friendly fork of nerdctl, 14th of December 2024, from
 https://github.com/containerd/nerdctl/commit/7e97f0618ceb160b044e95810e17fccf21fea3df
 
-As such, a large fraction of its codebase is indeed coming from https://github.com/containerd/nerdctl
+As such, a large fraction of its codebase is coming from https://github.com/containerd/nerdctl
 (copyright The Containerd Authors, licensed under the Apache License, see NOTICE).
 
 Lepton is regularly cherry-picking changes from nerdctl, and conversely, so far, about 100k lines of code
-have been contributed back from lepton to nerdctl.
+have been contributed back from lepton to nerdctl (last synced 2025-03-09).
 
 Unlike nerdctl, lepton does not support (and has removed from its codebase):
 - freebsd
@@ -56,7 +58,7 @@ Also, lepton does not explicitly support and does not test anymore (might still 
 - ubuntu 22.04 and earlier
 
 So far, besides removal of unsupported code, lepton has been focused on cleanup, reviewing and moving "library"
-packages up into https://github.com/farcloser/go-containers, and UX review and sanity.
+packages up into https://github.com/farcloser/go-containers.
 
 <!--
 [[⬇️ **Download]**](https://github.com/containerd/nerdctl/releases)
