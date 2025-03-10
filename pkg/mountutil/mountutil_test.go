@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package mountutil
+package mountutil_test
 
 import (
 	"runtime"
@@ -34,4 +34,4 @@ func (mv *MockVolumeStore) CreateWithoutLock(name string, labels map[string]stri
 	return &api.Volume{Name: "test_volume", Mountpoint: "/test/volume"}, nil
 }
 
-var mockVolumeStore = &MockVolumeStore{}
+var MckVolStore = &MockVolumeStore{}

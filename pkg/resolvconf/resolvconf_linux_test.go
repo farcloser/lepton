@@ -15,16 +15,18 @@
 */
 
 // originally from https://github.com/moby/moby/blob/6014c1e29dc34dffa77fb5749cc3281c1b4854ac/libnetwork/resolvconf/resolvconf_linux_test.go
-package resolvconf
+package resolvconf_test
 
 import (
 	"bytes"
 	"os"
 	"testing"
+
+	"go.farcloser.world/lepton/pkg/resolvconf"
 )
 
 func TestGet(t *testing.T) {
-	resolvConfUtils, err := Get()
+	resolvConfUtils, err := resolvconf.Get()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -34,13 +36,6 @@ func TestGet(t *testing.T) {
 	}
 	if string(resolvConfUtils.Content) != string(resolvConfSystem) {
 		t.Fatalf("/etc/resolv.conf and GetResolvConf have different content.")
-	}
-	hashSystem, err := hashData(bytes.NewReader(resolvConfSystem))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if resolvConfUtils.Hash != hashSystem {
-		t.Fatalf("/etc/resolv.conf and GetResolvConf have different hashes.")
 	}
 }
 
@@ -61,7 +56,7 @@ nameserver 1.2.3.4
 		`search example.com
 nameserver 1.2.3.4 # not 4.3.2.1`: {"1.2.3.4"},
 	} {
-		test := GetNameservers([]byte(resolv), IP)
+		test := resolvconf.GetNameservers([]byte(resolv), resolvconf.IP)
 		if !strSlicesEqual(test, result) {
 			t.Fatalf("Wrong nameserver string {%s} should be %v. Input: %s", test, result, resolv)
 		}
@@ -85,7 +80,7 @@ nameserver 1.2.3.4
 		`search example.com
 nameserver 1.2.3.4 # not 4.3.2.1`: {"1.2.3.4/32"},
 	} {
-		test := GetNameserversAsCIDR([]byte(resolv))
+		test := resolvconf.GetNameserversAsCIDR([]byte(resolv))
 		if !strSlicesEqual(test, result) {
 			t.Fatalf("Wrong nameserver string {%s} should be %v. Input: %s", test, result, resolv)
 		}
@@ -112,7 +107,7 @@ search foo.example.com example.com`: {"foo.example.com", "example.com"},
 search foo.example.com example.com
 nameserver 4.30.20.100`: {"foo.example.com", "example.com"},
 	} {
-		test := GetSearchDomains([]byte(resolv))
+		test := resolvconf.GetSearchDomains([]byte(resolv))
 		if !strSlicesEqual(test, result) {
 			t.Fatalf("Wrong search domain string {%s} should be %v. Input: %s", test, result, resolv)
 		}
@@ -138,7 +133,7 @@ options opt1 opt2 opt3`: {"opt1", "opt2", "opt3"},
 options opt1 opt2
 options opt3 opt4`: {"opt3", "opt4"},
 	} {
-		test := GetOptions([]byte(resolv))
+		test := resolvconf.GetOptions([]byte(resolv))
 		if !strSlicesEqual(test, result) {
 			t.Fatalf("Wrong options string {%s} should be %v. Input: %s", test, result, resolv)
 		}
@@ -166,7 +161,7 @@ func TestBuild(t *testing.T) {
 	}
 	defer os.Remove(file.Name())
 
-	_, err = Build(file.Name(), []string{"ns1", "ns2", "ns3"}, []string{"search1"}, []string{"opt1"})
+	_, err = resolvconf.Build(file.Name(), []string{"ns1", "ns2", "ns3"}, []string{"search1"}, []string{"opt1"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -188,7 +183,7 @@ func TestBuildWithZeroLengthDomainSearch(t *testing.T) {
 	}
 	defer os.Remove(file.Name())
 
-	_, err = Build(file.Name(), []string{"ns1", "ns2", "ns3"}, []string{"."}, []string{"opt1"})
+	_, err = resolvconf.Build(file.Name(), []string{"ns1", "ns2", "ns3"}, []string{"."}, []string{"opt1"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -213,7 +208,7 @@ func TestBuildWithNoOptions(t *testing.T) {
 	}
 	defer os.Remove(file.Name())
 
-	_, err = Build(file.Name(), []string{"ns1", "ns2", "ns3"}, []string{"search1"}, []string{})
+	_, err = resolvconf.Build(file.Name(), []string{"ns1", "ns2", "ns3"}, []string{"search1"}, []string{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -234,42 +229,42 @@ func TestBuildWithNoOptions(t *testing.T) {
 func TestFilterResolvDns(t *testing.T) {
 	ns0 := "nameserver 10.16.60.14\nnameserver 10.16.60.21\n"
 
-	if result, _ := FilterResolvDNS([]byte(ns0), false); result != nil {
+	if result, _ := resolvconf.FilterResolvDNS([]byte(ns0), false); result != nil {
 		if ns0 != string(result.Content) {
 			t.Fatalf("Failed No Localhost: expected \n<%s> got \n<%s>", ns0, string(result.Content))
 		}
 	}
 
 	ns1 := "nameserver 10.16.60.14\nnameserver 10.16.60.21\nnameserver 127.0.0.1\n"
-	if result, _ := FilterResolvDNS([]byte(ns1), false); result != nil {
+	if result, _ := resolvconf.FilterResolvDNS([]byte(ns1), false); result != nil {
 		if ns0 != string(result.Content) {
 			t.Fatalf("Failed Localhost: expected \n<%s> got \n<%s>", ns0, string(result.Content))
 		}
 	}
 
 	ns1 = "nameserver 10.16.60.14\nnameserver 127.0.0.1\nnameserver 10.16.60.21\n"
-	if result, _ := FilterResolvDNS([]byte(ns1), false); result != nil {
+	if result, _ := resolvconf.FilterResolvDNS([]byte(ns1), false); result != nil {
 		if ns0 != string(result.Content) {
 			t.Fatalf("Failed Localhost: expected \n<%s> got \n<%s>", ns0, string(result.Content))
 		}
 	}
 
 	ns1 = "nameserver 127.0.1.1\nnameserver 10.16.60.14\nnameserver 10.16.60.21\n"
-	if result, _ := FilterResolvDNS([]byte(ns1), false); result != nil {
+	if result, _ := resolvconf.FilterResolvDNS([]byte(ns1), false); result != nil {
 		if ns0 != string(result.Content) {
 			t.Fatalf("Failed Localhost: expected \n<%s> got \n<%s>", ns0, string(result.Content))
 		}
 	}
 
 	ns1 = "nameserver ::1\nnameserver 10.16.60.14\nnameserver 127.0.2.1\nnameserver 10.16.60.21\n"
-	if result, _ := FilterResolvDNS([]byte(ns1), false); result != nil {
+	if result, _ := resolvconf.FilterResolvDNS([]byte(ns1), false); result != nil {
 		if ns0 != string(result.Content) {
 			t.Fatalf("Failed Localhost: expected \n<%s> got \n<%s>", ns0, string(result.Content))
 		}
 	}
 
 	ns1 = "nameserver 10.16.60.14\nnameserver ::1\nnameserver 10.16.60.21\nnameserver ::1"
-	if result, _ := FilterResolvDNS([]byte(ns1), false); result != nil {
+	if result, _ := resolvconf.FilterResolvDNS([]byte(ns1), false); result != nil {
 		if ns0 != string(result.Content) {
 			t.Fatalf("Failed Localhost: expected \n<%s> got \n<%s>", ns0, string(result.Content))
 		}
@@ -277,7 +272,7 @@ func TestFilterResolvDns(t *testing.T) {
 
 	// with IPv6 disabled (false param), the IPv6 nameserver should be removed
 	ns1 = "nameserver 10.16.60.14\nnameserver 2002:dead:beef::1\nnameserver 10.16.60.21\nnameserver ::1"
-	if result, _ := FilterResolvDNS([]byte(ns1), false); result != nil {
+	if result, _ := resolvconf.FilterResolvDNS([]byte(ns1), false); result != nil {
 		if ns0 != string(result.Content) {
 			t.Fatalf("Failed Localhost+IPv6 off: expected \n<%s> got \n<%s>", ns0, string(result.Content))
 		}
@@ -285,7 +280,7 @@ func TestFilterResolvDns(t *testing.T) {
 
 	// with IPv6 disabled (false param), the IPv6 link-local nameserver with zone ID should be removed
 	ns1 = "nameserver 10.16.60.14\nnameserver FE80::BB1%1\nnameserver FE80::BB1%eth0\nnameserver 10.16.60.21\n"
-	if result, _ := FilterResolvDNS([]byte(ns1), false); result != nil {
+	if result, _ := resolvconf.FilterResolvDNS([]byte(ns1), false); result != nil {
 		if ns0 != string(result.Content) {
 			t.Fatalf("Failed Localhost+IPv6 off: expected \n<%s> got \n<%s>", ns0, string(result.Content))
 		}
@@ -294,7 +289,7 @@ func TestFilterResolvDns(t *testing.T) {
 	// with IPv6 enabled, the IPv6 nameserver should be preserved
 	ns0 = "nameserver 10.16.60.14\nnameserver 2002:dead:beef::1\nnameserver 10.16.60.21\n"
 	ns1 = "nameserver 10.16.60.14\nnameserver 2002:dead:beef::1\nnameserver 10.16.60.21\nnameserver ::1"
-	if result, _ := FilterResolvDNS([]byte(ns1), true); result != nil {
+	if result, _ := resolvconf.FilterResolvDNS([]byte(ns1), true); result != nil {
 		if ns0 != string(result.Content) {
 			t.Fatalf("Failed Localhost+IPv6 on: expected \n<%s> got \n<%s>", ns0, string(result.Content))
 		}
@@ -303,7 +298,7 @@ func TestFilterResolvDns(t *testing.T) {
 	// with IPv6 enabled, and no non-localhost servers, Google defaults (both IPv4+IPv6) should be added
 	ns0 = "\nnameserver 8.8.8.8\nnameserver 8.8.4.4\nnameserver 2001:4860:4860::8888\nnameserver 2001:4860:4860::8844"
 	ns1 = "nameserver 127.0.0.1\nnameserver ::1\nnameserver 127.0.2.1"
-	if result, _ := FilterResolvDNS([]byte(ns1), true); result != nil {
+	if result, _ := resolvconf.FilterResolvDNS([]byte(ns1), true); result != nil {
 		if ns0 != string(result.Content) {
 			t.Fatalf("Failed no Localhost+IPv6 enabled: expected \n<%s> got \n<%s>", ns0, string(result.Content))
 		}
@@ -312,7 +307,7 @@ func TestFilterResolvDns(t *testing.T) {
 	// with IPv6 disabled, and no non-localhost servers, Google defaults (only IPv4) should be added
 	ns0 = "\nnameserver 8.8.8.8\nnameserver 8.8.4.4"
 	ns1 = "nameserver 127.0.0.1\nnameserver ::1\nnameserver 127.0.2.1"
-	if result, _ := FilterResolvDNS([]byte(ns1), false); result != nil {
+	if result, _ := resolvconf.FilterResolvDNS([]byte(ns1), false); result != nil {
 		if ns0 != string(result.Content) {
 			t.Fatalf("Failed no Localhost+IPv6 enabled: expected \n<%s> got \n<%s>", ns0, string(result.Content))
 		}

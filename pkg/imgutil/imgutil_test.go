@@ -14,12 +14,14 @@
    limitations under the License.
 */
 
-package imgutil
+package imgutil_test
 
 import (
 	"testing"
 
 	"gotest.tools/v3/assert"
+
+	"go.farcloser.world/lepton/pkg/imgutil"
 )
 
 func TestParseRepoTag(t *testing.T) {
@@ -52,7 +54,7 @@ func TestParseRepoTag(t *testing.T) {
 		},
 	}
 	for _, tc := range testCases {
-		repo, tag := ParseRepoTag(tc.imgName)
+		repo, tag := imgutil.ParseRepoTag(tc.imgName)
 		assert.Equal(t, tc.repo, repo)
 		assert.Equal(t, tc.tag, tag)
 	}

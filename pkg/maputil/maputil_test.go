@@ -14,13 +14,15 @@
    limitations under the License.
 */
 
-package maputil
+package maputil_test
 
 import (
 	"fmt"
 	"testing"
 
 	"gotest.tools/v3/assert"
+
+	"go.farcloser.world/lepton/pkg/maputil"
 )
 
 func TestMapBoolValueAsOpt(t *testing.T) {
@@ -68,7 +70,7 @@ func TestMapBoolValueAsOpt(t *testing.T) {
 	}
 
 	for i, tt := range tests {
-		got, err := MapBoolValueAsOpt(tt.m, tt.key)
+		got, err := maputil.MapBoolValueAsOpt(tt.m, tt.key)
 		assert.Equal(t, got, tt.want, fmt.Sprintf("case %d", i+1))
 		if (err != nil) != tt.wantErr {
 			t.Errorf("MapBoolValueAsOpt() case %d error = %v, wantErr %v", i+1, err, tt.wantErr)

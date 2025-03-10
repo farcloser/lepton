@@ -608,7 +608,7 @@ func (e *CNIEnv) parseSubnet(subnetStr string) (*net.IPNet, error) {
 	return subnet, nil
 }
 
-func parseIPAMRange(subnet *net.IPNet, gatewayStr, ipRangeStr string) (*IPAMRange, error) {
+func ParseIPAMRange(subnet *net.IPNet, gatewayStr, ipRangeStr string) (*IPAMRange, error) {
 	var gateway, rangeStart, rangeEnd net.IP
 	if gatewayStr != "" {
 		gatewayIP := net.ParseIP(gatewayStr)

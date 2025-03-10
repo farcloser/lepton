@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package mountutil
+package mountutil_test
 
 import (
 	"context"
@@ -27,6 +27,8 @@ import (
 	is "gotest.tools/v3/assert/cmp"
 
 	"go.farcloser.world/containers/specs"
+
+	"go.farcloser.world/lepton/pkg/mountutil"
 )
 
 // TestParseVolumeOptions tests volume options are parsed as expected.
@@ -172,7 +174,7 @@ func TestParseVolumeOptions(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			opts, specOpts, err := parseVolumeOptionsWithMountInfo(tt.vType, tt.src, tt.optsRaw, func(string) (mount.Info, error) {
+			opts, specOpts, err := mountutil.ParseVolumeOptionsWithMountInfo(tt.vType, tt.src, tt.optsRaw, func(string) (mount.Info, error) {
 				return mount.Info{
 					Mountpoint: tt.src,
 					Optional:   strings.Join(tt.srcOptional, " "),
@@ -202,7 +204,7 @@ func TestProcessTmpfs(t *testing.T) {
 		"/tmp:size=64m,exec": {"nosuid", "nodev", "size=64m", "exec"},
 	}
 	for k, expected := range testCases {
-		x, err := ProcessFlagTmpfs(k)
+		x, err := mountutil.ProcessFlagTmpfs(k)
 		assert.NilError(t, err)
 		assert.DeepEqual(t, expected, x.Mount.Options)
 	}
@@ -211,13 +213,13 @@ func TestProcessTmpfs(t *testing.T) {
 func TestProcessFlagV(t *testing.T) {
 	tests := []struct {
 		rawSpec string
-		wants   *Processed
+		wants   *mountutil.Processed
 		err     string
 	}{
 		// Bind volumes: absolute path
 		{
 			rawSpec: "/mnt/foo:/mnt/foo:ro",
-			wants: &Processed{
+			wants: &mountutil.Processed{
 				Type: "bind",
 				Mount: specs.Mount{
 					Type:        "none",
@@ -229,7 +231,7 @@ func TestProcessFlagV(t *testing.T) {
 		// Bind volumes: relative path
 		{
 			rawSpec: `./TestVolume/Path:/mnt/foo`,
-			wants: &Processed{
+			wants: &mountutil.Processed{
 				Type: "bind",
 				Mount: specs.Mount{
 					Type:        "none",
@@ -241,7 +243,7 @@ func TestProcessFlagV(t *testing.T) {
 		// Named volumes
 		{
 			rawSpec: `TestVolume:/mnt/foo`,
-			wants: &Processed{
+			wants: &mountutil.Processed{
 				Type: "volume",
 				Name: "TestVolume",
 				Mount: specs.Mount{
@@ -263,7 +265,7 @@ func TestProcessFlagV(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.rawSpec, func(t *testing.T) {
-			processedVolSpec, err := ProcessFlagV(tt.rawSpec, mockVolumeStore, false)
+			processedVolSpec, err := mountutil.ProcessFlagV(tt.rawSpec, MckVolStore, false)
 			if err != nil {
 				assert.Error(t, err, tt.err)
 				return
@@ -287,12 +289,12 @@ func TestProcessFlagV(t *testing.T) {
 func TestProcessFlagVAnonymousVolumes(t *testing.T) {
 	tests := []struct {
 		rawSpec string
-		wants   *Processed
+		wants   *mountutil.Processed
 		err     string
 	}{
 		{
 			rawSpec: `/mnt/foo`,
-			wants: &Processed{
+			wants: &mountutil.Processed{
 				Type: "volume",
 				Mount: specs.Mount{
 					Type:        "none",
@@ -302,7 +304,7 @@ func TestProcessFlagVAnonymousVolumes(t *testing.T) {
 		},
 		{
 			rawSpec: `./TestVolume/Path`,
-			wants: &Processed{
+			wants: &mountutil.Processed{
 				Type: "volume",
 				Mount: specs.Mount{
 					Type:        "none",
@@ -312,7 +314,7 @@ func TestProcessFlagVAnonymousVolumes(t *testing.T) {
 		},
 		{
 			rawSpec: "TestVolume",
-			wants: &Processed{
+			wants: &mountutil.Processed{
 				Type: "volume",
 				Mount: specs.Mount{
 					Type:        "none",
@@ -328,7 +330,7 @@ func TestProcessFlagVAnonymousVolumes(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.rawSpec, func(t *testing.T) {
-			processedVolSpec, err := ProcessFlagV(tt.rawSpec, mockVolumeStore, true)
+			processedVolSpec, err := mountutil.ProcessFlagV(tt.rawSpec, MckVolStore, true)
 			if err != nil {
 				assert.ErrorContains(t, err, tt.err)
 				return

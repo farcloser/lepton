@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package portutil
+package portutil_test
 
 import (
 	"reflect"
@@ -25,6 +25,7 @@ import (
 	"github.com/containerd/go-cni"
 
 	"go.farcloser.world/lepton/pkg/labels"
+	"go.farcloser.world/lepton/pkg/portutil"
 	"go.farcloser.world/lepton/pkg/rootlessutil"
 )
 
@@ -130,7 +131,7 @@ func TestTestParseFlagPWithPlatformSpec(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := ParseFlagP(tt.args.s)
+			got, err := portutil.ParseFlagP(tt.args.s)
 			t.Log(err)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ParseFlagP() error = %v, wantErr %v", err, tt.wantErr)
@@ -211,7 +212,7 @@ func TestParsePortsLabel(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := ParsePortsLabel(tt.labelMap)
+			got, err := portutil.ParsePortsLabel(tt.labelMap)
 			t.Log(err)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ParsePortsLabel() error = %v, wantErr %v", err, tt.wantErr)
@@ -424,7 +425,7 @@ func TestParseFlagP(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := ParseFlagP(tt.args.s)
+			got, err := portutil.ParseFlagP(tt.args.s)
 			t.Log(err)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ParseFlagP() error = %v, wantErr %v", err, tt.wantErr)

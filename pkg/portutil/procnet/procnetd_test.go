@@ -14,13 +14,15 @@
    limitations under the License.
 */
 
-package procnet
+package procnet_test
 
 import (
 	"net"
 	"testing"
 
 	"gotest.tools/v3/assert"
+
+	"go.farcloser.world/lepton/pkg/portutil/procnet"
 )
 
 // All the code in this file is copied from the iima project in https://github.com/lima-vm/lima/blob/v0.8.3/pkg/guestagent/procnettcp/procnettcp_test.go.
@@ -34,7 +36,7 @@ func TestParseTCP(t *testing.T) {
 		"3: 00000000:0016 00000000:0000 0A 00000000:00000000 00:00000000 00000000     0        0 32910 1 0000000000000000 100 0 0 10 0",
 		"4: 0100007F:053A 00000000:0000 0A 00000000:00000000 00:00000000 00000000     0        0 31430 1 0000000000000000 100 0 0 10 0",
 		"5: 0B3CA8C0:0016 690AA8C0:F705 01 00000000:00000000 02:00028D8B 00000000     0        0 32989 4 0000000000000000 20 4 31 10 19"}
-	entries := Parse(procNetTCP)
+	entries := procnet.Parse(procNetTCP)
 	t.Log(entries)
 
 	assert.Check(t, net.ParseIP("127.0.0.1").Equal(entries[0].LocalIP))
@@ -48,7 +50,7 @@ func TestParseTCP6(t *testing.T) {
 	procNetTCP := []string{
 		"0: 000080FE00000000FF57A6705DC771FE:0050 00000000000000000000000000000000:0000 0A 00000000:00000000 00:00000000 00000000     0        0 850222 1 0000000000000000 100 0 0 10 0",
 	}
-	entries := Parse(procNetTCP)
+	entries := procnet.Parse(procNetTCP)
 	t.Log(entries)
 
 	assert.Check(t, net.ParseIP("fe80::70a6:57ff:fe71:c75d").Equal(entries[0].LocalIP))
@@ -61,7 +63,7 @@ func TestParseTCP6Zero(t *testing.T) {
 		"1: 00000000000000000000000000000000:006F 00000000000000000000000000000000:0000 0A 00000000:00000000 00:00000000 00000000     0        0 26772 1 0000000000000000 100 0 0 10 0",
 		"2: 00000000000000000000000000000000:0050 00000000000000000000000000000000:0000 0A 00000000:00000000 00:00000000 00000000     0        0 1210901 1 0000000000000000 100 0 0 10 0"}
 
-	entries := Parse(procNetTCP)
+	entries := procnet.Parse(procNetTCP)
 	t.Log(entries)
 
 	assert.Check(t, net.IPv6zero.Equal(entries[0].LocalIP))

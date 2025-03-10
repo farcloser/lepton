@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package netutil
+package netutil_test
 
 import "testing"
 

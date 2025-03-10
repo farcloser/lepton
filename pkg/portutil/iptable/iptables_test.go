@@ -14,10 +14,12 @@
    limitations under the License.
 */
 
-package iptable
+package iptable_test
 
 import (
 	"testing"
+
+	"go.farcloser.world/lepton/pkg/portutil/iptable"
 )
 
 func TestParseIPTableRules(t *testing.T) {
@@ -50,7 +52,7 @@ func TestParseIPTableRules(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			got := ParseIPTableRules(tc.rules)
+			got := iptable.ParseIPTableRules(tc.rules)
 			if !equal(got, tc.want) {
 				t.Errorf("ParseIPTableRules(%v) = %v; want %v", tc.rules, got, tc.want)
 			}

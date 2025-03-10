@@ -14,20 +14,22 @@
    limitations under the License.
 */
 
-package tabutil
+package tabutil_test
 
 import (
 	"strings"
 	"testing"
 
 	"gotest.tools/v3/assert"
+
+	"go.farcloser.world/lepton/pkg/tabutil"
 )
 
 func TestTabReader(t *testing.T) {
 	tabRows := strings.Split(`a    b    c
 1    2    3
 123  456  789`, "\n")
-	reader := NewReader("a\tb\tc\t")
+	reader := tabutil.NewReader("a\tb\tc\t")
 
 	err := reader.ParseHeader(tabRows[0])
 	assert.NilError(t, err)

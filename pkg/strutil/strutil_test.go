@@ -14,41 +14,43 @@
    limitations under the License.
 */
 
-package strutil
+package strutil_test
 
 import (
 	"reflect"
 	"testing"
 
 	"gotest.tools/v3/assert"
+
+	"go.farcloser.world/lepton/pkg/strutil"
 )
 
 func TestDedupeStrSlice(t *testing.T) {
 	assert.DeepEqual(t,
 		[]string{"apple", "banana", "chocolate"},
-		DedupeStrSlice([]string{"apple", "banana", "apple", "chocolate"}))
+		strutil.DedupeStrSlice([]string{"apple", "banana", "apple", "chocolate"}))
 
 	assert.DeepEqual(t,
 		[]string{"apple", "banana", "chocolate"},
-		DedupeStrSlice([]string{"apple", "apple", "banana", "chocolate", "apple"}))
+		strutil.DedupeStrSlice([]string{"apple", "apple", "banana", "chocolate", "apple"}))
 
 }
 
 func TestSliceToSet(t *testing.T) {
 	assert.DeepEqual(t,
 		map[string]bool{"apple": true, "banana": true, "chocolate": true},
-		SliceToSet([]string{"apple", "banana", "apple", "chocolate"}))
+		strutil.SliceToSet([]string{"apple", "banana", "apple", "chocolate"}))
 
 	assert.DeepEqual(t,
 		map[string]bool{"apple": true, "banana": true, "chocolate": true},
-		SliceToSet([]string{"apple", "apple", "banana", "chocolate", "apple"}))
+		strutil.SliceToSet([]string{"apple", "apple", "banana", "chocolate", "apple"}))
 
 }
 
 func TestReverseStrSlice(t *testing.T) {
 	assert.DeepEqual(t,
 		[]string{"foo", "bar", "baz"},
-		ReverseStrSlice([]string{"baz", "bar", "foo"}))
+		strutil.ReverseStrSlice([]string{"baz", "bar", "foo"}))
 }
 
 func TestParseBoolOrAuto(t *testing.T) {
@@ -99,7 +101,7 @@ func TestParseBoolOrAuto(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := ParseBoolOrAuto(tt.args.s)
+			got, err := strutil.ParseBoolOrAuto(tt.args.s)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ParseBoolOrAuto() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -144,7 +146,7 @@ func TestInStringSlice(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := InStringSlice(tt.args.ss, tt.args.str); got != tt.want {
+			if got := strutil.InStringSlice(tt.args.ss, tt.args.str); got != tt.want {
 				t.Errorf("InStringSlice() = %v, want %v", got, tt.want)
 			}
 		})
@@ -218,7 +220,7 @@ func TestParseCSVMap(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := ParseCSVMap(tt.args.s)
+			got, err := strutil.ParseCSVMap(tt.args.s)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ParseCSVMap() error = %v, wantErr %v", err, tt.wantErr)
 				return

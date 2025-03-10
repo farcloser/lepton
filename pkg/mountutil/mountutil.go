@@ -66,7 +66,7 @@ func ProcessFlagV(s string, volStore volumestore.VolumeService, createDir bool) 
 		options  []string
 	)
 
-	split, err := splitVolumeSpec(s)
+	split, err := SplitVolumeSpec(s)
 	if err != nil {
 		return nil, fmt.Errorf("failed to split volume mount specification: %w", err)
 	}
@@ -222,6 +222,7 @@ func getVolumeOptions(src string, vType string, rawOpts string) ([]string, []oci
 		return nil, nil, fmt.Errorf("failed to parse volume options (%q, %q, %q): %w", vType, src, rawOpts, err)
 	}
 
+	// FIXME ?
 	specOpts = append(specOpts, specOpts...)
 	return options, specOpts, nil
 }

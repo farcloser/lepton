@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package netutil
+package netutil_test
 
 import (
 	"encoding/json"
@@ -27,6 +27,7 @@ import (
 
 	ncdefaults "go.farcloser.world/lepton/pkg/defaults"
 	"go.farcloser.world/lepton/pkg/labels"
+	"go.farcloser.world/lepton/pkg/netutil"
 	"go.farcloser.world/lepton/pkg/rootlessutil"
 )
 
@@ -38,7 +39,7 @@ func testDefaultNetworkCreationWithBridgeIP(t *testing.T) {
 	// To prevent subnet collisions when attempting to recreate the default network
 	// in the isolated CNI config dir we'll be using, we must first delete
 	// the network in the default CNI config dir.
-	defaultCniEnv := CNIEnv{
+	defaultCniEnv := netutil.CNIEnv{
 		Path:        ncdefaults.CNIPath(),
 		NetconfPath: ncdefaults.CNINetConfPath(),
 	}
@@ -50,7 +51,7 @@ func testDefaultNetworkCreationWithBridgeIP(t *testing.T) {
 
 	// We create a tempdir for the CNI conf path to ensure an empty env for this test.
 	cniConfTestDir := t.TempDir()
-	cniEnv := CNIEnv{
+	cniEnv := netutil.CNIEnv{
 		Path:        ncdefaults.CNIPath(),
 		NetconfPath: cniConfTestDir,
 	}
@@ -60,7 +61,7 @@ func testDefaultNetworkCreationWithBridgeIP(t *testing.T) {
 	assert.Assert(t, defaultNetConf == nil)
 
 	// Attempt to create the default network with a test bridgeIP
-	err = cniEnv.ensureDefaultNetworkConfig(testBridgeIP)
+	err = netutil.WithDefaultNetwork(testBridgeIP)(&cniEnv)
 	assert.NilError(t, err)
 
 	// Ensure default network config is present now.
@@ -114,7 +115,7 @@ func testDefaultNetworkCreationWithBridgeIP(t *testing.T) {
 	assert.Equal(t, "host-local", bridgeConfig.IPAM.Type)
 
 	// Ensure network isn't created twice or accidentally re-created.
-	err = cniEnv.ensureDefaultNetworkConfig(testBridgeIP)
+	err = netutil.WithDefaultNetwork(testBridgeIP)(&cniEnv)
 	assert.NilError(t, err)
 
 	// Check for any other network config files.

@@ -14,44 +14,46 @@
    limitations under the License.
 */
 
-package nettype
+package nettype_test
 
 import (
 	"testing"
 
 	"gotest.tools/v3/assert"
+
+	"go.farcloser.world/lepton/pkg/netutil/nettype"
 )
 
 func TestDetect(t *testing.T) {
 	type testCase struct {
 		names    []string
-		expected Type
+		expected nettype.Type
 		err      string
 	}
 	testCases := []testCase{
 		{
 			names:    nil,
-			expected: CNI,
+			expected: nettype.CNI,
 		},
 		{
 			names:    []string{"none"},
-			expected: None,
+			expected: nettype.None,
 		},
 		{
 			names:    []string{"host"},
-			expected: Host,
+			expected: nettype.Host,
 		},
 		{
 			names:    []string{"bridge"},
-			expected: CNI,
+			expected: nettype.CNI,
 		},
 		{
 			names:    []string{"foo", "bar"},
-			expected: CNI,
+			expected: nettype.CNI,
 		},
 		{
 			names:    []string{"foo", "bar", "bridge"},
-			expected: CNI,
+			expected: nettype.CNI,
 		},
 		{
 			names: []string{"none", "host"},
@@ -68,7 +70,7 @@ func TestDetect(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		got, err := Detect(tc.names)
+		got, err := nettype.Detect(tc.names)
 		if tc.err == "" {
 			assert.NilError(t, err)
 			assert.Equal(t, tc.expected, got)

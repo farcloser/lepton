@@ -20,13 +20,17 @@
 	Licensed under the Apache License, Version 2.0
 */
 
-package tail
+package tail_test
 
 import (
 	"bytes"
 	"strings"
 	"testing"
+
+	"go.farcloser.world/lepton/pkg/logging/tail"
 )
+
+const blockSize = 1024
 
 func TestTail(t *testing.T) {
 	line := strings.Repeat("a", blockSize)
@@ -46,7 +50,7 @@ func TestTail(t *testing.T) {
 	} {
 		t.Logf("TestCase #%d: %+v", c, test)
 		r := bytes.NewReader(testBytes)
-		s, err := FindTailLineStartIndex(r, uint(test.n))
+		s, err := tail.FindTailLineStartIndex(r, uint(test.n))
 		if err != nil {
 			t.Error(err)
 		}

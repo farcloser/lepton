@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package dockerconfigresolver
+package dockerconfigresolver_test
 
 import (
 	"encoding/base64"
@@ -26,6 +26,7 @@ import (
 
 	"gotest.tools/v3/assert"
 
+	"go.farcloser.world/lepton/pkg/imgutil/dockerconfigresolver"
 	"go.farcloser.world/lepton/pkg/version"
 )
 
@@ -57,7 +58,7 @@ func TestBrokenCredentialsStore(t *testing.T) {
 				tmpDir := createTempDir(t, 0000)
 				return filepath.Join(tmpDir, "doesnotexistcantcreate")
 			},
-			errorNew: ErrUnableToInstantiate,
+			errorNew: dockerconfigresolver.ErrUnableToInstantiate,
 		},
 		{
 			description: "Pointing DOCKER_CONFIG at a non-existent directory inside a read-only directory will prevent saving credentials",
@@ -65,21 +66,21 @@ func TestBrokenCredentialsStore(t *testing.T) {
 				tmpDir := createTempDir(t, 0500)
 				return filepath.Join(tmpDir, "doesnotexistcantcreate")
 			},
-			errorWrite: ErrUnableToStore,
+			errorWrite: dockerconfigresolver.ErrUnableToStore,
 		},
 		{
 			description: "Pointing DOCKER_CONFIG at an unreadable directory will prevent instantiation",
 			setup: func() string {
 				return createTempDir(t, 0000)
 			},
-			errorNew: ErrUnableToInstantiate,
+			errorNew: dockerconfigresolver.ErrUnableToInstantiate,
 		},
 		{
 			description: "Pointing DOCKER_CONFIG at a read-only directory will prevent saving credentials",
 			setup: func() string {
 				return createTempDir(t, 0500)
 			},
-			errorWrite: ErrUnableToStore,
+			errorWrite: dockerconfigresolver.ErrUnableToStore,
 		},
 		{
 			description: "Pointing DOCKER_CONFIG at a directory containing am unparsable `config.json` will prevent instantiation",
@@ -91,7 +92,7 @@ func TestBrokenCredentialsStore(t *testing.T) {
 				}
 				return tmpDir
 			},
-			errorNew: ErrUnableToInstantiate,
+			errorNew: dockerconfigresolver.ErrUnableToInstantiate,
 		},
 		{
 			description: "Pointing DOCKER_CONFIG at a file instead of a directory will prevent instantiation",
@@ -107,7 +108,7 @@ func TestBrokenCredentialsStore(t *testing.T) {
 				}
 				return filepath.Join(tmpDir, "isafile")
 			},
-			errorNew: ErrUnableToInstantiate,
+			errorNew: dockerconfigresolver.ErrUnableToInstantiate,
 		},
 		{
 			description: "Pointing DOCKER_CONFIG at a directory containing a `config.json` directory will prevent instantiation",
@@ -119,7 +120,7 @@ func TestBrokenCredentialsStore(t *testing.T) {
 				}
 				return tmpDir
 			},
-			errorNew: ErrUnableToInstantiate,
+			errorNew: dockerconfigresolver.ErrUnableToInstantiate,
 		},
 		{
 			description: "Pointing DOCKER_CONFIG at a directory containing a `config.json` dangling symlink will still work",
@@ -146,7 +147,7 @@ func TestBrokenCredentialsStore(t *testing.T) {
 				}
 				return tmpDir
 			},
-			errorNew: ErrUnableToInstantiate,
+			errorNew: dockerconfigresolver.ErrUnableToInstantiate,
 		},
 		{
 			description: "Pointing DOCKER_CONFIG at a directory containing a read-only, valid `config.json` file will NOT prevent saving credentials",
@@ -167,7 +168,7 @@ func TestBrokenCredentialsStore(t *testing.T) {
 
 	t.Run("Docker Config testing with a variety of filesystem situations", func(t *testing.T) {
 		// Do NOT parallelize this test, as it relies on Chdir, which would have side effects for other tests.
-		registryURL, err := Parse("registry")
+		registryURL, err := dockerconfigresolver.Parse("registry")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -187,14 +188,14 @@ func TestBrokenCredentialsStore(t *testing.T) {
 					assert.NilError(tt, err)
 				})
 
-				var cs *CredentialsStore
-				cs, err = NewCredentialsStore(directory)
+				var cs *dockerconfigresolver.CredentialsStore
+				cs, err = dockerconfigresolver.NewCredentialsStore(directory)
 				assert.ErrorIs(tt, err, tc.errorNew)
 				if err != nil {
 					return
 				}
 
-				var af *Credentials
+				var af *dockerconfigresolver.Credentials
 				af, err = cs.Retrieve(registryURL, true)
 				assert.ErrorIs(tt, err, tc.errorRead)
 
@@ -343,16 +344,16 @@ func TestWorkingCredentialsStore(t *testing.T) {
 
 		for _, tc := range testCases {
 			t.Run(tc.description, func(t *testing.T) {
-				registryURL, err := Parse("registry.example")
+				registryURL, err := dockerconfigresolver.Parse("registry.example")
 				if err != nil {
 					t.Fatal(err)
 				}
-				cs, err := NewCredentialsStore(tc.setup())
+				cs, err := dockerconfigresolver.NewCredentialsStore(tc.setup())
 				if err != nil {
 					t.Fatal(err)
 				}
 
-				var af *Credentials
+				var af *dockerconfigresolver.Credentials
 				af, err = cs.Retrieve(registryURL, true)
 				assert.ErrorIs(t, err, nil)
 				assert.Equal(t, af.Username, tc.username)
@@ -364,7 +365,7 @@ func TestWorkingCredentialsStore(t *testing.T) {
 
 	t.Run("Namespaced host", func(t *testing.T) {
 		server := "host.example/path?ns=namespace.example"
-		registryURL, err := Parse(server)
+		registryURL, err := dockerconfigresolver.Parse(server)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -377,12 +378,12 @@ func TestWorkingCredentialsStore(t *testing.T) {
 				}
 			}`, version.RootName)
 		dir := writeContent(t, content)
-		cs, err := NewCredentialsStore(dir)
+		cs, err := dockerconfigresolver.NewCredentialsStore(dir)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		var af *Credentials
+		var af *dockerconfigresolver.Credentials
 		af, err = cs.Retrieve(registryURL, true)
 		assert.ErrorIs(t, err, nil)
 		assert.Equal(t, af.Username, "username")

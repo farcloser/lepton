@@ -26,7 +26,7 @@ import (
 	"go.farcloser.world/lepton/pkg/mountutil/volumestore"
 )
 
-func splitVolumeSpec(s string) ([]string, error) {
+func SplitVolumeSpec(s string) ([]string, error) {
 	s = strings.TrimLeft(s, ":")
 	split := strings.Split(s, ":")
 	return split, nil

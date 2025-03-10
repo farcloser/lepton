@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package netutil
+package netutil_test
 
 import (
 	"bytes"
@@ -29,6 +29,7 @@ import (
 
 	ncdefaults "go.farcloser.world/lepton/pkg/defaults"
 	"go.farcloser.world/lepton/pkg/labels"
+	"go.farcloser.world/lepton/pkg/netutil"
 	"go.farcloser.world/lepton/pkg/testutil"
 )
 
@@ -59,13 +60,13 @@ func TestParseIPAMRange(t *testing.T) {
 		subnet   string
 		gateway  string
 		iprange  string
-		expected *IPAMRange
+		expected *netutil.IPAMRange
 		err      string
 	}
 	testCases := []testCase{
 		{
 			subnet: "10.1.100.0/24",
-			expected: &IPAMRange{
+			expected: &netutil.IPAMRange{
 				Subnet:  "10.1.100.0/24",
 				Gateway: "10.1.100.1",
 			},
@@ -78,7 +79,7 @@ func TestParseIPAMRange(t *testing.T) {
 		{
 			subnet:  "10.1.100.0/24",
 			gateway: "10.1.100.100",
-			expected: &IPAMRange{
+			expected: &netutil.IPAMRange{
 				Subnet:  "10.1.100.0/24",
 				Gateway: "10.1.100.100",
 			},
@@ -96,7 +97,7 @@ func TestParseIPAMRange(t *testing.T) {
 		{
 			subnet:  "10.1.0.0/16",
 			iprange: "10.1.100.0/24",
-			expected: &IPAMRange{
+			expected: &netutil.IPAMRange{
 				Subnet:     "10.1.0.0/16",
 				Gateway:    "10.1.0.1",
 				IPRange:    "10.1.100.0/24",
@@ -107,7 +108,7 @@ func TestParseIPAMRange(t *testing.T) {
 		{
 			subnet:  "10.1.100.0/23",
 			iprange: "10.1.100.0/25",
-			expected: &IPAMRange{
+			expected: &netutil.IPAMRange{
 				Subnet:     "10.1.100.0/23",
 				Gateway:    "10.1.100.1",
 				IPRange:    "10.1.100.0/25",
@@ -118,7 +119,7 @@ func TestParseIPAMRange(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		_, subnet, _ := net.ParseCIDR(tc.subnet)
-		got, err := parseIPAMRange(subnet, tc.gateway, tc.iprange)
+		got, err := netutil.ParseIPAMRange(subnet, tc.gateway, tc.iprange)
 		if tc.err != "" {
 			assert.ErrorContains(t, err, tc.err)
 		} else {
@@ -136,7 +137,7 @@ func testDefaultNetworkCreation(t *testing.T) {
 	// To prevent subnet collisions when attempting to recreate the default network
 	// in the isolated CNI config dir we'll be using, we must first delete
 	// the network in the default CNI config dir.
-	defaultCniEnv := CNIEnv{
+	defaultCniEnv := netutil.CNIEnv{
 		Path:        ncdefaults.CNIPath(),
 		NetconfPath: ncdefaults.CNINetConfPath(),
 	}
@@ -148,7 +149,7 @@ func testDefaultNetworkCreation(t *testing.T) {
 
 	// We create a tempdir for the CNI conf path to ensure an empty env for this test.
 	cniConfTestDir := t.TempDir()
-	cniEnv := CNIEnv{
+	cniEnv := netutil.CNIEnv{
 		Path:        ncdefaults.CNIPath(),
 		NetconfPath: cniConfTestDir,
 	}
@@ -158,7 +159,7 @@ func testDefaultNetworkCreation(t *testing.T) {
 	assert.Assert(t, defaultNetConf == nil)
 
 	// Attempt to create the default network.
-	err = cniEnv.ensureDefaultNetworkConfig("")
+	err = netutil.WithDefaultNetwork("")(&cniEnv)
 	assert.NilError(t, err)
 
 	// Ensure default network config is present now.
@@ -180,7 +181,7 @@ func testDefaultNetworkCreation(t *testing.T) {
 	assert.Assert(t, boolv)
 
 	// Ensure network isn't created twice or accidentally re-created.
-	err = cniEnv.ensureDefaultNetworkConfig("")
+	err = netutil.WithDefaultNetwork("")(&cniEnv)
 	assert.NilError(t, err)
 
 	// Check for any other network config files.
@@ -202,7 +203,7 @@ func testDefaultNetworkCreation(t *testing.T) {
 func TestNetworkWithDefaultNameAlreadyExists(t *testing.T) {
 	// We create a tempdir for the CNI conf path to ensure an empty env for this test.
 	cniConfTestDir := t.TempDir()
-	cniEnv := CNIEnv{
+	cniEnv := netutil.CNIEnv{
 		Path:        t.TempDir(), // irrelevant for this test
 		NetconfPath: cniConfTestDir,
 	}
@@ -214,7 +215,7 @@ func TestNetworkWithDefaultNameAlreadyExists(t *testing.T) {
 
 	// Manually define and write a network config file.
 	values := map[string]string{
-		"network_name": DefaultNetworkName,
+		"network_name": netutil.DefaultNetworkName,
 		"subnet":       "10.7.1.1/24",
 		"gateway":      "10.7.1.1",
 	}
@@ -233,9 +234,9 @@ func TestNetworkWithDefaultNameAlreadyExists(t *testing.T) {
 	assert.NilError(t, err)
 	assert.Assert(t, len(netConfs) > 0)
 
-	var listedDefaultNetConf *NetworkConfig
+	var listedDefaultNetConf *netutil.NetworkConfig
 	for _, netConf := range netConfs {
-		if netConf.Name == DefaultNetworkName {
+		if netConf.Name == netutil.DefaultNetworkName {
 			listedDefaultNetConf = netConf
 			break
 		}
@@ -247,14 +248,14 @@ func TestNetworkWithDefaultNameAlreadyExists(t *testing.T) {
 	assert.Assert(t, defaultNetConf != nil)
 	assert.Assert(t, defaultNetConf.File == testConfFile)
 
-	err = cniEnv.ensureDefaultNetworkConfig("")
+	err = netutil.WithDefaultNetwork("")(&cniEnv)
 	assert.NilError(t, err)
 
 	netConfs, err = cniEnv.NetworkList()
 	assert.NilError(t, err)
 	defaultNamedNetworksFileDefinitions := []string{}
 	for _, netConf := range netConfs {
-		if netConf.Name == DefaultNetworkName {
+		if netConf.Name == netutil.DefaultNetworkName {
 			defaultNamedNetworksFileDefinitions = append(defaultNamedNetworksFileDefinitions, netConf.File)
 		}
 	}
