@@ -30,7 +30,7 @@ import (
 	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
-	"go.farcloser.world/lepton/pkg/buildkitutil"
+	"go.farcloser.world/lepton/leptonic/buildkit"
 	"go.farcloser.world/lepton/pkg/inspecttypes/dockercompat"
 	"go.farcloser.world/lepton/pkg/rootlessutil"
 	"go.farcloser.world/lepton/pkg/testutil/nerdtest/platform"
@@ -271,7 +271,7 @@ var Build = &test.Requirement{
 		mess := "buildkitd is enabled"
 
 		if getTarget() == targetNerdishctl || getTarget() == targetNerdctl {
-			bkHostAddr, err := buildkitutil.GetBuildkitHost(defaultNamespace)
+			bkHostAddr, err := buildkit.GetBuildkitHost(defaultNamespace)
 			if err != nil {
 				ret = false
 				mess = fmt.Sprintf("buildkitd is not enabled: %+v", err)

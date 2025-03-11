@@ -48,7 +48,7 @@ func ParentMain(hostGatewayIP string) error {
 		return err
 	}
 
-	detachedNetNSPath, err := detachedNetNS(stateDir)
+	detachedNetNSPath, err := getDetachedNetNSPath(stateDir)
 	if err != nil {
 		return err
 	}

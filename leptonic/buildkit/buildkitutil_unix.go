@@ -16,7 +16,7 @@
    limitations under the License.
 */
 
-package buildkitutil
+package buildkit
 
 import (
 	"errors"
