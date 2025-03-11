@@ -36,8 +36,10 @@ import (
 )
 
 func TestComposeUp(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
-	various.ComposeUp(t, base, fmt.Sprintf(`
+	various.ComposeUp(t, base, "8087", fmt.Sprintf(`
 version: '3.1'
 
 services:
@@ -46,7 +48,7 @@ services:
     image: %s
     restart: always
     ports:
-      - 8080:80
+      - 8087:80
     environment:
       WORDPRESS_DB_HOST: db
       WORDPRESS_DB_USER: exampleuser
@@ -73,6 +75,8 @@ volumes:
 }
 
 func TestComposeUpBuild(t *testing.T) {
+	t.Parallel()
+
 	testutil.RequiresBuild(t)
 	testutil.RegisterBuildCacheCleanup(t)
 	base := testutil.NewBase(t)
@@ -82,7 +86,7 @@ services:
   web:
     build: .
     ports:
-    - 8080:80
+    - 8083:80
 `
 	dockerfile := fmt.Sprintf(`FROM %s
 COPY index.html /usr/share/nginx/html/index.html
@@ -100,7 +104,7 @@ COPY index.html /usr/share/nginx/html/index.html
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "up", "-d", "--build").AssertOK()
 	defer base.ComposeCmd("-f", comp.YAMLFullPath(), "down", "-v").Run()
 
-	resp, err := nettestutil.HTTPGet("http://127.0.0.1:8080", 50, false)
+	resp, err := nettestutil.HTTPGet("http://127.0.0.1:8083", 50, false)
 	assert.NilError(t, err)
 	defer resp.Body.Close()
 	respBody, err := io.ReadAll(resp.Body)
@@ -110,6 +114,8 @@ COPY index.html /usr/share/nginx/html/index.html
 }
 
 func TestComposeUpNetWithStaticIP(t *testing.T) {
+	t.Parallel()
+
 	if rootlessutil.IsRootless() {
 		t.Skip("Static IP assignment is not supported rootless mode yet.")
 	}
@@ -151,6 +157,8 @@ networks:
 }
 
 func TestComposeUpMultiNet(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 
 	var dockerComposeYAML = fmt.Sprintf(`
@@ -200,6 +208,8 @@ networks:
 }
 
 func TestComposeUpOsEnvVar(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	const containerName = "nginxAlpine"
 	var dockerComposeYAML = fmt.Sprintf(`
@@ -210,7 +220,7 @@ services:
     image: %s
     container_name: %s
     ports:
-      - ${ADDRESS:-127.0.0.1}:8080:80
+      - ${ADDRESS:-127.0.0.1}:8084:80
 `, testutil.NginxAlpineImage, containerName)
 
 	comp := testutil.NewComposeDir(t, dockerComposeYAML)
@@ -227,12 +237,14 @@ services:
 	inspect80TCP := (*inspect.NetworkSettings.Ports)["80/tcp"]
 	expected := nat.PortBinding{
 		HostIP:   "0.0.0.0",
-		HostPort: "8080",
+		HostPort: "8084",
 	}
 	assert.Equal(base.T, expected, inspect80TCP[0])
 }
 
 func TestComposeUpDotEnvFile(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 
 	var dockerComposeYAML = `
@@ -256,6 +268,8 @@ services:
 }
 
 func TestComposeUpEnvFileNotFoundError(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 
 	var dockerComposeYAML = `
@@ -280,6 +294,8 @@ services:
 }
 
 func TestComposeUpWithScale(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 
 	var dockerComposeYAML = fmt.Sprintf(`
@@ -303,6 +319,8 @@ services:
 }
 
 func TestComposeIPAMConfig(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 
 	var dockerComposeYAML = fmt.Sprintf(`
@@ -333,6 +351,8 @@ networks:
 }
 
 func TestComposeUpRemoveOrphans(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 
 	var (
@@ -372,6 +392,8 @@ services:
 }
 
 func TestComposeUpIdempotent(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 
 	var dockerComposeYAML = fmt.Sprintf(`
@@ -395,6 +417,8 @@ services:
 }
 
 func TestComposeUpWithExternalNetwork(t *testing.T) {
+	t.Parallel()
+
 	containerName1 := testutil.Identifier(t) + "-1"
 	containerName2 := testutil.Identifier(t) + "-2"
 	networkName := testutil.Identifier(t) + "-network"
@@ -448,6 +472,8 @@ networks:
 }
 
 func TestComposeUpWithBypass4netns(t *testing.T) {
+	t.Parallel()
+
 	// docker does not support bypass4netns mode
 	testutil.DockerIncompatible(t)
 	if !rootlessutil.IsRootless() {
@@ -456,7 +482,7 @@ func TestComposeUpWithBypass4netns(t *testing.T) {
 	testutil.RequireKernelVersion(t, ">= 5.9.0-0")
 	testutil.RequireSystemService(t, "bypass4netnsd")
 	base := testutil.NewBase(t)
-	various.ComposeUp(t, base, fmt.Sprintf(`
+	various.ComposeUp(t, base, "8085", fmt.Sprintf(`
 version: '3.1'
 
 services:
@@ -465,7 +491,7 @@ services:
     image: %s
     restart: always
     ports:
-      - 8080:80
+      - 8085:80
     environment:
       WORDPRESS_DB_HOST: db
       WORDPRESS_DB_USER: exampleuser
@@ -496,6 +522,8 @@ volumes:
 }
 
 func TestComposeUpProfile(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	serviceRegular := testutil.Identifier(t) + "-regular"
 	serviceProfiled := testutil.Identifier(t) + "-profiled"
@@ -538,6 +566,8 @@ services:
 }
 
 func TestComposeUpAbortOnContainerExit(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	serviceRegular := "regular"
 	serviceProfiled := "exited"
@@ -546,7 +576,7 @@ services:
   %s:
     image: %s
     ports:
-      - 8080:80
+      - 8086:80
   %s:
     image: %s
     entrypoint: /bin/sh -c "exit 1"
@@ -582,6 +612,9 @@ services:
 }
 
 func TestComposeUpPull(t *testing.T) {
+	// This test is removing the common image
+	// t.Parallel()
+
 	base := testutil.NewBase(t)
 
 	var dockerComposeYAML = fmt.Sprintf(`

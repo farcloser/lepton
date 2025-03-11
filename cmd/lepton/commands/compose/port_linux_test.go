@@ -24,6 +24,8 @@ import (
 )
 
 func TestComposePort(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 
 	var dockerComposeYAML = fmt.Sprintf(`
@@ -52,6 +54,8 @@ services:
 }
 
 func TestComposePortFailure(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 
 	var dockerComposeYAML = fmt.Sprintf(`
@@ -62,8 +66,8 @@ services:
     image: %s
     command: "sleep infinity"
     ports:
-    - "12345:10000"
-    - "12346:10001/udp"
+    - "12347:10000"
+    - "12348:10001/udp"
 `, testutil.CommonImage)
 
 	comp := testutil.NewComposeDir(t, dockerComposeYAML)

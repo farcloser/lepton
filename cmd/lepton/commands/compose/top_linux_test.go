@@ -27,6 +27,8 @@ import (
 )
 
 func TestComposeTop(t *testing.T) {
+	t.Parallel()
+
 	if rootlessutil.IsRootless() && cgroups.Version() < 2 {
 		t.Skip("test skipped for rootless containers on cgroup v1")
 	}

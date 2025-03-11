@@ -28,6 +28,8 @@ import (
 )
 
 func TestComposeImages(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	var dockerComposeYAML = fmt.Sprintf(`
 version: '3.1'
@@ -36,7 +38,7 @@ services:
   wordpress:
     image: %s
     ports:
-      - 8080:80
+      - 8093:80
     environment:
       WORDPRESS_DB_HOST: db
       WORDPRESS_DB_USER: exampleuser
@@ -80,6 +82,8 @@ volumes:
 }
 
 func TestComposeImagesJson(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	var dockerComposeYAML = fmt.Sprintf(`
 version: '3.1'
@@ -89,7 +93,7 @@ services:
     image: %s
     container_name: wordpress
     ports:
-      - 8080:80
+      - 8096:80
     environment:
       WORDPRESS_DB_HOST: db
       WORDPRESS_DB_USER: exampleuser

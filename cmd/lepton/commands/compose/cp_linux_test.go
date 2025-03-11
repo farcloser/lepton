@@ -28,6 +28,8 @@ import (
 )
 
 func TestComposeCopy(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 
 	var dockerComposeYAML = fmt.Sprintf(`
