@@ -22,7 +22,6 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 	"testing"
 
 	"github.com/containerd/continuity/testutil/loopback"
@@ -33,13 +32,13 @@ import (
 	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/pkg/cmd/container"
-	"go.farcloser.world/lepton/pkg/infoutil"
 	"go.farcloser.world/lepton/pkg/testutil"
 	"go.farcloser.world/lepton/pkg/testutil/nerdtest"
 )
 
 func TestRunCgroupV2(t *testing.T) {
 	t.Parallel()
+
 	if cgroups.Version() != cgroups.Version2 {
 		t.Skip("test requires cgroup v2")
 	}
@@ -138,14 +137,6 @@ func TestRunDevice(t *testing.T) {
 
 	testCase.Require = nerdtest.Rootful
 
-	if unameR := infoutil.UnameR(); strings.Contains(unameR, ".el8") {
-		t.Logf("Assuming to be running on EL8 (kernel release %q)", unameR)
-		t.Skip("FIXME: loopback.New fails on EL8 (when the test is executed inside a container) https://github.com/containerd/nerdctl/pull/3904#issuecomment-2670917820")
-		// > === FAIL: cmd/nerdctl/container TestRunDevice (0.44s)
-		// > container_run_cgroup_linux_test.go:236: assertion failed: error is not nil: loopback setup failed ([losetup --find --show /tmp/containerd-test-loopback3931357228]):
-		// > stdout="", stderr="losetup: /tmp/containerd-test-loopback3931357228: failed to set up loop device: No such file or directory\n": exit status 1
-	}
-
 	const n = 3
 	lo := make([]*loopback.Loopback, n)
 
@@ -239,6 +230,7 @@ func TestRunDevice(t *testing.T) {
 
 func TestParseDevice(t *testing.T) {
 	t.Parallel()
+
 	type testCase struct {
 		s                     string
 		expectedDevPath       string
@@ -303,6 +295,7 @@ func TestParseDevice(t *testing.T) {
 
 func TestRunCgroupConf(t *testing.T) {
 	t.Parallel()
+
 	if cgroups.Version() != cgroups.Version2 {
 		t.Skip("test requires cgroup v2")
 	}
@@ -322,6 +315,7 @@ func TestRunCgroupConf(t *testing.T) {
 
 func TestRunCgroupParent(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	info := base.Info()
 	switch info.CgroupDriver {
@@ -375,6 +369,7 @@ func TestRunCgroupParent(t *testing.T) {
 
 func TestRunBlkioWeightCgroupV2(t *testing.T) {
 	t.Parallel()
+
 	if cgroups.Version() != cgroups.Version2 {
 		t.Skip("test requires cgroup v2")
 	}

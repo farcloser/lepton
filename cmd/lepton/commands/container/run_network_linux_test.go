@@ -77,6 +77,7 @@ func valuesOfMapStringString(m map[string]string) map[string]struct{} {
 func TestRunInternetConnectivity(t *testing.T) {
 	base := testutil.NewBase(t)
 	customNet := testutil.Identifier(t)
+	base.Cmd("network", "rm", customNet).Run()
 	base.Cmd("network", "create", customNet).AssertOK()
 	defer base.Cmd("network", "rm", customNet).Run()
 
@@ -401,7 +402,7 @@ func TestRunContainerWithStaticIP(t *testing.T) {
 	if rootlessutil.IsRootless() {
 		t.Skip("Static IP assignment is not supported rootless mode yet.")
 	}
-	networkName := "test-network"
+	networkName := "test-network" + testutil.Identifier(t)
 	networkSubnet := "172.0.0.0/16"
 	base := testutil.NewBase(t)
 	cmd := base.Cmd("network", "create", networkName, "--subnet", networkSubnet)
@@ -848,7 +849,7 @@ func TestRunContainerWithStaticIP6(t *testing.T) {
 	if rootlessutil.IsRootless() {
 		t.Skip("Static IP6 assignment is not supported rootless mode yet.")
 	}
-	networkName := "test-network"
+	networkName := "test-network-" + testutil.Identifier(t)
 	networkSubnet := "2001:db8:5::/64"
 	_, subnet, err := net.ParseCIDR(networkSubnet)
 	assert.Assert(t, err == nil)

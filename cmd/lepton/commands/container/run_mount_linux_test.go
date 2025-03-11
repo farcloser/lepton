@@ -35,6 +35,7 @@ import (
 
 func TestRunVolume(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	tID := testutil.Identifier(t)
 	rwDir := t.TempDir()
@@ -81,6 +82,7 @@ func TestRunVolume(t *testing.T) {
 
 func TestRunAnonymousVolume(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	base.Cmd("run", "--rm", "-v", "/foo", testutil.AlpineImage).AssertOK()
 	base.Cmd("run", "--rm", "-v", "TestVolume2:/foo", testutil.AlpineImage).AssertOK()
@@ -92,6 +94,7 @@ func TestRunAnonymousVolume(t *testing.T) {
 
 func TestRunVolumeRelativePath(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	base.Dir = t.TempDir()
 	base.Cmd("run", "--rm", "-v", "./foo:/mnt/foo", testutil.AlpineImage).AssertOK()
@@ -103,6 +106,7 @@ func TestRunVolumeRelativePath(t *testing.T) {
 
 func TestRunAnonymousVolumeWithTypeMountFlag(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	base.Cmd("run", "--rm", "--mount", "type=volume,dst=/foo", testutil.AlpineImage,
 		"mountpoint", "-q", "/foo").AssertOK()
@@ -110,6 +114,7 @@ func TestRunAnonymousVolumeWithTypeMountFlag(t *testing.T) {
 
 func TestRunAnonymousVolumeWithBuild(t *testing.T) {
 	t.Parallel()
+
 	testutil.RequiresBuild(t)
 	testutil.RegisterBuildCacheCleanup(t)
 	base := testutil.NewBase(t)
@@ -129,6 +134,7 @@ VOLUME /foo
 
 func TestRunCopyingUpInitialContentsOnVolume(t *testing.T) {
 	t.Parallel()
+
 	testutil.RequiresBuild(t)
 	testutil.RegisterBuildCacheCleanup(t)
 	base := testutil.NewBase(t)
@@ -156,6 +162,7 @@ CMD ["cat", "/mnt/initial_file"]
 
 func TestRunCopyingUpInitialContentsOnDockerfileVolume(t *testing.T) {
 	t.Parallel()
+
 	testutil.RequiresBuild(t)
 	testutil.RegisterBuildCacheCleanup(t)
 	base := testutil.NewBase(t)
@@ -189,6 +196,7 @@ CMD ["cat", "/mnt/initial_file"]
 
 func TestRunCopyingUpInitialContentsOnVolumeShouldRetainSymlink(t *testing.T) {
 	t.Parallel()
+
 	testutil.RequiresBuild(t)
 	testutil.RegisterBuildCacheCleanup(t)
 	base := testutil.NewBase(t)
@@ -212,6 +220,7 @@ CMD ["readlink", "/mnt/passwd"]
 
 func TestRunCopyingUpInitialContentsShouldNotResetTheCopiedContents(t *testing.T) {
 	t.Parallel()
+
 	testutil.RequiresBuild(t)
 	testutil.RegisterBuildCacheCleanup(t)
 	base := testutil.NewBase(t)
@@ -249,6 +258,7 @@ RUN echo -n "rev0" > /mnt/file
 
 func TestRunTmpfs(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	f := func(allow, deny []string) func(stdout string) error {
 		return func(stdout string) error {
@@ -277,6 +287,7 @@ func TestRunTmpfs(t *testing.T) {
 
 func TestRunBindMountTmpfs(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	f := func(allow []string) func(stdout string) error {
 		return func(stdout string) error {
@@ -298,6 +309,7 @@ func TestRunBindMountTmpfs(t *testing.T) {
 
 func TestRunBindMountBind(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	tID := testutil.Identifier(t)
 	rwDir := t.TempDir()
@@ -355,10 +367,11 @@ func TestRunBindMountBind(t *testing.T) {
 }
 
 func TestRunMountBindMode(t *testing.T) {
+	t.Parallel()
+
 	if rootlessutil.IsRootless() {
 		t.Skip("must be superuser to use mount")
 	}
-	t.Parallel()
 	base := testutil.NewBase(t)
 
 	tmpDir1 := t.TempDir()
@@ -412,11 +425,12 @@ func TestRunMountBindMode(t *testing.T) {
 }
 
 func TestRunVolumeBindMode(t *testing.T) {
+	t.Parallel()
+
 	if rootlessutil.IsRootless() {
 		t.Skip("must be superuser to use mount")
 	}
 	testutil.DockerIncompatible(t)
-	t.Parallel()
 	base := testutil.NewBase(t)
 
 	tmpDir1 := t.TempDir()
@@ -469,6 +483,8 @@ func TestRunVolumeBindMode(t *testing.T) {
 }
 
 func TestRunBindMountPropagation(t *testing.T) {
+	t.Parallel()
+
 	t.Skip("This test is currently broken. See https://github.com/containerd/nerdctl/issues/3404")
 
 	tID := testutil.Identifier(t)
@@ -477,7 +493,6 @@ func TestRunBindMountPropagation(t *testing.T) {
 		t.Skipf("rootfs doesn't support shared mount, skip test %s", tID)
 	}
 
-	t.Parallel()
 	base := testutil.NewBase(t)
 
 	testCases := []struct {
@@ -611,6 +626,7 @@ func isRootfsShareableMount() bool {
 
 func TestRunVolumesFrom(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	tID := testutil.Identifier(t)
 	rwDir := t.TempDir()
@@ -658,6 +674,7 @@ func TestRunVolumesFrom(t *testing.T) {
 
 func TestBindMountWhenHostFolderDoesNotExist(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	containerName := testutil.Identifier(t) + "-host-dir-not-found"
 	hostDir := t.TempDir()

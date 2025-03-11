@@ -51,6 +51,8 @@ func TestCreateWithLabel(t *testing.T) {
 }
 
 func TestCreateWithMACAddress(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	tID := testutil.Identifier(t)
 	networkBridge := "testNetworkBridge" + tID
@@ -153,6 +155,8 @@ func TestCreateWithMACAddress(t *testing.T) {
 }
 
 func TestCreateWithTty(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	imageName := testutil.CommonImage
 	withoutTtyContainerName := "without-terminal-" + testutil.Identifier(t)
@@ -296,6 +300,8 @@ func TestIssue2993(t *testing.T) {
 }
 
 func TestCreateFromOCIArchive(t *testing.T) {
+	t.Parallel()
+
 	testutil.RequiresBuild(t)
 	testutil.RegisterBuildCacheCleanup(t)
 

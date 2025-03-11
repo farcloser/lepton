@@ -23,6 +23,8 @@ import (
 )
 
 func TestRunUserName(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	testCases := map[string]string{
 		"":                       "ContainerAdministrator",
@@ -32,6 +34,7 @@ func TestRunUserName(t *testing.T) {
 	for userStr, expected := range testCases {
 		t.Run(userStr, func(t *testing.T) {
 			t.Parallel()
+
 			cmd := []string{"run", "--rm"}
 			if userStr != "" {
 				cmd = append(cmd, "--user", userStr)

@@ -49,6 +49,8 @@ func testMultiPlatformRun(base *testutil.Base, alpineImage string) {
 }
 
 func TestMultiPlatformRun(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	testMultiPlatformRun(base, testutil.AlpineImage)
 }
@@ -181,6 +183,8 @@ func TestMultiPlatformPullPushAllPlatforms(t *testing.T) {
 }
 
 func TestMultiPlatformComposeUpBuild(t *testing.T) {
+	t.Parallel()
+
 	testutil.DockerIncompatible(t)
 	testutil.RequiresBuild(t)
 	testutil.RegisterBuildCacheCleanup(t)

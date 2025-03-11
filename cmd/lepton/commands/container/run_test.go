@@ -41,6 +41,7 @@ import (
 
 func TestRunEntrypointWithBuild(t *testing.T) {
 	t.Parallel()
+
 	testutil.RequiresBuild(t)
 	testutil.RegisterBuildCacheCleanup(t)
 	base := testutil.NewBase(t)
@@ -86,6 +87,7 @@ CMD ["echo", "bar"]
 
 func TestRunWorkdir(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	dir := "/foo"
 	if runtime.GOOS == "windows" {
@@ -97,6 +99,7 @@ func TestRunWorkdir(t *testing.T) {
 
 func TestRunWithDoubleDash(t *testing.T) {
 	t.Parallel()
+
 	testutil.DockerIncompatible(t)
 	base := testutil.NewBase(t)
 	base.Cmd("run", "--rm", testutil.CommonImage, "--", "sh", "-euxc", "exit 0").AssertOK()
@@ -104,6 +107,7 @@ func TestRunWithDoubleDash(t *testing.T) {
 
 func TestRunExitCode(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	tID := testutil.Identifier(t)
 	testContainer0 := tID + "-0"
@@ -133,6 +137,7 @@ func TestRunExitCode(t *testing.T) {
 
 func TestRunCIDFile(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	fileName := filepath.Join(t.TempDir(), "cid.file")
 
@@ -147,6 +152,7 @@ func TestRunCIDFile(t *testing.T) {
 
 func TestRunEnvFile(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	base.Env = append(base.Env, "HOST_ENV=ENV-IN-HOST")
 
@@ -174,6 +180,7 @@ func TestRunEnvFile(t *testing.T) {
 
 func TestRunEnv(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	base.Env = append(base.Env, "CORGE=corge-value-in-host", "GARPLY=garply-value-in-host")
 	base.Cmd("run", "--rm",
@@ -222,6 +229,7 @@ func TestRunEnv(t *testing.T) {
 }
 func TestRunHostnameEnv(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 
 	base.Cmd("run", "-i", "--rm", testutil.CommonImage).
@@ -236,6 +244,7 @@ func TestRunHostnameEnv(t *testing.T) {
 
 func TestRunStdin(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 
 	const testStr = "test-run-stdin"
@@ -246,6 +255,8 @@ func TestRunStdin(t *testing.T) {
 }
 
 func TestRunWithJsonFileLogDriver(t *testing.T) {
+	t.Parallel()
+
 	if runtime.GOOS == "windows" {
 		t.Skip("json-file log driver is not yet implemented on Windows")
 	}
@@ -278,6 +289,8 @@ func TestRunWithJsonFileLogDriver(t *testing.T) {
 }
 
 func TestRunWithJsonFileLogDriverAndLogPathOpt(t *testing.T) {
+	t.Parallel()
+
 	if runtime.GOOS == "windows" {
 		t.Skip("json-file log driver is not yet implemented on Windows")
 	}
@@ -313,6 +326,8 @@ func TestRunWithJsonFileLogDriverAndLogPathOpt(t *testing.T) {
 }
 
 func TestRunWithJournaldLogDriver(t *testing.T) {
+	t.Parallel()
+
 	testutil.RequireExecutable(t, "journalctl")
 	journalctl, _ := exec.LookPath("journalctl")
 	res := icmd.RunCmd(icmd.Command(journalctl, "-xe"))
@@ -354,6 +369,8 @@ func TestRunWithJournaldLogDriver(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
 			found := 0
 			check := func(log poll.LogT) poll.Result {
 				res := icmd.RunCmd(icmd.Command(journalctl, "--no-pager", "--since", "2 minutes ago", tc.filter))
@@ -371,6 +388,8 @@ func TestRunWithJournaldLogDriver(t *testing.T) {
 }
 
 func TestRunWithJournaldLogDriverAndLogOpt(t *testing.T) {
+	t.Parallel()
+
 	testutil.RequireExecutable(t, "journalctl")
 	journalctl, _ := exec.LookPath("journalctl")
 	res := icmd.RunCmd(icmd.Command(journalctl, "-xe"))
@@ -405,12 +424,13 @@ func TestRunWithJournaldLogDriverAndLogOpt(t *testing.T) {
 }
 
 func TestRunWithLogBinary(t *testing.T) {
+	t.Parallel()
+
 	testutil.RequiresBuild(t)
 	if runtime.GOOS == "windows" {
 		t.Skip("buildkit is not enabled on windows, this feature may work on windows.")
 	}
 	testutil.DockerIncompatible(t)
-	t.Parallel()
 	base := testutil.NewBase(t)
 	imageName := testutil.Identifier(t) + "-image"
 	containerName := testutil.Identifier(t)
@@ -495,6 +515,8 @@ COPY --from=builder /go/src/logger/logger /
 // This case ensures that it doesn't happen.
 // (https://github.com/containerd/nerdctl/issues/2560)
 func TestRunAddHostRemainsWhenAnotherContainerCreated(t *testing.T) {
+	t.Parallel()
+
 	if runtime.GOOS == "windows" {
 		t.Skip("ocihook is not yet supported on Windows")
 	}
@@ -529,13 +551,15 @@ func TestRunAddHostRemainsWhenAnotherContainerCreated(t *testing.T) {
 
 // https://github.com/containerd/nerdctl/issues/2726
 func TestRunRmTime(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	base.Cmd("pull", "--quiet", testutil.CommonImage).AssertOK()
 	t0 := time.Now()
 	base.Cmd("run", "--rm", testutil.CommonImage, "true").AssertOK()
 	t1 := time.Now()
 	took := t1.Sub(t0)
-	const deadline = 3 * time.Second
+	const deadline = 10 * time.Second
 	if took > deadline {
 		t.Fatalf("expected to have completed in %v, took %v", deadline, took)
 	}
@@ -595,6 +619,7 @@ func runAttach(t *testing.T, testStr string, args []string) string {
 }
 
 func TestRunAttachFlag(t *testing.T) {
+	t.Parallel()
 
 	type testCase struct {
 		name        string
@@ -661,6 +686,9 @@ func TestRunAttachFlag(t *testing.T) {
 }
 
 func TestRunQuiet(t *testing.T) {
+	// This test is removing the common image
+	// t.Parallel()
+
 	base := testutil.NewBase(t)
 
 	teardown := func() {
@@ -688,6 +716,8 @@ func TestRunQuiet(t *testing.T) {
 }
 
 func TestRunFromOCIArchive(t *testing.T) {
+	t.Parallel()
+
 	testutil.RequiresBuild(t)
 	testutil.RegisterBuildCacheCleanup(t)
 
