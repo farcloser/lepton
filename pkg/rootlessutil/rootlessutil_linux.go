@@ -83,7 +83,7 @@ func DetachedNetNS() (string, error) {
 		return "", err
 	}
 
-	return detachedNetNS(stateDir)
+	return getDetachedNetNSPath(stateDir)
 }
 
 // WithDetachedNetNSIfAny executes fn in [DetachedNetNS] if RootlessKit is running with --detach-netns mode.
@@ -101,7 +101,7 @@ func WithDetachedNetNSIfAny(fn func() error) error {
 	return ns.WithNetNSPath(netns, func(_ ns.NetNS) error { return fn() })
 }
 
-func detachedNetNS(stateDir string) (string, error) {
+func getDetachedNetNSPath(stateDir string) (string, error) {
 	p := filepath.Join(stateDir, "netns")
 	if _, err := os.Stat(p); err != nil {
 		if errors.Is(err, os.ErrNotExist) {
