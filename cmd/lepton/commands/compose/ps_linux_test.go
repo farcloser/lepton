@@ -32,6 +32,8 @@ import (
 )
 
 func TestComposePs(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	var dockerComposeYAML = fmt.Sprintf(`
 version: '3.1'
@@ -41,7 +43,7 @@ services:
     image: %s
     container_name: wordpress_container
     ports:
-      - 8080:80
+      - 8082:80
     environment:
       WORDPRESS_DB_HOST: db
       WORDPRESS_DB_USER: exampleuser
@@ -109,6 +111,8 @@ volumes:
 }
 
 func TestComposePsJSON(t *testing.T) {
+	t.Parallel()
+
 	// docker parses unknown 'format' as a Go template and won't output an error
 	testutil.DockerIncompatible(t)
 
@@ -120,7 +124,7 @@ services:
   wordpress:
     image: %s
     ports:
-      - 8080:80
+      - 8081:80
     environment:
       WORDPRESS_DB_HOST: db
       WORDPRESS_DB_USER: exampleuser
@@ -180,7 +184,7 @@ volumes:
 			fmt.Sprintf(`"Image":"%s"`, testutil.WordpressImage), fmt.Sprintf(`"Image":"%s"`, testutil.MariaDBImage)))
 	// check WordPress is running
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "--format", formatter.FormatJSON, "wordpress").
-		AssertOutWithFunc(assertHandler("wordpress", 1, `"Service":"wordpress"`, `"State":"running"`, `"TargetPort":80`, `"PublishedPort":8080`))
+		AssertOutWithFunc(assertHandler("wordpress", 1, `"Service":"wordpress"`, `"State":"running"`, `"TargetPort":80`, `"PublishedPort":8081`))
 	// check WordPress is stopped
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "stop", "wordpress").AssertOK()
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "--format", formatter.FormatJSON, "wordpress", "-a").

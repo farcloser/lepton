@@ -14,32 +14,34 @@
    limitations under the License.
 */
 
-package compose_test
+package nerdtest
 
 import (
-	"testing"
+	"os"
+	"path/filepath"
 
-	"go.farcloser.world/lepton/pkg/formatter"
-	"go.farcloser.world/lepton/pkg/testutil"
+	"gotest.tools/v3/assert"
+
+	"go.farcloser.world/tigron/test"
 )
 
-func TestComposeVersion(t *testing.T) {
-	t.Parallel()
-
-	base := testutil.NewBase(t)
-	base.ComposeCmd("version").AssertOutContains("Compose version ")
+type CosignKeyPair struct {
+	PublicKey  string
+	PrivateKey string
 }
 
-func TestComposeVersionShort(t *testing.T) {
-	t.Parallel()
+func NewCosignKeyPair(data test.Data, helpers test.Helpers) *CosignKeyPair {
+	dir, err := os.MkdirTemp(data.TempDir(), "cosign")
+	assert.NilError(helpers.T(), err)
 
-	base := testutil.NewBase(t)
-	base.ComposeCmd("version", "--short").AssertOK()
-}
+	cmd := helpers.Custom("cosign", "generate-key-pair")
+	cmd.WithCwd(dir)
+	cmd.Run(&test.Expected{
+		ExitCode: 0,
+	})
 
-func TestComposeVersionJson(t *testing.T) {
-	t.Parallel()
-
-	base := testutil.NewBase(t)
-	base.ComposeCmd("version", "--format", formatter.FormatJSON).AssertOutContains("{\"version\":\"")
+	return &CosignKeyPair{
+		PublicKey:  filepath.Join(dir, "cosign.pub"),
+		PrivateKey: filepath.Join(dir, "cosign.key"),
+	}
 }

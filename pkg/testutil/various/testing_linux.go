@@ -116,7 +116,7 @@ func NewCosignKeyPair(t testing.TB, path string, password string) *CosignKeyPair
 	}
 }
 
-func ComposeUp(t *testing.T, base *testutil.Base, dockerComposeYAML string, opts ...string) {
+func ComposeUp(t *testing.T, base *testutil.Base, port string, dockerComposeYAML string, opts ...string) {
 	comp := testutil.NewComposeDir(t, dockerComposeYAML)
 	t.Cleanup(func() {
 		comp.CleanUp()
@@ -133,7 +133,7 @@ func ComposeUp(t *testing.T, base *testutil.Base, dockerComposeYAML string, opts
 	base.Cmd("network", "inspect", projectName+"_default").AssertOK()
 
 	checkWordpress := func() error {
-		resp, err := nettestutil.HTTPGet("http://127.0.0.1:8080", 10, false)
+		resp, err := nettestutil.HTTPGet("http://127.0.0.1:"+port, 10, false)
 		if err != nil {
 			return err
 		}

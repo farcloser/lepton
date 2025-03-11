@@ -42,7 +42,7 @@ services:
     build: .
     image: %s
     ports:
-    - 8080:80
+    - 8089:80
     depends_on:
     - svc1
   svc1:

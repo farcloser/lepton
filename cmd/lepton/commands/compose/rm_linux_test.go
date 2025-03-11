@@ -25,6 +25,8 @@ import (
 )
 
 func TestComposeRemove(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	var dockerComposeYAML = fmt.Sprintf(`
 version: '3.1'
@@ -34,7 +36,7 @@ services:
   wordpress:
     image: %s
     ports:
-      - 8080:80
+      - 8095:80
     environment:
       WORDPRESS_DB_HOST: db
       WORDPRESS_DB_USER: exampleuser

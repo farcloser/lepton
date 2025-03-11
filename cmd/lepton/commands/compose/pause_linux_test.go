@@ -26,6 +26,8 @@ import (
 )
 
 func TestComposePauseAndUnpause(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	switch base.Info().CgroupDriver {
 	case cgroups.NoneManager, "":

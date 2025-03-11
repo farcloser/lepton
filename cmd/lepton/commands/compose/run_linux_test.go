@@ -33,10 +33,11 @@ import (
 	"go.farcloser.world/lepton/pkg/testutil/nerdtest"
 	"go.farcloser.world/lepton/pkg/testutil/nerdtest/registry"
 	"go.farcloser.world/lepton/pkg/testutil/nettestutil"
-	"go.farcloser.world/lepton/pkg/testutil/various"
 )
 
 func TestComposeRun(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	// specify the name of container in order to remove
 	// TODO: when `compose rm` is implemented, replace it.
@@ -67,6 +68,9 @@ services:
 }
 
 func TestComposeRunWithRM(t *testing.T) {
+	// Test does not make sense. Image may or may not be there.
+	// t.Parallel()
+
 	base := testutil.NewBase(t)
 	// specify the name of container in order to remove
 	// TODO: when `compose rm` is implemented, replace it.
@@ -107,6 +111,8 @@ services:
 }
 
 func TestComposeRunWithServicePorts(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	// specify the name of container in order to remove
 	// TODO: when `compose rm` is implemented, replace it.
@@ -118,7 +124,7 @@ services:
   web:
     image: %s
     ports:
-      - 8080:80
+      - 8090:80
 `, testutil.NginxAlpineImage)
 
 	comp := testutil.NewComposeDir(t, dockerComposeYAML)
@@ -137,7 +143,7 @@ services:
 	}()
 
 	checkNginx := func() error {
-		resp, err := nettestutil.HTTPGet("http://127.0.0.1:8080", 10, false)
+		resp, err := nettestutil.HTTPGet("http://127.0.0.1:8090", 10, false)
 		if err != nil {
 			return err
 		}
@@ -170,6 +176,8 @@ services:
 }
 
 func TestComposeRunWithPublish(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	// specify the name of container in order to remove
 	// TODO: when `compose rm` is implemented, replace it.
@@ -194,11 +202,11 @@ services:
 		// unbuffer(1) can be installed with `apt-get install expect`.
 		unbuffer := []string{"unbuffer"}
 		base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(),
-			"run", "--publish", "8080:80", "--name", containerName, "web").Run()
+			"run", "--publish", "8091:80", "--name", containerName, "web").Run()
 	}()
 
 	checkNginx := func() error {
-		resp, err := nettestutil.HTTPGet("http://127.0.0.1:8080", 10, false)
+		resp, err := nettestutil.HTTPGet("http://127.0.0.1:8091", 10, false)
 		if err != nil {
 			return err
 		}
@@ -230,6 +238,8 @@ services:
 }
 
 func TestComposeRunWithEnv(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	// specify the name of container in order to remove
 	// TODO: when `compose rm` is implemented, replace it.
@@ -262,6 +272,8 @@ services:
 }
 
 func TestComposeRunWithUser(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	// specify the name of container in order to remove
 	// TODO: when `compose rm` is implemented, replace it.
@@ -293,6 +305,8 @@ services:
 }
 
 func TestComposeRunWithLabel(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	containerName := testutil.Identifier(t)
 
@@ -331,6 +345,8 @@ services:
 }
 
 func TestComposeRunWithArgs(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	containerName := testutil.Identifier(t)
 
@@ -359,6 +375,8 @@ services:
 }
 
 func TestComposeRunWithEntrypoint(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	// specify the name of container in order to remove
 	// TODO: when `compose rm` is implemented, replace it.
@@ -458,10 +476,7 @@ func TestComposePushAndPullWithCosignVerify(t *testing.T) {
 		base := testutil.NewBase(t)
 		base.Env = append(base.Env, "COSIGN_PASSWORD=1")
 
-		keyPair := various.NewCosignKeyPair(t, "cosign-key-pair", "1")
-		t.Cleanup(func() {
-			keyPair.Cleanup()
-		})
+		keyPair := nerdtest.NewCosignKeyPair(data, helpers)
 
 		tID := testutil.Identifier(t)
 		testImageRefPrefix := fmt.Sprintf("127.0.0.1:%d/%s/", reg.Port, tID)

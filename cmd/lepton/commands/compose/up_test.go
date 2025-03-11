@@ -32,6 +32,8 @@ import (
 
 // https://github.com/containerd/nerdctl/issues/1942
 func TestComposeUpDetailedError(t *testing.T) {
+	t.Parallel()
+
 	if runtime.GOOS != "linux" {
 		t.Skip("FIXME: test does not work on Windows yet (runtime \"io.containerd.runc.v2\" binary not installed \"containerd-shim-runc-v2.exe\": file does not exist)")
 	}
@@ -58,6 +60,9 @@ services:
 
 // https://github.com/containerd/nerdctl/issues/1652
 func TestComposeUpBindCreateHostPath(t *testing.T) {
+	// Image may not be there
+	// t.Parallel()
+
 	if runtime.GOOS == "windows" {
 		t.Skip(`FIXME: no support for Windows path: (error: "volume target must be an absolute path, got \"/mnt\")`)
 	}
