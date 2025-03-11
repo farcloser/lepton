@@ -679,22 +679,6 @@ func RequireExecPlatform(t testing.TB, ss ...string) {
 	}
 }
 
-func RequireDaemonVersion(b *Base, constraint string) {
-	b.T.Helper()
-	c, err := semver.NewConstraint(constraint)
-	if err != nil {
-		b.T.Fatal(err)
-	}
-	info := b.Info()
-	sv, err := semver.NewVersion(info.ServerVersion)
-	if err != nil {
-		b.T.Skip(err)
-	}
-	if !c.Check(sv) {
-		b.T.Skipf("version %v does not satisfy constraints %v", sv, c)
-	}
-}
-
 func RequireKernelVersion(t testing.TB, constraint string) {
 	t.Helper()
 	c, err := semver.NewConstraint(constraint)
