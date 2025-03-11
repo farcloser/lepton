@@ -35,8 +35,11 @@ import (
 )
 
 func TestRunRestart(t *testing.T) {
+	// Because this will kill the daemon, parallel tests would fail
+	// t.Parallel()
+
 	const (
-		hostPort = 8080
+		hostPort = 8180
 	)
 	testContainerName := testutil.Identifier(t)
 	if testing.Short() {
@@ -48,7 +51,12 @@ func TestRunRestart(t *testing.T) {
 	}
 	t.Log("NOTE: this test may take a while")
 
-	defer base.Cmd("rm", "-f", testContainerName).Run()
+	tearDown := func() {
+		base.Cmd("rm", "-f", testContainerName).Run()
+	}
+
+	tearDown()
+	t.Cleanup(tearDown)
 
 	base.Cmd("run", "-d",
 		"--restart=always",
@@ -95,6 +103,8 @@ func TestRunRestart(t *testing.T) {
 }
 
 func TestRunRestartWithOnFailure(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	if nerdtest.IsNotDocker() {
 		testutil.RequireContainerdPlugin(base, "io.containerd.internal.v1", "restart", []string{"on-failure"})
@@ -116,6 +126,8 @@ func TestRunRestartWithOnFailure(t *testing.T) {
 }
 
 func TestRunRestartWithUnlessStopped(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	if nerdtest.IsNotDocker() {
 		testutil.RequireContainerdPlugin(base, "io.containerd.internal.v1", "restart", []string{"unless-stopped"})
@@ -140,6 +152,8 @@ func TestRunRestartWithUnlessStopped(t *testing.T) {
 }
 
 func TestUpdateRestartPolicy(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	if nerdtest.IsNotDocker() {
 		testutil.RequireContainerdPlugin(base, "io.containerd.internal.v1", "restart", []string{"on-failure"})
@@ -163,6 +177,8 @@ func TestUpdateRestartPolicy(t *testing.T) {
 // The test is to add a restart policy to a container with no prior restart policy,
 // and check it can work correctly.
 func TestAddRestartPolicy(t *testing.T) {
+	t.Parallel()
+
 	base := testutil.NewBase(t)
 	if nerdtest.IsNotDocker() {
 		testutil.RequireContainerdPlugin(base, "io.containerd.internal.v1", "restart", []string{"on-failure"})

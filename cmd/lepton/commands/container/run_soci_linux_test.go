@@ -26,6 +26,8 @@ import (
 )
 
 func TestRunSoci(t *testing.T) {
+	t.Parallel()
+
 	testutil.DockerIncompatible(t)
 	tests := []struct {
 		name                         string
@@ -41,6 +43,8 @@ func TestRunSoci(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			base := testutil.NewBase(t)
 			various.RequiresSoci(base)
 

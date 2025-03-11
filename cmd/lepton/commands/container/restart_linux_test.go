@@ -33,6 +33,7 @@ import (
 
 func TestRestart(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	tID := testutil.Identifier(t)
 
@@ -53,6 +54,7 @@ func TestRestart(t *testing.T) {
 
 func TestRestartPIDContainer(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 
 	baseContainerName := testutil.Identifier(t)
@@ -78,6 +80,7 @@ func TestRestartPIDContainer(t *testing.T) {
 
 func TestRestartIPCContainer(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 
 	const shmSize = "32m"
@@ -105,6 +108,7 @@ func TestRestartIPCContainer(t *testing.T) {
 
 func TestRestartWithTime(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	tID := testutil.Identifier(t)
 

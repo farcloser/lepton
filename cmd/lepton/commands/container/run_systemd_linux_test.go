@@ -24,8 +24,9 @@ import (
 )
 
 func TestRunWithSystemdAlways(t *testing.T) {
-	testutil.DockerIncompatible(t)
 	t.Parallel()
+
+	testutil.DockerIncompatible(t)
 	base := testutil.NewBase(t)
 	containerName := testutil.Identifier(t)
 	defer base.Cmd("container", "rm", "-f", containerName).AssertOK()
@@ -37,11 +38,12 @@ func TestRunWithSystemdAlways(t *testing.T) {
 }
 
 func TestRunWithSystemdTrueEnabled(t *testing.T) {
+	t.Parallel()
+
 	if runtime.GOARCH != "amd64" {
 		t.Skip("This test is currently broken on arm with no emulation, as the Systemd image being used is amd64 only")
 	}
 	testutil.DockerIncompatible(t)
-	t.Parallel()
 	base := testutil.NewBase(t)
 	containerName := testutil.Identifier(t)
 	defer base.Cmd("container", "rm", "-f", containerName).AssertOK()
@@ -64,11 +66,12 @@ systemctl list-jobs`).AssertOutContains("jobs")
 }
 
 func TestRunWithSystemdTrueDisabled(t *testing.T) {
+	t.Parallel()
+
 	if runtime.GOARCH != "amd64" {
 		t.Skip("This test is currently broken on arm with no emulation, as the Systemd image being used is amd64 only")
 	}
 	testutil.DockerIncompatible(t)
-	t.Parallel()
 	base := testutil.NewBase(t)
 	containerName := testutil.Identifier(t)
 	defer base.Cmd("rm", "-f", containerName).AssertOK()
@@ -77,8 +80,9 @@ func TestRunWithSystemdTrueDisabled(t *testing.T) {
 }
 
 func TestRunWithSystemdFalse(t *testing.T) {
-	testutil.DockerIncompatible(t)
 	t.Parallel()
+
+	testutil.DockerIncompatible(t)
 	base := testutil.NewBase(t)
 	containerName := testutil.Identifier(t)
 	defer base.Cmd("rm", "-f", containerName).AssertOK()
@@ -89,8 +93,9 @@ func TestRunWithSystemdFalse(t *testing.T) {
 }
 
 func TestRunWithNoSystemd(t *testing.T) {
-	testutil.DockerIncompatible(t)
 	t.Parallel()
+
+	testutil.DockerIncompatible(t)
 	base := testutil.NewBase(t)
 	containerName := testutil.Identifier(t)
 	defer base.Cmd("rm", "-f", containerName).AssertOK()
@@ -101,22 +106,24 @@ func TestRunWithNoSystemd(t *testing.T) {
 }
 
 func TestRunWithSystemdPrivilegedError(t *testing.T) {
+	t.Parallel()
+
 	if runtime.GOARCH != "amd64" {
 		t.Skip("This test is currently broken on arm with no emulation, as the Systemd image being used is amd64 only")
 	}
 	testutil.DockerIncompatible(t)
-	t.Parallel()
 	base := testutil.NewBase(t)
 
 	base.Cmd("run", "--privileged", "--rm", "--systemd=always", "--entrypoint=/sbin/init", testutil.SystemdImage).AssertCombinedOutContains("if --privileged is used with systemd `--security-opt privileged-without-host-devices` must also be used")
 }
 
 func TestRunWithSystemdPrivilegedSuccess(t *testing.T) {
+	t.Parallel()
+
 	if runtime.GOARCH != "amd64" {
 		t.Skip("This test is currently broken on arm with no emulation, as the Systemd image being used is amd64 only")
 	}
 	testutil.DockerIncompatible(t)
-	t.Parallel()
 	base := testutil.NewBase(t)
 	containerName := testutil.Identifier(t)
 	defer base.Cmd("container", "rm", "-f", containerName).AssertOK()

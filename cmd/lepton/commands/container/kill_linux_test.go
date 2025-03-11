@@ -34,6 +34,8 @@ import (
 // The test checks that the kill command effectively clean up
 // the iptables forwards creted from the run.
 func TestKillCleanupForwards(t *testing.T) {
+	t.Parallel()
+
 	const (
 		hostPort          = 9999
 		testContainerName = "ngx"

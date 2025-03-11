@@ -23,6 +23,8 @@ import (
 )
 
 func TestUpdateContainer(t *testing.T) {
+	t.Parallel()
+
 	testutil.DockerIncompatible(t)
 	testContainerName := testutil.Identifier(t)
 	base := testutil.NewBase(t)

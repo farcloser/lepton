@@ -39,6 +39,8 @@ import (
 )
 
 func TestStopStart(t *testing.T) {
+	t.Parallel()
+
 	const (
 		hostPort = 8080
 	)
@@ -101,6 +103,8 @@ func TestStopWithStopSignal(t *testing.T) {
 }
 
 func TestStopCleanupForwards(t *testing.T) {
+	t.Parallel()
+
 	const (
 		hostPort          = 9999
 		testContainerName = "ngx"

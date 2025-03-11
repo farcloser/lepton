@@ -28,6 +28,7 @@ import (
 // https://github.com/containerd/nerdctl/issues/2598
 func TestContainerListWithFormatLabel(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	tID := testutil.Identifier(t)
 	cID := tID
@@ -46,6 +47,7 @@ func TestContainerListWithFormatLabel(t *testing.T) {
 
 func TestContainerListWithJsonFormatLabel(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	tID := testutil.Identifier(t)
 	cID := tID

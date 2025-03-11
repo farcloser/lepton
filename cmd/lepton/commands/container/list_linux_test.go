@@ -118,6 +118,9 @@ func preparePsTestContainer(t *testing.T, identity string, keepAlive bool) (*tes
 }
 
 func TestContainerList(t *testing.T) {
+	// XXX
+	// t.Parallel()
+
 	base, testContainer := preparePsTestContainer(t, "list", true)
 
 	// hope there are no tests running parallel
@@ -160,6 +163,9 @@ func TestContainerList(t *testing.T) {
 }
 
 func TestContainerListWideMode(t *testing.T) {
+	// Cannot be parallelized as-is
+	// t.Parallel()
+
 	testutil.DockerIncompatible(t)
 	base, testContainer := preparePsTestContainer(t, "listWithMode", true)
 
@@ -200,6 +206,8 @@ func TestContainerListWideMode(t *testing.T) {
 }
 
 func TestContainerListWithLabels(t *testing.T) {
+	t.Parallel()
+
 	base, testContainer := preparePsTestContainer(t, "listWithLabels", true)
 
 	// hope there are no tests running parallel
@@ -230,6 +238,9 @@ func TestContainerListWithLabels(t *testing.T) {
 }
 
 func TestContainerListWithNames(t *testing.T) {
+	// Cannot be parallelized
+	// t.Parallel()
+
 	base, testContainer := preparePsTestContainer(t, "listWithNames", true)
 
 	// hope there are no tests running parallel
@@ -248,6 +259,9 @@ func TestContainerListWithNames(t *testing.T) {
 }
 
 func TestContainerListWithFilter(t *testing.T) {
+	// Cannot be parallelized
+	// t.Parallel()
+
 	base, testContainerA := preparePsTestContainer(t, "listWithFilterA", true)
 	_, testContainerB := preparePsTestContainer(t, "listWithFilterB", true)
 	_, testContainerC := preparePsTestContainer(t, "listWithFilterC", false)
@@ -607,6 +621,8 @@ func TestContainerListWithFilter(t *testing.T) {
 }
 
 func TestContainerListCheckCreatedTime(t *testing.T) {
+	t.Parallel()
+
 	base, _ := preparePsTestContainer(t, "checkCreatedTimeA", true)
 	preparePsTestContainer(t, "checkCreatedTimeB", true)
 	preparePsTestContainer(t, "checkCreatedTimeC", false)

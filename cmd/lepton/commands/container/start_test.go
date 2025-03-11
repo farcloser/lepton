@@ -25,6 +25,7 @@ import (
 
 func TestStart(t *testing.T) {
 	t.Parallel()
+
 	base := testutil.NewBase(t)
 	containerName := testutil.Identifier(t)
 
@@ -34,10 +35,11 @@ func TestStart(t *testing.T) {
 }
 
 func TestStartAttach(t *testing.T) {
+	t.Parallel()
+
 	if runtime.GOOS == "windows" {
 		t.Skip("start attach test is not yet implemented on Windows")
 	}
-	t.Parallel()
 	base := testutil.NewBase(t)
 	containerName := testutil.Identifier(t)
 

@@ -72,6 +72,8 @@ func runSyslogTest(t *testing.T, networks []string, syslogFacilities map[string]
 						i := rI
 						rI++
 						t.Run(subTestName, func(t *testing.T) {
+							t.Parallel()
+
 							tID := testutil.Identifier(t)
 							tag := tID + "_syslog_driver"
 							msg := "hello, " + tID + "_syslog_driver"
