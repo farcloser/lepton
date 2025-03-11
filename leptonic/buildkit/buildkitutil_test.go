@@ -21,7 +21,7 @@
    NOTICE: https://github.com/docker/cli/blob/v20.10.9/NOTICE
 */
 
-package buildkitutil_test
+package buildkit_test
 
 import (
 	"os"
@@ -30,7 +30,7 @@ import (
 
 	"gotest.tools/v3/assert"
 
-	"go.farcloser.world/lepton/pkg/buildkitutil"
+	"go.farcloser.world/lepton/leptonic/buildkit"
 )
 
 func TestBuildKitFile(t *testing.T) {
@@ -55,11 +55,11 @@ func TestBuildKitFile(t *testing.T) {
 		{
 			name: "only Dockerfile is present",
 			prepare: func(t *testing.T) error {
-				return os.WriteFile(filepath.Join(tmp, buildkitutil.DefaultDockerfileName), []byte{}, 0o644)
+				return os.WriteFile(filepath.Join(tmp, buildkit.DefaultDockerfileName), []byte{}, 0o644)
 			},
 			args:       args{".", ""},
 			wantAbsDir: tmp,
-			wantFile:   buildkitutil.DefaultDockerfileName,
+			wantFile:   buildkit.DefaultDockerfileName,
 			wantErr:    false,
 		},
 		{
@@ -69,7 +69,7 @@ func TestBuildKitFile(t *testing.T) {
 			},
 			args:       args{".", ""},
 			wantAbsDir: tmp,
-			wantFile:   buildkitutil.ContainerfileName,
+			wantFile:   buildkit.ContainerfileName,
 			wantErr:    false,
 		},
 		{
@@ -83,7 +83,7 @@ func TestBuildKitFile(t *testing.T) {
 			},
 			args:       args{".", ""},
 			wantAbsDir: tmp,
-			wantFile:   buildkitutil.DefaultDockerfileName,
+			wantFile:   buildkit.DefaultDockerfileName,
 			wantErr:    false,
 		},
 		{
@@ -97,7 +97,7 @@ func TestBuildKitFile(t *testing.T) {
 			},
 			args:       args{".", ""},
 			wantAbsDir: tmp,
-			wantFile:   buildkitutil.DefaultDockerfileName,
+			wantFile:   buildkit.DefaultDockerfileName,
 			wantErr:    false,
 		},
 		{
@@ -127,33 +127,33 @@ func TestBuildKitFile(t *testing.T) {
 			},
 			args:       args{tmp, "."},
 			wantAbsDir: tmp,
-			wantFile:   buildkitutil.DefaultDockerfileName,
+			wantFile:   buildkit.DefaultDockerfileName,
 			wantErr:    false,
 		},
 		{
 			name: "Absolute path is specified with Container file in the path",
 			prepare: func(t *testing.T) error {
-				return os.WriteFile(filepath.Join(tmp, buildkitutil.ContainerfileName), []byte{}, 0o644)
+				return os.WriteFile(filepath.Join(tmp, buildkit.ContainerfileName), []byte{}, 0o644)
 			},
 			args:       args{tmp, "."},
 			wantAbsDir: tmp,
-			wantFile:   buildkitutil.ContainerfileName,
+			wantFile:   buildkit.ContainerfileName,
 			wantErr:    false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.prepare(t)
-			gotAbsDir, gotFile, err := buildkitutil.BuildKitFile(tt.args.dir, tt.args.inputfile)
+			gotAbsDir, gotFile, err := buildkit.File(tt.args.dir, tt.args.inputfile)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("BuildKitFile() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("File() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if gotAbsDir != tt.wantAbsDir {
-				t.Errorf("BuildKitFile() gotAbsDir = %v, want %v", gotAbsDir, tt.wantAbsDir)
+				t.Errorf("File() gotAbsDir = %v, want %v", gotAbsDir, tt.wantAbsDir)
 			}
 			if gotFile != tt.wantFile {
-				t.Errorf("BuildKitFile() gotFile = %v, want %v", gotFile, tt.wantFile)
+				t.Errorf("File() gotFile = %v, want %v", gotFile, tt.wantFile)
 			}
 
 			entry, err := os.ReadDir(tmp)

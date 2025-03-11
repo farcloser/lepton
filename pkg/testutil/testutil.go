@@ -42,10 +42,10 @@ import (
 	"go.farcloser.world/core/version/semver"
 
 	"go.farcloser.world/lepton/leptonic/api"
+	"go.farcloser.world/lepton/leptonic/buildkit"
 	"go.farcloser.world/lepton/leptonic/emulation"
 	"go.farcloser.world/lepton/leptonic/platforms"
 	"go.farcloser.world/lepton/leptonic/rootlesskit"
-	"go.farcloser.world/lepton/pkg/buildkitutil"
 	"go.farcloser.world/lepton/pkg/imgutil"
 	"go.farcloser.world/lepton/pkg/infoutil"
 	"go.farcloser.world/lepton/pkg/inspecttypes/dockercompat"
@@ -654,7 +654,7 @@ func DockerIncompatible(t testing.TB) {
 
 func RequiresBuild(t testing.TB) {
 	if GetTarget() == Nerdctl || GetTarget() == Nerdishctl {
-		buildkitHost, err := buildkitutil.GetBuildkitHost(Namespace)
+		buildkitHost, err := buildkit.GetBuildkitHost(Namespace)
 		if err != nil {
 			t.Skipf("test requires buildkitd: %+v", err)
 		}
