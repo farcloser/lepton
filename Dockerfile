@@ -97,7 +97,6 @@ RUN apt-get install -qq --no-install-recommends \
 # Finally note that we are retrieving both architectures we are currently supporting (arm64 and amd64) in one stage,
 # and do NOT leverage TARGETARCH, as that would force cross compilation to use a non-native binary in dependent stages.
 FROM --platform=$BUILDPLATFORM tooling-downloader AS tooling-downloader-golang
-ARG BUILDPLATFORM
 ARG GO_VERSION
 # This run does:
 # a. retrieve golang list of versions
@@ -107,7 +106,7 @@ ARG GO_VERSION
 # Consuming stages later on can just COPY --from=tooling-downloader-golang /out/usr/local/$BUILDPLATFORM /usr/local
 # to get native go for their current execution platform
 # Note that though we dynamically retrieve GOOS here, we only support linux
-RUN os="${BUILDPLATFORM%%/*}"; \
+RUN os=linux; \
     all_versions="$(curl -fsSL --proto '=https' --tlsv1.2 "https://go.dev/dl/?mode=json&include=all")"; \
     candidates="$(case "$GO_VERSION" in \
       canary) condition=".stable==false" ;; \
@@ -309,16 +308,30 @@ RUN --mount=target=/src,type=cache,from=dependencies-download-buildg,source=/src
 
 # cli binary is built from the local context
 FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-cli
-COPY . /src
+RUN --mount=target=go.mod,source=go.mod,type=bind \
+    --mount=target=go.sum,source=go.sum,type=bind \
+    go mod download
+# Copy the docs
 COPY docs /out/share/doc/"$BINARY_NAME"/docs
-RUN { echo "# "$BINARY_NAME" (full distribution)"; echo "- "$BINARY_NAME": $(git describe --tags)"; } \
+# CAREFUL: this will fail to retrieve a tag with a shallow clone. So, full-release should better be done with a full history clone
+# ALSO: since .dockerignore does list .git, as it is otherwise breaking cache on the CI, this cannot work unless .dockerignore is
+# removed beforehand...
+RUN --mount=target=/src,type=bind \
+    { echo "# "$BINARY_NAME" (full distribution)"; echo "- "$BINARY_NAME": $(git describe --tags 2>/dev/null || true)"; } \
   > /metadata/VERSION
 
 FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-build-cli
 ARG TARGETARCH
-RUN  --mount=target=/root/go/pkg/mod,type=cache \
-     --mount=target=/src,type=cache,from=dependencies-download-cli,source=/src,sharing=locked \
-  BINDIR=/out/bin make build install
+RUN --mount=target=/src/go.mod,source=go.mod,type=bind \
+    --mount=target=/src/go.sum,source=go.sum,type=bind \
+    --mount=target=/src/Makefile,source=Makefile,type=bind \
+    --mount=target=/src/pkg,source=pkg,type=bind \
+    --mount=target=/src/cmd,source=cmd,type=bind \
+    --mount=target=/src/leptonic,source=leptonic,type=bind \
+    --mount=target=/src/extras,source=extras,type=bind \
+    --mount=target=/build,type=tmpfs \
+    --mount=target=/root/go/pkg/mod,type=bind,from=dependencies-download-cli,source=/root/go/pkg/mod \
+  cd /build; BINDIR=/out/bin make -f /src/Makefile build install
 
 # dependencies-download will retrieve all dependencies that are not compiled from source and used in binary form
 # FIXME: some of these binary dependencies seem very large. We might consider building some of these from source instead.
@@ -493,9 +506,6 @@ RUN apt-get install -qq --no-install-recommends \
   uidmap \
   openssh-server \
   openssh-client >/dev/null
-# Add go
-ENV PATH="/root/go/bin:/usr/local/go/bin:$PATH"
-COPY --from=tooling-downloader-golang /out/usr/local/$TARGETPLATFORM /usr/local
 # Add all needed dependencies, but not the cli yet to avoid busting cache
 COPY --from=dependencies-build-containerd /out /usr/local
 COPY --from=dependencies-build-runc /out /usr/local
@@ -516,11 +526,35 @@ RUN cd /usr/local/lib/systemd/system && \
 # Final preparations
 RUN cp /usr/local/bin/tini /usr/local/bin/tini-custom
 RUN mkdir -p -m 0755 /etc/cni
+# Add go
+ENV PATH="/root/go/bin:/usr/local/go/bin:$PATH"
+COPY --from=tooling-downloader-golang /out/usr/local/$TARGETPLATFORM /usr/local
 VOLUME /var/lib/containerd
 VOLUME /var/lib/buildkit
 VOLUME /var/lib/containerd-stargz-grpc
 VOLUME /var/lib/"$BINARY_NAME"
 VOLUME /tmp
+
+FROM assembly-runtime AS assembly-integration
+WORKDIR /src
+# Copy config and service files
+COPY ./Dockerfile.d/etc_containerd_config.toml /etc/containerd/config.toml
+COPY ./Dockerfile.d/etc_buildkit_buildkitd.toml /etc/buildkit/buildkitd.toml
+COPY ./Dockerfile.d/test-integration-buildkit-test.service /usr/local/lib/systemd/system/
+COPY ./Dockerfile.d/test-integration-soci-snapshotter.service /usr/local/lib/systemd/system/
+# using test integration containerd config
+COPY ./Dockerfile.d/test-integration-etc_containerd_config.toml /etc/containerd/config.toml
+RUN perl -pi -e 's/multi-user.target/docker-entrypoint.target/g' /usr/local/lib/systemd/system/*.service
+# install ipfs service. avoid using 5001(api)/8080(gateway) which are reserved by tests.
+RUN systemctl enable \
+    containerd  \
+    buildkit \
+    test-integration-buildkit-test  \
+    test-integration-soci-snapshotter
+# Install dev tools
+RUN --mount=target=/root/go/pkg/mod,type=cache \
+    --mount=target=/src/Makefile,source=Makefile,type=bind \
+  NO_COLOR=true make install-dev-gotestsum; chmod -R a+rx /root/go/bin
 
 ########################################################################################################################
 # Final
@@ -533,36 +567,16 @@ COPY --from=assembly-shasum /out/SHA256SUMS /share/doc/"$BINARY_NAME"-full/SHA25
 
 # test-integration is the final stage for the integration testing environment
 # it is multi-architecture, and not fully cacheable, as changing anything in the cli will invalidate cache here
-FROM assembly-runtime AS test-integration
-ARG TARGETARCH
-WORKDIR /src
-# Copy config and service files
-COPY ./Dockerfile.d/etc_containerd_config.toml /etc/containerd/config.toml
-COPY ./Dockerfile.d/etc_buildkit_buildkitd.toml /etc/buildkit/buildkitd.toml
-COPY ./Dockerfile.d/test-integration-buildkit-test.service /usr/local/lib/systemd/system/
-COPY ./Dockerfile.d/test-integration-soci-snapshotter.service /usr/local/lib/systemd/system/
-# using test integration containerd config
-COPY ./Dockerfile.d/test-integration-etc_containerd_config.toml /etc/containerd/config.toml
-RUN perl -pi -e 's/multi-user.target/docker-entrypoint.target/g' /usr/local/lib/systemd/system/*.service
-# install ipfs service. avoid using 5001(api)/8080(gateway) which are reserved by tests.
-RUN systemctl enable containerd  \
-    buildkit \
-    test-integration-buildkit-test  \
-    test-integration-soci-snapshotter
-# Install dev tools
-COPY Makefile .
-RUN --mount=target=/root/go/pkg/mod,type=cache \
-  apt-get install -qq file; file go; \
-  go version; \
-  NO_COLOR=true make install-dev-tools; chmod -R a+rx /root/go/bin
-# Add binary and source
-COPY --from=dependencies-download-cli /src /src
-# Warm-up cache for runtime
-RUN go mod download
+FROM assembly-integration AS test-integration
+# Get modules
+COPY --from=dependencies-download-cli /root/go/pkg/mod /root/go/pkg/mod
+# Get binaries
 COPY --from=dependencies-build-cli /out /usr/local
 # Install shell completion
 RUN mkdir -p /etc/bash_completion.d && \
   "$BINARY_NAME" completion bash >/etc/bash_completion.d/"$BINARY_NAME"
+# Copy the relevant part
+COPY . /src
 CMD ["./hack/test-integration.sh"]
 
 # test-integration-rootless

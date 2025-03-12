@@ -17,6 +17,7 @@ on:
 
 jobs:
   env:
+    name: " "
     uses: ./.github/workflows/environment.yml
 
   test-integration-docker-compatibility:

@@ -21,3 +21,5 @@ runs:
       shell: bash
       run: |
         go mod download
+        echo "ACTION_NODE_ARCH=$(echo "$RUNNER_ARCH" | sed -E "s/(X86|X64)/amd64/" | sed -E "s/(ARM|ARM64)/arm64/")" >> "$GITHUB_ENV"
+        echo "ACTION_NODE_OS=$(echo "$RUNNER_OS" | tr '[:upper:]' '[:lower:]' | sed -E "s/macos/darwin/")" >> "$GITHUB_ENV"
