@@ -189,6 +189,7 @@ RUN apt-get update -qq && apt-get install -qq --no-install-recommends \
   dbus dbus-user-session systemd systemd-sysv \
   curl \
   fuse3 >/dev/null
+# FIXME: remove this
 ARG CONTAINERIZED_SYSTEMD_VERSION
 RUN curl -o /docker-entrypoint.sh -fsSL --proto '=https' --tlsv1.3 https://raw.githubusercontent.com/AkihiroSuda/containerized-systemd/${CONTAINERIZED_SYSTEMD_VERSION}/docker-entrypoint.sh && \
   chmod +x /docker-entrypoint.sh
@@ -228,40 +229,42 @@ CMD ["bash", "--login", "-i"]
 # for the full tartine.
 FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-containerd
 ARG CONTAINERD_VERSION
-RUN echo "- containerd: ${CONTAINERD_VERSION}" >> /metadata/VERSION
 # containerd does vendor its deps, no need to mod download
-RUN git clone --depth 1 --branch "$CONTAINERD_VERSION" https://github.com/containerd/containerd.git .
+RUN echo "- containerd: ${CONTAINERD_VERSION}" >> /metadata/VERSION && \
+    touch /run/.lock && \
+    git clone --depth 1 --branch "$CONTAINERD_VERSION" https://github.com/containerd/containerd.git .
 
 # Note that only containerd itself is built with CGO. For ctr and shim, we do not need CGO, so, reset the flags there.
 FROM --platform=$BUILDPLATFORM tooling-builder-with-c-dependencies AS dependencies-build-containerd
 ARG TARGETARCH
-ENV GOPROXY=off
-RUN --mount=target=/src,type=cache,from=dependencies-download-containerd,source=/src,sharing=locked \
+RUN --mount=from=dependencies-download-containerd,type=bind,target=/src,source=/src,rw \
+    --mount=from=dependencies-download-containerd,type=cache,target=/run/.lock,source=/run/.lock,sharing=locked \
   make bin/containerd STATIC=1 && \
   GOFLAGS="" CGO_ENABLED=0 make bin/ctr && \
   GOFLAGS="" CGO_ENABLED=0 make bin/containerd-shim-runc-v2 && \
-  cp -a containerd.service / && \
-  cp -a bin/containerd bin/containerd-shim-runc-v2 bin/ctr \
-    /out/bin
+  mv containerd.service / && \
+  mv bin/containerd bin/containerd-shim-runc-v2 bin/ctr /out/bin
 
 FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-runc
 ARG RUNC_VERSION
-RUN echo "- runc: ${RUNC_VERSION}" >> /metadata/VERSION
 # runc does vendor its deps, no need to mod download
-RUN git clone --depth 1 --branch "$RUNC_VERSION" https://github.com/opencontainers/runc.git .
+RUN echo "- runc: ${RUNC_VERSION}" >> /metadata/VERSION && \
+    touch /run/.lock && \
+    git clone --depth 1 --branch "$RUNC_VERSION" https://github.com/opencontainers/runc.git .
 
 FROM --platform=$BUILDPLATFORM tooling-builder-with-c-dependencies AS dependencies-build-runc
 ARG TARGETARCH
-ENV GOPROXY=off
-RUN --mount=target=/src,type=cache,from=dependencies-download-runc,source=/src,sharing=locked \
+RUN --mount=from=dependencies-download-runc,type=bind,target=/src,source=/src,rw \
+    --mount=from=dependencies-download-runc,type=cache,target=/run/.lock,source=/run/.lock,sharing=locked \
   CC=$(xx-info)-gcc STRIP=$(xx-info)-strip make static && \
-  cp -a runc /out/bin
+  mv runc /out/bin
 
 # bypass4netns
 FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-bypass4netns
 ARG BYPASS4NETNS_VERSION
-RUN echo "- bypass4netns: ${BYPASS4NETNS_VERSION}" >> /metadata/VERSION
-RUN git clone --depth 1 --branch "$BYPASS4NETNS_VERSION" https://github.com/rootless-containers/bypass4netns.git .
+RUN echo "- bypass4netns: ${BYPASS4NETNS_VERSION}" >> /metadata/VERSION && \
+    touch /run/.lock && \
+    git clone --depth 1 --branch "$BYPASS4NETNS_VERSION" https://github.com/rootless-containers/bypass4netns.git .
 
 FROM --platform=$BUILDPLATFORM tooling-builder-with-c-dependencies AS dependencies-build-bypass4netns
 ARG TARGETARCH
@@ -269,21 +272,24 @@ ARG TARGETARCH
 # Also note that the make file passes -ldflags on the command-line, so we need to re-stuff `linkmode` into their custom
 # "GO_BUILD_LDFLAGS" variable.
 ENV GO_BUILD_LDFLAGS="-linkmode=external"
-RUN --mount=target=/src,type=cache,from=dependencies-download-bypass4netns,source=/src,sharing=locked \
+RUN --mount=from=dependencies-download-bypass4netns,type=bind,target=/src,source=/src,rw \
+    --mount=from=dependencies-download-bypass4netns,type=cache,target=/run/.lock,source=/run/.lock,sharing=locked \
     --mount=target=/root/go/pkg/mod,type=cache \
   make static && \
-  cp -a bypass4netns bypass4netnsd /out/bin
+  mv bypass4netns bypass4netnsd /out/bin
 
 # imgcrypt
 FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-imgcrypt
 ARG IMGCRYPT_VERSION
-RUN echo "- imgcrypt: ${IMGCRYPT_VERSION}" >> /metadata/VERSION
-RUN git clone --depth 1 --branch "$IMGCRYPT_VERSION" https://github.com/containerd/imgcrypt.git .
+RUN echo "- imgcrypt: ${IMGCRYPT_VERSION}" >> /metadata/VERSION && \
+    touch /run/.lock && \
+    git clone --depth 1 --branch "$IMGCRYPT_VERSION" https://github.com/containerd/imgcrypt.git .
 
 # imgrcrypt does not allow overriding GO, so, wrap instead
 FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-build-imgcrypt
 ARG TARGETARCH
-RUN --mount=target=/src,type=cache,from=dependencies-download-imgcrypt,source=/src,sharing=locked \
+RUN --mount=from=dependencies-download-imgcrypt,type=bind,target=/src,source=/src,rw \
+    --mount=from=dependencies-download-imgcrypt,type=cache,target=/run/.lock,source=/run/.lock,sharing=locked \
     --mount=target=/root/go/pkg/mod,type=cache \
   xx-go --wrap && \
   make && \
@@ -292,16 +298,16 @@ RUN --mount=target=/src,type=cache,from=dependencies-download-imgcrypt,source=/s
 # buildg
 FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-buildg
 ARG BUILDG_VERSION
-RUN echo "- buildg: ${BUILDG_VERSION}" >> /metadata/VERSION
-RUN git clone --depth 1 --branch "$BUILDG_VERSION" https://github.com/ktock/buildg.git .
+RUN echo "- buildg: ${BUILDG_VERSION}" >> /metadata/VERSION && \
+    git clone --depth 1 --branch "$BUILDG_VERSION" https://github.com/ktock/buildg.git .
 
 # buildg does not allow overriding GO, so, wrap instead
 FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-build-buildg
 ARG TARGETARCH
-RUN --mount=target=/src,type=cache,from=dependencies-download-buildg,source=/src,sharing=locked \
+RUN --mount=from=dependencies-download-buildg,type=bind,target=/src,source=/src \
     --mount=target=/root/go/pkg/mod,type=cache \
   xx-go --wrap && \
-  CMD_DESTDIR=/out make buildg install
+  PREFIX=/out/bin make buildg
 
 # cli binary is built from the local context
 FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-cli
