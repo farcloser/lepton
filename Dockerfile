@@ -104,7 +104,7 @@ ARG GO_VERSION
 # to get native go for their current execution platform
 # Note that though we dynamically retrieve GOOS here, we only support linux
 RUN os=linux; \
-    all_versions="$(curl -fsSL --proto '=https' --tlsv1.2 "https://go.dev/dl/?mode=json&include=all")"; \
+    all_versions="$(curl -fsSL --proto '=https' --tlsv1.3 "https://go.dev/dl/?mode=json&include=all")"; \
     candidates="$(case "$GO_VERSION" in \
       canary) condition=".stable==false" ;; \
       stable|"") condition=".stable==true" ;; \
@@ -114,14 +114,14 @@ RUN os=linux; \
     arch=arm64; \
     filename="$(jq -r 'map(select(.arch=="'"$arch"'"))[0].filename' <(printf "$candidates"))"; \
     mkdir -p /out/usr/local/linux/"$arch"; \
-    [ "$filename" != "" ] && curl -fsSL --proto '=https' --tlsv1.2 https://go.dev/dl/"$filename" | tar xzC /out/usr/local/linux/"$arch" || {  \
+    [ "$filename" != "" ] && curl -fsSL --proto '=https' --tlsv1.3 https://go.dev/dl/"$filename" | tar xzC /out/usr/local/linux/"$arch" || {  \
       echo "Failed retrieving go download for $arch: $GO_VERSION"; \
       exit 1; \
     }; \
     arch=amd64; \
     filename="$(jq -r 'map(select(.arch=="'"$arch"'"))[0].filename' <(printf "$candidates"))"; \
     mkdir -p /out/usr/local/linux/"$arch"; \
-    [ "$filename" != "" ] && curl -fsSL --proto '=https' --tlsv1.2 https://go.dev/dl/"$filename" | tar xzC /out/usr/local/linux/"$arch" || {  \
+    [ "$filename" != "" ] && curl -fsSL --proto '=https' --tlsv1.3 https://go.dev/dl/"$filename" | tar xzC /out/usr/local/linux/"$arch" || {  \
       echo "Failed retrieving go download for $arch: $GO_VERSION"; \
       exit 1; \
     }
@@ -190,7 +190,7 @@ RUN apt-get update -qq && apt-get install -qq --no-install-recommends \
   curl \
   fuse3 >/dev/null
 ARG CONTAINERIZED_SYSTEMD_VERSION
-RUN curl -o /docker-entrypoint.sh -fsSL --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/AkihiroSuda/containerized-systemd/${CONTAINERIZED_SYSTEMD_VERSION}/docker-entrypoint.sh && \
+RUN curl -o /docker-entrypoint.sh -fsSL --proto '=https' --tlsv1.3 https://raw.githubusercontent.com/AkihiroSuda/containerized-systemd/${CONTAINERIZED_SYSTEMD_VERSION}/docker-entrypoint.sh && \
   chmod +x /docker-entrypoint.sh
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
@@ -354,7 +354,7 @@ COPY ./Dockerfile.d/SHA256SUMS.d /SHA256SUMS.d
 
 # C
 RUN fname="tini-static-$TARGETARCH" && \
-  curl -o "$fname" -fsSL --proto '=https' --tlsv1.2 "https://github.com/krallin/tini/releases/download/${TINI_VERSION}/${fname}" && \
+  curl -o "$fname" -fsSL --proto '=https' --tlsv1.3 "https://github.com/krallin/tini/releases/download/${TINI_VERSION}/${fname}" && \
   grep "$fname" "/SHA256SUMS.d/tini-${TINI_VERSION}" | sha256sum -c && \
   cp -a "$fname" /out/bin/tini && chmod +x /out/bin/tini && \
   rm "$fname" && \
@@ -363,7 +363,7 @@ RUN fname="tini-static-$TARGETARCH" && \
 
 # C
 RUN fname="slirp4netns-$(cat /target_uname_m)" && \
-  curl -o "$fname" -fsSL --proto '=https' --tlsv1.2 "https://github.com/rootless-containers/slirp4netns/releases/download/${SLIRP4NETNS_VERSION}/${fname}" && \
+  curl -o "$fname" -fsSL --proto '=https' --tlsv1.3 "https://github.com/rootless-containers/slirp4netns/releases/download/${SLIRP4NETNS_VERSION}/${fname}" && \
   grep "$fname" "/SHA256SUMS.d/slirp4netns-${SLIRP4NETNS_VERSION}" | sha256sum -c && \
   mv "$fname" /out/bin/slirp4netns && \
   chmod +x /out/bin/slirp4netns && \
@@ -372,7 +372,7 @@ RUN fname="slirp4netns-$(cat /target_uname_m)" && \
 
 # golang CGO_ENABLED=0, vendored
 RUN fname="cni-plugins-${TARGETOS:-linux}-$TARGETARCH-${CNI_PLUGINS_VERSION}.tgz" && \
-  curl -o "$fname" -fsSL --proto '=https' --tlsv1.2 "https://github.com/containernetworking/plugins/releases/download/${CNI_PLUGINS_VERSION}/${fname}" && \
+  curl -o "$fname" -fsSL --proto '=https' --tlsv1.3 "https://github.com/containernetworking/plugins/releases/download/${CNI_PLUGINS_VERSION}/${fname}" && \
   grep "$fname" "/SHA256SUMS.d/cni-plugins-${CNI_PLUGINS_VERSION}" | sha256sum -c && \
   mkdir -p /out/libexec/cni && \
   tar xzf "$fname" -C /out/libexec/cni && \
@@ -381,7 +381,7 @@ RUN fname="cni-plugins-${TARGETOS:-linux}-$TARGETARCH-${CNI_PLUGINS_VERSION}.tgz
 
 # golang CGO_ENABLED=0?
 RUN fname="buildkit-${BUILDKIT_VERSION}.${TARGETOS:-linux}-$TARGETARCH.tar.gz" && \
-  curl -o "$fname" -fsSL --proto '=https' --tlsv1.2 "https://github.com/moby/buildkit/releases/download/${BUILDKIT_VERSION}/${fname}" && \
+  curl -o "$fname" -fsSL --proto '=https' --tlsv1.3 "https://github.com/moby/buildkit/releases/download/${BUILDKIT_VERSION}/${fname}" && \
   grep "$fname" "/SHA256SUMS.d/buildkit-${BUILDKIT_VERSION}" | sha256sum -c && \
   tar xzf "$fname" -C /out && \
   rm -f "$fname" /out/bin/buildkit-qemu-* /out/bin/buildkit-cni-* /out/bin/buildkit-runc && \
@@ -391,7 +391,7 @@ RUN fname="buildkit-${BUILDKIT_VERSION}.${TARGETOS:-linux}-$TARGETARCH.tar.gz" &
 
 # golang CGO_ENABLED=0
 RUN fname="rootlesskit-$(cat /target_uname_m).tar.gz" && \
-  curl -o "$fname" -fsSL --proto '=https' --tlsv1.2 "https://github.com/rootless-containers/rootlesskit/releases/download/${ROOTLESSKIT_VERSION}/${fname}" && \
+  curl -o "$fname" -fsSL --proto '=https' --tlsv1.3 "https://github.com/rootless-containers/rootlesskit/releases/download/${ROOTLESSKIT_VERSION}/${fname}" && \
   grep "$fname" "/SHA256SUMS.d/rootlesskit-${ROOTLESSKIT_VERSION}" | sha256sum -c && \
   tar xzf "$fname" -C /out/bin && \
   rm -f "$fname" /out/bin/rootlesskit-docker-proxy && \
@@ -402,7 +402,7 @@ FROM --platform=$BUILDPLATFORM tooling-downloader AS dependencies-download-no-re
 ARG TARGETARCH
 ARG SOCI_SNAPSHOTTER_VERSION
 RUN fname="soci-snapshotter-${SOCI_SNAPSHOTTER_VERSION}-${TARGETOS:-linux}-$TARGETARCH.tar.gz" && \
-  curl -o "$fname" -fsSL --proto '=https' --tlsv1.2 "https://github.com/awslabs/soci-snapshotter/releases/download/v${SOCI_SNAPSHOTTER_VERSION}/${fname}" && \
+  curl -o "$fname" -fsSL --proto '=https' --tlsv1.3 "https://github.com/awslabs/soci-snapshotter/releases/download/v${SOCI_SNAPSHOTTER_VERSION}/${fname}" && \
   tar xzf "$fname" -C /out/bin soci soci-snapshotter-grpc && \
   rm "$fname"
 # FIXME: parameterize version
