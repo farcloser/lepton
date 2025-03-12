@@ -37,8 +37,6 @@ dependencies=(
   moby/buildkit
   containerd/containerd
   distribution/distribution
-  containers/fuse-overlayfs
-  containerd/fuse-overlayfs-snapshotter
   gotestyourself/gotestsum
   containernetworking/plugins
   rootless-containers/rootlesskit
@@ -56,8 +54,6 @@ CONTAINERD_EXCLUDE="containerd API"
 # The value you set the variable to also decides which artifacts you are interested in.
 BUILDKIT_CHECKSUM=linux
 CNI_PLUGINS_CHECKSUM=linux
-CONTAINERD_FUSE_OVERLAYFS_CHECKSUM=linux
-FUSE_OVERLAYFS_CHECKSUM=linux
 # Avoids the full build
 BUILDG_CHECKSUM=buildg-v
 ROOTLESSKIT_CHECKSUM=linux
@@ -220,7 +216,6 @@ canary::build::integration(){
     local bl=""
     shortname="${dep##*/}"
     [ "$shortname" != "plugins" ] || shortname="cni-plugins"
-    [ "$shortname" != "fuse-overlayfs-snapshotter" ] || shortname="containerd-fuse-overlayfs"
     for bl in "${blacklist[@]}"; do
       if [ "$bl" == "$shortname" ]; then
         log::warning "Dependency $shortname is blacklisted and will be left to its currently pinned version"

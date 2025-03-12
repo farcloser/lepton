@@ -2,13 +2,18 @@
 
 ## TL;DR
 
-lepton is an experimental containerd cli.
+lepton is a modern containerd cli.
 
-Requires:
+## Detailed requirements
+
+Any modern linux distro will fit these
+
 - containerd 2.0+
 - golang 1.23+
+- kernel >= 5.13
 - cni plugins 1.6+
-- cgroup v2 (see https://rootlesscontaine.rs/getting-started/common/cgroup2/)
+
+If you do want cgroup, lepton supports v2.
 
 ## Project goals
 
@@ -52,6 +57,7 @@ Unlike nerdctl, lepton does not support (and has removed from its codebase):
 - nydus
 - IPFS
 - cgroup v1
+- fuse-overlayfs
 
 Also, lepton does not explicitly support and does not test anymore (might still work):
 - containerd pre v2 (v1.7, v1.6)
@@ -60,7 +66,15 @@ Also, lepton does not explicitly support and does not test anymore (might still 
 So far, besides removal of unsupported code, lepton has been focused on cleanup, reviewing and moving "library"
 packages up into https://github.com/farcloser/go-containers.
 
+
 <!--
+## Private notes
+
+<!> testing notes: export CONTAINERD_NAMESPACE=lepton-test; ./extras/rootless/containerd-rootless-setuptool.sh install-buildkit-containerd
+
+
+
+
 [[⬇️ **Download]**](https://github.com/containerd/nerdctl/releases)
 [[📖 **Command reference]**](./docs/command-reference.md)
 [[❓**FAQs & Troubleshooting]**](./docs/faq.md)

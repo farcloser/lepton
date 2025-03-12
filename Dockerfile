@@ -34,9 +34,6 @@ ARG ROOTLESSKIT_VERSION=v2.3.2
 ARG SLIRP4NETNS_VERSION=v1.3.1
 # - bypass4netns
 ARG BYPASS4NETNS_VERSION=v0.4.2
-# - fuse-overlayfs
-ARG FUSE_OVERLAYFS_VERSION=v1.14
-ARG CONTAINERD_FUSE_OVERLAYFS_VERSION=v2.1.1
 # - Init
 ARG TINI_VERSION=v0.19.0
 # - Debug
@@ -339,10 +336,6 @@ FROM --platform=$BUILDPLATFORM tooling-downloader AS dependencies-download
 ARG TARGETARCH
 # Last updated in 2020
 ARG TINI_VERSION
-# Updated 1 time in 2024
-ARG FUSE_OVERLAYFS_VERSION
-# Updated 1 time in 2024
-ARG CONTAINERD_FUSE_OVERLAYFS_VERSION
 # Updated 3 times in 2024
 ARG SLIRP4NETNS_VERSION
 # Updated 4 times in 2024
@@ -367,23 +360,6 @@ RUN fname="tini-static-$TARGETARCH" && \
   rm "$fname" && \
   echo "- Tini: ${TINI_VERSION}" >> /metadata/VERSION && \
   echo "- bin/tini: [MIT License](https://github.com/krallin/tini/blob/${TINI_VERSION}/LICENSE)" >> /metadata/LICENSE
-
-# C
-RUN fname="fuse-overlayfs-$(cat /target_uname_m)" && \
-  curl -o "$fname" -fsSL --proto '=https' --tlsv1.2 "https://github.com/containers/fuse-overlayfs/releases/download/${FUSE_OVERLAYFS_VERSION}/${fname}" && \
-  grep "$fname" "/SHA256SUMS.d/fuse-overlayfs-${FUSE_OVERLAYFS_VERSION}" | sha256sum -c && \
-  mv "$fname" /out/bin/fuse-overlayfs && \
-  chmod +x /out/bin/fuse-overlayfs && \
-  echo "- fuse-overlayfs: ${FUSE_OVERLAYFS_VERSION}" >> /metadata/VERSION && \
-  echo "- bin/fuse-overlayfs: [GNU GENERAL PUBLIC LICENSE, Version 2](https://github.com/containers/fuse-overlayfs/blob/${FUSE_OVERLAYFS_VERSION}/COPYING)" >> /metadata/LICENSE
-
-# golang CGO_ENABLED=0
-RUN fname="containerd-fuse-overlayfs-${CONTAINERD_FUSE_OVERLAYFS_VERSION/v}-${TARGETOS:-linux}-$TARGETARCH.tar.gz" && \
-  curl -o "$fname" -fsSL --proto '=https' --tlsv1.2 "https://github.com/containerd/fuse-overlayfs-snapshotter/releases/download/${CONTAINERD_FUSE_OVERLAYFS_VERSION}/${fname}" && \
-  grep "$fname" "/SHA256SUMS.d/containerd-fuse-overlayfs-${CONTAINERD_FUSE_OVERLAYFS_VERSION}" | sha256sum -c && \
-  tar xzf "$fname" -C /out/bin && \
-  rm -f "$fname" && \
-  echo "- containerd-fuse-overlayfs: ${CONTAINERD_FUSE_OVERLAYFS_VERSION}" >> /metadata/VERSION
 
 # C
 RUN fname="slirp4netns-$(cat /target_uname_m)" && \
