@@ -4,22 +4,53 @@
 
 lepton is a modern containerd cli.
 
-## Detailed requirements
+## Requirements
 
-Any modern linux distro will fit these
+Any recent linux distro with a kernel >= 5.13 is supported.
 
+Lepton obviously requires other components to be useful (provided in the full release):
 - containerd 2.0+
-- golang 1.23+
-- kernel >= 5.13
+- runc 1.2+ (linux only)
 - cni plugins 1.6+
 
-If you do want cgroup, lepton supports v2.
+Building lepton itself requires:
+- golang 1.23+
+
+And building dependencies (containerd, etc):
+- libseccomp
+
+If you do want to use cgroup, lepton supports v2.
 
 ## Project goals
 
 1. provide a ready-to-use library to easily build cli and applications communicating with containerd
 2. provide a reference cli implementation, comparable to the docker cli or to nerdctl
-3. primary focus is on stability, code quality and developer quality of life, not on features
+3. primary focus is on stability, code quality and developer quality of life, not on features. Specifically,
+deperecated features, older configurations, and a number of "alternative" choices are not supported
+
+## Full distribution
+
+Unlike nerdctl, dependencies are _not_ downloaded in binary form and repackaged.
+They are compiled, from pinned commit shas, ensuring consistent compilation settings, golang version, and linking.
+
+The full-release bundles together:
+- containerd
+- runc
+- soci
+- bypass4netns
+- slirp4netns
+- tini
+- cni
+- rootlesskit
+- buildkit
+- imgcrypt
+- buildg
+
+All C (or CGO) binaries are compiled as static PIE executables, with immediate binding and read-only relocations.
+
+All pure go binaries are compiled statically with the same version of golang.
+
+For detailed versions and compiler settings information, see the Dockerfile.
 
 ## Detailed relationship with nerdctl, and current status
 
