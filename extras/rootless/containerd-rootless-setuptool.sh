@@ -44,7 +44,6 @@ ERROR() {
 CONTAINERD_ROOTLESS_SH="containerd-rootless.sh"
 SYSTEMD_CONTAINERD_UNIT="containerd.service"
 SYSTEMD_BUILDKIT_UNIT="buildkit.service"
-SYSTEMD_FUSE_OVERLAYFS_UNIT="containerd-fuse-overlayfs.service"
 SYSTEMD_BYPASS4NETNSD_UNIT="bypass4netnsd.service"
 
 # global vars
@@ -126,8 +125,8 @@ cmd_entrypoint_check() {
 	tmp=$(mktemp -d)
 	mkdir -p "${tmp}/l" "${tmp}/u" "${tmp}/w" "${tmp}/m"
 	if ! rootlesskit mount -t overlay -o lowerdir="${tmp}/l,upperdir=${tmp}/u,workdir=${tmp}/w" overlay "${tmp}/m"; then
-		WARNING "Overlayfs is not enabled, consider installing fuse-overlayfs snapshotter (\`$0 install-fuse-overlayfs\`), " \
-			"or see https://rootlesscontaine.rs/how-it-works/overlayfs/ to enable overlayfs."
+		WARNING "Overlayfs is not working. Maybe your configuration is not supported"
+	  exit 1
 	fi
 	rm -rf "${tmp}"
 	INFO "Requirements are satisfied"
@@ -363,50 +362,6 @@ cmd_entrypoint_install_bypass4netnsd() {
 	INFO "To use bypass4netnsd, set the \"lepton/bypass4netns=true\" annotation on containers, e.g., \`run --annotation lepton/bypass4netns=true\`"
 }
 
-# CLI subcommand: "install-fuse-overlayfs"
-cmd_entrypoint_install_fuse_overlayfs() {
-	init
-	if ! command -v "containerd-fuse-overlayfs-grpc" >/dev/null 2>&1; then
-		ERROR "containerd-fuse-overlayfs-grpc (https://github.com/containerd/fuse-overlayfs-snapshotter) needs to be present under \$PATH"
-		exit 1
-	fi
-	if ! command -v "fuse-overlayfs" >/dev/null 2>&1; then
-		ERROR "fuse-overlayfs (https://github.com/containers/fuse-overlayfs) needs to be present under \$PATH"
-		exit 1
-	fi
-	if ! systemctl --user --no-pager status "${SYSTEMD_CONTAINERD_UNIT}" >/dev/null 2>&1; then
-		ERROR "Install containerd first (\`$ARG0 install\`)"
-		exit 1
-	fi
-	cat <<-EOT | install_systemd_unit "${SYSTEMD_FUSE_OVERLAYFS_UNIT}"
-		[Unit]
-		Description=containerd-fuse-overlayfs (Rootless)
-		PartOf=${SYSTEMD_CONTAINERD_UNIT}
-
-		[Service]
-		Environment=PATH=$BIN:/sbin:/usr/sbin:$PATH
-		ExecStart="$REALPATH0" nsenter containerd-fuse-overlayfs-grpc "${XDG_RUNTIME_DIR}/containerd-fuse-overlayfs.sock" "${XDG_DATA_HOME}/containerd-fuse-overlayfs"
-		ExecReload=/bin/kill -s HUP \$MAINPID
-		RestartSec=2
-		Restart=always
-		Type=simple
-		KillMode=mixed
-
-		[Install]
-		WantedBy=default.target
-	EOT
-	INFO "Add the following lines to \"${XDG_CONFIG_HOME}/containerd/config.toml\" manually, and then run \`systemctl --user restart ${SYSTEMD_CONTAINERD_UNIT}\`:"
-	cat <<-EOT
-		### BEGIN ###
-		[proxy_plugins]
-		  [proxy_plugins."fuse-overlayfs"]
-		    type = "snapshot"
-		    address = "${XDG_RUNTIME_DIR}/containerd-fuse-overlayfs.sock"
-		###  END  ###
-	EOT
-	INFO "Set \`export CONTAINERD_SNAPSHOTTER=\"fuse-overlayfs\"\` to use the fuse-overlayfs snapshotter."
-}
-
 # CLI subcommand: "uninstall"
 cmd_entrypoint_uninstall() {
 	init
@@ -414,7 +369,6 @@ cmd_entrypoint_uninstall() {
 	if [ -n "${CONTAINERD_NAMESPACE:-}" ]; then
 		uninstall_systemd_unit "${CONTAINERD_NAMESPACE}-${SYSTEMD_BUILDKIT_UNIT}"
 	fi
-	uninstall_systemd_unit "${SYSTEMD_FUSE_OVERLAYFS_UNIT}"
 	uninstall_systemd_unit "${SYSTEMD_CONTAINERD_UNIT}"
 	uninstall_systemd_unit "${SYSTEMD_BYPASS4NETNSD_UNIT}"
 
@@ -453,14 +407,6 @@ cmd_entrypoint_uninstall_bypass4netnsd() {
 	uninstall_systemd_unit "${SYSTEMD_BYPASS4NETNSD_UNIT}"
 }
 
-# CLI subcommand: "uninstall-fuse-overlayfs"
-cmd_entrypoint_uninstall_fuse_overlayfs() {
-	init
-	uninstall_systemd_unit "${SYSTEMD_FUSE_OVERLAYFS_UNIT}"
-	INFO "This uninstallation tool does NOT remove data."
-	INFO "To remove data, run: \`$BIN/rootlesskit rm -rf ${XDG_DATA_HOME}/containerd-fuse-overlayfs"
-}
-
 # text for --help
 usage() {
 	echo "Usage: ${ARG0} [OPTIONS] COMMAND"
@@ -480,10 +426,6 @@ usage() {
 	echo "Add-on commands (bypass4netnsd):"
 	echo "  install-bypass4netnsd       Install the systemd unit for bypass4netnsd"
 	echo "  uninstall-bypass4netnsd     Uninstall the systemd unit for bypass4netnsd"
-	echo
-	echo "Add-on commands (fuse-overlayfs):"
-	echo "  install-fuse-overlayfs      Install the systemd unit for fuse-overlayfs snapshotter"
-	echo "  uninstall-fuse-overlayfs    Uninstall the systemd unit for fuse-overlayfs snapshotter"
 	echo
 	echo "Add-on commands (BuildKit containerd worker):"
 	echo "  install-buildkit-containerd   Install the systemd unit for BuildKit with CONTAINERD_NAMESPACE=${CONTAINERD_NAMESPACE:-} and CONTAINERD_SNAPSHOTTER=${CONTAINERD_SNAPSHOTTER:-}"

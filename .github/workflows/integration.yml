@@ -42,8 +42,8 @@ jobs:
           sudo -E buildctl build \
             --opt platform=linux/amd64,linux/arm64 \
             --frontend=dockerfile.v0 \
-            --import-cache="type=gha,scope=build-integration" \
-            --export-cache="type=gha,scope=build-integration,compression=zstd,mode=max" \
+            --import-cache="type=gha,scope=build-i9n" \
+            --export-cache="type=gha,scope=build-i9n,compression=zstd,mode=max" \
             --opt target="test-integration" \
             --local dockerfile=$(pwd) \
             --local context=$(pwd)
@@ -79,7 +79,7 @@ jobs:
             --opt build-arg:BUILDPLATFORM=linux/amd64 \
             --opt platform=$ACTION_NODE_OS/$ACTION_NODE_ARCH \
             --frontend=dockerfile.v0 \
-            --import-cache="type=gha,scope=build-integration" \
+            --import-cache="type=gha,scope=build-i9n" \
             --output=type=image,name=test-integration \
             --opt target="test-integration" \
             --local dockerfile=$(pwd) \

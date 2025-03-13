@@ -37,9 +37,6 @@ Just execute `nerdctl`. No need to specify the socket address manually.
 $ nerdctl run -it --rm alpine
 ```
 
-Depending on your kernel version, you may need to enable FUSE-OverlayFS or set `export CONTAINERD_SNAPSHOTTER=native`.
-(See below.)
-
 ## Add-ons
 ### BuildKit
 To enable BuildKit, run the following command:
@@ -56,32 +53,6 @@ The default `overlayfs` snapshotter only works on the following hosts:
 - Any distro, with kernel >= 5.13
 - Non-SELinux distro, with kernel >= 5.11
 - Ubuntu since 2015
-
-For other hosts, [`fuse-overlayfs` snapshotter](https://github.com/containerd/fuse-overlayfs-snapshotter) needs to be used instead.
-
-### FUSE-OverlayFS
-
-To enable `fuse-overlayfs` snapshotter, run the following command:
-```console
-$ containerd-rootless-setuptool.sh install-fuse-overlayfs
-```
-
-Then, add the following config to `~/.config/containerd/config.toml`, and run `systemctl --user restart containerd.service`:
-```toml
-[proxy_plugins]
-  [proxy_plugins."fuse-overlayfs"]
-      type = "snapshot"
-# NOTE: replace "1000" with your actual UID
-      address = "/run/user/1000/containerd-fuse-overlayfs.sock"
-```
-
-The snapshotter can be specified as `$CONTAINERD_SNAPSHOTTER`.
-```console
-$ export CONTAINERD_SNAPSHOTTER=fuse-overlayfs
-$ nerdctl run -it --rm alpine
-```
-
-If `fuse-overlayfs` does not work, try `export CONTAINERD_SNAPSHOTTER=native`.
 
 ## bypass4netns
 | :zap: Requirement | nerdctl >= 0.17 |
@@ -144,9 +115,6 @@ systemctl --user restart containerd
 ```
 
 ## Troubleshooting
-
-### Hint to Fedora users
-- If SELinux is enabled on your host and your kernel is older than 5.13, you need to use [`fuse-overlayfs` instead of `overlayfs`](#fuse-overlayfs).
 
 ## Rootlesskit Network Design
 
