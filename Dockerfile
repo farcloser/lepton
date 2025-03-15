@@ -29,63 +29,74 @@ ARG         BINARY_LICENSE="$LICENSE_APACHE_V2"
 ARG         CONTAINERD_VERSION=v2.0.3
 ARG         CONTAINERD_REVISION=06b99ca80cdbfbc6cc8bd567021738c9af2b36ce
 ARG         CONTAINERD_LICENSE="$LICENSE_APACHE_V2"
+ARG         CONTAINERD_REPO=github.com/containerd/containerd
 
 ARG         RUNC_VERSION=v1.2.5
 ARG         RUNC_REVISION=59923ef18c98053ddb1acf23ecba10344056c28e
 ARG         RUNC_LICENSE="$LICENSE_APACHE_V2"
+ARG         RUNC_REPO=github.com/opencontainers/runc
 
 ARG         CNI_PLUGINS_VERSION=v1.6.2
 ARG         CNI_PLUGINS_REVISION=7f756b411efc3d3730c707e2cc1f2baf1a66e28c
 ARG         CNI_PLUGINS_LICENSE="$LICENSE_APACHE_V2"
+ARG         CNI_PLUGINS_REPO=github.com/containernetworking/plugins
 
 ARG         BUILDKIT_VERSION=v0.20.1
 ARG         BUILDKIT_REVISION=de56a3c5056341667b5bad71f414ece70b50724f
 ARG         BUILDKIT_LICENSE="$LICENSE_APACHE_V2"
+ARG         BUILDKIT_REPO=github.com/moby/buildkit
 
 ARG         IMGCRYPT_VERSION=v2.0.0
 ARG         IMGCRYPT_REVISION=1e301ef2620964bedfa68ee4b841ff80f4887736
 ARG         IMGCRYPT_LICENSE="$LICENSE_APACHE_V2"
+ARG         IMGCRYPT_REPO=github.com/containerd/imgcrypt
 
 ARG         COSIGN_VERSION=v2.4.3
 ARG         COSIGN_REVISION=6a7abbf3ae7eb6949883a80c8f6007cc065d2dfb
 ARG         COSIGN_LICENSE="$LICENSE_APACHE_V2"
+ARG         COSIGN_REPO=github.com/sigstore/cosign
 
 ARG         ROOTLESSKIT_VERSION=v2.3.4
 ARG         ROOTLESSKIT_REVISION=59a459df858d39ad5f4eafa305545907bf0c48ab
 ARG         ROOTLESSKIT_LICENSE="$LICENSE_APACHE_V2"
+ARG         ROOTLESSKIT_REPO=github.com/rootless-containers/rootlesskit
 
 ARG         LIBSLIRP_VERSION=v4.9.0
 ARG         LIBSLIRP_REVISION=c32a8a1ccaae8490142e67e078336a95c5ffc956
 ARG         LIBSLIRP_LICENSE="$LICENSE_3CLAUSES_BSD"
+ARG         LIBSLIRP_REPO=gitlab.freedesktop.org/slirp/libslirp
 
 ARG         SLIRP4NETNS_VERSION=v1.3.2
 ARG         SLIRP4NETNS_REVISION=0f13345bcef588d2bb70d662d41e92ee8a816d85
 ARG         SLIRP4NETNS_LICENSE="$LICENSE_GPL_V2"
+ARG         SLIRP4NETNS_REPO=github.com/rootless-containers/slirp4netns
 
 ARG         BYPASS4NETNS_VERSION=v0.4.2
 ARG         BYPASS4NETNS_REVISION=aa04bd3dcc48c6dae6d7327ba219bda8fe2a4634
 ARG         BYPASS4NETNS_LICENSE="$LICENSE_APACHE_V2"
+ARG         BYPASS4NETNS_REPO=github.com/rootless-containers/bypass4netns
 
 ARG         BUILDG_VERSION=v0.4.1
 ARG         BUILDG_REVISION=8dd12a26f4ab05ad20f3fe9811fb42aff6bf472a
 ARG         BUILDG_LICENSE="$LICENSE_APACHE_V2"
+ARG         BUILDG_REPO=github.com/ktock/buildg
 
 ARG         SOCI_SNAPSHOTTER_VERSION=v0.9.0
 ARG         SOCI_SNAPSHOTTER_REVISION=737f61a3db40c386f997c1f126344158aa3ad43c
-ARG         SOCI_LICENSE="$LICENSE_APACHE_V2"
+ARG         SOCI_SNAPSHOTTER_LICENSE="$LICENSE_APACHE_V2"
+ARG         SOCI_SNAPSHOTTER_REPO=github.com/awslabs/soci-snapshotter
 
 ARG         TINI_VERSION=v0.19.0
 ARG         TINI_REVISION=de40ad007797e0dcd8b7126f27bb87401d224240
 ARG         TINI_LICENSE="$LICENSE_MIT"
+ARG         TINI_REPO=github.com/krallin/tini
 
 ARG         SECCOMP_LICENSE="$LICENSE_LGPL_V21"
 ARG         ZLIB_LICENSE="$LICENSE_ZLIB"
 ARG         GLIB_LICENSE="$LICENSE_APACHE_V2"
 ARG         LIBCAP_LICENSE="$LICENSE_3CLAUSES_BSD"
 
-ARG         GOFIPS140=v1.0.0
 ARG         NO_COLOR=true
-ARG         GOTOOLCHAIN=local
 ARG         DEBIAN_IMAGE=ghcr.io/apostasie/debian
 ARG         UBUNTU_IMAGE=ghcr.io/apostasie/ubuntu
 # XXX experimenting with musl. Unlikely to go anywhere (looks like linking pkcs11 requires glibc anyhow?).
@@ -93,10 +104,6 @@ ARG         UBUNTU_IMAGE=ghcr.io/apostasie/ubuntu
 #ARG         GCC=gnu-gcc
 #ARG         LIBC="musl-dev musl-tools"
 #ARG         GCC=musl-gcc
-
-# TODO: get rid of these
-#ARG         XX_VERSION=1.6.1
-ARG         CONTAINERIZED_SYSTEMD_VERSION=v0.1.1
 
 ########################################################################################################################
 # Base images
@@ -123,43 +130,6 @@ RUN         echo "force-unsafe-io" > /etc/dpkg/dpkg.cfg.d/farcloser-speedup && \
             apt-get install -qq --no-install-recommends \
                 ca-certificates \
                     >/dev/null
-
-#           tooling-runtime is the base stage that is used to build demo and testing images
-#           Note that unlike every other tooling- stage, this is a multi-architecture stage
-FROM        $UBUNTU_IMAGE:$UBUNTU_VERSION AS tooling-runtime
-SHELL       ["/bin/bash", "-o", "errexit", "-o", "errtrace", "-o", "functrace", "-o", "nounset", "-o", "pipefail", "-c"]
-ENV         DEBIAN_FRONTEND="noninteractive"
-ENV         TERM="xterm"
-ENV         LANG="C.UTF-8"
-ENV         LC_ALL="C.UTF-8"
-ENV         TZ="America/Los_Angeles"
-RUN         echo "force-unsafe-io" > /etc/dpkg/dpkg.cfg.d/farcloser-speedup && \
-            echo 'Acquire::Languages "none";' > /etc/apt/apt.conf.d/farcloser-no-language && \
-            echo 'Acquire::GzipIndexes "true";' > /etc/apt/apt.conf.d/farcloser-gzip-indexes && \
-            apt-get update -qq >/dev/null && \
-            apt-get install -qq --no-install-recommends \
-                ca-certificates \
-                apparmor \
-                bash-completion \
-                iptables \
-                iproute2 \
-                dbus dbus-user-session systemd systemd-sysv \
-                curl \
-                fuse3 \
-                    >/dev/null
-ARG         GOFIPS140
-ARG         BINARY_NAME
-# FIXME: remove this
-ARG         CONTAINERIZED_SYSTEMD_VERSION
-RUN         curl -o /docker-entrypoint.sh -fsSL --proto '=https' --tlsv1.3 https://raw.githubusercontent.com/AkihiroSuda/containerized-systemd/${CONTAINERIZED_SYSTEMD_VERSION}/docker-entrypoint.sh && \
-                chmod +x /docker-entrypoint.sh
-ENTRYPOINT  ["/docker-entrypoint.sh"]
-CMD         ["bash", "--login", "-i"]
-
-#COPY        /etc/systemd/system/docker-entrypoint.target
-#systemctl mask systemd-firstboot.service systemd-udevd.service systemd-modules-load.service
-#systemctl unmask systemd-logind
-
 
 #           tooling-downloader purpose is to enable later stages to download content directly using curl
 FROM        --platform=$BUILDPLATFORM tooling-base AS tooling-downloader
@@ -216,20 +186,20 @@ RUN         mkdir -p /out/bin; mkdir -p /metadata && \
                     >/dev/null && \
             git config --global advice.detachedHead false # Prevent git from complaining on detached head
 #           Configure base environment
-ARG         GOFIPS140
-ARG         NO_COLOR
-ARG         GOTOOLCHAIN
-ARG         CGO_ENABLED=0
-ENV         GOFLAGS="-trimpath"
+ENV         CGO_ENABLED=0
+ENV         GOFIPS140=v1.0.0
+ENV         GOTOOLCHAIN=local
 #           Add golang
 COPY        --from=tooling-downloader-golang /out/usr/local/$BUILDPLATFORM /usr/local
 ENV         PATH="/root/go/bin:/usr/local/go/bin:$PATH"
+ARG         NO_COLOR
+ENV         GOFLAGS="-trimpath"
 
 # tooling-builder-with-c-dependencies is an expansion of the previous stages that adds extra c dependencies.
 # It is meant for (cross-compilation of) c and cgo projects.
 FROM        --platform=$BUILDPLATFORM tooling-builder AS tooling-builder-with-c-dependencies-base
 # Enable CGO
-ARG         CGO_ENABLED=1
+ENV         CGO_ENABLED=1
 ## https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html
 ENV         WARNING_OPTIONS="-Wall -Werror=format-security"
 ## https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html#Optimize-Options
@@ -322,7 +292,8 @@ FROM        --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-c
 ARG         CONTAINERD_VERSION
 ARG         CONTAINERD_REVISION
 ARG         CONTAINERD_LICENSE
-ARG         _REPO=github.com/containerd/containerd
+ARG         CONTAINERD_REPO
+ARG         _REPO=$CONTAINERD_REPO
 ARG         _VERSION=$CONTAINERD_VERSION
 ARG         _REVISION=$CONTAINERD_REVISION
 ARG         _LICENSE=$CONTAINERD_LICENSE
@@ -337,7 +308,8 @@ FROM        --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-r
 ARG         RUNC_VERSION
 ARG         RUNC_REVISION
 ARG         RUNC_LICENSE
-ARG         _REPO=github.com/opencontainers/runc
+ARG         RUNC_REPO
+ARG         _REPO=$RUNC_REPO
 ARG         _VERSION=$RUNC_VERSION
 ARG         _REVISION=$RUNC_REVISION
 ARG         _LICENSE=$RUNC_LICENSE
@@ -352,7 +324,8 @@ FROM        --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-b
 ARG         BUILDKIT_VERSION
 ARG         BUILDKIT_REVISION
 ARG         BUILDKIT_LICENSE
-ARG         _REPO=github.com/moby/buildkit
+ARG         BUILDKIT_REPO
+ARG         _REPO=$BUILDKIT_REPO
 ARG         _VERSION=$BUILDKIT_VERSION
 ARG         _REVISION=$BUILDKIT_REVISION
 ARG         _LICENSE=$BUILDKIT_LICENSE
@@ -367,7 +340,8 @@ FROM        --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-c
 ARG         CNI_PLUGINS_VERSION
 ARG         CNI_PLUGINS_REVISION
 ARG         CNI_PLUGINS_LICENSE
-ARG         _REPO=github.com/containernetworking/plugins
+ARG         CNI_PLUGINS_REPO
+ARG         _REPO=$CNI_PLUGINS_REPO
 ARG         _VERSION=$CNI_PLUGINS_VERSION
 ARG         _REVISION=$CNI_PLUGINS_REVISION
 ARG         _LICENSE=$CNI_PLUGINS_LICENSE
@@ -382,7 +356,8 @@ FROM        --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-b
 ARG         BYPASS4NETNS_VERSION
 ARG         BYPASS4NETNS_REVISION
 ARG         BYPASS4NETNS_LICENSE
-ARG         _REPO=github.com/rootless-containers/bypass4netns
+ARG         BYPASS4NETNS_REPO
+ARG         _REPO=$BYPASS4NETNS_REPO
 ARG         _VERSION=$BYPASS4NETNS_VERSION
 ARG         _REVISION=$BYPASS4NETNS_REVISION
 ARG         _LICENSE=$BYPASS4NETNS_LICENSE
@@ -399,7 +374,8 @@ FROM        --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-i
 ARG         IMGCRYPT_VERSION
 ARG         IMGCRYPT_REVISION
 ARG         IMGCRYPT_LICENSE
-ARG         _REPO=github.com/containerd/imgcrypt
+ARG         IMGCRYPT_REPO
+ARG         _REPO=$IMGCRYPT_REPO
 ARG         _VERSION=$IMGCRYPT_VERSION
 ARG         _REVISION=$IMGCRYPT_REVISION
 ARG         _LICENSE=$IMGCRYPT_LICENSE
@@ -416,7 +392,8 @@ FROM        --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-b
 ARG         BUILDG_VERSION
 ARG         BUILDG_REVISION
 ARG         BUILDG_LICENSE
-ARG         _REPO=github.com/ktock/buildg
+ARG         BUILDG_REPO
+ARG         _REPO=$BUILDG_REPO
 ARG         _VERSION=$BUILDG_VERSION
 ARG         _REVISION=$BUILDG_REVISION
 ARG         _LICENSE=$BUILDG_LICENSE
@@ -433,7 +410,8 @@ FROM        --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-r
 ARG         ROOTLESSKIT_VERSION
 ARG         ROOTLESSKIT_REVISION
 ARG         ROOTLESSKIT_LICENSE
-ARG         _REPO=github.com/rootless-containers/rootlesskit
+ARG         ROOTLESSKIT_REPO
+ARG         _REPO=$ROOTLESSKIT_REPO
 ARG         _VERSION=$ROOTLESSKIT_VERSION
 ARG         _REVISION=$ROOTLESSKIT_REVISION
 ARG         _LICENSE=$ROOTLESSKIT_LICENSE
@@ -450,7 +428,8 @@ FROM        --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-c
 ARG         COSIGN_VERSION
 ARG         COSIGN_REVISION
 ARG         COSIGN_LICENSE
-ARG         _REPO=github.com/sigstore/cosign
+ARG         COSIGN_REPO
+ARG         _REPO=$COSIGN_REPO
 ARG         _VERSION=$COSIGN_VERSION
 ARG         _REVISION=$COSIGN_REVISION
 ARG         _LICENSE=$COSIGN_LICENSE
@@ -467,7 +446,8 @@ FROM        --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-s
 ARG         SOCI_SNAPSHOTTER_VERSION
 ARG         SOCI_SNAPSHOTTER_REVISION
 ARG         SOCI_SNAPSHOTTER_LICENSE
-ARG         _REPO=github.com/awslabs/soci-snapshotter
+ARG         SOCI_SNAPSHOTTER_REPO
+ARG         _REPO=$SOCI_SNAPSHOTTER_REPO
 ARG         _VERSION=$SOCI_SNAPSHOTTER_VERSION
 ARG         _REVISION=$SOCI_SNAPSHOTTER_REVISION
 ARG         _LICENSE=$SOCI_SNAPSHOTTER_LICENSE
@@ -484,7 +464,8 @@ FROM        --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-t
 ARG         TINI_VERSION
 ARG         TINI_REVISION
 ARG         TINI_LICENSE
-ARG         _REPO=github.com/krallin/tini
+ARG         TINI_REPO
+ARG         _REPO=$TINI_REPO
 ARG         _VERSION=$TINI_VERSION
 ARG         _REVISION=$TINI_REVISION
 ARG         _LICENSE=$TINI_LICENSE
@@ -500,7 +481,8 @@ FROM        --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-l
 ARG         LIBSLIRP_VERSION
 ARG         LIBSLIRP_REVISION
 ARG         LIBSLIRP_LICENSE
-ARG         _REPO=gitlab.freedesktop.org/slirp/libslirp
+ARG         LIBSLIRP_REPO
+ARG         _REPO=$LIBSLIRP_REPO
 ARG         _VERSION=$LIBSLIRP_VERSION
 ARG         _REVISION=$LIBSLIRP_REVISION
 ARG         _LICENSE=$LIBSLIRP_LICENSE
@@ -515,7 +497,8 @@ FROM        --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-s
 ARG         SLIRP4NETNS_VERSION
 ARG         SLIRP4NETNS_REVISION
 ARG         SLIRP4NETNS_LICENSE
-ARG         _REPO=github.com/rootless-containers/slirp4netns
+ARG         SLIRP4NETNS_REPO
+ARG         _REPO=$SLIRP4NETNS_REPO
 ARG         _VERSION=$SLIRP4NETNS_VERSION
 ARG         _REVISION=$SLIRP4NETNS_REVISION
 ARG         _LICENSE=$SLIRP4NETNS_LICENSE
@@ -895,6 +878,45 @@ RUN         --mount=target=/src,type=cache,from=assembly-release,source=/ \
             (cd /src && find ! -type d | sort | xargs sha256sum > /out/SHA256SUMS ) && \
             chown -R 0:0 /out
 
+
+
+
+#           tooling-runtime is the base stage that is used to build demo and testing images
+#           Note that unlike every other tooling- stage, this is a multi-architecture stage
+FROM        $UBUNTU_IMAGE:$UBUNTU_VERSION AS tooling-runtime
+SHELL       ["/bin/bash", "-o", "errexit", "-o", "errtrace", "-o", "functrace", "-o", "nounset", "-o", "pipefail", "-c"]
+ENV         DEBIAN_FRONTEND="noninteractive"
+ENV         TERM="xterm"
+ENV         LANG="C.UTF-8"
+ENV         LC_ALL="C.UTF-8"
+ENV         TZ="America/Los_Angeles"
+RUN         echo "force-unsafe-io" > /etc/dpkg/dpkg.cfg.d/farcloser-speedup && \
+            echo 'Acquire::Languages "none";' > /etc/apt/apt.conf.d/farcloser-no-language && \
+            echo 'Acquire::GzipIndexes "true";' > /etc/apt/apt.conf.d/farcloser-gzip-indexes && \
+            apt-get update -qq >/dev/null && \
+            apt-get install -qq --no-install-recommends \
+                ca-certificates \
+                apparmor \
+                bash-completion \
+                iptables \
+                iproute2 \
+                dbus dbus-user-session systemd systemd-sysv \
+                curl \
+                fuse3 \
+                uidmap \
+                openssh-server \
+                openssh-client \
+                    >/dev/null
+ARG         BINARY_NAME
+COPY        Dockerfile.d/systemd/entrypoint.service /etc/systemd/system/
+COPY        Dockerfile.d/systemd/entrypoint.target /etc/systemd/system/
+COPY        Dockerfile.d/systemd/entrypoint.sh /entrypoint.sh
+RUN         systemctl mask systemd-firstboot.service systemd-udevd.service systemd-modules-load.service && \
+            systemctl unmask systemd-logind && \
+            systemctl enable entrypoint.service
+ENTRYPOINT  ["/entrypoint.sh"]
+CMD         ["bash", "--login", "-i"]
+
 # assembly-runtime is the basis for the test integration environment
 # this stage purposedly does NOT depend on the cli, so, it should be highly cacheable
 FROM        tooling-runtime AS assembly-runtime
@@ -907,9 +929,6 @@ RUN         apt-get install -qq --no-install-recommends \
                 expect \
                 git \
                 make \
-                uidmap \
-                openssh-server \
-                openssh-client \
                     >/dev/null
 # Add all needed dependencies, but not the cli yet to avoid busting cache
 COPY        --from=dependencies-build-containerd /out /usr/local
@@ -942,9 +961,11 @@ RUN         mkdir -p -m 0755 /etc/cni
 # Add go
 ENV         PATH="/root/go/bin:/usr/local/go/bin:$PATH"
 COPY        --from=tooling-downloader-golang /out/usr/local/$TARGETPLATFORM /usr/local
+ENV         CGO_ENABLED=0
+ENV         GOFIPS140=v1.0.0
+ENV         GOTOOLCHAIN=local
 VOLUME      /var/lib/containerd
 VOLUME      /var/lib/buildkit
-VOLUME      /var/lib/containerd-stargz-grpc
 VOLUME      /var/lib/"$BINARY_NAME"
 VOLUME      /tmp
 
@@ -953,11 +974,11 @@ WORKDIR     /src
 # Copy config and service files
 COPY        ./Dockerfile.d/etc_containerd_config.toml /etc/containerd/config.toml
 COPY        ./Dockerfile.d/etc_buildkit_buildkitd.toml /etc/buildkit/buildkitd.toml
-COPY        ./Dockerfile.d/test-integration-buildkit-test.service /usr/local/lib/systemd/system/
-COPY        ./Dockerfile.d/test-integration-soci-snapshotter.service /usr/local/lib/systemd/system/
+COPY        ./Dockerfile.d/systemd/test-integration-buildkit-test.service /usr/local/lib/systemd/system/
+COPY        ./Dockerfile.d/systemd/test-integration-soci-snapshotter.service /usr/local/lib/systemd/system/
 # using test integration containerd config
 COPY        ./Dockerfile.d/test-integration-etc_containerd_config.toml /etc/containerd/config.toml
-RUN         perl -pi -e 's/multi-user.target/docker-entrypoint.target/g' /usr/local/lib/systemd/system/*.service
+RUN         perl -pi -e 's/multi-user.target/entrypoint.target/g' /usr/local/lib/systemd/system/*.service
 # install ipfs service. avoid using 5001(api)/8080(gateway) which are reserved by tests.
 RUN         systemctl enable \
                 containerd  \
@@ -978,6 +999,13 @@ FROM        assembly-release AS release-full
 ARG         BINARY_NAME
 # Stuff in the shasums
 COPY        --from=assembly-shasum /out/SHA256SUMS /share/doc/"$BINARY_NAME"-full/SHA256SUMS
+
+# release-demo
+FROM        tooling-runtime AS release-demo
+COPY        --from=release-full / /usr/local
+# Install shell completion
+RUN         mkdir -p /etc/bash_completion.d && \
+            "$BINARY_NAME" completion bash >/etc/bash_completion.d/"$BINARY_NAME"
 
 # test-integration is the final stage for the integration testing environment
 # it is multi-architecture, and not fully cacheable, as changing anything in the cli will invalidate cache here
@@ -1029,7 +1057,7 @@ RUN         apt-get install -qq --no-install-recommends \
                 devscripts \
                     >/dev/null
 
-COPY        ./hack/sanity.sh /
+COPY        ./Dockerfile.d/helpers/sanity.sh /
 
 # All binaries are expected to be static and to run
 ARG         STATIC=true
