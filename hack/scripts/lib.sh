@@ -219,7 +219,7 @@ github::request(){
 
 github::tags::latest(){
   local repo="$1"
-  github::request "repos/$repo/tags" | jq -rc .[0].name
+  github::request "repos/$repo/tags" | jq -rc .[0]
 }
 
 github::releases(){
