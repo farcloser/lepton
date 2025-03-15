@@ -24,7 +24,7 @@ jobs:
       matrix:
         include:
           - runner: ${{ needs.env.outputs.RUNNER_LINUX_AMD64_STABLE }}
-#          - runner: ${{ needs.env.outputs.RUNNER_LINUX_ARM64_STABLE }}
+          - runner: ${{ needs.env.outputs.RUNNER_LINUX_ARM64_STABLE }}
     steps:
       - name: "Clone"
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
@@ -32,21 +32,47 @@ jobs:
         uses: ./.github/actions/install-buildkit
       - name: "Build base dependencies for all targets"
         run: |
-          # FIXME: rid docker
-          sudo docker run --net none --privileged --rm tonistiigi/binfmt --install linux/arm64 || true
-          # This is building both arm and amd versions of the base dependencies (assembly-integration)
-          # IMPORTANT: currently, you cannot run a non-native go with qemu as of 2025-03.
-          # For that reason, the next stages down there cannot be pinned to the same BUILDPLATFORM, and all builds
-          # have to be done here.
-          # This will introduce significant cache churn, but there is no other choice.
           sudo -E buildctl build \
-            --opt platform=linux/amd64,linux/arm64 \
             --frontend=dockerfile.v0 \
-            --import-cache="type=gha,scope=build-i9n" \
-            --export-cache="type=gha,scope=build-i9n,compression=zstd,mode=max" \
+            --import-cache="type=gha,scope=build-i9n-${{ matrix.runner }}" \
+            --export-cache="type=gha,scope=build-i9n-${{ matrix.runner }},compression=zstd,mode=max" \
             --opt target="test-integration" \
             --local dockerfile=$(pwd) \
             --local context=$(pwd)
+
+#  build-dependencies:
+#    needs: env
+#    timeout-minutes: ${{ fromJSON(needs.env.outputs.TIMEOUT_LONG) }}
+#    name: dependencies
+#    runs-on: ${{ matrix.runner }}
+#    strategy:
+#      fail-fast: false
+#      matrix:
+#        include:
+#          - runner: ${{ needs.env.outputs.RUNNER_LINUX_AMD64_STABLE }}
+##          - runner: ${{ needs.env.outputs.RUNNER_LINUX_ARM64_STABLE }}
+#    steps:
+#      - name: "Clone"
+#        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+#      - name: "Buildkit"
+#        uses: ./.github/actions/install-buildkit
+#      - name: "Build base dependencies for all targets"
+#        run: |
+#          # FIXME: rid docker
+#          sudo docker run --net none --privileged --rm tonistiigi/binfmt --install linux/arm64 || true
+#          # This is building both arm and amd versions of the base dependencies (assembly-integration)
+#          # IMPORTANT: currently, you cannot run a non-native go with qemu as of 2025-03.
+#          # For that reason, the next stages down there cannot be pinned to the same BUILDPLATFORM, and all builds
+#          # have to be done here.
+#          # This will introduce significant cache churn, but there is no other choice.
+#          sudo -E buildctl build \
+#            --opt platform=linux/amd64,linux/arm64 \
+#            --frontend=dockerfile.v0 \
+#            --import-cache="type=gha,scope=build-i9n" \
+#            --export-cache="type=gha,scope=build-i9n,compression=zstd,mode=max" \
+#            --opt target="test-integration" \
+#            --local dockerfile=$(pwd) \
+#            --local context=$(pwd)
 
   test-integration:
     needs:
@@ -75,11 +101,11 @@ jobs:
           sudo docker run --net none --privileged --rm tonistiigi/binfmt --install linux/arm64 || true
           sudo docker run --net none --privileged --rm tonistiigi/binfmt --install linux/amd64 || true
           # Because of how buildkit cache works, force the same buildplatform as the build stage
+          #  --opt build-arg:BUILDPLATFORM=linux/amd64 \
           time sudo -E buildctl build \
-            --opt build-arg:BUILDPLATFORM=linux/amd64 \
             --opt platform=$ACTION_NODE_OS/$ACTION_NODE_ARCH \
             --frontend=dockerfile.v0 \
-            --import-cache="type=gha,scope=build-i9n" \
+            --import-cache="type=gha,scope=build-i9n-${{ matrix.runner }}" \
             --output=type=image,name=test-integration \
             --opt target="test-integration" \
             --local dockerfile=$(pwd) \
