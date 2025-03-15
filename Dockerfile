@@ -15,36 +15,89 @@
 # -----------------------------------------------------------------------------
 # Usage: `docker run -it --privileged <IMAGE>`. Make sure to add `-t` and `--privileged`.
 
-# TODO: verify commit hash
+ARG LICENSE_APACHE_V2="Apache License, version 2.0, https://opensource.org/license/apache-2-0"
+ARG LICENSE_MIT="The MIT License, https://opensource.org/license/mit"
+ARG LICENSE_3CLAUSES_BSD="The 3-Clause BSD License, https://opensource.org/license/bsd-3-clause"
+ARG LICENSE_GPL_V2="GNU General Public License version 2, https://opensource.org/license/gpl-2-0"
+# TODO: inform libseccomp license
+ARG LICENSE_LGPL_V21="GNU Lesser General Public License version 2.1, https://opensource.org/license/lgpl-2-1"
 
 ARG BINARY_NAME=lepton
+ARG BINARY_LICENSE="$LICENSE_APACHE_V2"
 
 # Basic deps
 ARG CONTAINERD_VERSION=v2.0.3
-ARG RUNC_VERSION=v1.2.5
-ARG CNI_PLUGINS_VERSION=v1.6.2
+ARG CONTAINERD_REVISION=06b99ca80cdbfbc6cc8bd567021738c9af2b36ce
+ARG CONTAINERD_LICENSE="$LICENSE_APACHE_V2"
 
-# Extra dependencies
+ARG RUNC_VERSION=v1.2.5
+ARG RUNC_REVISION=59923ef18c98053ddb1acf23ecba10344056c28e
+ARG RUNC_LICENSE="$LICENSE_APACHE_V2"
+
+ARG CNI_PLUGINS_VERSION=v1.6.2
+ARG CNI_PLUGINS_REVISION=7f756b411efc3d3730c707e2cc1f2baf1a66e28c
+ARG CNI_PLUGINS_LICENSE="$LICENSE_APACHE_V2"
+
 # - Build
 ARG BUILDKIT_VERSION=v0.19.0
+ARG BUILDKIT_REVISION=3637d1b15a13fc3cdd0c16fcf3be0845ae68f53d
+ARG BUILDKIT_LICENSE="$LICENSE_APACHE_V2"
+
 # - Encryption
 ARG IMGCRYPT_VERSION=v2.0.0
+ARG IMGCRYPT_REVISION=1e301ef2620964bedfa68ee4b841ff80f4887736
+ARG IMGCRYPT_LICENSE="$LICENSE_APACHE_V2"
+
+# - Signing
+ARG COSIGN_VERSION=v2.4.3
+ARG COSIGN_REVISION=6a7abbf3ae7eb6949883a80c8f6007cc065d2dfb
+ARG COSIGN_LICENSE="$LICENSE_APACHE_V2"
+
 # - Rootless
 ARG ROOTLESSKIT_VERSION=v2.3.2
+ARG ROOTLESSKIT_REVISION=b8175e1f0b3987b9e2bd04e373f63b0ba0aa17c9
+ARG ROOTLESSKIT_LICENSE="$LICENSE_APACHE_V2"
+
+# - Rootless: network
+ARG LIBSLIRP_VERSION=v4.9.0
+ARG LIBSLIRP_REVISION=c32a8a1ccaae8490142e67e078336a95c5ffc956
+ARG LIBSLIRP_LICENSE="$LICENSE_3CLAUSES_BSD"
+
 ARG SLIRP4NETNS_VERSION=v1.3.1
-# - bypass4netns
+ARG SLIRP4NETNS_REVISION=e5e368c4f5db6ae75c2fce786e31eef9da6bf236
+ARG SLIRP4NETNS_LICENSE="$LICENSE_GPL_V2"
+
+# - Rootless: network speed-up
 ARG BYPASS4NETNS_VERSION=v0.4.2
-# - Init
-ARG TINI_VERSION=v0.19.0
+ARG BYPASS4NETNS_REVISION=aa04bd3dcc48c6dae6d7327ba219bda8fe2a4634
+ARG BYPASS4NETNS_LICENSE="$LICENSE_APACHE_V2"
+
 # - Debug
 ARG BUILDG_VERSION=v0.4.1
+ARG BUILDG_REVISION=8dd12a26f4ab05ad20f3fe9811fb42aff6bf472a
+ARG BUILDG_LICENSE="$LICENSE_APACHE_V2"
+
+# - Lazy snapshotter
+ARG SOCI_SNAPSHOTTER_VERSION=v0.8.0
+ARG SOCI_SNAPSHOTTER_REVISION=7255bcbc3eafb622faadfeb2709d442afc4878cd
+ARG SOCI_LICENSE="$LICENSE_APACHE_V2"
+
+# - Init
+ARG TINI_VERSION=v0.19.0
+ARG TINI_REVISION=de40ad007797e0dcd8b7126f27bb87401d224240
+ARG TINI_LICENSE="$LICENSE_MIT"
 
 # Test and demo dependencies
 ARG UBUNTU_VERSION=24.04
-ARG SOCI_SNAPSHOTTER_VERSION=0.8.0
 
 # Tooling versions
-ARG DEBIAN_VERSION=bookworm
+ARG DEBIAN_VERSION=bookworm-slim
+ARG GOFIPS140=v1.0.0
+ARG LIBC="libc6-dev gcc binutils"
+# XXX experimenting with musl. Likely pkcs11 linkage requires glibc.
+#ARG GCC=gnu-gcc
+#ARG LIBC="musl-dev musl-tools"
+#ARG GCC=musl-gcc
 ARG XX_VERSION=1.6.1
 ARG GO_VERSION=1.24.0
 ARG CONTAINERIZED_SYSTEMD_VERSION=v0.1.1
@@ -61,14 +114,15 @@ ARG CONTAINERIZED_SYSTEMD_VERSION=v0.1.1
 # tooling-base is the single base image we use for all other tooling image
 FROM --platform=$BUILDPLATFORM ghcr.io/apostasie/debian:$DEBIAN_VERSION AS tooling-base
 SHELL ["/bin/bash", "-o", "errexit", "-o", "errtrace", "-o", "functrace", "-o", "nounset", "-o", "pipefail", "-c"]
+ARG BINARY_NAME
 ENV DEBIAN_FRONTEND="noninteractive"
 ENV TERM="xterm"
 ENV LANG="C.UTF-8"
 ENV LC_ALL="C.UTF-8"
 ENV TZ="America/Los_Angeles"
-ARG BINARY_NAME
-RUN apt-get update -qq >/dev/null && apt-get install -qq --no-install-recommends \
-  ca-certificates >/dev/null
+RUN apt-get update -qq >/dev/null && \
+    apt-get install -qq --no-install-recommends \
+      ca-certificates >/dev/null
 
 # xx provides tooling to ease cross-compilation
 FROM --platform=$BUILDPLATFORM ghcr.io/apostasie/xx:$XX_VERSION AS tooling-xx
@@ -83,8 +137,8 @@ RUN mkdir -p /out/bin
 RUN mkdir -p /metadata
 # Get curl and jq
 RUN apt-get install -qq --no-install-recommends \
-  curl \
-  jq >/dev/null
+      curl \
+      jq >/dev/null
 
 # tooling-downloader-golang will download a golang archive and expand it into /out/usr/local
 # You may set GO_VERSION to an explicit, complete version (eg: 1.23.0), or you can also set it to:
@@ -128,9 +182,10 @@ RUN os=linux; \
 
 # tooling-builder is a go enabled stage with minimal build tooling installed that can be used to build non-cgo projects
 FROM --platform=$BUILDPLATFORM tooling-base AS tooling-builder
+ARG BUILDPLATFORM
+ARG GOFIPS140
 # We do not want fancy display when building
 ENV NO_COLOR=true
-ARG BUILDPLATFORM
 WORKDIR /src
 RUN mkdir -p /out/bin
 RUN mkdir -p /metadata
@@ -138,6 +193,7 @@ RUN mkdir -p /metadata
 RUN apt-get install -qq --no-install-recommends \
   git \
   make \
+  cmake \
   libmagic-mgc libmagic1 file >/dev/null
 # Prevent git from complaining on detached head
 RUN git config --global advice.detachedHead false
@@ -148,40 +204,88 @@ ENV PATH="/root/go/bin:/usr/local/go/bin:$PATH"
 COPY --from=tooling-downloader-golang /out/usr/local/$BUILDPLATFORM /usr/local
 # Disable CGO
 ENV CGO_ENABLED=0
+ENV GOFLAGS="-trimpath"
 # Set xx-go as go
 ENV GO=xx-go
+ENV GOTOOLCHAIN=local
 
 # tooling-builder-with-c-dependencies is an expansion of the previous stages that adds extra c dependencies.
 # It is meant for (cross-compilation of) c and cgo projects.
-FROM --platform=$BUILDPLATFORM tooling-builder AS tooling-builder-with-c-dependencies
-ARG TARGETARCH
-# libbtrfs: for containerd
-# libseccomp: for runc and bypass4netns
-RUN xx-apt-get install -qq --no-install-recommends \
-  binutils \
-  gcc \
-  dpkg-dev \
-  libc6-dev \
-  libbtrfs-dev \
-  libseccomp-dev \
-  pkg-config >/dev/null
+FROM --platform=$BUILDPLATFORM tooling-builder AS tooling-builder-with-c-dependencies-base
+# libseccomp: runc, bypass4netns, slirp4netns
+# zlib1g-dev: for soci
+RUN apt-get install -qq --no-install-recommends \
+      dpkg-cross >/dev/null
+## https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html
+ENV WARNING_OPTIONS="-Wall -Werror=format-security"
+## https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html#Optimize-Options
+ENV OPTIMIZATION_OPTIONS="-O2"
+## https://gcc.gnu.org/onlinedocs/gcc/Debugging-Options.html#Debugging-Options
+ENV DEBUGGING_OPTIONS="-grecord-gcc-switches -g"
+## https://gcc.gnu.org/onlinedocs/gcc/Preprocessor-Options.html#Preprocessor-Options
+# https://www.gnu.org/software/libc/manual/html_node/Source-Fortification.html
+ENV SECURITY_OPTIONS="-fstack-protector-strong -fstack-clash-protection -fPIE -D_FORTIFY_SOURCE=2 -D_GLIBCXX_ASSERTIONS"
+## Control flow integrity is amd64 only
+# -mcet -fcf-protection
+## https://gcc.gnu.org/onlinedocs/gcc/Link-Options.html#Link-Options
+ENV LDFLAGS_COMMON="-Wl,-z,relro -Wl,-z,now -Wl,-z,defs -Wl,-z,noexecstack"
+ENV LDFLAGS_NOPIE="$LDFLAGS_COMMON -static"
+ENV LDFLAGS_PIE="$LDFLAGS_COMMON -pie -static-pie"
+ENV LDFLAGS="$LDFLAGS_PIE"
+# -s strips symbol and relocation info
+# -pipe gives a little speed-up by using pipes instead of temp files
+ENV CFLAGS="$WARNING_OPTIONS $OPTIMIZATION_OPTIONS $DEBUGGING_OPTIONS $SECURITY_OPTIONS -s -pipe"
+ENV CPPFLAGS="-D_FORTIFY_SOURCE=2 -D_GLIBCXX_ASSERTIONS"
+ENV CXXFLAGS="$WARNING_OPTIONS $OPTIMIZATION_OPTIONS $DEBUGGING_OPTIONS $SECURITY_OPTIONS -s -pipe"
+ENV CGO_CFLAGS="$CFLAGS"
+ENV CGO_CPPFLAGS="$CPPFLAGS"
+ENV CGO_CXXFLAGS="$CXXFLAGS"
+ENV CGO_CPPFLAGS="$CPPFLAGS"
+ENV CGO_LDFLAGS="$LDFLAGS"
+# More reading:
+## https://news.ycombinator.com/item?id=18874113
+## https://developers.redhat.com/blog/2018/03/21/compiler-and-linker-flags-gcc
+## https://gcc.gnu.org/onlinedocs/gcc/Instrumentation-Options.html
+# https://github.com/golang/go/issues/26849
+ENV GOFLAGS_COMMON="$GOFLAGS -ldflags=-linkmode=external -tags=cgo,netgo,osusergo,static_build"
+ENV GOFLAGS_NOPIE="$GOFLAGS_COMMON"
+ENV GOFLAGS_PIE="$GOFLAGS_COMMON -buildmode=pie"
 # Set default linker options for CGO projects
-ENV GOFLAGS="$GOFLAGS -ldflags=-linkmode=external -tags=netgo,osusergo"
+ENV GOFLAGS="$GOFLAGS_PIE"
+# TODO: -s -w - extldflags -static-pie and -static? GOFIPS140?
 # Enable CGO
 ENV CGO_ENABLED=1
+
+FROM --platform=$BUILDPLATFORM tooling-builder-with-c-dependencies-base AS tooling-builder-with-c-dependencies
+ARG TARGETARCH
+ARG TARGETVARIANT
+ARG LIBC
+ARG GCC
+RUN xx-apt-get install -qq --no-install-recommends \
+          dpkg-dev \
+          $LIBC \
+          libseccomp-dev \
+          pkg-config >/dev/null
+RUN eval "$(dpkg-architecture -A "$(echo "$TARGETARCH$TARGETVARIANT" | sed -e "s/^armv6$/armel/" -e "s/^armv7$/armhf/" -e "s/^ppc64le$/ppc64el/" -e "s/^386$/i386/")")"; \
+    echo "export PKG_CONFIG="$DEB_TARGET_GNU_TYPE"-pkg-config" >> /.env; \
+    echo "export AR="$DEB_TARGET_GNU_TYPE"-ar" >> /.env; \
+    echo "export CC="$DEB_TARGET_GNU_TYPE"-gcc" >> /.env; \
+    echo "export CXX="$DEB_TARGET_GNU_TYPE"-g++" >> /.env; \
+    echo "export STRIP="$DEB_TARGET_GNU_TYPE"-strip" >> /.env
 
 # tooling-runtime is the base stage that is used to build demo and testing images
 # Note that unlike every other tooling- stage, this is a multi-architecture stage
 FROM ghcr.io/apostasie/ubuntu:${UBUNTU_VERSION} AS tooling-runtime
 SHELL ["/bin/bash", "-o", "errexit", "-o", "errtrace", "-o", "functrace", "-o", "nounset", "-o", "pipefail", "-c"]
+ARG GOFIPS140
+ARG BINARY_NAME
 ENV DEBIAN_FRONTEND="noninteractive"
 ENV TERM="xterm"
 ENV LANG="C.UTF-8"
 ENV LC_ALL="C.UTF-8"
 ENV TZ="America/Los_Angeles"
-ARG BINARY_NAME
 # fuse3 is required by stargz snapshotter
-RUN apt-get update -qq && apt-get install -qq --no-install-recommends \
+RUN apt-get update -qq >/dev/null && apt-get install -qq --no-install-recommends \
   ca-certificates \
   apparmor \
   bash-completion \
@@ -202,19 +306,252 @@ ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["bash", "--login", "-i"]
 
 ########################################################################################################################
-# Dependencies targets
-# These stages are downloading and building all projects, using the base tooling stages from above
-# Note that:
+# Downloading sources
+# These stages are downloading all projects, using the base tooling stage from above
+# Note:
 # - clone are restricted to the exact tag and depth 1 to reduce overall clone traffic
-# - clones (and where appropriate go mod download) are in separate single stages so that we clone only ONCE
-# - clones checkouts are then mounted into the build stage, so that we avoid creating useless copy layers
-# - clone sources are mounted `locked` to avoid conflicts between parallel cross compilations using the same src
-# (`locked` comes at a price, as parallel cross compilation build will be sequential, but it beats `private` in term
-# of performance)
-# - on build, GOPROXY is set to `off` to ensure we did perform any network operation properly during the download phase
-# - mod downloads are using a shared cache so that dependencies shared accross projects are not duplicated
+# - clones (and vendorization) are in separate single stages so that we do that only ONCE when targetting multiple archs
+# - clones checkouts are then mounted into the build stage to avoid creating useless copy layers
+# - mod downloads are using a shared cache when vendorizing (if necessary) so that dependencies shared accross projects
+# are not retrieved too many times
 ########################################################################################################################
 
+########################################################################################################################
+# containerd (vendored)
+########################################################################################################################
+FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-containerd
+ARG CONTAINERD_VERSION
+ARG CONTAINERD_REVISION
+ARG CONTAINERD_LICENSE
+ARG _REPO=github.com/containerd/containerd
+ARG _VERSION=$CONTAINERD_VERSION
+ARG _REVISION=$CONTAINERD_REVISION
+ARG _LICENSE=$CONTAINERD_LICENSE
+RUN echo "$_VERSION" > /metadata/VERSION && echo "$_REVISION" > /metadata/REVISION && echo "$_LICENSE" > /metadata/LICENSE && \
+    git clone --quiet --depth 1 --branch "$_VERSION" https://"$_REPO".git . && \
+    [ "$_REVISION" == "$(git rev-parse HEAD)" ] || { echo "ERROR: commit hash $(git rev-parse HEAD) does not match expectations $_REVISION"; exit 42; }
+
+########################################################################################################################
+# runc (vendored)
+########################################################################################################################
+FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-runc
+ARG RUNC_VERSION
+ARG RUNC_REVISION
+ARG RUNC_LICENSE
+ARG _REPO=github.com/opencontainers/runc
+ARG _VERSION=$RUNC_VERSION
+ARG _REVISION=$RUNC_REVISION
+ARG _LICENSE=$RUNC_LICENSE
+RUN echo "$_VERSION" > /metadata/VERSION && echo "$_REVISION" > /metadata/REVISION && echo "$_LICENSE" > /metadata/LICENSE && \
+    git clone --quiet --depth 1 --branch "$_VERSION" https://"$_REPO".git . && \
+    [ "$_REVISION" == "$(git rev-parse HEAD)" ] || { echo "ERROR: commit hash $(git rev-parse HEAD) does not match expectations $_REVISION"; exit 42; }
+
+########################################################################################################################
+# buildkit (vendored)
+########################################################################################################################
+FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-buildkit
+ARG BUILDKIT_VERSION
+ARG BUILDKIT_REVISION
+ARG BUILDKIT_LICENSE
+ARG _REPO=github.com/moby/buildkit
+ARG _VERSION=$BUILDKIT_VERSION
+ARG _REVISION=$BUILDKIT_REVISION
+ARG _LICENSE=$BUILDKIT_LICENSE
+RUN echo "$_VERSION" > /metadata/VERSION && echo "$_REVISION" > /metadata/REVISION && echo "$_LICENSE" > /metadata/LICENSE && \
+    git clone --quiet --depth 1 --branch "$_VERSION" https://"$_REPO".git . && \
+    [ "$_REVISION" == "$(git rev-parse HEAD)" ] || { echo "ERROR: commit hash $(git rev-parse HEAD) does not match expectations $_REVISION"; exit 42; }
+
+########################################################################################################################
+# cni-plugins (vendored)
+########################################################################################################################
+FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-cni
+ARG CNI_PLUGINS_VERSION
+ARG CNI_PLUGINS_REVISION
+ARG CNI_PLUGINS_LICENSE
+ARG _REPO=github.com/containernetworking/plugins
+ARG _VERSION=$CNI_PLUGINS_VERSION
+ARG _REVISION=$CNI_PLUGINS_REVISION
+ARG _LICENSE=$CNI_PLUGINS_LICENSE
+RUN echo "$_VERSION" > /metadata/VERSION && echo "$_REVISION" > /metadata/REVISION && echo "$_LICENSE" > /metadata/LICENSE && \
+    git clone --quiet --depth 1 --branch "$_VERSION" https://"$_REPO".git . && \
+    [ "$_REVISION" == "$(git rev-parse HEAD)" ] || { echo "ERROR: commit hash $(git rev-parse HEAD) does not match expectations $_REVISION"; exit 42; }
+
+########################################################################################################################
+# bypass4netns
+########################################################################################################################
+FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-bypass4netns
+ARG BYPASS4NETNS_VERSION
+ARG BYPASS4NETNS_REVISION
+ARG BYPASS4NETNS_LICENSE
+ARG _REPO=github.com/rootless-containers/bypass4netns
+ARG _VERSION=$BYPASS4NETNS_VERSION
+ARG _REVISION=$BYPASS4NETNS_REVISION
+ARG _LICENSE=$BYPASS4NETNS_LICENSE
+RUN --mount=target=/root/go/pkg/mod,type=cache \
+    echo "$_VERSION" > /metadata/VERSION && echo "$_REVISION" > /metadata/REVISION && echo "$_LICENSE" > /metadata/LICENSE && \
+    git clone --quiet --depth 1 --branch "$_VERSION" https://"$_REPO".git .  && go mod vendor && \
+    [ "$_REVISION" == "$(git rev-parse HEAD)" ] || { echo "ERROR: commit hash $(git rev-parse HEAD) does not match expectations $_REVISION"; exit 42; }
+
+########################################################################################################################
+# imgcrypt
+########################################################################################################################
+FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-imgcrypt
+ARG IMGCRYPT_VERSION
+ARG IMGCRYPT_REVISION
+ARG IMGCRYPT_LICENSE
+ARG _REPO=github.com/containerd/imgcrypt
+ARG _VERSION=$IMGCRYPT_VERSION
+ARG _REVISION=$IMGCRYPT_REVISION
+ARG _LICENSE=$IMGCRYPT_LICENSE
+RUN --mount=target=/root/go/pkg/mod,type=cache \
+    echo "$_VERSION" > /metadata/VERSION && echo "$_REVISION" > /metadata/REVISION && echo "$_LICENSE" > /metadata/LICENSE && \
+    git clone --quiet --depth 1 --branch "$_VERSION" https://"$_REPO".git .  && go mod vendor && cd cmd && go mod vendor && \
+    [ "$_REVISION" == "$(git rev-parse HEAD)" ] || { echo "ERROR: commit hash $(git rev-parse HEAD) does not match expectations $_REVISION"; exit 42; }
+
+########################################################################################################################
+# buildg
+########################################################################################################################
+FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-buildg
+ARG BUILDG_VERSION
+ARG BUILDG_REVISION
+ARG BUILDG_LICENSE
+ARG _REPO=github.com/ktock/buildg
+ARG _VERSION=$BUILDG_VERSION
+ARG _REVISION=$BUILDG_REVISION
+ARG _LICENSE=$BUILDG_LICENSE
+RUN --mount=target=/root/go/pkg/mod,type=cache \
+    echo "$_VERSION" > /metadata/VERSION && echo "$_REVISION" > /metadata/REVISION && echo "$_LICENSE" > /metadata/LICENSE && \
+    git clone --quiet --depth 1 --branch "$_VERSION" https://"$_REPO".git .  && go mod vendor && \
+    [ "$_REVISION" == "$(git rev-parse HEAD)" ] || { echo "ERROR: commit hash $(git rev-parse HEAD) does not match expectations $_REVISION"; exit 42; }
+
+########################################################################################################################
+# rootlesskit
+########################################################################################################################
+FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-rootlesskit
+ARG ROOTLESSKIT_VERSION
+ARG ROOTLESSKIT_REVISION
+ARG ROOTLESSKIT_LICENSE
+ARG _REPO=github.com/rootless-containers/rootlesskit
+ARG _VERSION=$ROOTLESSKIT_VERSION
+ARG _REVISION=$ROOTLESSKIT_REVISION
+ARG _LICENSE=$ROOTLESSKIT_LICENSE
+RUN --mount=target=/root/go/pkg/mod,type=cache \
+    echo "$_VERSION" > /metadata/VERSION && echo "$_REVISION" > /metadata/REVISION && echo "$_LICENSE" > /metadata/LICENSE && \
+    git clone --quiet --depth 1 --branch "$_VERSION" https://"$_REPO".git .  && go mod vendor && \
+    [ "$_REVISION" == "$(git rev-parse HEAD)" ] || { echo "ERROR: commit hash $(git rev-parse HEAD) does not match expectations $_REVISION"; exit 42; }
+
+########################################################################################################################
+# cosign
+########################################################################################################################
+FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-cosign
+ARG COSIGN_VERSION
+ARG COSIGN_REVISION
+ARG COSIGN_LICENSE
+ARG _REPO=github.com/sigstore/cosign
+ARG _VERSION=$COSIGN_VERSION
+ARG _REVISION=$COSIGN_REVISION
+ARG _LICENSE=$COSIGN_LICENSE
+RUN --mount=target=/root/go/pkg/mod,type=cache \
+    echo "$_VERSION" > /metadata/VERSION && echo "$_REVISION" > /metadata/REVISION && echo "$_LICENSE" > /metadata/LICENSE && \
+    git clone --quiet --depth 1 --branch "$_VERSION" https://"$_REPO".git .  && go mod vendor && \
+    [ "$_REVISION" == "$(git rev-parse HEAD)" ] || { echo "ERROR: commit hash $(git rev-parse HEAD) does not match expectations $_REVISION"; exit 42; }
+
+########################################################################################################################
+# soci
+########################################################################################################################
+FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-soci
+ARG SOCI_SNAPSHOTTER_VERSION
+ARG SOCI_SNAPSHOTTER_REVISION
+ARG SOCI_SNAPSHOTTER_LICENSE
+ARG _REPO=github.com/awslabs/soci-snapshotter
+ARG _VERSION=$SOCI_SNAPSHOTTER_VERSION
+ARG _REVISION=$SOCI_SNAPSHOTTER_REVISION
+ARG _LICENSE=$SOCI_SNAPSHOTTER_LICENSE
+RUN --mount=target=/root/go/pkg/mod,type=cache \
+    echo "$_VERSION" > /metadata/VERSION && echo "$_REVISION" > /metadata/REVISION && echo "$_LICENSE" > /metadata/LICENSE && \
+    git clone --quiet --depth 1 --branch "$_VERSION" https://"$_REPO".git .  && go mod vendor && cd cmd && go mod vendor && \
+    [ "$_REVISION" == "$(git rev-parse HEAD)" ] || { echo "ERROR: commit hash $(git rev-parse HEAD) does not match expectations $_REVISION"; exit 42; }
+
+########################################################################################################################
+# tini
+########################################################################################################################
+FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-tini
+ARG TINI_VERSION
+ARG TINI_REVISION
+ARG TINI_LICENSE
+ARG _REPO=github.com/krallin/tini
+ARG _VERSION=$TINI_VERSION
+ARG _REVISION=$TINI_REVISION
+ARG _LICENSE=$TINI_LICENSE
+RUN --mount=target=/root/go/pkg/mod,type=cache \
+    echo "$_VERSION" > /metadata/VERSION && echo "$_REVISION" > /metadata/REVISION && echo "$_LICENSE" > /metadata/LICENSE && \
+    git clone --quiet --depth 1 --branch "$_VERSION" https://"$_REPO".git . && \
+    [ "$_REVISION" == "$(git rev-parse HEAD)" ] || { echo "ERROR: commit hash $(git rev-parse HEAD) does not match expectations $_REVISION"; exit 42; }
+
+########################################################################################################################
+# libslirp
+########################################################################################################################
+FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-libslirp
+ARG LIBSLIRP_VERSION
+ARG LIBSLIRP_REVISION
+ARG LIBSLIRP_LICENSE
+ARG _REPO=gitlab.freedesktop.org/slirp/libslirp
+ARG _VERSION=$LIBSLIRP_VERSION
+ARG _REVISION=$LIBSLIRP_REVISION
+ARG _LICENSE=$LIBSLIRP_LICENSE
+RUN echo "$_VERSION" > /metadata/VERSION && echo "$_REVISION" > /metadata/REVISION && echo "$_LICENSE" > /metadata/LICENSE && \
+    git clone --quiet --depth 1 --branch "$_VERSION" https://"$_REPO".git . && \
+    [ "$_REVISION" == "$(git rev-parse HEAD)" ] || { echo "ERROR: commit hash $(git rev-parse HEAD) does not match expectations $_REVISION"; exit 42; }
+
+########################################################################################################################
+# slirp4netns
+########################################################################################################################
+FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-slirp4netns
+ARG SLIRP4NETNS_VERSION
+ARG SLIRP4NETNS_REVISION
+ARG SLIRP4NETNS_LICENSE
+ARG _REPO=github.com/rootless-containers/slirp4netns
+ARG _VERSION=$SLIRP4NETNS_VERSION
+ARG _REVISION=$SLIRP4NETNS_REVISION
+ARG _LICENSE=$SLIRP4NETNS_LICENSE
+RUN --mount=target=/root/go/pkg/mod,type=cache \
+    echo "$_VERSION" > /metadata/VERSION && echo "$_REVISION" > /metadata/REVISION && echo "$_LICENSE" > /metadata/LICENSE && \
+    git clone --quiet --depth 1 --branch "$_VERSION" https://"$_REPO".git . && \
+    [ "$_REVISION" == "$(git rev-parse HEAD)" ] || { echo "ERROR: commit hash $(git rev-parse HEAD) does not match expectations $_REVISION"; exit 42; }
+
+########################################################################################################################
+# cli binary is built from the local context
+########################################################################################################################
+FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-cli
+ARG BINARY_LICENSE
+RUN --mount=target=/root/go/pkg/mod,type=cache \
+    --mount=target=go.mod,source=go.mod,type=bind \
+    --mount=target=go.sum,source=go.sum,type=bind \
+    --mount=target=pkg,source=pkg,type=bind \
+    --mount=target=cmd,source=cmd,type=bind \
+    --mount=target=leptonic,source=leptonic,type=bind \
+    go mod vendor
+# Copy the docs
+COPY docs /out/share/doc/"$BINARY_NAME"/docs
+# CAREFUL: this will fail to retrieve a tag with a shallow clone. So, full-release should better be done with a full history clone for version to be sensical
+RUN --mount=target=/src,type=bind \
+  { printf "%s" "$(git rev-parse HEAD)"; if ! git diff --no-ext-diff --quiet --exit-code; then printf .m; fi; } > /metadata/REVISION && \
+  { git describe --tags --match 'v[0-9]*' --dirty='.m' --always 2>/dev/null || true; } > /metadata/VERSION && \
+  echo "$BINARY_LICENSE" > /metadata/LICENSE
+
+
+########################################################################################################################
+# Building
+# From the source above, source layers are mounted.
+# Note:
+# - we are systematically bypassing native Makefile and other ways to build as:
+#   - most of them do not allow building out of tree (problematic for sharing the layer accross multiple arch)
+#   - they all have different ways to pass additional arguments, and do not enforce the same compiler or linker parameters
+########################################################################################################################
+
+########################################################################################################################
+# containerd
+########################################################################################################################
 # IMPORTANT: containerd is compiled statically so that we avoid having to build for both glibc and musl
 # That comes at a cost:
 # - pkcs11 support is very likely broken, as it relies on dlopen
@@ -227,192 +564,286 @@ CMD ["bash", "--login", "-i"]
 # level operations (that would require netcgo and linking dynamically against *glibc* - musl does not support NSS anyhow)
 # See https://medium.com/@dubo-dubon-duponey/a-beginners-guide-to-cross-compiling-static-cgo-pie-binaries-golang-1-16-792eea92d5aa
 # for the full tartine.
-FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-containerd
-ARG CONTAINERD_VERSION
-# containerd does vendor its deps, no need to mod download
-RUN echo "- containerd: ${CONTAINERD_VERSION}" >> /metadata/VERSION && \
-    touch /run/.lock && \
-    git clone --depth 1 --branch "$CONTAINERD_VERSION" https://github.com/containerd/containerd.git .
 
-# Note that only containerd itself is built with CGO. For ctr and shim, we do not need CGO, so, reset the flags there.
-FROM --platform=$BUILDPLATFORM tooling-builder-with-c-dependencies AS dependencies-build-containerd
+########################################################################################################################
+# containerd shim and ctr
+########################################################################################################################
+FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-build-containerd-tools
 ARG TARGETARCH
-RUN --mount=from=dependencies-download-containerd,type=bind,target=/src,source=/src,rw \
-    --mount=from=dependencies-download-containerd,type=cache,target=/run/.lock,source=/run/.lock,sharing=locked \
-  make bin/containerd STATIC=1 && \
-  GOFLAGS="" CGO_ENABLED=0 make bin/ctr && \
-  GOFLAGS="" CGO_ENABLED=0 make bin/containerd-shim-runc-v2 && \
-  mv containerd.service / && \
-  mv bin/containerd bin/containerd-shim-runc-v2 bin/ctr /out/bin
+ARG GOPROXY=off
+ARG PKG=github.com/containerd/containerd/v2
+RUN --mount=from=dependencies-download-containerd,type=bind,target=/src,source=/src \
+    --mount=from=dependencies-download-containerd,type=bind,target=/metadata,source=/metadata \
+  GOOS=linux GOARCH=$TARGETARCH \
+    go build --mod=vendor \
+      -ldflags "-X $PKG/version.Version=$(cat /metadata/VERSION) -X $PKG/version.Revision=$(cat /metadata/REVISION) -X $PKG/version.Package=$PKG" \
+      -o /out/bin/ctr ./cmd/ctr && \
+  GOOS=linux GOARCH=$TARGETARCH \
+    go build --mod=vendor \
+      -ldflags "-X $PKG/version.Version=$(cat /metadata/VERSION) -X $PKG/version.Revision=$(cat /metadata/REVISION) -X $PKG/version.Package=$PKG" \
+      -o /out/bin/containerd-shim-runc-v2 ./cmd/containerd-shim-runc-v2
 
-FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-runc
-ARG RUNC_VERSION
-# runc does vendor its deps, no need to mod download
-RUN echo "- runc: ${RUNC_VERSION}" >> /metadata/VERSION && \
-    touch /run/.lock && \
-    git clone --depth 1 --branch "$RUNC_VERSION" https://github.com/opencontainers/runc.git .
-
-FROM --platform=$BUILDPLATFORM tooling-builder-with-c-dependencies AS dependencies-build-runc
+########################################################################################################################
+# buildctl and buildkitd
+########################################################################################################################
+FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-build-buildkit
 ARG TARGETARCH
-RUN --mount=from=dependencies-download-runc,type=bind,target=/src,source=/src,rw \
-    --mount=from=dependencies-download-runc,type=cache,target=/run/.lock,source=/run/.lock,sharing=locked \
-  CC=$(xx-info)-gcc STRIP=$(xx-info)-strip make static && \
-  mv runc /out/bin
+ARG GOPROXY=off
+ARG PKG=github.com/moby/buildkit
+RUN --mount=from=dependencies-download-buildkit,type=bind,target=/src,source=/src \
+    --mount=from=dependencies-download-buildkit,type=bind,target=/metadata,source=/metadata \
+  GOOS=linux GOARCH=$TARGETARCH \
+    go build -mod=vendor \
+      -ldflags "-X $PKG/version.Version=$(cat /metadata/VERSION) -X $PKG/version.Revision=$(cat /metadata/REVISION) -X $PKG/version.Package=$PKG" \
+      -o /out/bin/buildctl ./cmd/buildctl && \
+  GOOS=linux GOARCH=$TARGETARCH \
+    go build -mod=vendor \
+      -ldflags "-X $PKG/version.Version=$(cat /metadata/VERSION) -X $PKG/version.Revision=$(cat /metadata/REVISION) -X $PKG/version.Package=$PKG" \
+      -o /out/bin/buildkitd ./cmd/buildkitd
 
-# bypass4netns
-FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-bypass4netns
-ARG BYPASS4NETNS_VERSION
-RUN echo "- bypass4netns: ${BYPASS4NETNS_VERSION}" >> /metadata/VERSION && \
-    touch /run/.lock && \
-    git clone --depth 1 --branch "$BYPASS4NETNS_VERSION" https://github.com/rootless-containers/bypass4netns.git .
-
-FROM --platform=$BUILDPLATFORM tooling-builder-with-c-dependencies AS dependencies-build-bypass4netns
+########################################################################################################################
+# bypass4netnsd
+########################################################################################################################
+FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-build-bypass4netnsd
 ARG TARGETARCH
-# We would need to call the dynamic task to be able to build static _pie_ instead of static
-# Also note that the make file passes -ldflags on the command-line, so we need to re-stuff `linkmode` into their custom
-# "GO_BUILD_LDFLAGS" variable.
-ENV GO_BUILD_LDFLAGS="-linkmode=external"
-RUN --mount=from=dependencies-download-bypass4netns,type=bind,target=/src,source=/src,rw \
-    --mount=from=dependencies-download-bypass4netns,type=cache,target=/run/.lock,source=/run/.lock,sharing=locked \
-    --mount=target=/root/go/pkg/mod,type=cache \
-  make static && \
-  mv bypass4netns bypass4netnsd /out/bin
+ARG GOPROXY=off
+ARG PKG=github.com/rootless-containers/bypass4netns
+RUN --mount=from=dependencies-download-bypass4netns,type=bind,target=/src,source=/src \
+    --mount=from=dependencies-download-bypass4netns,type=bind,target=/metadata,source=/metadata \
+  GOOS=linux GOARCH=$TARGETARCH \
+    go build --mod=vendor \
+      -ldflags "-X $PKG/pkg/version.Version=$(cat /metadata/VERSION)" \
+      -o /out/bin/bypass4netnsd ./cmd/bypass4netnsd
 
+########################################################################################################################
 # imgcrypt
-FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-imgcrypt
-ARG IMGCRYPT_VERSION
-RUN echo "- imgcrypt: ${IMGCRYPT_VERSION}" >> /metadata/VERSION && \
-    touch /run/.lock && \
-    git clone --depth 1 --branch "$IMGCRYPT_VERSION" https://github.com/containerd/imgcrypt.git .
-
-# imgrcrypt does not allow overriding GO, so, wrap instead
+########################################################################################################################
 FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-build-imgcrypt
 ARG TARGETARCH
-RUN --mount=from=dependencies-download-imgcrypt,type=bind,target=/src,source=/src,rw \
-    --mount=from=dependencies-download-imgcrypt,type=cache,target=/run/.lock,source=/run/.lock,sharing=locked \
-    --mount=target=/root/go/pkg/mod,type=cache \
-  xx-go --wrap && \
-  make && \
-  DESTDIR=/out make install
+ARG GOPROXY=off
+ARG PKG=github.com/containerd/containerd/v2
+RUN --mount=from=dependencies-download-imgcrypt,type=bind,target=/src,source=/src \
+    --mount=from=dependencies-download-imgcrypt,type=bind,target=/metadata,source=/metadata \
+  cd cmd && \
+  GOOS=linux GOARCH=$TARGETARCH \
+    go build --mod=vendor \
+      -ldflags "-X $PKG/version.Version=$(cat /metadata/VERSION)" \
+      -o /out/bin/ctr-enc ./ctr && \
+  GOOS=linux GOARCH=$TARGETARCH \
+    go build --mod=vendor \
+      -o /out/bin/ctd-decoder ./ctd-decoder
 
+########################################################################################################################
 # buildg
-FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-buildg
-ARG BUILDG_VERSION
-RUN echo "- buildg: ${BUILDG_VERSION}" >> /metadata/VERSION && \
-    git clone --depth 1 --branch "$BUILDG_VERSION" https://github.com/ktock/buildg.git .
-
-# buildg does not allow overriding GO, so, wrap instead
+########################################################################################################################
 FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-build-buildg
 ARG TARGETARCH
+ARG GOPROXY=off
+ARG PKG=github.com/ktock/buildg/pkg
 RUN --mount=from=dependencies-download-buildg,type=bind,target=/src,source=/src \
-    --mount=target=/root/go/pkg/mod,type=cache \
-  xx-go --wrap && \
-  PREFIX=/out/bin make buildg
+    --mount=from=dependencies-download-buildg,type=bind,target=/metadata,source=/metadata \
+  GOOS=linux GOARCH=$TARGETARCH \
+    go build --mod=vendor \
+      -ldflags "-X $PKG/version.Version=$(cat /metadata/VERSION) -X $PKG/version.Revision=$(cat /metadata/REVISION)" \
+      -o /out/bin/buildg .
 
-# cli binary is built from the local context
-FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-cli
-RUN --mount=target=go.mod,source=go.mod,type=bind \
-    --mount=target=go.sum,source=go.sum,type=bind \
-    go mod download
-# Copy the docs
-COPY docs /out/share/doc/"$BINARY_NAME"/docs
-# CAREFUL: this will fail to retrieve a tag with a shallow clone. So, full-release should better be done with a full history clone
-# ALSO: since .dockerignore does list .git, as it is otherwise breaking cache on the CI, this cannot work unless .dockerignore is
-# removed beforehand...
-RUN --mount=target=/src,type=bind \
-    { echo "# "$BINARY_NAME" (full distribution)"; echo "- "$BINARY_NAME": $(git describe --tags 2>/dev/null || true)"; } \
-  > /metadata/VERSION
+########################################################################################################################
+# rootlesskit
+########################################################################################################################
+FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-build-rootlesskit
+ARG TARGETARCH
+ARG GOPROXY=off
+RUN --mount=from=dependencies-download-rootlesskit,type=bind,target=/src,source=/src \
+    --mount=from=dependencies-download-rootlesskit,type=bind,target=/metadata,source=/metadata \
+  GOOS=linux GOARCH=$TARGETARCH \
+    go build --mod=vendor \
+      -o /out/bin/rootlesskit ./cmd/rootlesskit
 
+########################################################################################################################
+# cni
+########################################################################################################################
+FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-build-cni
+ARG TARGETARCH
+ARG GOPROXY=off
+ARG PKG=github.com/containernetworking/plugins/pkg/utils
+RUN --mount=from=dependencies-download-cni,type=bind,target=/src,source=/src \
+    --mount=from=dependencies-download-cni,type=bind,target=/metadata,source=/metadata \
+  mkdir -p /out/libexec/cni; \
+  for d in plugins/meta/* plugins/main/* plugins/ipam/*; do \
+    plugin="$(basename "$d")"; \
+    if [ "${plugin}" != "windows" ]; then \
+      GOOS=linux GOARCH=$TARGETARCH \
+        go build --mod=vendor \
+          -ldflags "-X $PKG/buildversion.BuildVersion=$(cat /metadata/VERSION)" \
+          -o /out/libexec/cni/"$plugin" ./"$d"; \
+        ln -s ../libexec/cni/"$plugin" /out/bin/buildkit-cni-"$plugin"; \
+    fi; \
+  done
+
+########################################################################################################################
+# cosign
+########################################################################################################################
+FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-build-cosign
+ARG TARGETARCH
+ARG GOPROXY=off
+ARG PKG=sigs.k8s.io/release-utils
+RUN --mount=from=dependencies-download-cosign,type=bind,target=/src,source=/src \
+    --mount=from=dependencies-download-cosign,type=bind,target=/metadata,source=/metadata \
+  epoch="$(git log -1 --no-show-signature --pretty=%ct)"; format="+%Y-%m-%dT%H:%M:%SZ"; date="$(date -u -d "@$epoch" "$format")"; \
+  GOOS=linux GOARCH=$TARGETARCH \
+    go build --mod=vendor \
+      -ldflags "-X $PKG/version.gitVersion=$(cat /metadata/VERSION) \
+                -X $PKG/version.gitCommit=$(cat /metadata/REVISION) \
+                -X $PKG/version.gitTreeState=clean -X $PKG/version.buildDate=$date" \
+      -o /out/bin/cosign ./cmd/cosign
+
+########################################################################################################################
+# CGO: bypass4netns
+########################################################################################################################
+FROM --platform=$BUILDPLATFORM tooling-builder-with-c-dependencies AS dependencies-build-bypass4netns
+ARG TARGETARCH
+ARG GOPROXY=off
+ARG PKG=github.com/rootless-containers/bypass4netns/pkg
+RUN --mount=from=dependencies-download-bypass4netns,type=bind,target=/src,source=/src \
+    --mount=from=dependencies-download-bypass4netns,type=bind,target=/metadata,source=/metadata \
+  . /.env; \
+  GOOS=linux GOARCH=$TARGETARCH \
+    go build --mod=vendor \
+      -ldflags "-X $PKG/version.Version=$(cat /metadata/VERSION)" \
+      -o /out/bin/bypass4netns ./cmd/bypass4netns
+
+########################################################################################################################
+# CGO: runc
+########################################################################################################################
+FROM --platform=$BUILDPLATFORM tooling-builder-with-c-dependencies AS dependencies-build-runc
+ARG TARGETARCH
+ARG GOPROXY=off
+RUN --mount=from=dependencies-download-runc,type=bind,target=/src,source=/src \
+    --mount=from=dependencies-download-runc,type=bind,target=/metadata,source=/metadata \
+  . /.env; \
+  GOOS=linux GOARCH=$TARGETARCH \
+    go build -mod=vendor \
+      -ldflags "-X main.gitCommit=$(cat /metadata/REVISION) -X main.version=$(cat /metadata/VERSION)" \
+      -tags=urfave_cli_no_docs,seccomp,cgo,netgo,osusergo,static_build \
+      -o /out/bin/runc .
+
+########################################################################################################################
+# CGO: containerd
+########################################################################################################################
+# -gcflags=all="-N -l" static_build
+# CGO_LDFLAGS=-fuse-ld=lld?
+# do we want rdt?
+FROM --platform=$BUILDPLATFORM tooling-builder-with-c-dependencies AS dependencies-build-containerd
+ARG TARGETARCH
+ARG GOPROXY=off
+ARG PKG=github.com/containerd/containerd/v2
+RUN --mount=from=dependencies-download-containerd,type=bind,target=/src,source=/src \
+    --mount=from=dependencies-download-containerd,type=bind,target=/metadata,source=/metadata \
+  . /.env; \
+  GOOS=linux GOARCH=$TARGETARCH \
+    go build --mod=vendor \
+      -ldflags "-X $PKG/version.Version=$(cat /metadata/VERSION) -X $PKG/version.Revision=$(cat /metadata/REVISION) -X $PKG/version.Package=$PKG" \
+      -tags=no_btrfs,no_devmapper,no_zfs,seccomp,urfave_cli_no_docs,cgo,osusergo,netgo,static_build \
+      -o /out/bin/containerd ./cmd/containerd && \
+  cp -a containerd.service /; [ ! -e /out/bin/core ] || { go env; ls -lA /out/bin; exit 42; }
+
+########################################################################################################################
+# CGO: soci
+########################################################################################################################
+FROM --platform=$BUILDPLATFORM tooling-builder-with-c-dependencies AS dependencies-build-soci
+ARG TARGETARCH
+ARG GOPROXY=off
+ARG PKG=github.com/awslabs/soci-snapshotter
+RUN xx-apt-get install -qq --no-install-recommends zlib1g-dev >/dev/null
+RUN --mount=from=dependencies-download-soci,type=bind,target=/src,source=/src \
+    --mount=from=dependencies-download-soci,type=bind,target=/metadata,source=/metadata \
+  . /.env; \
+  cd cmd && \
+  GOOS=linux GOARCH=$TARGETARCH \
+    go build --mod=vendor \
+      -ldflags "-X $PKG/version.Version=$(cat /metadata/VERSION) -X $PKG/version.Revision=$(cat /metadata/REVISION)" \
+      -o /out/bin/soci ./soci && \
+  GOOS=linux GOARCH=$TARGETARCH \
+    go build --mod=vendor \
+      -ldflags "-X $PKG/version.Version=$(cat /metadata/VERSION) -X $PKG/version.Revision=$(cat /metadata/REVISION)" \
+      -o /out/bin/soci-snapshotter-grpc ./soci-snapshotter-grpc
+
+########################################################################################################################
+# CGO: cosign-pivkey-pkcs11key
+########################################################################################################################
+# FIXME: currently failing to link against pcsclite
+#FROM --platform=$BUILDPLATFORM tooling-builder-with-c-dependencies AS dependencies-build-cosign-pkcs
+#ARG TARGETARCH
+#ARG GOPROXY=off
+#ARG PKG=sigs.k8s.io/release-utils
+#RUN xx-apt-get install -qq --no-install-recommends libpcsclite-dev >/dev/null
+#RUN --mount=from=dependencies-download-cosign,type=bind,target=/src,source=/src \
+#    --mount=from=dependencies-download-cosign,type=bind,target=/metadata,source=/metadata \
+#  . /.env; \
+#  epoch="$(git log -1 --no-show-signature --pretty=%ct)"; format="+%Y-%m-%dT%H:%M:%SZ"; date="$(date -u -d "@$epoch" "$format")"; \
+#  GOOS=linux GOARCH=$TARGETARCH \
+#    go build --mod=vendor \
+#      -tags=pivkey,pkcs11key,cgo,osusergo,netgo,static_build \
+#      -ldflags "-X $PKG/version.gitVersion=$(cat /metadata/VERSION) \
+#                -X $PKG/version.gitCommit=$(cat /metadata/REVISION) \
+#                -X $PKG/version.gitTreeState=clean -X $PKG/version.buildDate=$date" \
+#      -o /out/bin/cosign-pivkey-pkcs11key ./cmd/cosign
+
+########################################################################################################################
+# C: tini
+########################################################################################################################
+FROM --platform=$BUILDPLATFORM tooling-builder-with-c-dependencies AS dependencies-build-tini
+ARG TARGETARCH
+# Note: build target tini (and not tini-static), as we want static-pie
+RUN --mount=from=dependencies-download-tini,type=bind,target=/src,source=/src,rw \
+    --mount=from=dependencies-download-tini,type=bind,target=/metadata,source=/metadata \
+    --mount=type=tmpfs,target=/build \
+  . /.env; \
+  exec 42>.lock; flock -x 42; \
+  cd /build && cmake /src && make tini; mv tini /out/bin; \
+  flock -u 42
+
+########################################################################################################################
+# C: libslirp & slirp4netns
+########################################################################################################################
+FROM --platform=$BUILDPLATFORM tooling-builder-with-c-dependencies AS dependencies-build-slirp4netns
+ARG TARGETARCH
+RUN apt-get install -qq --no-install-recommends apt-utils automake autotools-dev file make git ninja-build meson >/dev/null && \
+    xx-apt-get install -qq --no-install-recommends libglib2.0-dev libcap-dev >/dev/null
+# Note: there is likely a bug in libslirp meson script, as building only static does not install the library
+RUN --mount=from=dependencies-download-slirp4netns,type=bind,target=/src,source=/src,rw \
+    --mount=from=dependencies-download-slirp4netns,type=bind,target=/metadata,source=/metadata \
+    --mount=from=dependencies-download-libslirp,type=bind,target=/src_libslirp,source=/src \
+    --mount=type=tmpfs,target=/build \
+  . /.env; \
+  cd /src_libslirp; \
+  LDFLAGS="$LDFLAGS_COMMON"; \
+  meson setup --default-library=both /build && ninja -C /build install; \
+  LDFLAGS="$LDFLAGS_PIE"; \
+  cd /src; \
+  exec 42>.lock; flock -x 42; \
+  ./autogen.sh; ./configure; make; ls -lA .; cp slirp4netns /out/bin; \
+  flock -u 42
+
+########################################################################################################################
+# cli
+########################################################################################################################
 FROM --platform=$BUILDPLATFORM tooling-builder AS dependencies-build-cli
 ARG TARGETARCH
-RUN --mount=target=/src/go.mod,source=go.mod,type=bind \
-    --mount=target=/src/go.sum,source=go.sum,type=bind \
-    --mount=target=/src/Makefile,source=Makefile,type=bind \
-    --mount=target=/src/pkg,source=pkg,type=bind \
-    --mount=target=/src/cmd,source=cmd,type=bind \
-    --mount=target=/src/leptonic,source=leptonic,type=bind \
-    --mount=target=/src/extras,source=extras,type=bind \
-    --mount=target=/build,type=tmpfs \
-    --mount=target=/root/go/pkg/mod,type=bind,from=dependencies-download-cli,source=/root/go/pkg/mod \
-  cd /build; BINDIR=/out/bin make -f /src/Makefile build install
-
-# dependencies-download will retrieve all dependencies that are not compiled from source and used in binary form
-# FIXME: some of these binary dependencies seem very large. We might consider building some of these from source instead.
-FROM --platform=$BUILDPLATFORM tooling-downloader AS dependencies-download
-ARG TARGETARCH
-# Last updated in 2020
-ARG TINI_VERSION
-# Updated 3 times in 2024
-ARG SLIRP4NETNS_VERSION
-# Updated 4 times in 2024
-ARG STARGZ_SNAPSHOTTER_VERSION
-# Updated 5 times in 2024
-ARG CNI_PLUGINS_VERSION
-# Updated 8 times in 2024, and is also sharding in two different major versions by the builder
-ARG ROOTLESSKIT_VERSION
-# Updates often
-ARG BUILDKIT_VERSION
-# Get the debian arch
-RUN echo "$TARGETARCH" | sed -e s/amd64/x86_64/ -e s/arm64/aarch64/ | tee /target_uname_m
-# Copy in the shasums - note this any change in there will invalidate the cache for all subsequent steps
-# As this does not happen very often, this is fine.
-COPY ./Dockerfile.d/SHA256SUMS.d /SHA256SUMS.d
-
-# C
-RUN fname="tini-static-$TARGETARCH" && \
-  curl -o "$fname" -fsSL --proto '=https' --tlsv1.3 "https://github.com/krallin/tini/releases/download/${TINI_VERSION}/${fname}" && \
-  grep "$fname" "/SHA256SUMS.d/tini-${TINI_VERSION}" | sha256sum -c && \
-  cp -a "$fname" /out/bin/tini && chmod +x /out/bin/tini && \
-  rm "$fname" && \
-  echo "- Tini: ${TINI_VERSION}" >> /metadata/VERSION && \
-  echo "- bin/tini: [MIT License](https://github.com/krallin/tini/blob/${TINI_VERSION}/LICENSE)" >> /metadata/LICENSE
-
-# C
-RUN fname="slirp4netns-$(cat /target_uname_m)" && \
-  curl -o "$fname" -fsSL --proto '=https' --tlsv1.3 "https://github.com/rootless-containers/slirp4netns/releases/download/${SLIRP4NETNS_VERSION}/${fname}" && \
-  grep "$fname" "/SHA256SUMS.d/slirp4netns-${SLIRP4NETNS_VERSION}" | sha256sum -c && \
-  mv "$fname" /out/bin/slirp4netns && \
-  chmod +x /out/bin/slirp4netns && \
-  echo "- slirp4netns: ${SLIRP4NETNS_VERSION}" >> /metadata/VERSION && \
-  echo "- bin/slirp4netns:    [GNU GENERAL PUBLIC LICENSE, Version 2](https://github.com/rootless-containers/slirp4netns/blob/${SLIRP4NETNS_VERSION}/COPYING)" >> /metadata/LICENSE
-
-# golang CGO_ENABLED=0, vendored
-RUN fname="cni-plugins-${TARGETOS:-linux}-$TARGETARCH-${CNI_PLUGINS_VERSION}.tgz" && \
-  curl -o "$fname" -fsSL --proto '=https' --tlsv1.3 "https://github.com/containernetworking/plugins/releases/download/${CNI_PLUGINS_VERSION}/${fname}" && \
-  grep "$fname" "/SHA256SUMS.d/cni-plugins-${CNI_PLUGINS_VERSION}" | sha256sum -c && \
-  mkdir -p /out/libexec/cni && \
-  tar xzf "$fname" -C /out/libexec/cni && \
-  rm -f "$fname" && \
-  echo "- CNI plugins: ${CNI_PLUGINS_VERSION}" >> /metadata/VERSION
-
-# golang CGO_ENABLED=0?
-RUN fname="buildkit-${BUILDKIT_VERSION}.${TARGETOS:-linux}-$TARGETARCH.tar.gz" && \
-  curl -o "$fname" -fsSL --proto '=https' --tlsv1.3 "https://github.com/moby/buildkit/releases/download/${BUILDKIT_VERSION}/${fname}" && \
-  grep "$fname" "/SHA256SUMS.d/buildkit-${BUILDKIT_VERSION}" | sha256sum -c && \
-  tar xzf "$fname" -C /out && \
-  rm -f "$fname" /out/bin/buildkit-qemu-* /out/bin/buildkit-cni-* /out/bin/buildkit-runc && \
-  for f in /out/libexec/cni/*; do ln -s ../libexec/cni/$(basename $f) /out/bin/buildkit-cni-$(basename $f); done && \
-  rm /out/bin/buildkit-cni-LICENSE /out/bin/buildkit-cni-README.md && \
-  echo "- BuildKit: ${BUILDKIT_VERSION}" >> /metadata/VERSION
-
-# golang CGO_ENABLED=0
-RUN fname="rootlesskit-$(cat /target_uname_m).tar.gz" && \
-  curl -o "$fname" -fsSL --proto '=https' --tlsv1.3 "https://github.com/rootless-containers/rootlesskit/releases/download/${ROOTLESSKIT_VERSION}/${fname}" && \
-  grep "$fname" "/SHA256SUMS.d/rootlesskit-${ROOTLESSKIT_VERSION}" | sha256sum -c && \
-  tar xzf "$fname" -C /out/bin && \
-  rm -f "$fname" /out/bin/rootlesskit-docker-proxy && \
-  echo "- RootlessKit: ${ROOTLESSKIT_VERSION}" >> /metadata/VERSION
-
-# These are not part of the full-release so they are in their own stage (soci, cosign)
-FROM --platform=$BUILDPLATFORM tooling-downloader AS dependencies-download-no-release
-ARG TARGETARCH
-ARG SOCI_SNAPSHOTTER_VERSION
-RUN fname="soci-snapshotter-${SOCI_SNAPSHOTTER_VERSION}-${TARGETOS:-linux}-$TARGETARCH.tar.gz" && \
-  curl -o "$fname" -fsSL --proto '=https' --tlsv1.3 "https://github.com/awslabs/soci-snapshotter/releases/download/v${SOCI_SNAPSHOTTER_VERSION}/${fname}" && \
-  tar xzf "$fname" -C /out/bin soci soci-snapshotter-grpc && \
-  rm "$fname"
-# FIXME: parameterize version
-COPY --from=ghcr.io/sigstore/cosign/cosign:v2.2.3@sha256:8fc9cad121611e8479f65f79f2e5bea58949e8a87ffac2a42cb99cf0ff079ba7 /ko-app/cosign /out/bin/cosign
+ARG GOPROXY=off
+ARG PKG=go.farcloser.world/lepton
+RUN --mount=from=dependencies-download-cli,type=bind,target=/metadata,source=/metadata \
+    --mount=from=dependencies-download-cli,type=bind,target=vendor,source=/src/vendor \
+    --mount=target=go.mod,source=go.mod,type=bind \
+    --mount=target=go.sum,source=go.sum,type=bind \
+    --mount=target=pkg,source=pkg,type=bind \
+    --mount=target=cmd,source=cmd,type=bind \
+    --mount=target=leptonic,source=leptonic,type=bind \
+    --mount=target=extras,source=extras,type=bind \
+  GOOS=linux GOARCH=$TARGETARCH \
+    go build --mod=vendor \
+      -ldflags "-X $PKG/pkg/version.Version=$(cat /metadata/VERSION) -X $PKG/pkg/version.Revision=$(cat /metadata/REVISION)" \
+      -o /out/bin/$BINARY_NAME ./cmd/$BINARY_NAME
 
 ########################################################################################################################
 # Assembly
@@ -433,38 +864,45 @@ RUN cd /out/lib/systemd/system && \
   echo "" >> buildkit.service && \
   echo "# This file was converted from containerd.service, with \`sed -E '${sedcomm}'\`" >> buildkit.service
 COPY --from=dependencies-download-cli /out/share /out/share
-RUN --mount=target=/metadata,type=cache,from=dependencies-download-cli,source=/metadata \
-    cat /metadata/VERSION > /out/share/doc/"$BINARY_NAME"-full/README.md
-RUN --mount=target=/metadata,type=cache,from=dependencies-download-containerd,source=/metadata \
-    cat /metadata/VERSION >> /out/share/doc/"$BINARY_NAME"-full/README.md
-RUN --mount=target=/metadata,type=cache,from=dependencies-download-runc,source=/metadata \
-    cat /metadata/VERSION >> /out/share/doc/"$BINARY_NAME"-full/README.md
-RUN --mount=target=/metadata,type=cache,from=dependencies-download-bypass4netns,source=/metadata \
-    cat /metadata/VERSION >> /out/share/doc/"$BINARY_NAME"-full/README.md
-RUN --mount=target=/metadata,type=cache,from=dependencies-download-imgcrypt,source=/metadata \
-    cat /metadata/VERSION >> /out/share/doc/"$BINARY_NAME"-full/README.md
-RUN --mount=target=/metadata,type=cache,from=dependencies-download-buildg,source=/metadata \
-    cat /metadata/VERSION >> /out/share/doc/"$BINARY_NAME"-full/README.md
-RUN --mount=target=/metadata,type=cache,from=dependencies-download,source=/metadata \
-    cat /metadata/VERSION >> /out/share/doc/"$BINARY_NAME"-full/README.md
-RUN --mount=target=/metadata/LICENSE,type=cache,from=dependencies-download,source=/metadata/LICENSE \
-  echo "" >> /out/share/doc/"$BINARY_NAME"-full/README.md && \
-  echo "## License" >> /out/share/doc/"$BINARY_NAME"-full/README.md && \
-  cat /metadata/LICENSE >>  /out/share/doc/"$BINARY_NAME"-full/README.md && \
-  echo "- bin/{runc,bypass4netns,bypass4netnsd}: Apache License 2.0, statically linked with libseccomp ([LGPL 2.1](https://github.com/seccomp/libseccomp/blob/main/LICENSE), source code available at https://github.com/seccomp/libseccomp/)" >> /out/share/doc/"$BINARY_NAME"-full/README.md && \
-  echo "- Other files: [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)" >> /out/share/doc/"$BINARY_NAME"-full/README.md
+RUN --mount=target=/metadata-$BINARY_NAME,type=cache,from=dependencies-download-cli,source=/metadata \
+    --mount=target=/metadata-containerd,type=cache,from=dependencies-download-containerd,source=/metadata \
+    --mount=target=/metadata-runc,type=cache,from=dependencies-download-runc,source=/metadata \
+    --mount=target=/metadata-soci,type=cache,from=dependencies-download-soci,source=/metadata \
+    --mount=target=/metadata-bypass4netns,type=cache,from=dependencies-download-bypass4netns,source=/metadata \
+    --mount=target=/metadata-libslirp,type=cache,from=dependencies-download-libslirp,source=/metadata \
+    --mount=target=/metadata-slirp4netns,type=cache,from=dependencies-download-slirp4netns,source=/metadata \
+    --mount=target=/metadata-tini,type=cache,from=dependencies-download-tini,source=/metadata \
+    --mount=target=/metadata-cni,type=cache,from=dependencies-download-cni,source=/metadata \
+    --mount=target=/metadata-rootlesskit,type=cache,from=dependencies-download-rootlesskit,source=/metadata \
+    --mount=target=/metadata-buildg,type=cache,from=dependencies-download-buildg,source=/metadata \
+    --mount=target=/metadata-imgcrypt,type=cache,from=dependencies-download-imgcrypt,source=/metadata \
+    --mount=target=/metadata-buildkit,type=cache,from=dependencies-download-buildkit,source=/metadata \
+    --mount=target=/metadata-cosign,type=cache,from=dependencies-download-cosign,source=/metadata \
+    for item in /metadata-*; do \
+      item="${item##*-}"; \
+      printf "* %s:\n    - version: %s\n    -license: %s\n" "$item" "$(cat /metadata-$item/VERSION)" "$(cat /metadata-$item/LICENSE)" >> /out/share/doc/"$BINARY_NAME"-full/README.md; \
+    done
 
 # assembly-release is multi-architecture, and is the stage assembling all assets for full-release
 # Once done, shasums will be generated and stuffed in to produce the full release
 FROM scratch AS assembly-release
 COPY --from=dependencies-build-containerd /out /
+COPY --from=dependencies-build-containerd-tools /out /
 COPY --from=dependencies-build-runc /out /
+COPY --from=dependencies-build-soci /out /
 COPY --from=dependencies-build-bypass4netns /out /
-COPY --from=dependencies-build-imgcrypt /out /
+COPY --from=dependencies-build-bypass4netnsd /out /
+COPY --from=dependencies-build-slirp4netns /out /
+COPY --from=dependencies-build-tini /out /
+COPY --from=dependencies-build-cni /out /
+COPY --from=dependencies-build-rootlesskit /out /
 COPY --from=dependencies-build-buildg /out /
-COPY --from=dependencies-download /out /
-COPY --from=dependencies-build-cli /out /
+COPY --from=dependencies-build-imgcrypt /out /
+COPY --from=dependencies-build-buildkit /out /
+COPY --from=dependencies-build-cosign /out /usr/local/
+#COPY --from=dependencies-build-cosign-pkcs /out /usr/local/
 COPY --from=assembly-release-assets /out /
+COPY --from=dependencies-build-cli /out /
 
 # assembly-shasum prepares the shasum file from above
 FROM --platform=$BUILDPLATFORM tooling-builder AS assembly-shasum
@@ -490,12 +928,20 @@ RUN apt-get install -qq --no-install-recommends \
   openssh-client >/dev/null
 # Add all needed dependencies, but not the cli yet to avoid busting cache
 COPY --from=dependencies-build-containerd /out /usr/local
+COPY --from=dependencies-build-containerd-tools /out /usr/local
 COPY --from=dependencies-build-runc /out /usr/local
+COPY --from=dependencies-build-soci /out /usr/local/
 COPY --from=dependencies-build-bypass4netns /out /usr/local
-COPY --from=dependencies-build-imgcrypt /out /usr/local
+COPY --from=dependencies-build-bypass4netnsd /out /usr/local
+COPY --from=dependencies-build-slirp4netns /out /usr/local/
+COPY --from=dependencies-build-tini /out /usr/local/
+COPY --from=dependencies-build-cni /out /usr/local/
+COPY --from=dependencies-build-rootlesskit /out /usr/local/
 COPY --from=dependencies-build-buildg /out /usr/local
-COPY --from=dependencies-download /out /usr/local
-COPY --from=dependencies-download-no-release /out /usr/local/
+COPY --from=dependencies-build-imgcrypt /out /usr/local
+COPY --from=dependencies-build-buildkit /out /usr/local/
+COPY --from=dependencies-build-cosign /out /usr/local/
+#COPY --from=dependencies-build-cosign-pkcs /out /usr/local/
 # Add assets
 COPY --from=dependencies-build-containerd /containerd.service /usr/local/lib/systemd/system/containerd.service
 # NOTE: github.com/moby/buildkit/examples/systemd is not included in BuildKit v0.8.x, will be included in v0.9.x
@@ -544,14 +990,13 @@ RUN --mount=target=/root/go/pkg/mod,type=cache \
 ########################################################################################################################
 # release-full is the final stage producing the -full releases, including SHASUM
 FROM assembly-release AS release-full
+ARG BINARY_NAME
 # Stuff in the shasums
 COPY --from=assembly-shasum /out/SHA256SUMS /share/doc/"$BINARY_NAME"-full/SHA256SUMS
 
 # test-integration is the final stage for the integration testing environment
 # it is multi-architecture, and not fully cacheable, as changing anything in the cli will invalidate cache here
 FROM assembly-integration AS test-integration
-# Get modules
-COPY --from=dependencies-download-cli /root/go/pkg/mod /root/go/pkg/mod
 # Get binaries
 COPY --from=dependencies-build-cli /out /usr/local
 # Install shell completion
@@ -559,6 +1004,8 @@ RUN mkdir -p /etc/bash_completion.d && \
   "$BINARY_NAME" completion bash >/etc/bash_completion.d/"$BINARY_NAME"
 # Copy the relevant part
 COPY . /src
+# Get modules
+COPY --from=dependencies-download-cli /src/vendor /src/vendor
 CMD ["./hack/test-integration.sh"]
 
 # test-integration-rootless
@@ -580,3 +1027,56 @@ CMD ["/test-integration-rootless.sh", "./hack/test-integration.sh"]
 FROM test-integration-rootless AS test-integration-rootless-port-slirp4netns
 COPY ./Dockerfile.d/home_rootless_.config_systemd_user_containerd.service.d_port-slirp4netns.conf /home/rootless/.config/systemd/user/containerd.service.d/port-slirp4netns.conf
 RUN chown -R rootless:rootless /home/rootless/.config
+
+########################################################################################################################
+# Auditing
+# These stages are meant to perform additional analysis on the binaries that do not belong in test nor linting
+########################################################################################################################
+# this stage does run sanity checks on the output:
+# - verify all binaries architecture is matching the target
+# - verify all binaries are static and running
+FROM tooling-runtime AS release-full-sanity
+ARG TARGETARCH
+RUN apt-get install -qq --no-install-recommends \
+    binutils patchelf devscripts >/dev/null
+COPY ./hack/sanity.sh /
+
+# bypass4netns will crash if this is not set
+ENV XDG_RUNTIME_DIR=/tmp
+# All binaries are expected to be static and to run
+ENV STATIC=true
+ENV RUNNING=true
+# This is a subset of STATIC
+ENV NO_SYSTEM_LINK=true
+# All CGO and C binaries should be PIE + bind now + read-only relocations
+ENV CBINS="runc containerd bypass4netns soci soci-snapshotter-grpc slirp4netns tini"
+ENV RO_RELOCATIONS=true
+ENV BIND_NOW=true
+ENV PIE=true
+# We do not link against protectable libc functions
+ENV FORTIFIED=true
+ENV STACK_CLASH=true
+ENV STACK_PROTECTED=false
+
+WORKDIR /src
+
+RUN --mount=target=/src,type=cache,from=release-full,source=/ \
+    sha256sum -c share/doc/"$BINARY_NAME"-full/SHA256SUMS; \
+    cd bin; \
+    filearch="$(echo "$TARGETARCH" | sed -e s/amd64/x86-64/ -e s/arm64/aarch64/)"; \
+    for i in ./*; do \
+      echo "Auditing $i"; \
+      ff="$(file -L "$i")"; \
+      ! grep -q "POSIX shell script," <(echo "$ff") || { \
+        echo "Skipping test for shell script"; \
+        continue; \
+      }; \
+      grep -q "$filearch," <(echo "$ff") || { \
+        echo "Wrong architecture: $ff (expected: $filearch)"; \
+        exit 1; \
+      }; \
+      [[ "$CBINS" == *"$(basename "$i")"* ]] && \
+        { export PIE=true; export BIND_NOW=true; export RO_RELOCATIONS=true; } || \
+        { export PIE=false; export BIND_NOW=false; export RO_RELOCATIONS=false; }; \
+      /sanity.sh validate "$i";  \
+    done
