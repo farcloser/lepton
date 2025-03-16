@@ -293,7 +293,7 @@ func TestRunWithInit(t *testing.T) {
 	t.Parallel()
 
 	testutil.DockerIncompatible(t)
-	testutil.RequireExecutable(t, "tini-custom")
+	testutil.RequireExecutable(t, "tini")
 	base := testutil.NewBase(t)
 
 	container := testutil.Identifier(t)
@@ -306,7 +306,7 @@ func TestRunWithInit(t *testing.T) {
 
 	// Test with --init-path
 	container1 := container + "-1"
-	base.Cmd("run", "-d", "--name", container1, "--init-binary", "tini-custom",
+	base.Cmd("run", "-d", "--name", container1, "--init-binary", "tini",
 		testutil.AlpineImage, "sleep", nerdtest.Infinity).AssertOK()
 	defer base.Cmd("rm", "-f", container1).Run()
 

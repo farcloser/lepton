@@ -956,7 +956,6 @@ RUN         cd /usr/local/lib/systemd/system && \
             echo "" >> buildkit.service && \
             echo "# This file was converted from containerd.service, with \`sed -E '${sedcomm}'\`" >> buildkit.service
 # Final preparations
-RUN         cp /usr/local/bin/tini /usr/local/bin/tini-custom
 RUN         mkdir -p -m 0755 /etc/cni
 # Add go
 ENV         PATH="/root/go/bin:/usr/local/go/bin:$PATH"
