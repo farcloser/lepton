@@ -1,0 +1,14 @@
+[Unit]
+Description=entrypoint.service
+
+[Service]
+ExecStart=/bin/bash -exc "source /etc/entrypoint-cmd"
+ExecStopPost=/bin/bash -ec "if echo ${EXIT_STATUS} | grep [A-Z] > /dev/null; then echo >&2 \"got signal ${EXIT_STATUS}\"; systemctl exit $(( 128 + $( kill -l ${EXIT_STATUS} ) )); else systemctl exit ${EXIT_STATUS}; fi"
+StandardInput=tty-force
+StandardOutput=inherit
+StandardError=inherit
+WorkingDirectory=/src
+EnvironmentFile=/etc/entrypoint-env
+
+[Install]
+WantedBy=multi-user.target

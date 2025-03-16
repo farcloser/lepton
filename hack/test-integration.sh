@@ -24,7 +24,9 @@ readonly binary=lepton
 if [[ "$(id -u)" = "0" ]]; then
   # Ensure securityfs is mounted for apparmor to work
   if ! mountpoint -q /sys/kernel/security; then
-    mount -tsecurityfs securityfs /sys/kernel/security
+    mount -tsecurityfs securityfs /sys/kernel/security || {
+      >&2 printf "Failed to mount securityfs. AppArmor will not work.\n"
+    }
   fi
 fi
 
