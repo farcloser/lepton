@@ -64,7 +64,9 @@ ARG         ROOTLESSKIT_REPO=github.com/rootless-containers/rootlesskit
 ARG         LIBSLIRP_VERSION=v4.9.0
 ARG         LIBSLIRP_REVISION=c32a8a1ccaae8490142e67e078336a95c5ffc956
 ARG         LIBSLIRP_LICENSE="$LICENSE_3CLAUSES_BSD"
-ARG         LIBSLIRP_REPO=gitlab.freedesktop.org/slirp/libslirp
+# Maintenance for a week, March 2025
+# ARG         LIBSLIRP_REPO=gitlab.freedesktop.org/slirp/libslirp
+ARG         LIBSLIRP_REPO=gitlab.com/qemu-project/libslirp
 
 ARG         SLIRP4NETNS_VERSION=v1.3.2
 ARG         SLIRP4NETNS_REVISION=0f13345bcef588d2bb70d662d41e92ee8a816d85
@@ -878,6 +880,7 @@ ENV         TERM="xterm"
 ENV         LANG="C.UTF-8"
 ENV         LC_ALL="C.UTF-8"
 ENV         TZ="America/Los_Angeles"
+#           FIXME: curl is only necessary for a single netns test. Fix the test and remove curl.
 RUN         echo "force-unsafe-io" > /etc/dpkg/dpkg.cfg.d/farcloser-speedup && \
             echo 'Acquire::Languages "none";' > /etc/apt/apt.conf.d/farcloser-no-language && \
             echo 'Acquire::GzipIndexes "true";' > /etc/apt/apt.conf.d/farcloser-gzip-indexes && \
@@ -889,6 +892,7 @@ RUN         echo "force-unsafe-io" > /etc/dpkg/dpkg.cfg.d/farcloser-speedup && \
                 iptables \
                 iproute2 \
                 dbus dbus-user-session systemd systemd-sysv \
+                curl \
                 uidmap \
                 openssh-server \
                 openssh-client \

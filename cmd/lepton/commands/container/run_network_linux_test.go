@@ -21,6 +21,7 @@ import (
 	"io"
 	"net"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -728,11 +729,8 @@ func TestRunContainerInExistingNetNS(t *testing.T) {
 	time.Sleep(3 * time.Second)
 
 	err = netNS.Do(func(netns ns.NetNS) error {
-		u := "http://127.0.0.1:80"
-		resp, err := nettestutil.HTTPGet(u, 5, false)
-		assert.NilError(t, err)
-		defer resp.Body.Close()
-		stdout, err := io.ReadAll(resp.Body)
+		// FIXME: does not work directly in go - figure out why
+		stdout, err := exec.Command("curl", "-s", "http://127.0.0.1:80").Output()
 		assert.NilError(t, err)
 		assert.Assert(t, strings.Contains(string(stdout), testutil.NginxAlpineIndexHTMLSnippet))
 		return nil
