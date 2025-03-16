@@ -15,6 +15,7 @@
 ARG         DEBIAN_VERSION=bookworm-slim
 ARG         UBUNTU_VERSION=24.04
 ARG         GO_VERSION=1.24.0
+ARG         SUPPORTED_ARCHS="arm64 amd64"
 
 ARG         LICENSE_APACHE_V2="Apache License, version 2.0, https://opensource.org/license/apache-2-0"
 ARG         LICENSE_MIT="The MIT License, https://opensource.org/license/mit"
@@ -64,7 +65,7 @@ ARG         ROOTLESSKIT_REPO=github.com/rootless-containers/rootlesskit
 ARG         LIBSLIRP_VERSION=v4.9.0
 ARG         LIBSLIRP_REVISION=c32a8a1ccaae8490142e67e078336a95c5ffc956
 ARG         LIBSLIRP_LICENSE="$LICENSE_3CLAUSES_BSD"
-# Maintenance for a week, March 2025
+# FIXME: maintenance for a week, March 2025 - revert once they are done with their very very slow migration
 # ARG         LIBSLIRP_REPO=gitlab.freedesktop.org/slirp/libslirp
 ARG         LIBSLIRP_REPO=gitlab.com/qemu-project/libslirp
 
@@ -98,9 +99,12 @@ ARG         ZLIB_LICENSE="$LICENSE_ZLIB"
 ARG         GLIB_LICENSE="$LICENSE_APACHE_V2"
 ARG         LIBCAP_LICENSE="$LICENSE_3CLAUSES_BSD"
 
-ARG         NO_COLOR=true
 ARG         DEBIAN_IMAGE=ghcr.io/apostasie/debian
 ARG         UBUNTU_IMAGE=ghcr.io/apostasie/ubuntu
+
+ARG         NO_COLOR=true
+ARG         GOFIPS140=v1.0.0
+ARG         GOTOOLCHAIN=local
 
 ########################################################################################################################
 # Base images
@@ -110,9 +114,9 @@ ARG         UBUNTU_IMAGE=ghcr.io/apostasie/ubuntu
 # - GO_VERSION
 ########################################################################################################################
 
-#           tooling-base is the single base image we use for all other tooling image
-#           Note: technically, we should rm -rf /var/lib/apt/lists/* - however that means forcing apt-get update everytime
-#           The cost is about 20MB on a single arch.
+# tooling-base is the single base image we use for all other tooling image
+# Note: technically, we should rm -rf /var/lib/apt/lists/* - however that means forcing apt-get update everytime
+# The cost is about 20MB on a single arch.
 FROM        --platform=$BUILDPLATFORM $DEBIAN_IMAGE:$DEBIAN_VERSION AS tooling-base
 SHELL       ["/bin/bash", "-o", "errexit", "-o", "errtrace", "-o", "functrace", "-o", "nounset", "-o", "pipefail", "-c"]
 ENV         DEBIAN_FRONTEND="noninteractive"
@@ -128,15 +132,16 @@ RUN         echo "force-unsafe-io" > /etc/dpkg/dpkg.cfg.d/farcloser-speedup && \
                 ca-certificates \
                     >/dev/null
 
-#           tooling-downloader-golang will download a golang archive and expand it into /out/usr/local
-#           You may set GO_VERSION to an explicit, complete version (eg: 1.23.0), or you can also set it to:
-#           - canary: that will retrieve the latest alpha/beta/RC
-#           - stable (or ""): that will retrieve the latest stable version
-#           Note that for these last two, you need to bust the cache for this stage if you expect a refresh
-#           Finally note that we are retrieving both architectures we are currently supporting (arm64 and amd64) in one stage,
-#           and do NOT leverage TARGETARCH, as that would force cross compilation to use a non-native binary in dependent stages.
+# tooling-downloader-golang will download a golang archive and expand it into /out/usr/local
+# You may set GO_VERSION to an explicit, complete version (eg: 1.23.0), or you can also set it to:
+# - canary: that will retrieve the latest alpha/beta/RC
+# - stable (or ""): that will retrieve the latest stable version
+# Note that for these last two, you need to bust the cache for this stage if you expect a refresh
+# Finally note that we are retrieving both architectures we are currently supporting (arm64 and amd64) in one stage,
+# and do NOT leverage TARGETARCH, as that would force cross compilation to use a non-native binary in dependent stages.
 FROM        --platform=$BUILDPLATFORM tooling-base AS tooling-downloader-golang
 ARG         GO_VERSION
+ARG         SUPPORTED_ARCHS
 RUN         apt-get install -qq --no-install-recommends \
                curl \
                jq \
@@ -149,23 +154,17 @@ RUN         apt-get install -qq --no-install-recommends \
                     *) condition='.version | startswith("go'"$GO_VERSION"'")' ;; \
                 esac; \
                 jq -rc 'map(select('"$condition"'))[0].files | map(select(.os=="'"$os"'"))' <(printf "$all_versions"))"; \
-            arch=arm64; \
-            filename="$(jq -r 'map(select(.arch=="'"$arch"'"))[0].filename' <(printf "$candidates"))"; \
-            mkdir -p /out/usr/local/linux/"$arch"; \
-            curl -fsSL --proto '=https' --tlsv1.3 https://go.dev/dl/"$filename" | tar xzC /out/usr/local/linux/"$arch" || {  \
-                echo "Failed retrieving go download for $arch: $GO_VERSION"; \
-                exit 1; \
-            }; \
-            arch=amd64; \
-            filename="$(jq -r 'map(select(.arch=="'"$arch"'"))[0].filename' <(printf "$candidates"))"; \
-            mkdir -p /out/usr/local/linux/"$arch"; \
-            curl -fsSL --proto '=https' --tlsv1.3 https://go.dev/dl/"$filename" | tar xzC /out/usr/local/linux/"$arch" || {  \
-                echo "Failed retrieving go download for $arch: $GO_VERSION"; \
-                exit 1; \
-            }; \
+            for arch in $SUPPORTED_ARCHS; do \
+                filename="$(jq -r 'map(select(.arch=="'"$arch"'"))[0].filename' <(printf "$candidates"))"; \
+                mkdir -p /out/usr/local/linux/"$arch"; \
+                curl -fsSL --proto '=https' --tlsv1.3 https://go.dev/dl/"$filename" | tar xzC /out/usr/local/linux/"$arch" || {  \
+                    echo "Failed retrieving go download for $arch: $GO_VERSION"; \
+                    exit 1; \
+                }; \
+            done; \
             apt-get purge -qq curl jq
 
-#           tooling-builder is a go enabled stage with minimal build tooling installed that can be used to build non-cgo projects
+# tooling-builder is a go enabled stage with minimal build tooling installed that can be used to build non-cgo projects
 FROM        --platform=$BUILDPLATFORM tooling-base AS tooling-builder
 ARG         BUILDPLATFORM
 WORKDIR     /src
@@ -175,21 +174,21 @@ RUN         mkdir -p /out/bin; mkdir -p /metadata && \
                 make \
                     >/dev/null && \
             git config --global advice.detachedHead false # Prevent git from complaining on detached head
-#           Configure base environment
-ENV         CGO_ENABLED=0
-ENV         GOFIPS140=v1.0.0
-ENV         GOTOOLCHAIN=local
+#           Configure base environment.
+ARG         NO_COLOR
+ARG         GOFIPS140
+ARG         GOTOOLCHAIN
+ARG         GOFLAGS="-trimpath"
+ARG         CGO_ENABLED=0
 #           Add golang
 COPY        --from=tooling-downloader-golang /out/usr/local/$BUILDPLATFORM /usr/local
 ENV         PATH="/root/go/bin:/usr/local/go/bin:$PATH"
-ARG         NO_COLOR
-ENV         GOFLAGS="-trimpath"
 
 # tooling-builder-with-c-dependencies is an expansion of the previous stages that adds extra c dependencies.
 # It is meant for (cross-compilation of) c and cgo projects.
 FROM        --platform=$BUILDPLATFORM tooling-builder AS tooling-builder-with-c-dependencies-base
 # Enable CGO
-ENV         CGO_ENABLED=1
+ARG         CGO_ENABLED=1
 ## https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html
 ENV         WARNING_OPTIONS="-Wall -Werror=format-security"
 ## https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html#Optimize-Options
@@ -221,11 +220,11 @@ ENV         CGO_LDFLAGS="$LDFLAGS"
 ## https://developers.redhat.com/blog/2018/03/21/compiler-and-linker-flags-gcc
 ## https://gcc.gnu.org/onlinedocs/gcc/Instrumentation-Options.html
 # https://github.com/golang/go/issues/26849
-ENV         GOFLAGS_COMMON="$GOFLAGS -ldflags=-linkmode=external -tags=cgo,netgo,osusergo,static_build"
-ENV         GOFLAGS_NOPIE="$GOFLAGS_COMMON"
-ENV         GOFLAGS_PIE="$GOFLAGS_COMMON -buildmode=pie"
+ARG         GOFLAGS_COMMON="$GOFLAGS -ldflags=-linkmode=external -tags=cgo,netgo,osusergo,static_build"
+ARG         GOFLAGS_NOPIE="$GOFLAGS_COMMON"
+ARG         GOFLAGS_PIE="$GOFLAGS_COMMON -buildmode=pie"
 # Set default linker options for CGO projects
-ENV         GOFLAGS="$GOFLAGS_PIE"
+ARG         GOFLAGS="$GOFLAGS_PIE"
 # TODO: -s -w - extldflags -static-pie and -static?
 # -gcflags=all="-N -l"?
 # CGO_LDFLAGS=-fuse-ld=lld?
@@ -553,6 +552,9 @@ ARG         GOPROXY=off
 ARG         PKG=github.com/moby/buildkit
 RUN         --mount=from=dependencies-download-buildkit,type=bind,target=/src,source=/src \
             --mount=from=dependencies-download-buildkit,type=bind,target=/metadata,source=/metadata \
+            mkdir -p /out/lib/systemd/system; \
+            sed 's/multi-user.target/entrypoint.target/' examples/systemd/system/buildkit.service > /out/lib/systemd/system/buildkit.service; \
+            cp -a examples/systemd/system/buildkit.socket /out/lib/systemd/system/; \
             GOOS=linux GOARCH=$TARGETARCH go build -mod=vendor \
                 -ldflags "-X $PKG/version.Version=$(cat /metadata/VERSION) -X $PKG/version.Revision=$(cat /metadata/REVISION) -X $PKG/version.Package=$PKG" \
                 -o /out/bin/buildctl ./cmd/buildctl && \
@@ -688,12 +690,12 @@ ARG         PKG=github.com/containerd/containerd/v2
 RUN         --mount=from=dependencies-download-containerd,type=bind,target=/src,source=/src \
             --mount=from=dependencies-download-containerd,type=bind,target=/metadata,source=/metadata \
             . /.env; \
+            mkdir -p /out/lib/systemd/system; \
             GOOS=linux GOARCH=$TARGETARCH go build --mod=vendor \
                 -ldflags "-X $PKG/version.Version=$(cat /metadata/VERSION) -X $PKG/version.Revision=$(cat /metadata/REVISION) -X $PKG/version.Package=$PKG" \
                 -tags=no_btrfs,no_devmapper,no_zfs,seccomp,urfave_cli_no_docs,cgo,osusergo,netgo,static_build \
                 -o /out/bin/containerd ./cmd/containerd && \
-            cp -a containerd.service /; [ ! -e /out/bin/core ] || { go env; ls -lA /out/bin; exit 42; }
-# FIXME: ^ remove core debug stance when confident this does not happen
+            sed 's/multi-user.target/entrypoint.target/' containerd.service > /out/lib/systemd/system/containerd.service
 
 ########################################################################################################################
 # CGO: soci
@@ -702,11 +704,11 @@ FROM        --platform=$BUILDPLATFORM tooling-builder-with-c-dependencies AS dep
 ARG         TARGETARCH
 ARG         GOPROXY=off
 ARG         PKG=github.com/awslabs/soci-snapshotter
-RUN         apt-get install -qq --no-install-recommends \
-                zlib1g-dev:"$TARGETARCH" \
-                    >/dev/null
 RUN         --mount=from=dependencies-download-soci,type=bind,target=/src,source=/src \
             --mount=from=dependencies-download-soci,type=bind,target=/metadata,source=/metadata \
+            apt-get install -qq --no-install-recommends \
+                zlib1g-dev:"$TARGETARCH" \
+                    >/dev/null; \
             . /.env; \
             cd cmd && \
             GOOS=linux GOARCH=$TARGETARCH go build --mod=vendor \
@@ -714,7 +716,9 @@ RUN         --mount=from=dependencies-download-soci,type=bind,target=/src,source
                 -o /out/bin/soci ./soci && \
             GOOS=linux GOARCH=$TARGETARCH go build --mod=vendor \
                 -ldflags "-X $PKG/version.Version=$(cat /metadata/VERSION) -X $PKG/version.Revision=$(cat /metadata/REVISION)" \
-                -o /out/bin/soci-snapshotter-grpc ./soci-snapshotter-grpc
+                -o /out/bin/soci-snapshotter-grpc ./soci-snapshotter-grpc; \
+            apt-get purge -qq \
+                zlib1g-dev:"$TARGETARCH"
 
 ########################################################################################################################
 # CGO: cosign-pivkey-pkcs11key
@@ -755,14 +759,14 @@ RUN         --mount=from=dependencies-download-tini,type=bind,target=/src,source
 ########################################################################################################################
 FROM        --platform=$BUILDPLATFORM tooling-builder-with-c-dependencies AS dependencies-build-slirp4netns
 ARG         TARGETARCH
-RUN         apt-get install -qq --no-install-recommends \
-                libglib2.0-dev:$TARGETARCH \
-                libcap-dev:$TARGETARCH \
-                    >/dev/null
 RUN         --mount=from=dependencies-download-slirp4netns,type=bind,target=/src_slirp,source=/src,rw \
             --mount=from=dependencies-download-slirp4netns,type=bind,target=/metadata,source=/metadata \
             --mount=from=dependencies-download-libslirp,type=bind,target=/src,source=/src \
             --mount=type=tmpfs,target=/build \
+            apt-get install -qq --no-install-recommends \
+                libglib2.0-dev:$TARGETARCH \
+                libcap-dev:$TARGETARCH \
+                    >/dev/null; \
             . /.env; \
             # Note: libslirp script won't install unless building both dyn and static versions of the lib
             LDFLAGS="$LDFLAGS_COMMON"; \
@@ -771,7 +775,10 @@ RUN         --mount=from=dependencies-download-slirp4netns,type=bind,target=/src
             cd /src_slirp; \
             exec 42>.lock; flock -x 42; \
             ./autogen.sh; ./configure; make; mv slirp4netns /out/bin; \
-            flock -u 42
+            flock -u 42; \
+            apt-get purge -qq \
+                libglib2.0-dev:$TARGETARCH \
+                libcap-dev:$TARGETARCH
 
 ########################################################################################################################
 # cli
@@ -807,15 +814,6 @@ ARG         SECCOMP_LICENSE
 ARG         ZLIB_LICENSE
 ARG         GLIB_LICENSE
 ARG         LIBCAP_LICENSE
-RUN         mkdir -p /out/lib/systemd/system /out/share/doc/"$BINARY_NAME"-full
-COPY        --from=dependencies-build-containerd /containerd.service /out/lib/systemd/system/containerd.service
-# NOTE: github.com/moby/buildkit/examples/systemd is not included in BuildKit v0.8.x, will be included in v0.9.x
-# FIXME: now that we are at buildkit 0.20+, do we want to move over to their example systemd file?
-RUN         cd /out/lib/systemd/system && \
-            sedcomm='s@bin/containerd@bin/buildkitd@g; s@(Description|Documentation)=.*@@' && \
-            sed -E "${sedcomm}" containerd.service > buildkit.service && \
-            echo "" >> buildkit.service && \
-            echo "# This file was converted from containerd.service, with \`sed -E '${sedcomm}'\`" >> buildkit.service
 COPY        --from=dependencies-download-cli /out/share /out/share
 RUN         --mount=target=/metadata-$BINARY_NAME,type=cache,from=dependencies-download-cli,source=/metadata \
             --mount=target=/metadata-containerd,type=cache,from=dependencies-download-containerd,source=/metadata \
@@ -830,15 +828,19 @@ RUN         --mount=target=/metadata-$BINARY_NAME,type=cache,from=dependencies-d
             --mount=target=/metadata-imgcrypt,type=cache,from=dependencies-download-imgcrypt,source=/metadata \
             --mount=target=/metadata-buildkit,type=cache,from=dependencies-download-buildkit,source=/metadata \
             --mount=target=/metadata-cosign,type=cache,from=dependencies-download-cosign,source=/metadata \
+            destination=/out/share/doc/"$BINARY_NAME"-full/README.md; \
+            mkdir -p "$(dirname "$destination")"; \
             for item in /metadata-*; do \
                 item="${item##*-}"; \
-                printf "* %s:\n    - version: %s\n    - license: %s\n" "$item" "$(cat /metadata-$item/VERSION)" "$(cat /metadata-$item/LICENSE)" >> /out/share/doc/"$BINARY_NAME"-full/README.md; \
+                printf "* %s:\n    - version: %s\n    - license: %s\n" "$item" "$(cat /metadata-$item/VERSION)" "$(cat /metadata-$item/LICENSE)" >> "$destination"; \
             done; \
-            printf "Statically compiled (runc and others):\n* %s:\n    - license: %s\n" "libseccomp" "$SECCOMP_LICENSE" >> /out/share/doc/"$BINARY_NAME"-full/README.md; \
-            printf "Statically compiled (soci):\n* %s:\n    - license: %s\n" "zlib1g" "$ZLIB_LICENSE" >> /out/share/doc/"$BINARY_NAME"-full/README.md; \
-            printf "Statically compiled (slirp4netns):\n* %s:\n    - license: %s\n" "libglib2.0" "$GLIB_LICENSE" >> /out/share/doc/"$BINARY_NAME"-full/README.md; \
-            printf "* %s:\n    - license: %s\n" "libcap" "$LIBCAP_LICENSE" >> /out/share/doc/"$BINARY_NAME"-full/README.md; \
-            printf "* %s:\n    - license: %s\n" "libslirp" "$LIBSLIRP_LICENSE" >> /out/share/doc/"$BINARY_NAME"-full/README.md
+            printf "\n" >> "$destination"; \
+            printf "Statically linked:\n" >> "$destination"; \
+            printf "* %s:\n    - license: %s\n" "libseccomp" "$SECCOMP_LICENSE" >> "$destination"; \
+            printf "* %s:\n    - license: %s\n" "zlib1g" "$ZLIB_LICENSE" >> "$destination"; \
+            printf "* %s:\n    - license: %s\n" "libglib2.0" "$GLIB_LICENSE" >> "$destination"; \
+            printf "* %s:\n    - license: %s\n" "libcap" "$LIBCAP_LICENSE" >> "$destination"; \
+            printf "* %s:\n    - license: %s\n" "libslirp" "$LIBSLIRP_LICENSE" >> "$destination"
 
 # assembly-release is multi-architecture, and is the stage assembling all assets for full-release
 # Once done, shasums will be generated and stuffed in to produce the full release
@@ -856,23 +858,20 @@ COPY        --from=dependencies-build-rootlesskit /out /
 COPY        --from=dependencies-build-buildg /out /
 COPY        --from=dependencies-build-imgcrypt /out /
 COPY        --from=dependencies-build-buildkit /out /
-COPY        --from=dependencies-build-cosign /out /usr/local/
-#COPY        --from=dependencies-build-cosign-pkcs /out /usr/local/
+COPY        --from=dependencies-build-cosign /out /
+#COPY        --from=dependencies-build-cosign-pkcs /out /
 COPY        --from=assembly-release-assets /out /
 COPY        --from=dependencies-build-cli /out /
 
-# assembly-shasum prepares the shasum file from above
+# assembly-shasum prepares the shasum file from the full release assembly
 FROM        --platform=$BUILDPLATFORM tooling-builder AS assembly-shasum
 ARG         TARGETARCH
 RUN         --mount=target=/src,type=cache,from=assembly-release,source=/ \
             (cd /src && find ! -type d | sort | xargs sha256sum > /out/SHA256SUMS ) && \
             chown -R 0:0 /out
 
-
-
-
-#           tooling-runtime is the base stage that is used to build demo and testing images
-#           Note that unlike every other tooling- stage, this is a multi-architecture stage
+# tooling-runtime is the base stage that is used to build demo and testing images
+# Note that unlike every other tooling- stage, this is a multi-architecture stage
 FROM        $UBUNTU_IMAGE:$UBUNTU_VERSION AS tooling-runtime
 SHELL       ["/bin/bash", "-o", "errexit", "-o", "errtrace", "-o", "functrace", "-o", "nounset", "-o", "pipefail", "-c"]
 ENV         DEBIAN_FRONTEND="noninteractive"
@@ -880,7 +879,10 @@ ENV         TERM="xterm"
 ENV         LANG="C.UTF-8"
 ENV         LC_ALL="C.UTF-8"
 ENV         TZ="America/Los_Angeles"
-#           FIXME: curl is only necessary for a single netns test. Fix the test and remove curl.
+#           FIXME: replace this ssh thing with a proper su -
+#           SSH is necessary for rootless testing (to create systemd user session).
+#           (`sudo` does not work for this purpose,
+#           OTOH `machinectl shell` can create the session but does not propagate exit code)
 RUN         echo "force-unsafe-io" > /etc/dpkg/dpkg.cfg.d/farcloser-speedup && \
             echo 'Acquire::Languages "none";' > /etc/apt/apt.conf.d/farcloser-no-language && \
             echo 'Acquire::GzipIndexes "true";' > /etc/apt/apt.conf.d/farcloser-gzip-indexes && \
@@ -892,33 +894,9 @@ RUN         echo "force-unsafe-io" > /etc/dpkg/dpkg.cfg.d/farcloser-speedup && \
                 iptables \
                 iproute2 \
                 dbus dbus-user-session systemd systemd-sysv \
-                curl \
                 uidmap \
                 openssh-server \
                 openssh-client \
-                    >/dev/null
-ARG         BINARY_NAME
-COPY        Dockerfile.d/systemd/entrypoint.service /etc/systemd/system/
-COPY        Dockerfile.d/systemd/entrypoint.target /etc/systemd/system/
-COPY        Dockerfile.d/systemd/entrypoint.sh /entrypoint.sh
-RUN         systemctl mask systemd-firstboot.service systemd-udevd.service systemd-modules-load.service && \
-            systemctl unmask systemd-logind && \
-            systemctl enable entrypoint.service
-ENTRYPOINT  ["/entrypoint.sh"]
-CMD         ["bash", "--login", "-i"]
-
-# assembly-runtime is the basis for the test integration environment
-# this stage purposedly does NOT depend on the cli, so, it should be highly cacheable
-FROM        tooling-runtime AS assembly-runtime
-ARG         TARGETPLATFORM
-# FIXME: finish removing unbuffer from the test codebase and then remove expect
-# SSH is necessary for rootless testing (to create systemd user session).
-# (`sudo` does not work for this purpose,
-# OTOH `machinectl shell` can create the session but does not propagate exit code)
-RUN         apt-get install -qq --no-install-recommends \
-                expect \
-                git \
-                make \
                     >/dev/null
 # Add all needed dependencies, but not the cli yet to avoid busting cache
 COPY        --from=dependencies-build-containerd /out /usr/local
@@ -936,49 +914,62 @@ COPY        --from=dependencies-build-imgcrypt /out /usr/local
 COPY        --from=dependencies-build-buildkit /out /usr/local/
 COPY        --from=dependencies-build-cosign /out /usr/local/
 #COPY        --from=dependencies-build-cosign-pkcs /out /usr/local/
-# Add assets
-COPY        --from=dependencies-build-containerd /containerd.service /usr/local/lib/systemd/system/containerd.service
-# NOTE: github.com/moby/buildkit/examples/systemd is not included in BuildKit v0.8.x, will be included in v0.9.x
-# FIXME: now that we are at buildkit 0.20+, do we want to move over to their example systemd file?
-RUN         cd /usr/local/lib/systemd/system && \
-            sedcomm='s@bin/containerd@bin/buildkitd@g; s@(Description|Documentation)=.*@@' && \
-            sed -E "${sedcomm}" containerd.service > buildkit.service && \
-            echo "" >> buildkit.service && \
-            echo "# This file was converted from containerd.service, with \`sed -E '${sedcomm}'\`" >> buildkit.service
-# Final preparations
-RUN         mkdir -p -m 0755 /etc/cni
-# Add go
-ENV         PATH="/root/go/bin:/usr/local/go/bin:$PATH"
-COPY        --from=tooling-downloader-golang /out/usr/local/$TARGETPLATFORM /usr/local
-ENV         CGO_ENABLED=0
-ENV         GOFIPS140=v1.0.0
-ENV         GOTOOLCHAIN=local
-ENV         GOFLAGS="$GOFLAGS -mod=vendor"
+COPY        ./Dockerfile.d/etc /etc
+COPY        ./Dockerfile.d/entrypoint.sh /
+RUN         systemctl mask systemd-firstboot.service systemd-udevd.service systemd-modules-load.service && \
+            systemctl unmask systemd-logind && \
+            systemctl enable entrypoint.service
+RUN         useradd -m -s /bin/bash rootless && \
+            mkdir -p /home/rootless/.local/share && \
+            chown -R rootless:rootless /home/rootless
+ARG         BINARY_NAME
 VOLUME      /var/lib/containerd
 VOLUME      /var/lib/buildkit
 VOLUME      /var/lib/"$BINARY_NAME"
+VOLUME      /home/rootless/.local/share
 VOLUME      /tmp
+# Use a different bridge ip to avoid conflicts with the host
+ENV         LEPTON_BRIDGE_IP=10.42.100.1/24
+ENTRYPOINT  ["/entrypoint.sh"]
+CMD         ["bash", "--login", "-i"]
+
+# assembly-runtime is the basis for the test integration environment
+# this stage purposedly does NOT depend on the cli, so, it should be highly cacheable
+FROM        tooling-runtime AS assembly-runtime
+ARG         TARGETPLATFORM
+WORKDIR     /src
+ENV         GOFIPS140=v1.0.0
+ENV         GOTOOLCHAIN=local
+ENV         GOFLAGS="$GOFLAGS -mod=vendor"
+ENV         CGO_ENABLED=0
+COPY        --from=tooling-downloader-golang /out/usr/local/$TARGETPLATFORM /usr/local
+ENV         PATH="/root/go/bin:/usr/local/go/bin:$PATH"
+RUN         --mount=target=/root/go/pkg/mod,type=cache \
+            --mount=target=/src/Makefile,source=Makefile,type=bind \
+            apt-get install -qq --no-install-recommends \
+                git \
+                make \
+                    >/dev/null; \
+            NO_COLOR=true GOFLAGS= make install-dev-gotestsum; chmod -R a+rx /root/go/bin; \
+            apt-get purge -qq \
+                git make \
+                    >/dev/null
 
 FROM        assembly-runtime AS assembly-integration
-WORKDIR     /src
 # Copy config and service files
-COPY        ./Dockerfile.d/etc_containerd_config.toml /etc/containerd/config.toml
-COPY        ./Dockerfile.d/etc_buildkit_buildkitd.toml /etc/buildkit/buildkitd.toml
-COPY        ./Dockerfile.d/systemd/test-integration-buildkit-test.service /usr/local/lib/systemd/system/
-COPY        ./Dockerfile.d/systemd/test-integration-soci-snapshotter.service /usr/local/lib/systemd/system/
+COPY        ./Dockerfile.d/lib /usr/local/lib
 # using test integration containerd config
 COPY        ./Dockerfile.d/test-integration-etc_containerd_config.toml /etc/containerd/config.toml
-RUN         perl -pi -e 's/multi-user.target/entrypoint.target/g' /usr/local/lib/systemd/system/*.service
-# install ipfs service. avoid using 5001(api)/8080(gateway) which are reserved by tests.
 RUN         systemctl enable \
                 containerd  \
                 buildkit \
                 test-integration-buildkit-test  \
                 test-integration-soci-snapshotter
-# Install dev tools
-RUN         --mount=target=/root/go/pkg/mod,type=cache \
-            --mount=target=/src/Makefile,source=Makefile,type=bind \
-            NO_COLOR=true GOFLAGS= make install-dev-gotestsum; chmod -R a+rx /root/go/bin
+#           FIXME: finish removing unbuffer from the test codebase and then remove expect
+#           FIXME: curl is only necessary for a single netns test. Fix the test and remove curl.
+RUN         apt-get install -qq --no-install-recommends \
+                 curl \
+                 expect >/dev/null
 
 ########################################################################################################################
 # Final
@@ -1009,12 +1000,8 @@ CMD         ["./hack/test-integration.sh"]
 FROM        test-integration AS test-integration-rootless
 # TODO: update containerized-systemd to enable sshd by default, or allow `systemctl wants <TARGET> ssh` here
 RUN         ssh-keygen -q -t rsa -f /root/.ssh/id_rsa -N '' && \
-            useradd -m -s /bin/bash rootless && \
             mkdir -p -m 0700 /home/rootless/.ssh && \
-            cp -a /root/.ssh/id_rsa.pub /home/rootless/.ssh/authorized_keys && \
-            mkdir -p /home/rootless/.local/share && \
-            chown -R rootless:rootless /home/rootless
-COPY        ./Dockerfile.d/etc_systemd_system_user@.service.d_delegate.conf /etc/systemd/system/user@.service.d/delegate.conf
+            cp -a /root/.ssh/id_rsa.pub /home/rootless/.ssh/authorized_keys
 VOLUME      /home/rootless/.local/share
 COPY        ./Dockerfile.d/test-integration-rootless.sh /
 RUN         chmod a+rx /test-integration-rootless.sh
