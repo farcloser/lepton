@@ -729,6 +729,7 @@ func TestRunContainerInExistingNetNS(t *testing.T) {
 	time.Sleep(3 * time.Second)
 
 	err = netNS.Do(func(netns ns.NetNS) error {
+		// FIXME: does not work directly in go - figure out why
 		stdout, err := exec.Command("curl", "-s", "http://127.0.0.1:80").Output()
 		assert.NilError(t, err)
 		assert.Assert(t, strings.Contains(string(stdout), testutil.NginxAlpineIndexHTMLSnippet))

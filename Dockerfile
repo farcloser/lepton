@@ -64,7 +64,9 @@ ARG         ROOTLESSKIT_REPO=github.com/rootless-containers/rootlesskit
 ARG         LIBSLIRP_VERSION=v4.9.0
 ARG         LIBSLIRP_REVISION=c32a8a1ccaae8490142e67e078336a95c5ffc956
 ARG         LIBSLIRP_LICENSE="$LICENSE_3CLAUSES_BSD"
-ARG         LIBSLIRP_REPO=gitlab.freedesktop.org/slirp/libslirp
+# Maintenance for a week, March 2025
+# ARG         LIBSLIRP_REPO=gitlab.freedesktop.org/slirp/libslirp
+ARG         LIBSLIRP_REPO=gitlab.com/qemu-project/libslirp
 
 ARG         SLIRP4NETNS_VERSION=v1.3.2
 ARG         SLIRP4NETNS_REVISION=0f13345bcef588d2bb70d662d41e92ee8a816d85
@@ -99,11 +101,6 @@ ARG         LIBCAP_LICENSE="$LICENSE_3CLAUSES_BSD"
 ARG         NO_COLOR=true
 ARG         DEBIAN_IMAGE=ghcr.io/apostasie/debian
 ARG         UBUNTU_IMAGE=ghcr.io/apostasie/ubuntu
-# XXX experimenting with musl. Unlikely to go anywhere (looks like linking pkcs11 requires glibc anyhow?).
-#ARG         LIBC="libc6-dev gcc binutils"
-#ARG         GCC=gnu-gcc
-#ARG         LIBC="musl-dev musl-tools"
-#ARG         GCC=musl-gcc
 
 ########################################################################################################################
 # Base images
@@ -115,7 +112,7 @@ ARG         UBUNTU_IMAGE=ghcr.io/apostasie/ubuntu
 
 #           tooling-base is the single base image we use for all other tooling image
 #           Note: technically, we should rm -rf /var/lib/apt/lists/* - however that means forcing apt-get update everytime
-#           The cost is about 20MB.
+#           The cost is about 20MB on a single arch.
 FROM        --platform=$BUILDPLATFORM $DEBIAN_IMAGE:$DEBIAN_VERSION AS tooling-base
 SHELL       ["/bin/bash", "-o", "errexit", "-o", "errtrace", "-o", "functrace", "-o", "nounset", "-o", "pipefail", "-c"]
 ENV         DEBIAN_FRONTEND="noninteractive"
@@ -131,18 +128,6 @@ RUN         echo "force-unsafe-io" > /etc/dpkg/dpkg.cfg.d/farcloser-speedup && \
                 ca-certificates \
                     >/dev/null
 
-#           tooling-downloader purpose is to enable later stages to download content directly using curl
-FROM        --platform=$BUILDPLATFORM tooling-base AS tooling-downloader
-#           Work directory where downloads will be stored
-WORKDIR     /src
-#           /out is meant to hold final / distributable assets
-#           /metadata to hold transient information useful for the build and assemblies (VERSION, LICENSE, etc)
-RUN         mkdir -p /out/bin; mkdir -p /metadata && \
-            apt-get install -qq --no-install-recommends \
-                curl \
-                jq \
-                    >/dev/null
-
 #           tooling-downloader-golang will download a golang archive and expand it into /out/usr/local
 #           You may set GO_VERSION to an explicit, complete version (eg: 1.23.0), or you can also set it to:
 #           - canary: that will retrieve the latest alpha/beta/RC
@@ -150,9 +135,13 @@ RUN         mkdir -p /out/bin; mkdir -p /metadata && \
 #           Note that for these last two, you need to bust the cache for this stage if you expect a refresh
 #           Finally note that we are retrieving both architectures we are currently supporting (arm64 and amd64) in one stage,
 #           and do NOT leverage TARGETARCH, as that would force cross compilation to use a non-native binary in dependent stages.
-FROM        --platform=$BUILDPLATFORM tooling-downloader AS tooling-downloader-golang
+FROM        --platform=$BUILDPLATFORM tooling-base AS tooling-downloader-golang
 ARG         GO_VERSION
-RUN         os=linux; \
+RUN         apt-get install -qq --no-install-recommends \
+               curl \
+               jq \
+                   >/dev/null; \
+            os=linux; \
             all_versions="$(curl -fsSL --proto '=https' --tlsv1.3 "https://go.dev/dl/?mode=json&include=all")"; \
             candidates="$(case "$GO_VERSION" in \
                     canary) condition=".stable==false" ;; \
@@ -173,7 +162,8 @@ RUN         os=linux; \
             curl -fsSL --proto '=https' --tlsv1.3 https://go.dev/dl/"$filename" | tar xzC /out/usr/local/linux/"$arch" || {  \
                 echo "Failed retrieving go download for $arch: $GO_VERSION"; \
                 exit 1; \
-            }
+            }; \
+            apt-get purge -qq curl jq
 
 #           tooling-builder is a go enabled stage with minimal build tooling installed that can be used to build non-cgo projects
 FROM        --platform=$BUILDPLATFORM tooling-base AS tooling-builder
@@ -510,6 +500,7 @@ RUN         --mount=target=/root/go/pkg/mod,type=cache \
 ########################################################################################################################
 # cli binary is built from the local context
 ########################################################################################################################
+# FIXME: leptonic is temporary
 FROM        --platform=$BUILDPLATFORM tooling-builder AS dependencies-download-cli
 ARG         BINARY_NAME
 ARG         BINARY_LICENSE
@@ -527,7 +518,6 @@ RUN         --mount=target=/src,type=bind \
             { printf "%s" "$(git rev-parse HEAD)"; if ! git diff --no-ext-diff --quiet --exit-code; then printf .m; fi; } > /metadata/REVISION && \
             { git describe --tags --match 'v[0-9]*' --dirty='.m' --always 2>/dev/null || true; } > /metadata/VERSION && \
             echo "$BINARY_LICENSE" > /metadata/LICENSE
-
 
 ########################################################################################################################
 # Building
@@ -832,7 +822,6 @@ RUN         --mount=target=/metadata-$BINARY_NAME,type=cache,from=dependencies-d
             --mount=target=/metadata-runc,type=cache,from=dependencies-download-runc,source=/metadata \
             --mount=target=/metadata-soci,type=cache,from=dependencies-download-soci,source=/metadata \
             --mount=target=/metadata-bypass4netns,type=cache,from=dependencies-download-bypass4netns,source=/metadata \
-            --mount=target=/metadata-libslirp,type=cache,from=dependencies-download-libslirp,source=/metadata \
             --mount=target=/metadata-slirp4netns,type=cache,from=dependencies-download-slirp4netns,source=/metadata \
             --mount=target=/metadata-tini,type=cache,from=dependencies-download-tini,source=/metadata \
             --mount=target=/metadata-cni,type=cache,from=dependencies-download-cni,source=/metadata \
@@ -845,10 +834,11 @@ RUN         --mount=target=/metadata-$BINARY_NAME,type=cache,from=dependencies-d
                 item="${item##*-}"; \
                 printf "* %s:\n    - version: %s\n    - license: %s\n" "$item" "$(cat /metadata-$item/VERSION)" "$(cat /metadata-$item/LICENSE)" >> /out/share/doc/"$BINARY_NAME"-full/README.md; \
             done; \
-            printf "Statically compiled:\n* %s:\n    - license: %s\n" "libseccomp" "$SECCOMP_LICENSE" >> /out/share/doc/"$BINARY_NAME"-full/README.md; \
+            printf "Statically compiled (runc and others):\n* %s:\n    - license: %s\n" "libseccomp" "$SECCOMP_LICENSE" >> /out/share/doc/"$BINARY_NAME"-full/README.md; \
             printf "Statically compiled (soci):\n* %s:\n    - license: %s\n" "zlib1g" "$ZLIB_LICENSE" >> /out/share/doc/"$BINARY_NAME"-full/README.md; \
             printf "Statically compiled (slirp4netns):\n* %s:\n    - license: %s\n" "libglib2.0" "$GLIB_LICENSE" >> /out/share/doc/"$BINARY_NAME"-full/README.md; \
-            printf "* %s:\n    - license: %s\n" "libcap" "$LIBCAP_LICENSE" >> /out/share/doc/"$BINARY_NAME"-full/README.md
+            printf "* %s:\n    - license: %s\n" "libcap" "$LIBCAP_LICENSE" >> /out/share/doc/"$BINARY_NAME"-full/README.md; \
+            printf "* %s:\n    - license: %s\n" "libslirp" "$LIBSLIRP_LICENSE" >> /out/share/doc/"$BINARY_NAME"-full/README.md
 
 # assembly-release is multi-architecture, and is the stage assembling all assets for full-release
 # Once done, shasums will be generated and stuffed in to produce the full release
@@ -890,6 +880,7 @@ ENV         TERM="xterm"
 ENV         LANG="C.UTF-8"
 ENV         LC_ALL="C.UTF-8"
 ENV         TZ="America/Los_Angeles"
+#           FIXME: curl is only necessary for a single netns test. Fix the test and remove curl.
 RUN         echo "force-unsafe-io" > /etc/dpkg/dpkg.cfg.d/farcloser-speedup && \
             echo 'Acquire::Languages "none";' > /etc/apt/apt.conf.d/farcloser-no-language && \
             echo 'Acquire::GzipIndexes "true";' > /etc/apt/apt.conf.d/farcloser-gzip-indexes && \
@@ -902,7 +893,6 @@ RUN         echo "force-unsafe-io" > /etc/dpkg/dpkg.cfg.d/farcloser-speedup && \
                 iproute2 \
                 dbus dbus-user-session systemd systemd-sysv \
                 curl \
-                fuse3 \
                 uidmap \
                 openssh-server \
                 openssh-client \
@@ -956,7 +946,6 @@ RUN         cd /usr/local/lib/systemd/system && \
             echo "" >> buildkit.service && \
             echo "# This file was converted from containerd.service, with \`sed -E '${sedcomm}'\`" >> buildkit.service
 # Final preparations
-RUN         cp /usr/local/bin/tini /usr/local/bin/tini-custom
 RUN         mkdir -p -m 0755 /etc/cni
 # Add go
 ENV         PATH="/root/go/bin:/usr/local/go/bin:$PATH"
@@ -964,6 +953,7 @@ COPY        --from=tooling-downloader-golang /out/usr/local/$TARGETPLATFORM /usr
 ENV         CGO_ENABLED=0
 ENV         GOFIPS140=v1.0.0
 ENV         GOTOOLCHAIN=local
+ENV         GOFLAGS="$GOFLAGS -mod=vendor"
 VOLUME      /var/lib/containerd
 VOLUME      /var/lib/buildkit
 VOLUME      /var/lib/"$BINARY_NAME"
@@ -988,40 +978,34 @@ RUN         systemctl enable \
 # Install dev tools
 RUN         --mount=target=/root/go/pkg/mod,type=cache \
             --mount=target=/src/Makefile,source=Makefile,type=bind \
-            NO_COLOR=true make install-dev-gotestsum; chmod -R a+rx /root/go/bin
+            NO_COLOR=true GOFLAGS= make install-dev-gotestsum; chmod -R a+rx /root/go/bin
 
 ########################################################################################################################
 # Final
 # These stages are high-level targets that correspond to a specific task (release, integration, etc)
 ########################################################################################################################
-# release-full is the final stage producing the -full releases, including SHASUM
+#           release-full is the final stage producing the -full releases, adding the computed SHASUM
 FROM        assembly-release AS release-full
 ARG         BINARY_NAME
-# Stuff in the shasums
 COPY        --from=assembly-shasum /out/SHA256SUMS /share/doc/"$BINARY_NAME"-full/SHA256SUMS
 
-# release-demo
+#           release-demo is a fully running stack in a container
 FROM        tooling-runtime AS release-demo
 COPY        --from=release-full / /usr/local
-# Install shell completion
 RUN         mkdir -p /etc/bash_completion.d && \
-            "$BINARY_NAME" completion bash >/etc/bash_completion.d/"$BINARY_NAME"
+            "$BINARY_NAME" completion bash >/usr/share/bash-completion/completions/"$BINARY_NAME"
 
-# test-integration is the final stage for the integration testing environment
-# it is multi-architecture, and not fully cacheable, as changing anything in the cli will invalidate cache here
+#           test-integration is the final stage for the integration testing environment
 FROM        assembly-integration AS test-integration
-# Get binaries
 COPY        --from=dependencies-build-cli /out /usr/local
-# Install shell completion
 RUN         mkdir -p /etc/bash_completion.d && \
-            "$BINARY_NAME" completion bash >/etc/bash_completion.d/"$BINARY_NAME"
-# Copy the relevant part
-COPY        . /src
-# Get modules
+            "$BINARY_NAME" completion bash >/usr/share/bash-completion/completions/"$BINARY_NAME"
 COPY        --from=dependencies-download-cli /src/vendor /src/vendor
+#           copy source - note this is volatile and not cacheable
+COPY        . /src
 CMD         ["./hack/test-integration.sh"]
 
-# test-integration-rootless
+#           test-integration-rootless
 FROM        test-integration AS test-integration-rootless
 # TODO: update containerized-systemd to enable sshd by default, or allow `systemctl wants <TARGET> ssh` here
 RUN         ssh-keygen -q -t rsa -f /root/.ssh/id_rsa -N '' && \
@@ -1050,35 +1034,24 @@ RUN         chown -R rootless:rootless /home/rootless/.config
 # - verify all binaries are static and running
 FROM        tooling-runtime AS release-full-sanity
 ARG         TARGETARCH
-
 RUN         apt-get install -qq --no-install-recommends \
                 binutils \
                 patchelf \
                 devscripts \
                     >/dev/null
-
 COPY        ./Dockerfile.d/helpers/sanity.sh /
-
-# All binaries are expected to be static and to run
+#           All binaries are expected to be static and to run
 ARG         STATIC=true
 ARG         RUNNING=true
-# This is a subset of STATIC
-ARG         NO_SYSTEM_LINK=true
-# All CGO and C binaries should be PIE + bind now + read-only relocations
+#           All CGO and C binaries must be PIE + BIND_NOW + RO_RELOCATIONS
 ARG         CBINS="runc containerd bypass4netns soci soci-snapshotter-grpc slirp4netns tini"
-ARG         RO_RELOCATIONS=true
-ARG         BIND_NOW=true
-ARG         PIE=true
-# We do not link against protectable libc functions
+#           We do not link against protectable libc functions, so...
 ARG         FORTIFIED=true
 ARG         STACK_CLASH=true
 ARG         STACK_PROTECTED=false
-
-# bypass4netns will crash if this is not set
+#           bypass4netns will crash if this is not set
 ENV         XDG_RUNTIME_DIR=/tmp
-
 WORKDIR     /src
-
 RUN         --mount=target=/src,type=cache,from=release-full,source=/ \
             sha256sum -c share/doc/*/SHA256SUMS; \
             cd bin; \
