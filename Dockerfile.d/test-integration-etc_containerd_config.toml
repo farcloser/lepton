@@ -1,6 +1,0 @@
-version = 2
-
-[proxy_plugins]
-  [proxy_plugins.soci]
-    type = "snapshot"
-    address = "/run/soci-snapshotter-grpc/soci-snapshotter-grpc.sock"

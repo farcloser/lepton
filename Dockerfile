@@ -224,11 +224,9 @@ ARG         GOFLAGS_COMMON="$GOFLAGS -ldflags=-linkmode=external -tags=cgo,netgo
 ARG         GOFLAGS_NOPIE="$GOFLAGS_COMMON"
 ARG         GOFLAGS_PIE="$GOFLAGS_COMMON -buildmode=pie"
 # Set default linker options for CGO projects
+# TODO: -s -w -gcflags=all="-N -l" CGO_LDFLAGS=-fuse-ld=lld?
 ARG         GOFLAGS="$GOFLAGS_PIE"
-# TODO: -s -w - extldflags -static-pie and -static?
-# -gcflags=all="-N -l"?
-# CGO_LDFLAGS=-fuse-ld=lld?
-
+ARG         SUPPORTED_ARCHS
 # cross-build-essential brings in gcc, g++ (along with binutils) and dpkg-cross
 # pkg-config: go libseccomp
 # cmake: tini
@@ -240,11 +238,11 @@ RUN         apt-get install -qq --no-install-recommends \
                 meson \
                 automake \
                     >/dev/null; \
-            for architecture in arm64 amd64; do \
+            for architecture in $SUPPORTED_ARCHS; do \
                 dpkg --add-architecture "$architecture"; \
             done; \
             apt-get update -qq >/dev/null; \
-            for architecture in amd64 arm64; do \
+            for architecture in $SUPPORTED_ARCHS; do \
                 debarch="$(sed -e 's/arm64/aarch64/' -e 's/amd64/x86-64/' <<<"$architecture")"; \
                 apt-get install -qq \
                     crossbuild-essential-"$architecture" \
@@ -520,7 +518,6 @@ RUN         --mount=target=/src,type=bind \
 
 ########################################################################################################################
 # Building
-# From the source above, source layers are mounted.
 # Note:
 # - we are systematically bypassing native Makefile and other ways to build as:
 #   - most of them do not allow building out of tree (problematic for sharing the layer accross multiple arch)
@@ -550,10 +547,10 @@ FROM        --platform=$BUILDPLATFORM tooling-builder AS dependencies-build-buil
 ARG         TARGETARCH
 ARG         GOPROXY=off
 ARG         PKG=github.com/moby/buildkit
+#            sed 's/WantedBy=multi-user.target/RequiredBy=entrypoint.target/' examples/systemd/system/buildkit.service > /out/lib/systemd/system/buildkit.service; \
 RUN         --mount=from=dependencies-download-buildkit,type=bind,target=/src,source=/src \
             --mount=from=dependencies-download-buildkit,type=bind,target=/metadata,source=/metadata \
             mkdir -p /out/lib/systemd/system; \
-            sed 's/multi-user.target/entrypoint.target/' examples/systemd/system/buildkit.service > /out/lib/systemd/system/buildkit.service; \
             cp -a examples/systemd/system/buildkit.socket /out/lib/systemd/system/; \
             GOOS=linux GOARCH=$TARGETARCH go build -mod=vendor \
                 -ldflags "-X $PKG/version.Version=$(cat /metadata/VERSION) -X $PKG/version.Revision=$(cat /metadata/REVISION) -X $PKG/version.Package=$PKG" \
@@ -695,7 +692,7 @@ RUN         --mount=from=dependencies-download-containerd,type=bind,target=/src,
                 -ldflags "-X $PKG/version.Version=$(cat /metadata/VERSION) -X $PKG/version.Revision=$(cat /metadata/REVISION) -X $PKG/version.Package=$PKG" \
                 -tags=no_btrfs,no_devmapper,no_zfs,seccomp,urfave_cli_no_docs,cgo,osusergo,netgo,static_build \
                 -o /out/bin/containerd ./cmd/containerd && \
-            sed 's/multi-user.target/entrypoint.target/' containerd.service > /out/lib/systemd/system/containerd.service
+            sed 's/WantedBy=multi-user.target/RequiredBy=entrypoint.target/' containerd.service > /out/lib/systemd/system/containerd.service
 
 ########################################################################################################################
 # CGO: soci
@@ -704,12 +701,15 @@ FROM        --platform=$BUILDPLATFORM tooling-builder-with-c-dependencies AS dep
 ARG         TARGETARCH
 ARG         GOPROXY=off
 ARG         PKG=github.com/awslabs/soci-snapshotter
+#            sed 's/WantedBy=multi-user.target/RequiredBy=entrypoint.target/' soci-snapshotter.service > /out/lib/systemd/system/soci-snapshotter.service; \
 RUN         --mount=from=dependencies-download-soci,type=bind,target=/src,source=/src \
             --mount=from=dependencies-download-soci,type=bind,target=/metadata,source=/metadata \
             apt-get install -qq --no-install-recommends \
                 zlib1g-dev:"$TARGETARCH" \
                     >/dev/null; \
             . /.env; \
+            mkdir -p /out/lib/systemd/system; \
+            cp -a soci-snapshotter.socket /out/lib/systemd/system/; \
             cd cmd && \
             GOOS=linux GOARCH=$TARGETARCH go build --mod=vendor \
                 -ldflags "-X $PKG/version.Version=$(cat /metadata/VERSION) -X $PKG/version.Revision=$(cat /metadata/REVISION)" \
@@ -879,11 +879,14 @@ ENV         TERM="xterm"
 ENV         LANG="C.UTF-8"
 ENV         LC_ALL="C.UTF-8"
 ENV         TZ="America/Los_Angeles"
-#           FIXME: replace this ssh thing with a proper su -
+RUN         useradd -m -s /bin/bash rootless; \
+            mkdir -p /home/rootless/.local/share; \
+            chown -R rootless:rootless /home/rootless; \
+#           FIXME: replace this ssh thing with something else
 #           SSH is necessary for rootless testing (to create systemd user session).
 #           (`sudo` does not work for this purpose,
 #           OTOH `machinectl shell` can create the session but does not propagate exit code)
-RUN         echo "force-unsafe-io" > /etc/dpkg/dpkg.cfg.d/farcloser-speedup && \
+            echo "force-unsafe-io" > /etc/dpkg/dpkg.cfg.d/farcloser-speedup && \
             echo 'Acquire::Languages "none";' > /etc/apt/apt.conf.d/farcloser-no-language && \
             echo 'Acquire::GzipIndexes "true";' > /etc/apt/apt.conf.d/farcloser-gzip-indexes && \
             apt-get update -qq >/dev/null && \
@@ -891,14 +894,16 @@ RUN         echo "force-unsafe-io" > /etc/dpkg/dpkg.cfg.d/farcloser-speedup && \
                 ca-certificates \
                 apparmor \
                 bash-completion \
+                git \
                 iptables \
                 iproute2 \
                 dbus dbus-user-session systemd systemd-sysv \
                 uidmap \
                 openssh-server \
                 openssh-client \
-                    >/dev/null
-# Add all needed dependencies, but not the cli yet to avoid busting cache
+                    >/dev/null; \
+            systemctl mask systemd-firstboot.service systemd-udevd.service systemd-modules-load.service; \
+            systemctl unmask systemd-logind
 COPY        --from=dependencies-build-containerd /out /usr/local
 COPY        --from=dependencies-build-containerd-tools /out /usr/local
 COPY        --from=dependencies-build-runc /out /usr/local
@@ -914,28 +919,30 @@ COPY        --from=dependencies-build-imgcrypt /out /usr/local
 COPY        --from=dependencies-build-buildkit /out /usr/local/
 COPY        --from=dependencies-build-cosign /out /usr/local/
 #COPY        --from=dependencies-build-cosign-pkcs /out /usr/local/
-COPY        ./Dockerfile.d/etc /etc
-COPY        ./Dockerfile.d/entrypoint.sh /
-RUN         systemctl mask systemd-firstboot.service systemd-udevd.service systemd-modules-load.service && \
-            systemctl unmask systemd-logind && \
-            systemctl enable entrypoint.service
-RUN         useradd -m -s /bin/bash rootless && \
-            mkdir -p /home/rootless/.local/share && \
-            chown -R rootless:rootless /home/rootless
 ARG         BINARY_NAME
 VOLUME      /var/lib/containerd
+VOLUME      /var/lib/soci-snapshotter-grpc
 VOLUME      /var/lib/buildkit
 VOLUME      /var/lib/"$BINARY_NAME"
 VOLUME      /home/rootless/.local/share
 VOLUME      /tmp
-# Use a different bridge ip to avoid conflicts with the host
+#           Use a different bridge ip to avoid conflicts with the host
 ENV         LEPTON_BRIDGE_IP=10.42.100.1/24
+#           Pass along a specific namespace for buildkit to use
+ENV         NAMESPACE=default
+COPY        ./Dockerfile.d/etc /etc
+COPY        ./Dockerfile.d/entrypoint.sh /
+COPY        ./Dockerfile.d/lib /usr/local/lib
+RUN         systemctl enable \
+                securityfs  \
+                containerd  \
+                soci-snapshotter \
+                buildkit \
+                entrypoint.service
 ENTRYPOINT  ["/entrypoint.sh"]
 CMD         ["bash", "--login", "-i"]
 
-# assembly-runtime is the basis for the test integration environment
-# this stage purposedly does NOT depend on the cli, so, it should be highly cacheable
-FROM        tooling-runtime AS assembly-runtime
+FROM        tooling-runtime AS assembly-integration
 ARG         TARGETPLATFORM
 WORKDIR     /src
 ENV         GOFIPS140=v1.0.0
@@ -944,27 +951,14 @@ ENV         GOFLAGS="$GOFLAGS -mod=vendor"
 ENV         CGO_ENABLED=0
 COPY        --from=tooling-downloader-golang /out/usr/local/$TARGETPLATFORM /usr/local
 ENV         PATH="/root/go/bin:/usr/local/go/bin:$PATH"
+ENV         NAMESPACE=cli-test
 RUN         --mount=target=/root/go/pkg/mod,type=cache \
-            --mount=target=/src/Makefile,source=Makefile,type=bind \
+            --mount=target=/src/Makefile,source=./Makefile,type=bind \
             apt-get install -qq --no-install-recommends \
-                git \
-                make \
-                    >/dev/null; \
+                make >/dev/null; \
             NO_COLOR=true GOFLAGS= make install-dev-gotestsum; chmod -R a+rx /root/go/bin; \
             apt-get purge -qq \
-                git make \
-                    >/dev/null
-
-FROM        assembly-runtime AS assembly-integration
-# Copy config and service files
-COPY        ./Dockerfile.d/lib /usr/local/lib
-# using test integration containerd config
-COPY        ./Dockerfile.d/test-integration-etc_containerd_config.toml /etc/containerd/config.toml
-RUN         systemctl enable \
-                containerd  \
-                buildkit \
-                test-integration-buildkit-test  \
-                test-integration-soci-snapshotter
+                make >/dev/null
 #           FIXME: finish removing unbuffer from the test codebase and then remove expect
 #           FIXME: curl is only necessary for a single netns test. Fix the test and remove curl.
 RUN         apt-get install -qq --no-install-recommends \
@@ -992,7 +986,6 @@ COPY        --from=dependencies-build-cli /out /usr/local
 RUN         mkdir -p /etc/bash_completion.d && \
             "$BINARY_NAME" completion bash >/usr/share/bash-completion/completions/"$BINARY_NAME"
 COPY        --from=dependencies-download-cli /src/vendor /src/vendor
-#           copy source - note this is volatile and not cacheable
 COPY        . /src
 CMD         ["./hack/test-integration.sh"]
 

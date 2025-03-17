@@ -32,7 +32,7 @@ env >/etc/entrypoint-env
 printf " %q" "$@" >/etc/entrypoint-cmd
 printf "\n" >>/etc/entrypoint-cmd
 
-# FIXME: AppArmor fails loading profiles on Lima - /proc/sys/kernel/apparmor_restrict_unprivileged_userns
-#sysctl -w kernel.apparmor_restrict_unprivileged_userns=1
+echo "NAMESPACE=$NAMESPACE" > /etc/buildkit/env
 
+# This will NOT guarantee is-active - any caller should first ensure `systemctl is-active entrypoint` before moving
 exec systemd --unit=entrypoint.target

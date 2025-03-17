@@ -21,20 +21,21 @@ readonly root
 
 readonly binary=lepton
 
-if [[ "$(id -u)" = "0" ]]; then
-  # Ensure securityfs is mounted for apparmor to work
-  if ! mountpoint -q /sys/kernel/security; then
-    mount -tsecurityfs securityfs /sys/kernel/security || {
-      >&2 printf "Failed to mount securityfs. AppArmor will not work.\n"
-    }
-  fi
-fi
+# This is mildly annoying
+x=0
+! command -v systemctl >/dev/null || while ! systemctl is-active containerd >/dev/null && [ "$x" -lt 20 ]; do
+  x=$((x+1))
+  sleep 0.5
+done
+[ "$x" -lt 20 ] || {
+  echo "failed waiting for systemd units to be active"
+  exit 42
+}
 
 readonly timeout="60m"
 readonly retries="2"
 readonly needsudo="${WITH_SUDO:-}"
 
-# See https://github.com/farcloser/lepton/blob/main/docs/testing/README.md#about-parallelization
 args=(--format=testname --jsonfile /tmp/test-integration.log --packages="$root"/../cmd/"$binary"/...)
 
 if [ "$#" == 0 ]; then
