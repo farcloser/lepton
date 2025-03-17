@@ -130,9 +130,9 @@ jobs:
         run: |
           # FIXME: we should delete on container shutdown instead
           sudo ip link delete lepton0 2>/dev/null || true
-          sudo unbuffer lepton run -t --net host --rm --env LEPTON_BRIDGE_IP=10.42.100.1/24 --privileged test-integration ./hack/test-integration.sh -test.only-flaky=false
+          sudo unbuffer lepton run -t --net host --rm --privileged test-integration ./hack/test-integration.sh -test.only-flaky=false
       - name: "Run integration tests (flaky)"
         run: |
           # FIXME: we should delete on container shutdown instead
           sudo ip link delete lepton0 2>/dev/null || true
-          sudo unbuffer lepton run -t --net host --rm --env LEPTON_BRIDGE_IP=10.42.100.1/24 --privileged test-integration ./hack/test-integration.sh -test.only-flaky=true
+          sudo unbuffer lepton run -t --net host --rm --privileged test-integration ./hack/test-integration.sh -test.only-flaky=true
