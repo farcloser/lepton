@@ -86,7 +86,13 @@ jobs:
       matrix:
         include:
           - runner: ${{ needs.env.outputs.RUNNER_LINUX_AMD64_STABLE }}
+            flaky: false
+          - runner: ${{ needs.env.outputs.RUNNER_LINUX_AMD64_STABLE }}
+            flaky: true
           - runner: ${{ needs.env.outputs.RUNNER_LINUX_ARM64_STABLE }}
+            flaky: false
+          - runner: ${{ needs.env.outputs.RUNNER_LINUX_ARM64_STABLE }}
+            flaky: true
     steps:
       - name: "Clone"
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
@@ -97,11 +103,6 @@ jobs:
         uses: ./.github/actions/install-buildkit
       - name: "Prepare integration test environment"
         run: |
-          # FIXME: rid docker
-          sudo docker run --net none --privileged --rm tonistiigi/binfmt --install linux/arm64 || true
-          sudo docker run --net none --privileged --rm tonistiigi/binfmt --install linux/amd64 || true
-          # Because of how buildkit cache works, force the same buildplatform as the build stage
-          #  --opt build-arg:BUILDPLATFORM=linux/amd64 \
           time sudo -E buildctl build \
             --opt platform=$ACTION_NODE_OS/$ACTION_NODE_ARCH \
             --frontend=dockerfile.v0 \
@@ -124,15 +125,10 @@ jobs:
           sudo make install
       - name: "QEMU"
         run: |
-          sudo lepton run --net none --privileged --rm tonistiigi/binfmt --install linux/amd64 || true
-          sudo lepton run --net none --privileged --rm tonistiigi/binfmt --install linux/arm64 || true
-      - name: "Run integration tests"
+          [ "$RUNNER_ARCH" == "amd64" ] || sudo lepton run --net none --privileged --rm tonistiigi/binfmt --install linux/amd64
+          [ "$RUNNER_ARCH" == "arm64" ] || sudo lepton run --net none --privileged --rm tonistiigi/binfmt --install linux/arm64
+      - name: "Run integration tests (flaky: ${{matrix.flaky}})"
         run: |
           # FIXME: we should delete on container shutdown instead
           sudo ip link delete lepton0 2>/dev/null || true
-          sudo unbuffer lepton run -t --net host --rm --privileged test-integration ./hack/test-integration.sh -test.only-flaky=false
-      - name: "Run integration tests (flaky)"
-        run: |
-          # FIXME: we should delete on container shutdown instead
-          sudo ip link delete lepton0 2>/dev/null || true
-          sudo unbuffer lepton run -t --net host --rm --privileged test-integration ./hack/test-integration.sh -test.only-flaky=true
+          sudo unbuffer lepton run -t --net host --rm --privileged test-integration ./hack/test-integration.sh -test.only-flaky=${{matrix.flaky}}
