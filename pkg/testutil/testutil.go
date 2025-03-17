@@ -39,7 +39,6 @@ import (
 	"go.farcloser.world/containers/digest"
 	"go.farcloser.world/containers/specs"
 	"go.farcloser.world/core/filesystem"
-	"go.farcloser.world/core/version/semver"
 
 	"go.farcloser.world/lepton/leptonic/api"
 	"go.farcloser.world/lepton/leptonic/buildkit"
@@ -47,7 +46,6 @@ import (
 	"go.farcloser.world/lepton/leptonic/platforms"
 	"go.farcloser.world/lepton/leptonic/rootlesskit"
 	"go.farcloser.world/lepton/pkg/imgutil"
-	"go.farcloser.world/lepton/pkg/infoutil"
 	"go.farcloser.world/lepton/pkg/inspecttypes/dockercompat"
 	"go.farcloser.world/lepton/pkg/inspecttypes/native"
 	"go.farcloser.world/lepton/pkg/rootlessutil"
@@ -676,21 +674,6 @@ func RequireExecPlatform(t testing.TB, ss ...string) {
 			msg += fmt.Sprintf(": %v", err)
 		}
 		t.Skip(msg)
-	}
-}
-
-func RequireKernelVersion(t testing.TB, constraint string) {
-	t.Helper()
-	c, err := semver.NewConstraint(constraint)
-	if err != nil {
-		t.Fatal(err)
-	}
-	unameR, err := semver.NewVersion(infoutil.UnameR())
-	if err != nil {
-		t.Skip(err)
-	}
-	if !c.Check(unameR) {
-		t.Skipf("version %v does not satisfy constraints %v", unameR, c)
 	}
 }
 

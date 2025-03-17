@@ -479,7 +479,6 @@ func TestComposeUpWithBypass4netns(t *testing.T) {
 	if !rootlessutil.IsRootless() {
 		t.Skip("test needs rootless")
 	}
-	testutil.RequireKernelVersion(t, ">= 5.9.0-0")
 	testutil.RequireSystemService(t, "bypass4netnsd")
 	base := testutil.NewBase(t)
 	various.ComposeUp(t, base, "8085", fmt.Sprintf(`
