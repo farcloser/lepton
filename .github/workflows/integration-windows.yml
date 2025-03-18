@@ -1,0 +1,54 @@
+name: i9n / windows
+
+on:
+  push:
+    branches:
+      - main
+      - 'release/**'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+
+jobs:
+  env:
+    name: "init"
+    uses: ./.github/workflows/environment.yml
+
+  test-integration-windows:
+    needs: env
+    timeout-minutes: ${{ fromJSON(needs.env.outputs.TIMEOUT_LONG) }}
+    name: windows
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ${{ needs.env.outputs.RUNNER_WINDOWS_STABLE }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: "Clone"
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - name: "Setup"
+        uses: ./.github/actions/node
+      # TODO: cache these
+      - name: "Set up CNI"
+        run: GOPATH=$(go env GOPATH) ./hack/provisioning/windows/cni.sh
+      - name: "Set up containerd"
+        env:
+          ctrdVersion: ${{ needs.env.outputs.CONTAINERD_VERSION }}
+        run: powershell ./hack/provisioning/windows/containerd.ps1
+
+      - name: "Build and install cli"
+        run: |
+          go install ./cmd/lepton
+          which lepton
+          which lepton.exe
+          ls -lA ~/go/bin
+          make build
+          ls -lA _output
+      - name: "Run integration tests"
+        run: ./hack/test-integration.sh -test.only-flaky=false
+#      - name: "Run integration tests (flaky)"
+#        run: ./hack/test-integration.sh -test.only-flaky=true
