@@ -123,7 +123,7 @@ func TestIssue3425(t *testing.T) {
 					require.Not(nerdtest.Docker),
 				),
 				Setup: func(data test.Data, helpers test.Helpers) {
-					helpers.Ensure("image", "pull", testutil.CommonImage)
+					helpers.Ensure("image", "pull", "--quiet", testutil.CommonImage)
 					helpers.Ensure("run", "--quiet", "-d", "--name", data.Identifier(), testutil.CommonImage)
 					helpers.Ensure("image", "rm", "-f", testutil.CommonImage)
 					helpers.Ensure("image", "pull", testutil.CommonImage)
