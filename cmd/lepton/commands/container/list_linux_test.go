@@ -206,7 +206,7 @@ func TestContainerListWideMode(t *testing.T) {
 }
 
 func TestContainerListWithLabels(t *testing.T) {
-	t.Parallel()
+	//t.Parallel()
 
 	base, testContainer := preparePsTestContainer(t, "listWithLabels", true)
 
