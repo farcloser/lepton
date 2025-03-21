@@ -16,7 +16,7 @@ env:
 
 jobs:
   env:
-    name: " "
+    name: "init"
     uses: ./.github/workflows/environment.yml
 
   linux:

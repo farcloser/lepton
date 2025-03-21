@@ -27,8 +27,8 @@ ARG         LICENSE_ZLIB="The zlib/libpng License, https://opensource.org/licens
 ARG         BINARY_NAME=lepton
 ARG         BINARY_LICENSE="$LICENSE_APACHE_V2"
 
-ARG         CONTAINERD_VERSION=v2.0.3
-ARG         CONTAINERD_REVISION=06b99ca80cdbfbc6cc8bd567021738c9af2b36ce
+ARG         CONTAINERD_VERSION=v2.0.4
+ARG         CONTAINERD_REVISION=1a43cb6a1035441f9aca8f5666a9b3ef9e70ab20
 ARG         CONTAINERD_LICENSE="$LICENSE_APACHE_V2"
 ARG         CONTAINERD_REPO=github.com/containerd/containerd
 
@@ -796,6 +796,8 @@ RUN         --mount=from=dependencies-download-cli,type=bind,target=/metadata,so
             --mount=target=cmd,source=cmd,type=bind \
             --mount=target=leptonic,source=leptonic,type=bind \
             --mount=target=extras,source=extras,type=bind \
+            cp ./extras/rootless/containerd-rootless* /out/bin; \
+            chmod a+rx /out/bin/containerd-rootless*; \
             GOOS=linux GOARCH=$TARGETARCH go build --mod=vendor \
                 -ldflags "-X $PKG/version.Version=$(cat /metadata/VERSION) -X $PKG/pkg/version.Revision=$(cat /metadata/REVISION)" \
                 -o /out/bin/$BINARY_NAME ./cmd/$BINARY_NAME
@@ -882,10 +884,6 @@ ENV         TZ="America/Los_Angeles"
 RUN         useradd -m -s /bin/bash rootless; \
             mkdir -p /home/rootless/.local/share; \
             chown -R rootless:rootless /home/rootless; \
-#           FIXME: replace this ssh thing with something else
-#           SSH is necessary for rootless testing (to create systemd user session).
-#           (`sudo` does not work for this purpose,
-#           OTOH `machinectl shell` can create the session but does not propagate exit code)
             echo "force-unsafe-io" > /etc/dpkg/dpkg.cfg.d/farcloser-speedup && \
             echo 'Acquire::Languages "none";' > /etc/apt/apt.conf.d/farcloser-no-language && \
             echo 'Acquire::GzipIndexes "true";' > /etc/apt/apt.conf.d/farcloser-gzip-indexes && \
@@ -899,8 +897,6 @@ RUN         useradd -m -s /bin/bash rootless; \
                 iproute2 \
                 dbus dbus-user-session systemd systemd-sysv \
                 uidmap \
-                openssh-server \
-                openssh-client \
                     >/dev/null; \
             systemctl mask systemd-firstboot.service systemd-udevd.service systemd-modules-load.service; \
             systemctl unmask systemd-logind
@@ -927,6 +923,7 @@ VOLUME      /var/lib/"$BINARY_NAME"
 VOLUME      /home/rootless/.local/share
 VOLUME      /tmp
 #           Use a different bridge ip to avoid conflicts with the host
+#           FIXME: tied to the current binary name
 ENV         LEPTON_BRIDGE_IP=10.42.100.1/24
 #           Pass along a specific namespace for buildkit to use
 ENV         NAMESPACE=default
@@ -965,6 +962,13 @@ RUN         apt-get install -qq --no-install-recommends \
                  curl \
                  expect >/dev/null
 
+# XXX REMOVE - tentative hack to workaround having to mess with sysctl
+#RUN         apt-get install -qq --no-install-recommends libcap2-bin >/dev/null; \
+#            for b in /usr/local/bin/rootlesskit; do \
+#              setcap 'cap_net_bind_service+ep' "$(readlink -f $b)"; \
+#            done; \
+#            apt-get purge -qq libcap2-bin >/dev/null
+
 ########################################################################################################################
 # Final
 # These stages are high-level targets that correspond to a specific task (release, integration, etc)
@@ -989,15 +993,11 @@ COPY        --from=dependencies-download-cli /src/vendor /src/vendor
 COPY        . /src
 CMD         ["./hack/test-integration.sh"]
 
-#           test-integration-rootless
 FROM        test-integration AS test-integration-rootless
-# TODO: update containerized-systemd to enable sshd by default, or allow `systemctl wants <TARGET> ssh` here
-RUN         ssh-keygen -q -t rsa -f /root/.ssh/id_rsa -N '' && \
-            mkdir -p -m 0700 /home/rootless/.ssh && \
-            cp -a /root/.ssh/id_rsa.pub /home/rootless/.ssh/authorized_keys
-VOLUME      /home/rootless/.local/share
 COPY        ./Dockerfile.d/test-integration-rootless.sh /
-RUN         chmod a+rx /test-integration-rootless.sh
+RUN         chmod a+rx /test-integration-rootless.sh; \
+            chown -R rootless /src; \
+            cp /root/go/bin/gotestsum /usr/local/bin
 CMD         ["/test-integration-rootless.sh", "./hack/test-integration.sh"]
 
 # test for CONTAINERD_ROOTLESS_ROOTLESSKIT_PORT_DRIVER=slirp4netns
