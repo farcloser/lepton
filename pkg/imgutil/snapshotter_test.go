@@ -107,7 +107,10 @@ func TestDefaultSnapshotterOpts(t *testing.T) {
 // see https://github.com/containerd/containerd/blob/77d53d2d230c3bcd3f02e6f493019a72905c875b/images/mediatypes.go#L115
 type dummyImageHandler struct{}
 
-func (dih *dummyImageHandler) Handle(_ctx context.Context, _desc specs.Descriptor) (subdescs []specs.Descriptor, err error) {
+func (dih *dummyImageHandler) Handle(
+	_ctx context.Context,
+	_desc specs.Descriptor,
+) (subdescs []specs.Descriptor, err error) {
 	return []specs.Descriptor{
 		{
 			MediaType: "application/vnd.oci.image.layer.dummy",
@@ -157,7 +160,8 @@ func checkRemoteSnapshotterAnnotataions(t *testing.T, a map[string]string) {
 }
 
 // using values from soci source to check for annotations (
-// see https://github.com/awslabs/soci-snapshotter/blob/b05ba712d246ecc5146469f87e5e9305702fd72b/fs/source/source.go#L80C1-L80C6
+// see
+// https://github.com/awslabs/soci-snapshotter/blob/b05ba712d246ecc5146469f87e5e9305702fd72b/fs/source/source.go#L80C1-L80C6
 func checkSociSnapshotterAnnotataions(t *testing.T, a map[string]string) {
 	assert.Check(t, a != nil)
 	_, ok := a["containerd.io/snapshot/remote/soci.size"]

@@ -50,11 +50,19 @@ func PsCommand() *cobra.Command {
 	cmd.Flags().BoolP("quiet", "q", false, "Only display container IDs")
 	cmd.Flags().BoolP("size", "s", false, "Display total file sizes")
 	cmd.Flags().String("format", "", "Format the output using the given Go template, e.g, '{{json .}}', 'wide'")
-	cmd.Flags().StringSliceP("filter", "f", nil, "Filter matches containers based on given conditions. When specifying the condition 'status', it filters all containers")
+	cmd.Flags().
+		StringSliceP("filter", "f", nil, "Filter matches containers based on given conditions. When specifying the condition 'status', it filters all containers")
 
-	_ = cmd.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{formatter.FormatJSON, formatter.FormatTable, formatter.FormatWide}, cobra.ShellCompDirectiveNoFileComp
-	})
+	_ = cmd.RegisterFlagCompletionFunc(
+		"format",
+		func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			return []string{
+				formatter.FormatJSON,
+				formatter.FormatTable,
+				formatter.FormatWide,
+			}, cobra.ShellCompDirectiveNoFileComp
+		},
+	)
 
 	return cmd
 }

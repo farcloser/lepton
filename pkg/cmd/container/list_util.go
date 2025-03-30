@@ -30,7 +30,11 @@ import (
 	"go.farcloser.world/lepton/pkg/containerutil"
 )
 
-func foldContainerFilters(ctx context.Context, containers []containerd.Container, filters []string) (*containerFilterContext, error) {
+func foldContainerFilters(
+	ctx context.Context,
+	containers []containerd.Container,
+	filters []string,
+) (*containerFilterContext, error) {
 	filterCtx := &containerFilterContext{containers: containers}
 	err := filterCtx.foldFilters(ctx, filters)
 	return filterCtx, err
@@ -86,7 +90,10 @@ func (cl *containerFilterContext) foldFilters(ctx context.Context, filters []str
 			}
 			splited := strings.SplitN(filter, "=", 2)
 			if len(splited) != 2 {
-				return fmt.Errorf("invalid argument \"%s\" for \"-f, --filter\": bad format of filter (expected name=value)", folder.filterType)
+				return fmt.Errorf(
+					"invalid argument \"%s\" for \"-f, --filter\": bad format of filter (expected name=value)",
+					folder.filterType,
+				)
 			}
 			if err := folder.foldFunc(ctx, filter, splited[1]); err != nil {
 				return err
@@ -115,7 +122,12 @@ func (cl *containerFilterContext) foldExitedFilter(_ context.Context, filter, va
 func (cl *containerFilterContext) foldStatusFilter(_ context.Context, filter, value string) error {
 	status := containerd.ProcessStatus(value)
 	switch status {
-	case containerd.Running, containerd.Created, containerd.Stopped, containerd.Paused, containerd.Pausing, containerd.Unknown:
+	case containerd.Running,
+		containerd.Created,
+		containerd.Stopped,
+		containerd.Paused,
+		containerd.Pausing,
+		containerd.Unknown:
 		cl.statusFilterFuncs = append(cl.statusFilterFuncs, func(stats containerd.ProcessStatus) bool {
 			return status == stats
 		})
@@ -366,7 +378,11 @@ func (cl *containerFilterContext) matchesNetworkFilter(info containers.Container
 	return false
 }
 
-func idOrNameFilter(ctx context.Context, containers []containerd.Container, value string) (*containers.Container, error) {
+func idOrNameFilter(
+	ctx context.Context,
+	containers []containerd.Container,
+	value string,
+) (*containers.Container, error) {
 	for _, container := range containers {
 		info, err := container.Info(ctx, containerd.WithoutRefreshedMetadata)
 		if err != nil {

@@ -116,7 +116,13 @@ func (c *Composer) Run(ctx context.Context, ro RunOptions) error {
 
 	for i := range svcs {
 		// FYI: https://github.com/docker/compose/blob/v2.18.1/pkg/compose/run.go#L65
-		svcs[i].ContainerName = fmt.Sprintf("%[1]s%[4]s%[2]s%[4]srun%[4]s%[3]s", c.project.Name, svcs[i].Name, utils.GenerateID(utils.ID12), serviceparser.Separator)
+		svcs[i].ContainerName = fmt.Sprintf(
+			"%[1]s%[4]s%[2]s%[4]srun%[4]s%[3]s",
+			c.project.Name,
+			svcs[i].Name,
+			utils.GenerateID(utils.ID12),
+			serviceparser.Separator,
+		)
 	}
 
 	targetSvc.Tty = ro.Tty
@@ -231,11 +237,15 @@ func (c *Composer) runServices(ctx context.Context, parsedServices []*servicepar
 		services = append(services, ps.Unparsed.Name)
 
 		if len(ps.Containers) != 1 {
-			log.G(ctx).Warnf("compose run does not support scale but %s is currently %v, automatically it will configure 1", ps.Unparsed.Name, len(ps.Containers))
+			log.G(ctx).
+				Warnf("compose run does not support scale but %s is currently %v, automatically it will configure 1", ps.Unparsed.Name, len(ps.Containers))
 		}
 
 		if len(ps.Containers) == 0 {
-			return fmt.Errorf("error, a service should have at least one container but %s does not have any container", ps.Unparsed.Name)
+			return fmt.Errorf(
+				"error, a service should have at least one container but %s does not have any container",
+				ps.Unparsed.Name,
+			)
 		}
 		container := ps.Containers[0]
 

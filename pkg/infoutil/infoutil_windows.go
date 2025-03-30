@@ -139,7 +139,11 @@ func getKernelVersion(sw windowsInfoUtil) (string, error) {
 	// Get BuildLabEx value from the Windows registry
 	// [buiild number].[revision number].[architecture].[branch].[date]-[time]
 	// Eg. "BuildLabEx: 10240.16412.amd64fre.th1.150729-1800"
-	buildLab, err := sw.GetRegistryStringValue(registry.LOCAL_MACHINE, `SOFTWARE\Microsoft\Windows NT\CurrentVersion`, "BuildLabEx")
+	buildLab, err := sw.GetRegistryStringValue(
+		registry.LOCAL_MACHINE,
+		`SOFTWARE\Microsoft\Windows NT\CurrentVersion`,
+		"BuildLabEx",
+	)
 	if err != nil {
 		return "", err
 	}

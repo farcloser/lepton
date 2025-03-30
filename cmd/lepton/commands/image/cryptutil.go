@@ -30,7 +30,8 @@ import (
 // Platform flags are registered too.
 //
 // From:
-// - https://github.com/containerd/imgcrypt/blob/v1.1.2/cmd/ctr/commands/flags/flags.go#L23-L44 (except skip-decrypt-auth)
+// - https://github.com/containerd/imgcrypt/blob/v1.1.2/cmd/ctr/commands/flags/flags.go#L23-L44 (except
+// skip-decrypt-auth)
 // - https://github.com/containerd/imgcrypt/blob/v1.1.2/cmd/ctr/commands/images/encrypt.go#L52-L55
 func registerImgcryptFlags(cmd *cobra.Command, encrypt bool) {
 	flags := cmd.Flags()
@@ -39,13 +40,25 @@ func registerImgcryptFlags(cmd *cobra.Command, encrypt bool) {
 	flags.Bool("all-platforms", false, "Convert content for all platforms")
 	flags.String("gpg-homedir", "", "The GPG homedir to use; by default gpg uses ~/.gnupg")
 	flags.String("gpg-version", "", "The GPG version (\"v1\" or \"v2\"), default will make an educated guess")
-	flags.StringSlice("key", []string{}, "A secret key's filename and an optional password separated by colon; this option may be provided multiple times")
+	flags.StringSlice(
+		"key",
+		[]string{},
+		"A secret key's filename and an optional password separated by colon; this option may be provided multiple times",
+	)
 	// While --recipient can be specified only for `image encrypt`,
 	// --dec-recipient can be specified for both `image encrypt` and `image decrypt`.
-	flags.StringSlice("dec-recipient", []string{}, "Recipient of the image; used only for PKCS7 and must be an x509 certificate")
+	flags.StringSlice(
+		"dec-recipient",
+		[]string{},
+		"Recipient of the image; used only for PKCS7 and must be an x509 certificate",
+	)
 	if encrypt {
 		// recipient is defined as StringSlice, not StringArray, to allow specifying "--recipient=jwe:FILE1,jwe:FILE2"
-		flags.StringSlice("recipient", []string{}, "Recipient of the image is the person who can decrypt it in the form specified above (i.e. jwe:/path/to/pubkey)")
+		flags.StringSlice(
+			"recipient",
+			[]string{},
+			"Recipient of the image is the person who can decrypt it in the form specified above (i.e. jwe:/path/to/pubkey)",
+		)
 	}
 
 	_ = cmd.RegisterFlagCompletionFunc("platform", completion.Platforms)

@@ -51,7 +51,8 @@ func psCommand() *cobra.Command {
 
 	cmd.Flags().String("format", formatter.FormatTable, "Format the output. Supported values: [table|json]")
 	cmd.Flags().String("filter", "", "Filter matches containers based on given conditions")
-	cmd.Flags().StringArray("status", []string{}, "Filter services by status. Values: [paused | restarting | removing | running | dead | created | exited]")
+	cmd.Flags().
+		StringArray("status", []string{}, "Filter services by status. Values: [paused | restarting | removing | running | dead | created | exited]")
 	cmd.Flags().BoolP("quiet", "q", false, "Only display container IDs")
 	cmd.Flags().Bool("services", false, "Display services")
 	cmd.Flags().BoolP("all", "a", false, "Show all containers (default shows just running)")
@@ -106,7 +107,10 @@ func psAction(cmd *cobra.Command, args []string) error {
 	if filter != "" {
 		splited := strings.SplitN(filter, "=", 2)
 		if len(splited) != 2 {
-			return fmt.Errorf("invalid argument \"%s\" for \"-f, --filter\": bad format of filter (expected name=value)", filter)
+			return fmt.Errorf(
+				"invalid argument \"%s\" for \"-f, --filter\": bad format of filter (expected name=value)",
+				filter,
+			)
 		}
 		// currently only the 'status' filter is supported
 		if splited[0] != "status" {

@@ -38,7 +38,13 @@ import (
 	"go.farcloser.world/lepton/pkg/platformutil"
 )
 
-func EnsureAllContent(ctx context.Context, client *containerd.Client, srcName string, platMC platforms.MatchComparer, options *options.Global) error {
+func EnsureAllContent(
+	ctx context.Context,
+	client *containerd.Client,
+	srcName string,
+	platMC platforms.MatchComparer,
+	options *options.Global,
+) error {
 	// Get the image from the srcName
 	imageService := client.ImageService()
 	img, err := imageService.Get(ctx, srcName)
@@ -63,7 +69,14 @@ func EnsureAllContent(ctx context.Context, client *containerd.Client, srcName st
 	return nil
 }
 
-func ensureOne(ctx context.Context, client *containerd.Client, rawRef string, target specs.Descriptor, platform specs.Platform, options *options.Global) error {
+func ensureOne(
+	ctx context.Context,
+	client *containerd.Client,
+	rawRef string,
+	target specs.Descriptor,
+	platform specs.Platform,
+	options *options.Global,
+) error {
 	parsedReference, err := reference.Parse(rawRef)
 	if err != nil {
 		return err
@@ -98,12 +111,15 @@ func ensureOne(ctx context.Context, client *containerd.Client, rawRef string, ta
 		err = fetch.Fetch(ctx, client, rawRef, config)
 
 		if err != nil {
-			// In some circumstance (e.g. people just use 80 port to support pure http), the error will contain message like "dial tcp <port>: connection refused".
+			// In some circumstance (e.g. people just use 80 port to support pure http), the error will contain message
+			// like "dial tcp <port>: connection refused".
 			if !errors.Is(err, http.ErrSchemeMismatch) && !errutil.IsErrConnectionRefused(err) {
 				return err
 			}
 			if options.InsecureRegistry {
-				log.G(ctx).WithError(err).Warnf("server %q does not seem to support HTTPS, falling back to plain HTTP", parsedReference.Domain)
+				log.G(ctx).
+					WithError(err).
+					Warnf("server %q does not seem to support HTTPS, falling back to plain HTTP", parsedReference.Domain)
 				dOpts = append(dOpts, dockerconfigresolver.WithPlainHTTP(true))
 				resolver, err = dockerconfigresolver.New(ctx, parsedReference.Domain, dOpts...)
 				if err != nil {
@@ -113,7 +129,8 @@ func ensureOne(ctx context.Context, client *containerd.Client, rawRef string, ta
 				return fetch.Fetch(ctx, client, rawRef, config)
 			}
 			log.G(ctx).WithError(err).Errorf("server %q does not seem to support HTTPS", parsedReference.Domain)
-			log.G(ctx).Info("Hint: you may want to try --insecure-registry to allow plain HTTP (if you are in a trusted network)")
+			log.G(ctx).
+				Info("Hint: you may want to try --insecure-registry to allow plain HTTP (if you are in a trusted network)")
 		}
 
 		return err

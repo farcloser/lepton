@@ -20,7 +20,8 @@ import (
 	"fmt"
 )
 
-// The following are here solely for windows to compile. They are not used, as the corresponding tests are running only on linux.
+// The following are here solely for windows to compile. They are not used, as the corresponding tests are running only
+// on linux.
 func mirrorOf(s string) string {
 	return fmt.Sprintf("ghcr.io/stargz-containers/%s-org", s)
 }

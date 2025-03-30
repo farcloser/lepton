@@ -251,7 +251,9 @@ func FilterByLabel(ctx context.Context, client *containerd.Client, labels map[st
 			if err != nil {
 				// Stop-gap measure. Do not hard error if some images config cannot be read.
 				// See https://github.com/containerd/nerdctl/issues/3516
-				log.G(ctx).WithError(err).Errorf("failed reading image config for %s (%s)", clientImage.Name(), clientImage.Platform())
+				log.G(ctx).
+					WithError(err).
+					Errorf("failed reading image config for %s (%s)", clientImage.Name(), clientImage.Platform())
 				return false, nil
 			}
 			return matchesAllLabels(imageCfg.Config.Labels, labels), nil

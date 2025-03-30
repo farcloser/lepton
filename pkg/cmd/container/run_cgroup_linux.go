@@ -44,7 +44,11 @@ type customMemoryOptions struct {
 	disableOOMKiller  *bool
 }
 
-func generateCgroupOpts(id string, options *options.ContainerCreate, internalLabels *internalLabels) ([]oci.SpecOpts, error) {
+func generateCgroupOpts(
+	id string,
+	options *options.ContainerCreate,
+	internalLabels *internalLabels,
+) ([]oci.SpecOpts, error) {
 	if options.KernelMemory != "" {
 		log.L.Warnf("The --kernel-memory flag is no longer supported. This flag is a noop.")
 	}

@@ -39,9 +39,12 @@ func versionCommand() *cobra.Command {
 	cmd.Flags().StringP("format", "f", formatter.FormatPretty, "Format the output. Values: [pretty | json]")
 	cmd.Flags().Bool("short", false, "Shows only Compose's version number")
 
-	_ = cmd.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{formatter.FormatJSON, formatter.FormatPretty}, cobra.ShellCompDirectiveNoFileComp
-	})
+	_ = cmd.RegisterFlagCompletionFunc(
+		"format",
+		func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			return []string{formatter.FormatJSON, formatter.FormatPretty}, cobra.ShellCompDirectiveNoFileComp
+		},
+	)
 
 	return cmd
 }

@@ -91,10 +91,18 @@ func Remove(ctx context.Context, client *containerd.Client, args []string, optio
 					}
 					return nil
 				}
-				return fmt.Errorf("conflict: unable to delete %s (cannot be forced) - image is being used by running container %s", found.Req, cid)
+				return fmt.Errorf(
+					"conflict: unable to delete %s (cannot be forced) - image is being used by running container %s",
+					found.Req,
+					cid,
+				)
 			}
 			if cid, ok := usedImages[found.Image.Name]; ok && !options.Force {
-				return fmt.Errorf("conflict: unable to delete %s (must be forced) - image is being used by stopped container %s", found.Req, cid)
+				return fmt.Errorf(
+					"conflict: unable to delete %s (must be forced) - image is being used by stopped container %s",
+					found.Req,
+					cid,
+				)
 			}
 			// digests is used only for emulating human-readable output of `docker rmi`
 			digests, err := found.Image.RootFS(ctx, cs, platforms.DefaultStrict())
@@ -138,10 +146,18 @@ func Remove(ctx context.Context, client *containerd.Client, args []string, optio
 					}
 					return false, nil
 				}
-				return false, fmt.Errorf("conflict: unable to delete %s (cannot be forced) - image is being used by running container %s", found.Req, cid)
+				return false, fmt.Errorf(
+					"conflict: unable to delete %s (cannot be forced) - image is being used by running container %s",
+					found.Req,
+					cid,
+				)
 			}
 			if cid, ok := usedImages[found.Image.Name]; ok && !options.Force {
-				return false, fmt.Errorf("conflict: unable to delete %s (must be forced) - image is being used by stopped container %s", found.Req, cid)
+				return false, fmt.Errorf(
+					"conflict: unable to delete %s (must be forced) - image is being used by stopped container %s",
+					found.Req,
+					cid,
+				)
 			}
 			// digests is used only for emulating human-readable output of `docker rmi`
 			digests, err := found.Image.RootFS(ctx, cs, platforms.DefaultStrict())

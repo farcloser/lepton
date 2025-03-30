@@ -232,7 +232,10 @@ func getCPULimit(svc types.ServiceConfig) string {
 	if svc.Deploy != nil && svc.Deploy.Resources.Limits != nil {
 		if nanoCPUs := svc.Deploy.Resources.Limits.NanoCPUs; nanoCPUs != 0 {
 			if svc.CPUS > 0 {
-				log.L.Warnf("deploy.resources.limits.cpus and cpus (deprecated) must not be set together, ignoring cpus=%f", svc.CPUS)
+				log.L.Warnf(
+					"deploy.resources.limits.cpus and cpus (deprecated) must not be set together, ignoring cpus=%f",
+					svc.CPUS,
+				)
 			}
 			limit = strconv.FormatFloat(float64(nanoCPUs), 'f', 2, 32)
 		}
@@ -249,7 +252,10 @@ func getMemLimit(svc types.ServiceConfig) types.UnitBytes {
 	if svc.Deploy != nil && svc.Deploy.Resources.Limits != nil {
 		if memoryBytes := svc.Deploy.Resources.Limits.MemoryBytes; memoryBytes > 0 {
 			if svc.MemLimit > 0 && memoryBytes != svc.MemLimit {
-				log.L.Warnf("deploy.resources.limits.memory and mem_limit (deprecated) must not be set together, ignoring mem_limit=%d", svc.MemLimit)
+				log.L.Warnf(
+					"deploy.resources.limits.memory and mem_limit (deprecated) must not be set together, ignoring mem_limit=%d",
+					svc.MemLimit,
+				)
 			}
 			limit = memoryBytes
 		}
@@ -269,7 +275,10 @@ func getGPUs(svc types.ServiceConfig) (reqs []string, _ error) {
 			if len(dev.Capabilities) == 0 {
 				// "capabilities" is required.
 				// https://github.com/compose-spec/compose-spec/blob/74b933db994109616580eab8f47bf2ba226e0faa/deploy.md#devices
-				return nil, fmt.Errorf("service %s: specifying \"capabilities\" is required for resource reservations", svc.Name)
+				return nil, fmt.Errorf(
+					"service %s: specifying \"capabilities\" is required for resource reservations",
+					svc.Name,
+				)
 			}
 
 			var requiresGPU bool
@@ -315,8 +324,10 @@ var restartFailurePat = regexp.MustCompile(`^on-failure:\d+$`)
 
 // getRestart returns `run --restart` flag string
 //
-// restart:                         {"no" (default), "always", "on-failure", "unless-stopped"} (https://github.com/compose-spec/compose-spec/blob/167f207d0a8967df87c5ed757dbb1a2bb6025a1e/spec.md#restart)
-// deploy.restart_policy.condition: {"none", "on-failure", "any" (default)}                    (https://github.com/compose-spec/compose-spec/blob/167f207d0a8967df87c5ed757dbb1a2bb6025a1e/deploy.md#restart_policy)
+// restart:                         {"no" (default), "always", "on-failure", "unless-stopped"}
+// (https://github.com/compose-spec/compose-spec/blob/167f207d0a8967df87c5ed757dbb1a2bb6025a1e/spec.md#restart)
+// deploy.restart_policy.condition: {"none", "on-failure", "any" (default)}
+// (https://github.com/compose-spec/compose-spec/blob/167f207d0a8967df87c5ed757dbb1a2bb6025a1e/deploy.md#restart_policy)
 func getRestart(svc types.ServiceConfig) (string, error) {
 	var restartFlag string
 	switch svc.Restart {
@@ -764,7 +775,10 @@ func servicePortConfigToFlagP(c types.ServicePortConfig) (string, error) {
 	return s, nil
 }
 
-func serviceVolumeConfigToFlagV(c types.ServiceVolumeConfig, project *types.Project) (flagV string, mkdir []string, err error) {
+func serviceVolumeConfigToFlagV(
+	c types.ServiceVolumeConfig,
+	project *types.Project,
+) (flagV string, mkdir []string, err error) {
 	if unknown := reflectutil.UnknownNonEmptyFields(&c,
 		"Type",
 		"Source",

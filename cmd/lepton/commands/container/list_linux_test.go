@@ -131,8 +131,9 @@ func TestContainerList(t *testing.T) {
 	// hope there are no tests running parallel
 	base.Cmd("ps", "-n", "1", "-s").AssertOutWithFunc(func(stdout string) error {
 		// An example of nerdctl/docker ps -n 1 -s
-		// CONTAINER ID    IMAGE                               COMMAND    CREATED           STATUS    PORTS    NAMES            SIZE
-		// be8d386c991e    docker.io/library/busybox:latest    "top"      1 second ago    Up                 c1       16.0 KiB (virtual 1.3 MiB)
+		// CONTAINER ID    IMAGE                               COMMAND    CREATED           STATUS    PORTS    NAMES
+		//        SIZE be8d386c991e    docker.io/library/busybox:latest    "top"      1 second ago    Up
+		// c1       16.0 KiB (virtual 1.3 MiB)
 
 		lines := strings.Split(strings.TrimSpace(stdout), "\n")
 		if len(lines) < 2 {
@@ -180,8 +181,10 @@ func TestContainerListWideMode(t *testing.T) {
 	base.Cmd("ps", "-n", "1", "--format", formatter.FormatWide).
 		AssertOutWithFunc(func(stdout string) error {
 			// An example of ps --format wide
-			// CONTAINER ID    IMAGE                               PLATFORM       COMMAND    CREATED              STATUS    PORTS    NAMES            RUNTIME                  SIZE
-			// 17181f208b61    docker.io/library/busybox:latest    linux/amd64    "top"      About an hour ago    Up                 busybox-17181    io.containerd.runc.v2    16.0 KiB (virtual 1.3 MiB)
+			// CONTAINER ID    IMAGE                               PLATFORM       COMMAND    CREATED              STATUS
+			//    PORTS    NAMES            RUNTIME                  SIZE 17181f208b61
+			// docker.io/library/busybox:latest    linux/amd64    "top"      About an hour ago    Up
+			// busybox-17181    io.containerd.runc.v2    16.0 KiB (virtual 1.3 MiB)
 
 			lines := strings.Split(strings.TrimSpace(stdout), "\n")
 			if len(lines) < 2 {

@@ -61,7 +61,13 @@ const (
 
 // DetectFlags detects IPC mode from the given ipc string and shmSize string.
 // If ipc is empty, it returns IPC{Mode: Private}.
-func DetectFlags(ctx context.Context, client *containerd.Client, stateDir string, ipc string, shmSize string) (IPC, error) {
+func DetectFlags(
+	ctx context.Context,
+	client *containerd.Client,
+	stateDir string,
+	ipc string,
+	shmSize string,
+) (IPC, error) {
 	var res IPC
 	res.ShmSize = shmSize
 	switch ipc {

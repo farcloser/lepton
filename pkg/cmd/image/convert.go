@@ -42,7 +42,13 @@ import (
 	"go.farcloser.world/lepton/pkg/platformutil"
 )
 
-func Convert(ctx context.Context, client *containerd.Client, output io.Writer, globalOptions *options.Global, opts *options.ImageConvert) error {
+func Convert(
+	ctx context.Context,
+	client *containerd.Client,
+	output io.Writer,
+	globalOptions *options.Global,
+	opts *options.ImageConvert,
+) error {
 	var (
 		convertOpts = []converter.Opt{}
 	)
@@ -159,7 +165,9 @@ func getZstdchunkedConverter(globalOptions *options.Global, opts *options.ImageC
 		var ignored []string
 		esgzOpts = append(esgzOpts, estargz.WithAllowPrioritizeNotFound(&ignored))
 	}
-	return zstdchunkedconvert.LayerConvertFuncWithCompressionLevel(zstd.EncoderLevelFromZstd(opts.ZstdChunkedCompressionLevel), esgzOpts...), nil
+	return zstdchunkedconvert.LayerConvertFuncWithCompressionLevel(
+		zstd.EncoderLevelFromZstd(opts.ZstdChunkedCompressionLevel),
+		esgzOpts...), nil
 }
 
 func readPathsFromRecordFile(filename string) ([]string, error) {

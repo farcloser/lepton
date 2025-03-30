@@ -40,7 +40,11 @@ func Create(output io.Writer, globalOption *options.Global, options *options.Net
 		options.Subnets = []string{""}
 	}
 
-	e, err := netutil.NewCNIEnv(globalOption.CNIPath, globalOption.CNINetConfPath, netutil.WithNamespace(globalOption.Namespace))
+	e, err := netutil.NewCNIEnv(
+		globalOption.CNIPath,
+		globalOption.CNINetConfPath,
+		netutil.WithNamespace(globalOption.Namespace),
+	)
 	if err != nil {
 		return err
 	}

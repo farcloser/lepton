@@ -153,7 +153,12 @@ func cleanupNetwork(ctx context.Context, container containerd.Container, globalO
 		case nettype.Host, nettype.None, nettype.Container, nettype.Namespace:
 			// NOP
 		case nettype.CNI:
-			e, err := netutil.NewCNIEnv(globalOpts.CNIPath, globalOpts.CNINetConfPath, netutil.WithNamespace(globalOpts.Namespace), netutil.WithDefaultNetwork(globalOpts.BridgeIP))
+			e, err := netutil.NewCNIEnv(
+				globalOpts.CNIPath,
+				globalOpts.CNINetConfPath,
+				netutil.WithNamespace(globalOpts.Namespace),
+				netutil.WithDefaultNetwork(globalOpts.BridgeIP),
+			)
 			if err != nil {
 				return err
 			}

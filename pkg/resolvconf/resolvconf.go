@@ -22,7 +22,8 @@
 */
 
 // Package resolvconf provides utility code to query and update DNS configuration in /etc/resolv.conf
-// originally from https://github.com/moby/moby/blob/6014c1e29dc34dffa77fb5749cc3281c1b4854ac/libnetwork/resolvconf/resolvconf.go
+// originally from
+// https://github.com/moby/moby/blob/6014c1e29dc34dffa77fb5749cc3281c1b4854ac/libnetwork/resolvconf/resolvconf.go
 package resolvconf
 
 import (
@@ -78,7 +79,10 @@ func Path() string {
 		ns := GetNameservers(candidateResolvConf, IP)
 		if len(ns) == 1 && ns[0] == "127.0.0.53" {
 			pathAfterSystemdDetection = alternatePath
-			log.L.Debugf("detected 127.0.0.53 nameserver, assuming systemd-resolved, so using resolv.conf: %s", alternatePath)
+			log.L.Debugf(
+				"detected 127.0.0.53 nameserver, assuming systemd-resolved, so using resolv.conf: %s",
+				alternatePath,
+			)
 		}
 	})
 	return pathAfterSystemdDetection
@@ -190,7 +194,10 @@ func FilterResolvDNS(resolvConf []byte, ipv6Enabled bool) (*File, error) {
 	// if the resulting resolvConf has no more nameservers defined, add appropriate
 	// default DNS servers for IPv4 and (optionally) IPv6
 	if len(GetNameservers(cleanedResolvConf, IP)) == 0 {
-		log.L.Infof("No non-localhost DNS nameservers are left in resolv.conf. Using default external servers: %v", defaultIPv4Dns)
+		log.L.Infof(
+			"No non-localhost DNS nameservers are left in resolv.conf. Using default external servers: %v",
+			defaultIPv4Dns,
+		)
 		dns := defaultIPv4Dns
 		if ipv6Enabled {
 			log.L.Infof("IPv6 enabled; Adding default IPv6 external servers: %v", defaultIPv6Dns)

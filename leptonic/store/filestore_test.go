@@ -63,16 +63,36 @@ func TestFileStoreBasics(t *testing.T) {
 
 	// Invalid keys
 	_, err = tempStore.Get("..")
-	assert.ErrorIs(t, err, errs.ErrInvalidArgument, "unsupported characters or patterns should return ErrInvalidArgument")
+	assert.ErrorIs(
+		t,
+		err,
+		errs.ErrInvalidArgument,
+		"unsupported characters or patterns should return ErrInvalidArgument",
+	)
 
 	err = tempStore.Set([]byte("foo"), "..")
-	assert.ErrorIs(t, err, errs.ErrInvalidArgument, "unsupported characters or patterns should return ErrInvalidArgument")
+	assert.ErrorIs(
+		t,
+		err,
+		errs.ErrInvalidArgument,
+		"unsupported characters or patterns should return ErrInvalidArgument",
+	)
 
 	err = tempStore.Delete("..")
-	assert.ErrorIs(t, err, errs.ErrInvalidArgument, "unsupported characters or patterns should return ErrInvalidArgument")
+	assert.ErrorIs(
+		t,
+		err,
+		errs.ErrInvalidArgument,
+		"unsupported characters or patterns should return ErrInvalidArgument",
+	)
 
 	_, err = tempStore.List("..")
-	assert.ErrorIs(t, err, errs.ErrInvalidArgument, "unsupported characters or patterns should return ErrInvalidArgument")
+	assert.ErrorIs(
+		t,
+		err,
+		errs.ErrInvalidArgument,
+		"unsupported characters or patterns should return ErrInvalidArgument",
+	)
 
 	// Writing, reading, listing, deleting
 	err = tempStore.Set([]byte("foo"), "something")

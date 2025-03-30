@@ -56,7 +56,8 @@ func NewRootlessKitClient() (client.Client, error) {
 	return client.New(apiSock)
 }
 
-// RootlessContainredSockAddress returns sock address of rootless containerd based on https://github.com/farcloser/lepton/blob/main/docs/faq.md#containerd-socket-address
+// RootlessContainredSockAddress returns sock address of rootless containerd based on
+// https://github.com/farcloser/lepton/blob/main/docs/faq.md#containerd-socket-address
 func RootlessContainredSockAddress() (string, error) {
 	stateDir, err := rootlesskit.StateDir()
 	if err != nil {

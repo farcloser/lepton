@@ -31,8 +31,14 @@ import (
 	"go.farcloser.world/lepton/pkg/imgutil"
 )
 
-// Prune will remove all dangling images. If all is specified, will also remove all images not referenced by any container.
-func Prune(ctx context.Context, client *containerd.Client, globalOptions *options.Global, opts options.ImagePrune) error {
+// Prune will remove all dangling images. If all is specified, will also remove all images not referenced by any
+// container.
+func Prune(
+	ctx context.Context,
+	client *containerd.Client,
+	globalOptions *options.Global,
+	opts options.ImagePrune,
+) error {
 	var (
 		imageStore   = client.ImageService()
 		contentStore = client.ContentStore()

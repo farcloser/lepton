@@ -158,7 +158,8 @@ func TestNetworkInspect(t *testing.T) {
 		{
 			Description: "match part of id",
 			// FIXME: for windows, network inspect testnetworkinspect-basenet-468cf999 --format {{ .Id }} MAY fail here
-			// This is bizarre, as it is working in the match exact id test - and there does not seem to be a particular reason for that
+			// This is bizarre, as it is working in the match exact id test - and there does not seem to be a particular
+			// reason for that
 			Require: require.Not(require.Windows),
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				id := strings.TrimSpace(
@@ -187,7 +188,8 @@ func TestNetworkInspect(t *testing.T) {
 		{
 			Description: "using another net short id",
 			// FIXME: for windows, network inspect testnetworkinspect-basenet-468cf999 --format {{ .Id }} MAY fail here
-			// This is bizarre, as it is working in the match exact id test - and there does not seem to be a particular reason for that
+			// This is bizarre, as it is working in the match exact id test - and there does not seem to be a particular
+			// reason for that
 			Require: require.Not(require.Windows),
 			Setup: func(data test.Data, helpers test.Helpers) {
 				id := strings.TrimSpace(

@@ -38,12 +38,20 @@ func listCommand() *cobra.Command {
 
 	cmd.Flags().BoolP("quiet", "q", false, "Only display volume names")
 	cmd.Flags().String("format", "", "Format the output using the given go template")
-	cmd.Flags().BoolP("size", "s", false, "Display the disk usage of volumes. Can be slow with volumes having loads of directories.")
+	cmd.Flags().
+		BoolP("size", "s", false, "Display the disk usage of volumes. Can be slow with volumes having loads of directories.")
 	cmd.Flags().StringSliceP("filter", "f", []string{}, "Filter matches volumes based on given conditions")
 
-	_ = cmd.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{formatter.FormatJSON, formatter.FormatTable, formatter.FormatWide}, cobra.ShellCompDirectiveNoFileComp
-	})
+	_ = cmd.RegisterFlagCompletionFunc(
+		"format",
+		func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			return []string{
+				formatter.FormatJSON,
+				formatter.FormatTable,
+				formatter.FormatWide,
+			}, cobra.ShellCompDirectiveNoFileComp
+		},
+	)
 
 	return cmd
 }

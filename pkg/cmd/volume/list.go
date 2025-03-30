@@ -163,7 +163,13 @@ func lsPrintOutput(w io.Writer, vols map[string]api.Volume, options *options.Vol
 // Unsupported filters:
 //   - dangling=true: Filter volumes by dangling.
 //   - driver=local: Filter volumes by driver.
-func Volumes(ns string, dataRoot string, address string, volumeSize bool, filters []string) (map[string]api.Volume, error) {
+func Volumes(
+	ns string,
+	dataRoot string,
+	address string,
+	volumeSize bool,
+	filters []string,
+) (map[string]api.Volume, error) {
 	volStore, err := Store(ns, dataRoot, address)
 	if err != nil {
 		return nil, err
@@ -188,7 +194,9 @@ func Volumes(ns string, dataRoot string, address string, volumeSize bool, filter
 	return vols, nil
 }
 
-func getVolumeFilterFuncs(filters []string) ([]func(map[string]string) bool, []func(string) bool, []func(int64) bool, bool, error) {
+func getVolumeFilterFuncs(
+	filters []string,
+) ([]func(map[string]string) bool, []func(string) bool, []func(int64) bool, bool, error) {
 	isFilter := len(filters) > 0
 	labelFilterFuncs := make([]func(map[string]string) bool, 0)
 	nameFilterFuncs := make([]func(string) bool, 0)
@@ -262,7 +270,12 @@ func getVolumeFilterFuncs(filters []string) ([]func(map[string]string) bool, []f
 	return labelFilterFuncs, nameFilterFuncs, sizeFilterFuncs, isFilter, nil
 }
 
-func volumeMatchesFilter(vol api.Volume, labelFilterFuncs []func(map[string]string) bool, nameFilterFuncs []func(string) bool, sizeFilterFuncs []func(int64) bool) bool {
+func volumeMatchesFilter(
+	vol api.Volume,
+	labelFilterFuncs []func(map[string]string) bool,
+	nameFilterFuncs []func(string) bool,
+	sizeFilterFuncs []func(int64) bool,
+) bool {
 	for _, labelFilterFunc := range labelFilterFuncs {
 		if !labelFilterFunc(vol.Labels) {
 			return false

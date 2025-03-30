@@ -786,7 +786,8 @@ CMD ["echo", "containerfile"]
 func TestBuildNoTag(t *testing.T) {
 	nerdtest.Setup()
 
-	// FIXME: this test should be rewritten and instead get the image id from the build, then query the image explicitly - instead of pruning / noparallel
+	// FIXME: this test should be rewritten and instead get the image id from the build, then query the image explicitly
+	// - instead of pruning / noparallel
 	testCase := &test.Case{
 		NoParallel: true,
 		Require:    nerdtest.Build,

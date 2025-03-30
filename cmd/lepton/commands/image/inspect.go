@@ -39,16 +39,23 @@ func inspectCommand() *cobra.Command {
 		SilenceErrors:     true,
 	}
 
-	cmd.Flags().String("mode", "dockercompat", `Inspect mode, "dockercompat" for Docker-compatible output, "native" for containerd-native output`)
+	cmd.Flags().
+		String("mode", "dockercompat", `Inspect mode, "dockercompat" for Docker-compatible output, "native" for containerd-native output`)
 	cmd.Flags().StringP("format", "f", "", "Format the output using the given Go template, e.g, '{{json .}}'")
 	cmd.Flags().String("platform", "", "Inspect a specific platform") // not a slice, and there is no --all-platforms
 
-	_ = cmd.RegisterFlagCompletionFunc("mode", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{"dockercompat", "native"}, cobra.ShellCompDirectiveNoFileComp
-	})
-	_ = cmd.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{formatter.FormatJSON}, cobra.ShellCompDirectiveNoFileComp
-	})
+	_ = cmd.RegisterFlagCompletionFunc(
+		"mode",
+		func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			return []string{"dockercompat", "native"}, cobra.ShellCompDirectiveNoFileComp
+		},
+	)
+	_ = cmd.RegisterFlagCompletionFunc(
+		"format",
+		func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			return []string{formatter.FormatJSON}, cobra.ShellCompDirectiveNoFileComp
+		},
+	)
 	_ = cmd.RegisterFlagCompletionFunc("platform", completion.Platforms)
 
 	return cmd
@@ -93,7 +100,12 @@ func inspectAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	cli, ctx, cancel, err := clientutil.NewClientWithPlatform(cmd.Context(), opts.GOptions.Namespace, opts.GOptions.Address, opts.Platform)
+	cli, ctx, cancel, err := clientutil.NewClientWithPlatform(
+		cmd.Context(),
+		opts.GOptions.Namespace,
+		opts.GOptions.Address,
+		opts.Platform,
+	)
 	if err != nil {
 		return err
 	}

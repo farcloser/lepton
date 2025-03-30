@@ -30,7 +30,13 @@ import (
 )
 
 // Prune remove all stopped containers
-func Prune(ctx context.Context, client *containerd.Client, output io.Writer, globalOptions *options.Global, options *options.ContainerPrune) error {
+func Prune(
+	ctx context.Context,
+	client *containerd.Client,
+	output io.Writer,
+	globalOptions *options.Global,
+	options *options.ContainerPrune,
+) error {
 	containers, err := client.Containers(ctx)
 	if err != nil {
 		return err

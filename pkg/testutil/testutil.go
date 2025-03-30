@@ -594,8 +594,9 @@ func M(m *testing.M) {
 	flag.Parse()
 
 	os.Exit(func() int {
-		// If there is a lockfile (no err), or if we error-ed stating it (permission), another test run is currently going.
-		// Note that this could be racy. The .lock file COULD get acquired after this and before we hit the lock section.
+		// If there is a lockfile (no err), or if we error-ed stating it (permission), another test run is currently
+		// going. Note that this could be racy. The .lock file COULD get acquired after this and before we hit the lock
+		// section.
 		// This is not a big deal then: we will just wait for the lock to free.
 		if _, err := os.Stat(testLockFile); err == nil || !errors.Is(err, os.ErrNotExist) {
 			log.L.Errorf(

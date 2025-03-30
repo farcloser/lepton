@@ -73,9 +73,11 @@ func TestImageHistory(t *testing.T) {
 	testCase := &test.Case{
 		Require: require.All(
 			require.Not(nerdtest.Docker),
-			// XXX the results here are obviously platform dependent - and it seems like windows cannot pull a linux image?
+			// XXX the results here are obviously platform dependent - and it seems like windows cannot pull a linux
+			// image?
 			require.Not(require.Windows),
-			// XXX Currently, history does not work on non-native platform, so, we cannot test reliably on other platforms
+			// XXX Currently, history does not work on non-native platform, so, we cannot test reliably on other
+			// platforms
 			require.Arm64,
 		),
 		Setup: func(data test.Data, helpers test.Helpers) {

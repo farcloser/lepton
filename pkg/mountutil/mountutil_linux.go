@@ -106,7 +106,10 @@ func getMountInfo(dir string) (mount.Info, error) {
 
 // parseVolumeOptionsWithMountInfo is the testable implementation
 // of parseVolumeOptions.
-func ParseVolumeOptionsWithMountInfo(vType, src, optsRaw string, getMountInfoFunc func(string) (mount.Info, error)) ([]string, []oci.SpecOpts, error) {
+func ParseVolumeOptionsWithMountInfo(
+	vType, src, optsRaw string,
+	getMountInfoFunc func(string) (mount.Info, error),
+) ([]string, []oci.SpecOpts, error) {
 	var (
 		writeModeRawOpts   []string
 		propagationRawOpts []string
@@ -146,7 +149,8 @@ func ParseVolumeOptionsWithMountInfo(vType, src, optsRaw string, getMountInfoFun
 		case "ro":
 			opts = append(opts, "ro")
 		case "rro":
-			// Mount option "rro" is supported since crun v1.4 / runc v1.1 (https://github.com/opencontainers/runc/pull/3272), with kernel >= 5.12.
+			// Mount option "rro" is supported since crun v1.4 / runc v1.1
+			// (https://github.com/opencontainers/runc/pull/3272), with kernel >= 5.12.
 			// Older version of runc just ignores "rro", so we have to add "ro" too, to our best effort.
 			opts = append(opts, "ro", "rro")
 			if len(propagationRawOpts) != 1 || propagationRawOpts[0] != "rprivate" {
@@ -189,8 +193,10 @@ func ParseVolumeOptionsWithMountInfo(vType, src, optsRaw string, getMountInfoFun
 			//      with the host. So we set RootfsPropagation to "shared" here.
 			//
 			// See also:
-			// - OCI Runtime Spec: https://github.com/opencontainers/runtime-spec/blob/v1.0.2/config-linux.md#rootfs-mount-propagation
-			// - runc implementation: https://github.com/opencontainers/runc/blob/v1.0.0/libcontainer/rootfs_linux.go#L771-L777
+			// - OCI Runtime Spec:
+			// https://github.com/opencontainers/runtime-spec/blob/v1.0.2/config-linux.md#rootfs-mount-propagation -
+			// runc implementation:
+			// https://github.com/opencontainers/runc/blob/v1.0.0/libcontainer/rootfs_linux.go#L771-L777
 			specOpts = append(specOpts, func(ctx context.Context, cli oci.Client, c *containers.Container, s *oci.Spec) error {
 				switch s.Linux.RootfsPropagation {
 				case "shared", "rshared":
@@ -436,7 +442,8 @@ func ProcessFlagMount(s string, volStore volumestore.VolumeService) (*Processed,
 	return nil, fmt.Errorf("invalid mount type '%s' must be a volume/bind/tmpfs", mountType)
 }
 
-// copy from https://github.com/moby/moby/blob/085c6a98d54720e70b28354ccec6da9b1b9e7fcf/volume/mounts/linux_parser.go#L375
+// copy from
+// https://github.com/moby/moby/blob/085c6a98d54720e70b28354ccec6da9b1b9e7fcf/volume/mounts/linux_parser.go#L375
 func getTmpfsSize(size int64) string {
 	// calculate suffix here, making this linux specific, but that is
 	// okay, since API is that way anyway.

@@ -78,7 +78,12 @@ func FromArchive(ctx context.Context, client *containerd.Client, options options
 }
 
 // FromOCIArchive loads and unpacks the images from the OCI formatted archive at the provided file system path.
-func FromOCIArchive(ctx context.Context, client *containerd.Client, pathToOCIArchive string, options options.ImageLoad) ([]images.Image, error) {
+func FromOCIArchive(
+	ctx context.Context,
+	client *containerd.Client,
+	pathToOCIArchive string,
+	options options.ImageLoad,
+) ([]images.Image, error) {
 	const ociArchivePrefix = "oci-archive://"
 	pathToOCIArchive = strings.TrimPrefix(pathToOCIArchive, ociArchivePrefix)
 
@@ -109,8 +114,15 @@ func (r *readCounter) Read(p []byte) (int, error) {
 	return n, err
 }
 
-func importImages(ctx context.Context, client *containerd.Client, in io.Reader, snapshotter string, platformMC platforms.MatchComparer) ([]images.Image, error) {
-	// In addition to passing WithImagePlatform() to client.Import(), we also need to pass WithDefaultPlatform() to NewClient().
+func importImages(
+	ctx context.Context,
+	client *containerd.Client,
+	in io.Reader,
+	snapshotter string,
+	platformMC platforms.MatchComparer,
+) ([]images.Image, error) {
+	// In addition to passing WithImagePlatform() to client.Import(), we also need to pass WithDefaultPlatform() to
+	// NewClient().
 	// Otherwise unpacking may fail.
 	r := &readCounter{Reader: in}
 	imgs, err := client.Import(ctx, r,
@@ -131,7 +143,13 @@ func importImages(ctx context.Context, client *containerd.Client, in io.Reader, 
 	return imgs, nil
 }
 
-func unpackImage(ctx context.Context, client *containerd.Client, model images.Image, platform platforms.MatchComparer, options options.ImageLoad) error {
+func unpackImage(
+	ctx context.Context,
+	client *containerd.Client,
+	model images.Image,
+	platform platforms.MatchComparer,
+	options options.ImageLoad,
+) error {
 	image := containerd.NewImageWithPlatform(client, model, platform)
 
 	if !options.Quiet {

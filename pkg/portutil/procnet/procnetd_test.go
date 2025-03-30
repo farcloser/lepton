@@ -25,7 +25,8 @@ import (
 	"go.farcloser.world/lepton/pkg/portutil/procnet"
 )
 
-// All the code in this file is copied from the iima project in https://github.com/lima-vm/lima/blob/v0.8.3/pkg/guestagent/procnettcp/procnettcp_test.go.
+// All the code in this file is copied from the iima project in
+// https://github.com/lima-vm/lima/blob/v0.8.3/pkg/guestagent/procnettcp/procnettcp_test.go.
 // and is licensed under the Apache License, Version 2.0.
 
 func TestParseTCP(t *testing.T) {

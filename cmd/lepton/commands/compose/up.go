@@ -39,17 +39,21 @@ func upCommand() *cobra.Command {
 		SilenceErrors: true,
 	}
 
-	cmd.Flags().Bool("abort-on-container-exit", false, "Stops all containers if any container was stopped. Incompatible with -d.")
-	cmd.Flags().BoolP("detach", "d", false, "Detached mode: Run containers in the background. Incompatible with --abort-on-container-exit.")
+	cmd.Flags().
+		Bool("abort-on-container-exit", false, "Stops all containers if any container was stopped. Incompatible with -d.")
+	cmd.Flags().
+		BoolP("detach", "d", false, "Detached mode: Run containers in the background. Incompatible with --abort-on-container-exit.")
 	cmd.Flags().Bool("no-build", false, "Don't build an image, even if it's missing.")
 	cmd.Flags().Bool("no-color", false, "Produce monochrome output")
 	cmd.Flags().Bool("no-log-prefix", false, "Don't print prefix in logs")
 	cmd.Flags().Bool("build", false, "Build images before starting containers.")
 	cmd.Flags().Bool("quiet-pull", false, "Pull without printing progress information")
 	cmd.Flags().Bool("remove-orphans", false, "Remove containers for services not defined in the Compose file.")
-	cmd.Flags().Bool("force-recreate", false, "Recreate containers even if their configuration and image haven't changed.")
+	cmd.Flags().
+		Bool("force-recreate", false, "Recreate containers even if their configuration and image haven't changed.")
 	cmd.Flags().Bool("no-recreate", false, "Don't recreate containers if they exist, conflict with --force-recreate.")
-	cmd.Flags().StringArray("scale", []string{}, "Scale SERVICE to NUM instances. Overrides the `scale` setting in the Compose file if present.")
+	cmd.Flags().
+		StringArray("scale", []string{}, "Scale SERVICE to NUM instances. Overrides the `scale` setting in the Compose file if present.")
 	cmd.Flags().String("pull", "", "Pull image before running (\"always\"|\"missing\"|\"never\")")
 
 	return cmd

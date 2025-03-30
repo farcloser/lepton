@@ -114,7 +114,8 @@ type ContainerCreate struct {
 	CPUShares uint64
 	// CPUSetCPUs specifies the CPUs in which to allow execution (0-3, 0,1)
 	CPUSetCPUs string
-	// CPUSetMems specifies the memory nodes (MEMs) in which to allow execution (0-3, 0,1). Only effective on NUMA systems.
+	// CPUSetMems specifies the memory nodes (MEMs) in which to allow execution (0-3, 0,1). Only effective on NUMA
+	// systems.
 	CPUSetMems string
 	// Memory specifies the memory limit
 	Memory string
@@ -200,7 +201,8 @@ type ContainerCreate struct {
 	// #region for rootfs flags
 	// ReadOnly mount the container's root filesystem as read only
 	ReadOnly bool
-	// Rootfs specifies the first argument is not an image but the rootfs to the exploded container. Corresponds to Podman CLI.
+	// Rootfs specifies the first argument is not an image but the rootfs to the exploded container. Corresponds to
+	// Podman CLI.
 	Rootfs bool
 	// #endregion
 
@@ -250,7 +252,8 @@ type ContainerCreate struct {
 	// #endregion
 
 	// #region for gpu flags
-	// GPUs specifies GPU devices to add to the container ('all' to pass all GPUs). Please see also ./gpu.md for details.
+	// GPUs specifies GPU devices to add to the container ('all' to pass all GPUs). Please see also ./gpu.md for
+	// details.
 	GPUs []string
 	// #endregion
 

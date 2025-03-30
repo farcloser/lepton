@@ -51,11 +51,18 @@ func List(ctx context.Context, client *containerd.Client, options options.Contai
 
 // filterContainers returns containers matching the filters.
 //
-//   - Supported filters: https://github.com/farcloser/lepton/blob/main/docs/command-reference.md#whale-blue_square-nerdctl-ps
+// - Supported filters:
+// https://github.com/farcloser/lepton/blob/main/docs/command-reference.md#whale-blue_square-nerdctl-ps
 //   - all means showing all containers (default shows just running).
 //   - lastN means only showing n last created containers (includes all states). Non-positive values are ignored.
 //     In other words, if lastN is positive, all will be set to true.
-func filterContainers(ctx context.Context, client *containerd.Client, filters []string, lastN int, all bool) ([]containerd.Container, map[string]string, error) {
+func filterContainers(
+	ctx context.Context,
+	client *containerd.Client,
+	filters []string,
+	lastN int,
+	all bool,
+) ([]containerd.Container, map[string]string, error) {
 	containers, err := client.Containers(ctx)
 	if err != nil {
 		return nil, nil, err
@@ -82,7 +89,8 @@ func filterContainers(ctx context.Context, client *containerd.Client, filters []
 	var wg sync.WaitGroup
 	statusPerContainer := make(map[string]string)
 	var mu sync.Mutex
-	// formatter.ContainerStatus(ctx, c) is time consuming so we do it in goroutines and return the container's id with status as a map.
+	// formatter.ContainerStatus(ctx, c) is time consuming so we do it in goroutines and return the container's id with
+	// status as a map.
 	// prepareContainers func will use this map to avoid call formatter.ContainerStatus again.
 	for _, c := range containers {
 		if c.ID() == "" {
@@ -133,7 +141,13 @@ func (x *ListItem) Label(s string) string {
 	return x.LabelsMap[s]
 }
 
-func prepareContainers(ctx context.Context, client *containerd.Client, containers []containerd.Container, statusPerContainer map[string]string, options options.ContainerList) ([]ListItem, error) {
+func prepareContainers(
+	ctx context.Context,
+	client *containerd.Client,
+	containers []containerd.Container,
+	statusPerContainer map[string]string,
+	options options.ContainerList,
+) ([]ListItem, error) {
 	listItems := make([]ListItem, len(containers))
 	snapshottersCache := map[string]snapshots.Snapshotter{}
 	for i, c := range containers {
@@ -217,5 +231,9 @@ func getContainerSize(ctx context.Context, snapshotter snapshots.Snapshotter, sn
 		imageSize = all.Size
 	}
 
-	return fmt.Sprintf("%s (virtual %s)", progress.Bytes(containerSize).String(), progress.Bytes(imageSize).String()), nil
+	return fmt.Sprintf(
+		"%s (virtual %s)",
+		progress.Bytes(containerSize).String(),
+		progress.Bytes(imageSize).String(),
+	), nil
 }

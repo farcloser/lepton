@@ -31,7 +31,8 @@ import (
 	"go.farcloser.world/lepton/pkg/testutil/nerdtest"
 )
 
-// This is a separate set of tests for cp specifically meant to test corner or extreme cases that do not fit in the normal testing rig
+// This is a separate set of tests for cp specifically meant to test corner or extreme cases that do not fit in the
+// normal testing rig
 // because of their complexity
 
 func TestCopyAcid(t *testing.T) {

@@ -74,7 +74,16 @@ func TestIssue3425(t *testing.T) {
 				Setup: func(data test.Data, helpers test.Helpers) {
 					identifier := data.Identifier()
 					helpers.Ensure("image", "pull", testutil.CommonImage)
-					helpers.Ensure("run", "--quiet", "-d", "--name", identifier, testutil.CommonImage, "touch", "/something")
+					helpers.Ensure(
+						"run",
+						"--quiet",
+						"-d",
+						"--name",
+						identifier,
+						testutil.CommonImage,
+						"touch",
+						"/something",
+					)
 					helpers.Ensure("image", "rm", "-f", testutil.CommonImage)
 					helpers.Ensure("image", "pull", testutil.CommonImage)
 					helpers.Ensure("commit", identifier, fmt.Sprintf("localhost:%d/%s", reg.Port, identifier))

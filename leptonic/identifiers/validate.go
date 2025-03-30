@@ -47,7 +47,12 @@ func Validate(s string) error {
 	}
 
 	if len(s) > maxLength {
-		return fmt.Errorf("identifier %q greater than maximum length (%d characters): %w", s, maxLength, errdefs.ErrInvalidArgument)
+		return fmt.Errorf(
+			"identifier %q greater than maximum length (%d characters): %w",
+			s,
+			maxLength,
+			errdefs.ErrInvalidArgument,
+		)
 	}
 
 	if !identifierRe.MatchString(s) {

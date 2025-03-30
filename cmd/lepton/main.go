@@ -153,7 +153,12 @@ func initRootCmdFlags(rootCmd *cobra.Command, tomlPath string) (*pflag.FlagSet, 
 		defer r.Close()
 		dec := toml.NewDecoder(r).DisallowUnknownFields() // set Strict to detect typo
 		if err := dec.Decode(cfg); err != nil {
-			return nil, fmt.Errorf("failed to load config (not daemon config) from %q (Hint: don't mix up daemon's `config.toml` with `%s.toml`): %w", tomlPath, version.RootName, err)
+			return nil, fmt.Errorf(
+				"failed to load config (not daemon config) from %q (Hint: don't mix up daemon's `config.toml` with `%s.toml`): %w",
+				tomlPath,
+				version.RootName,
+				err,
+			)
 		}
 		log.L.Debugf("Loaded config %+v", cfg)
 	} else {
@@ -166,26 +171,110 @@ func initRootCmdFlags(rootCmd *cobra.Command, tomlPath string) (*pflag.FlagSet, 
 
 	rootCmd.PersistentFlags().Bool("debug", cfg.Debug, "debug mode")
 	rootCmd.PersistentFlags().Bool("debug-full", cfg.DebugFull, "debug mode (with full output)")
-	helpers.AddPersistentStringFlag(rootCmd, "address", []string{"a", "H"}, nil, []string{"host"}, aliasToBeInherited, cfg.Address, "CONTAINERD_ADDRESS", `containerd address, optionally with "unix://" prefix`)
+	helpers.AddPersistentStringFlag(
+		rootCmd,
+		"address",
+		[]string{"a", "H"},
+		nil,
+		[]string{"host"},
+		aliasToBeInherited,
+		cfg.Address,
+		"CONTAINERD_ADDRESS",
+		`containerd address, optionally with "unix://" prefix`,
+	)
 	// -n is aliases (conflicts with logs -n)
-	helpers.AddPersistentStringFlag(rootCmd, "namespace", []string{"n"}, nil, nil, aliasToBeInherited, cfg.Namespace, "CONTAINERD_NAMESPACE", `containerd namespace, such as "moby" for Docker, "k8s.io" for Kubernetes`)
+	helpers.AddPersistentStringFlag(
+		rootCmd,
+		"namespace",
+		[]string{"n"},
+		nil,
+		nil,
+		aliasToBeInherited,
+		cfg.Namespace,
+		"CONTAINERD_NAMESPACE",
+		`containerd namespace, such as "moby" for Docker, "k8s.io" for Kubernetes`,
+	)
 	rootCmd.RegisterFlagCompletionFunc("namespace", completion.NamespaceNames)
-	helpers.AddPersistentStringFlag(rootCmd, "snapshotter", nil, nil, []string{"storage-driver"}, aliasToBeInherited, cfg.Snapshotter, "CONTAINERD_SNAPSHOTTER", "containerd snapshotter")
+	helpers.AddPersistentStringFlag(
+		rootCmd,
+		"snapshotter",
+		nil,
+		nil,
+		[]string{"storage-driver"},
+		aliasToBeInherited,
+		cfg.Snapshotter,
+		"CONTAINERD_SNAPSHOTTER",
+		"containerd snapshotter",
+	)
 	rootCmd.RegisterFlagCompletionFunc("snapshotter", completion.SnapshotterNames)
 	rootCmd.RegisterFlagCompletionFunc("storage-driver", completion.SnapshotterNames)
-	helpers.AddPersistentStringFlag(rootCmd, "cni-path", nil, nil, nil, aliasToBeInherited, cfg.CNIPath, "CNI_PATH", "cni plugins binary directory")
-	helpers.AddPersistentStringFlag(rootCmd, "cni-netconfpath", nil, nil, nil, aliasToBeInherited, cfg.CNINetConfPath, "NETCONFPATH", "cni config directory")
-	rootCmd.PersistentFlags().String("data-root", cfg.DataRoot, "Root directory of persistent state (managed by the cli, not by containerd)")
+	helpers.AddPersistentStringFlag(
+		rootCmd,
+		"cni-path",
+		nil,
+		nil,
+		nil,
+		aliasToBeInherited,
+		cfg.CNIPath,
+		"CNI_PATH",
+		"cni plugins binary directory",
+	)
+	helpers.AddPersistentStringFlag(
+		rootCmd,
+		"cni-netconfpath",
+		nil,
+		nil,
+		nil,
+		aliasToBeInherited,
+		cfg.CNINetConfPath,
+		"NETCONFPATH",
+		"cni config directory",
+	)
+	rootCmd.PersistentFlags().
+		String("data-root", cfg.DataRoot, "Root directory of persistent state (managed by the cli, not by containerd)")
 	rootCmd.PersistentFlags().String("cgroup-manager", string(cfg.CgroupManager), `Cgroup manager to use ("systemd")`)
 	rootCmd.RegisterFlagCompletionFunc("cgroup-manager", completion.CgroupManagerNames)
-	rootCmd.PersistentFlags().Bool("insecure-registry", cfg.InsecureRegistry, "skips verifying HTTPS certs, and allows falling back to plain HTTP")
-	// hosts-dir is defined as StringSlice, not StringArray, to allow specifying "--hosts-dir=/etc/containerd/certs.d,/etc/docker/certs.d"
-	rootCmd.PersistentFlags().StringSlice("hosts-dir", cfg.HostsDir, "A directory that contains <HOST:PORT>/hosts.toml (containerd style) or <HOST:PORT>/{ca.cert, cert.pem, key.pem} (docker style)")
-	// Experimental enable experimental feature, see in https://github.com/farcloser/lepton/blob/main/docs/experimental.md
-	helpers.AddPersistentBoolFlag(rootCmd, "experimental", nil, nil, cfg.Experimental, version.EnvPrefix+"_EXPERIMENTAL", "Control experimental: https://github.com/farcloser/lepton/blob/main/docs/experimental.md")
-	helpers.AddPersistentStringFlag(rootCmd, "host-gateway-ip", nil, nil, nil, aliasToBeInherited, cfg.HostGatewayIP, version.EnvPrefix+"_HOST_GATEWAY_IP", "IP address that the special 'host-gateway' string in --add-host resolves to. Defaults to the IP address of the host. It has no effect without setting --add-host")
-	helpers.AddPersistentStringFlag(rootCmd, "bridge-ip", nil, nil, nil, aliasToBeInherited, cfg.BridgeIP, version.EnvPrefix+"_BRIDGE_IP", "IP address for the default bridge network")
-	rootCmd.PersistentFlags().Bool("kube-hide-dupe", cfg.KubeHideDupe, "Deduplicate images for Kubernetes with namespace k8s.io")
+	rootCmd.PersistentFlags().
+		Bool("insecure-registry", cfg.InsecureRegistry, "skips verifying HTTPS certs, and allows falling back to plain HTTP")
+	// hosts-dir is defined as StringSlice, not StringArray, to allow specifying
+	// "--hosts-dir=/etc/containerd/certs.d,/etc/docker/certs.d"
+	rootCmd.PersistentFlags().
+		StringSlice("hosts-dir", cfg.HostsDir, "A directory that contains <HOST:PORT>/hosts.toml (containerd style) or <HOST:PORT>/{ca.cert, cert.pem, key.pem} (docker style)")
+	// Experimental enable experimental feature, see in
+	// https://github.com/farcloser/lepton/blob/main/docs/experimental.md
+	helpers.AddPersistentBoolFlag(
+		rootCmd,
+		"experimental",
+		nil,
+		nil,
+		cfg.Experimental,
+		version.EnvPrefix+"_EXPERIMENTAL",
+		"Control experimental: https://github.com/farcloser/lepton/blob/main/docs/experimental.md",
+	)
+	helpers.AddPersistentStringFlag(
+		rootCmd,
+		"host-gateway-ip",
+		nil,
+		nil,
+		nil,
+		aliasToBeInherited,
+		cfg.HostGatewayIP,
+		version.EnvPrefix+"_HOST_GATEWAY_IP",
+		"IP address that the special 'host-gateway' string in --add-host resolves to. Defaults to the IP address of the host. It has no effect without setting --add-host",
+	)
+	helpers.AddPersistentStringFlag(
+		rootCmd,
+		"bridge-ip",
+		nil,
+		nil,
+		nil,
+		aliasToBeInherited,
+		cfg.BridgeIP,
+		version.EnvPrefix+"_BRIDGE_IP",
+		"IP address for the default bridge network",
+	)
+	rootCmd.PersistentFlags().
+		Bool("kube-hide-dupe", cfg.KubeHideDupe, "Deduplicate images for Kubernetes with namespace k8s.io")
 	return aliasToBeInherited, nil
 }
 

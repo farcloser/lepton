@@ -39,7 +39,12 @@ var logViewers = make(map[string]LogViewerFunc)
 // RegisterLogViewer does register a LogViewerFunc
 func RegisterLogViewer(driverName string, lvfn LogViewerFunc) {
 	if v, ok := logViewers[driverName]; ok {
-		log.L.Warnf("A LogViewerFunc with name %q has already been registered: %#v, overriding with %#v either way", driverName, v, lvfn)
+		log.L.Warnf(
+			"A LogViewerFunc with name %q has already been registered: %#v, overriding with %#v either way",
+			driverName,
+			v,
+			lvfn,
+		)
 	}
 	logViewers[driverName] = lvfn
 }
@@ -117,7 +122,12 @@ type ContainerLogViewer struct {
 
 // Validates the given LogViewOptions, loads the logging config for the
 // given container and returns a ContainerLogViewer.
-func InitContainerLogViewer(containerLabels map[string]string, lvopts LogViewOptions, stopChannel chan os.Signal, experimental bool) (contlv *ContainerLogViewer, err error) {
+func InitContainerLogViewer(
+	containerLabels map[string]string,
+	lvopts LogViewOptions,
+	stopChannel chan os.Signal,
+	experimental bool,
+) (contlv *ContainerLogViewer, err error) {
 	var lcfg LogConfig
 	if _, ok := containerLabels[k8slabels.ContainerType]; ok {
 		lcfg.Driver = "cri"

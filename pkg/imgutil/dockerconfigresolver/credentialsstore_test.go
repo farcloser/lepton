@@ -392,4 +392,5 @@ func TestWorkingCredentialsStore(t *testing.T) {
 	})
 }
 
-// TODO: add more tests that write credentials (specifically to hub locations) to verify they use the canonical id properly
+// TODO: add more tests that write credentials (specifically to hub locations) to verify they use the canonical id
+// properly

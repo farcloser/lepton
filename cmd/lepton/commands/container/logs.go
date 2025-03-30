@@ -53,8 +53,10 @@ The following containers are supported:
 	cmd.Flags().BoolP("follow", "f", false, "Follow log output")
 	cmd.Flags().BoolP("timestamps", "t", false, "Show timestamps")
 	cmd.Flags().StringP("tail", "n", "all", "Number of lines to show from the end of the logs")
-	cmd.Flags().String("since", "", "Show logs since timestamp (e.g. 2013-01-02T13:23:37Z) or relative (e.g. 42m for 42 minutes)")
-	cmd.Flags().String("until", "", "Show logs before a timestamp (e.g. 2013-01-02T13:23:37Z) or relative (e.g. 42m for 42 minutes)")
+	cmd.Flags().
+		String("since", "", "Show logs since timestamp (e.g. 2013-01-02T13:23:37Z) or relative (e.g. 42m for 42 minutes)")
+	cmd.Flags().
+		String("until", "", "Show logs before a timestamp (e.g. 2013-01-02T13:23:37Z) or relative (e.g. 42m for 42 minutes)")
 
 	return cmd
 }

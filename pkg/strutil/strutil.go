@@ -41,7 +41,8 @@ import (
 // InStringSlice checks whether a string is inside a string slice.
 // Comparison is case-insensitive.
 //
-// From https://github.com/containerd/containerd/blob/7c6d710bcfc81a30ac1e8cbb2e6a4c294184f7b7/pkg/cri/util/strings.go#L21-L30
+// From
+// https://github.com/containerd/containerd/blob/7c6d710bcfc81a30ac1e8cbb2e6a4c294184f7b7/pkg/cri/util/strings.go#L21-L30
 func InStringSlice(ss []string, str string) bool {
 	for _, s := range ss {
 		if strings.EqualFold(s, str) {

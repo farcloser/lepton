@@ -147,7 +147,11 @@ func parseFluentdConfig(config map[string]string) (*fluentd.Config, error) {
 	if config[fluentdAsyncReconnectInterval] != "" {
 		tempDuration, err := time.ParseDuration(config[fluentdAsyncReconnectInterval])
 		if err != nil {
-			return nil, fmt.Errorf("error occurs %w, invalid async connect interval (%s)", err, config[fluentdAsyncReconnectInterval])
+			return nil, fmt.Errorf(
+				"error occurs %w, invalid async connect interval (%s)",
+				err,
+				config[fluentdAsyncReconnectInterval],
+			)
 		}
 		if err = result.SetAsyncReconnectInterval(int(tempDuration.Milliseconds())); err != nil {
 			return nil, err
@@ -157,7 +161,11 @@ func parseFluentdConfig(config map[string]string) (*fluentd.Config, error) {
 	if config[fluentdSubSecondPrecision] != "" {
 		result.SubSecondPrecision, err = strconv.ParseBool(config[fluentdSubSecondPrecision])
 		if err != nil {
-			return nil, fmt.Errorf("error occurs %w, invalid sub second precision (%s)", err, config[fluentdSubSecondPrecision])
+			return nil, fmt.Errorf(
+				"error occurs %w, invalid sub second precision (%s)",
+				err,
+				config[fluentdSubSecondPrecision],
+			)
 		}
 	}
 

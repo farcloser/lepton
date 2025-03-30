@@ -174,7 +174,12 @@ func newHandlerOpts(state *specs.State, dataStore, cniPath, cniNetconfPath, brid
 	case nettype.Host, nettype.None, nettype.Container, nettype.Namespace:
 		// NOP
 	case nettype.CNI:
-		e, err := netutil.NewCNIEnv(cniPath, cniNetconfPath, netutil.WithNamespace(namespace), netutil.WithDefaultNetwork(bridgeIP))
+		e, err := netutil.NewCNIEnv(
+			cniPath,
+			cniNetconfPath,
+			netutil.WithNamespace(namespace),
+			netutil.WithDefaultNetwork(bridgeIP),
+		)
 		if err != nil {
 			return nil, err
 		}
@@ -240,7 +245,10 @@ func newHandlerOpts(state *specs.State, dataStore, cniPath, cniNetconfPath, brid
 			}
 			o.bypassClient, err = b4nndclient.New(socketPath)
 			if err != nil {
-				return nil, fmt.Errorf("bypass4netnsd not running? (Hint: run `containerd-rootless-setuptool.sh install-bypass4netnsd`): %w", err)
+				return nil, fmt.Errorf(
+					"bypass4netnsd not running? (Hint: run `containerd-rootless-setuptool.sh install-bypass4netnsd`): %w",
+					err,
+				)
 			}
 		}
 	}
@@ -374,7 +382,9 @@ func getIPAddressOpts(opts *handlerOpts) []cni.NamespaceOpts {
 	}
 
 	if rootlessutil.IsRootlessChild() {
-		log.L.Debug("container IP assignment is not fully supported in rootless mode. The IP is not accessible from the host (but still accessible from other containers).")
+		log.L.Debug(
+			"container IP assignment is not fully supported in rootless mode. The IP is not accessible from the host (but still accessible from other containers).",
+		)
 	}
 
 	return []cni.NamespaceOpts{
@@ -409,7 +419,9 @@ func getIP6AddressOpts(opts *handlerOpts) []cni.NamespaceOpts {
 	}
 
 	if rootlessutil.IsRootlessChild() {
-		log.L.Debug("container IP6 assignment is not fully supported in rootless mode. The IP6 is not accessible from the host (but still accessible from other containers).")
+		log.L.Debug(
+			"container IP6 assignment is not fully supported in rootless mode. The IP6 is not accessible from the host (but still accessible from other containers).",
+		)
 	}
 
 	return []cni.NamespaceOpts{
@@ -487,13 +499,20 @@ func applyNetworkSettings(opts *handlerOpts) error {
 
 	if rootlessutil.IsRootlessChild() {
 		if b4nnEnabled {
-			bm, err := bypass4netnsutil.NewBypass4netnsCNIBypassManager(opts.bypassClient, opts.rootlessKitClient, opts.state.Annotations)
+			bm, err := bypass4netnsutil.NewBypass4netnsCNIBypassManager(
+				opts.bypassClient,
+				opts.rootlessKitClient,
+				opts.state.Annotations,
+			)
 			if err != nil {
 				return err
 			}
 			err = bm.StartBypass(ctx, opts.ports, opts.state.ID, opts.state.Annotations[labels.StateDir])
 			if err != nil {
-				return fmt.Errorf("bypass4netnsd not running? (Hint: run `containerd-rootless-setuptool.sh install-bypass4netnsd`): %w", err)
+				return fmt.Errorf(
+					"bypass4netnsd not running? (Hint: run `containerd-rootless-setuptool.sh install-bypass4netnsd`): %w",
+					err,
+				)
 			}
 		}
 		if !b4nnBindEnabled && len(opts.ports) > 0 {
@@ -550,7 +569,8 @@ func onPostStop(opts *handlerOpts) error {
 	err = lf.Transform(func(lf *state.Store) error {
 		// See https://github.com/containerd/nerdctl/issues/3357
 		// Check if we actually errored during runtimeCreate
-		// If that is the case, CreateError is set, and we are in postStop while the container will NOT be deleted (see ticket).
+		// If that is the case, CreateError is set, and we are in postStop while the container will NOT be deleted (see
+		// ticket).
 		// Thus, do NOT treat this as a deletion, as the container is still there.
 		// Reset CreateError, and return.
 		shouldExit = lf.CreateError
@@ -574,7 +594,11 @@ func onPostStop(opts *handlerOpts) error {
 		}
 		if rootlessutil.IsRootlessChild() {
 			if b4nnEnabled {
-				bm, err := bypass4netnsutil.NewBypass4netnsCNIBypassManager(opts.bypassClient, opts.rootlessKitClient, opts.state.Annotations)
+				bm, err := bypass4netnsutil.NewBypass4netnsCNIBypassManager(
+					opts.bypassClient,
+					opts.rootlessKitClient,
+					opts.state.Annotations,
+				)
 				if err != nil {
 					return err
 				}

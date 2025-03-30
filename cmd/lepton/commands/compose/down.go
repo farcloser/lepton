@@ -35,7 +35,8 @@ func downCommand() *cobra.Command {
 		SilenceErrors: true,
 	}
 
-	cmd.Flags().BoolP("volumes", "v", false, "Remove named volumes declared in the `volumes` section of the Compose file and anonymous volumes attached to containers.")
+	cmd.Flags().
+		BoolP("volumes", "v", false, "Remove named volumes declared in the `volumes` section of the Compose file and anonymous volumes attached to containers.")
 	cmd.Flags().Bool("remove-orphans", false, "Remove containers for services not defined in the Compose file.")
 
 	return cmd

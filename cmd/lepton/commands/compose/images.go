@@ -126,7 +126,13 @@ func printComposeImageIDs(ctx context.Context, containers []client.Container) er
 	return nil
 }
 
-func printComposeImages(ctx context.Context, cmd *cobra.Command, containers []client.Container, sn snapshots.Snapshotter, format string) error {
+func printComposeImages(
+	ctx context.Context,
+	cmd *cobra.Command,
+	containers []client.Container,
+	sn snapshots.Snapshotter,
+	format string,
+) error {
 	type composeImagePrintable struct {
 		ContainerName string
 		Repository    string

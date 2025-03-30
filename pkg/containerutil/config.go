@@ -35,7 +35,12 @@ import (
 )
 
 // ReconfigNetContainer reconfigures the container's network namespace path.
-func ReconfigNetContainer(ctx context.Context, c containerd.Container, client *containerd.Client, lab map[string]string) error {
+func ReconfigNetContainer(
+	ctx context.Context,
+	c containerd.Container,
+	client *containerd.Client,
+	lab map[string]string,
+) error {
 	networksJSON, ok := lab[labels.Networks]
 	if !ok {
 		return nil
@@ -79,7 +84,12 @@ func ReconfigNetContainer(ctx context.Context, c containerd.Container, client *c
 }
 
 // ReconfigPIDContainer reconfigures the container's spec options for sharing PID namespace.
-func ReconfigPIDContainer(ctx context.Context, c containerd.Container, client *containerd.Client, lab map[string]string) error {
+func ReconfigPIDContainer(
+	ctx context.Context,
+	c containerd.Container,
+	client *containerd.Client,
+	lab map[string]string,
+) error {
 	targetContainerID, ok := lab[labels.PIDContainer]
 	if !ok {
 		return nil
@@ -109,7 +119,12 @@ func ReconfigPIDContainer(ctx context.Context, c containerd.Container, client *c
 }
 
 // ReconfigIPCContainer reconfigures the container's spec options for sharing IPC namespace and volumns.
-func ReconfigIPCContainer(ctx context.Context, c containerd.Container, client *containerd.Client, lab map[string]string) error {
+func ReconfigIPCContainer(
+	ctx context.Context,
+	c containerd.Container,
+	client *containerd.Client,
+	lab map[string]string,
+) error {
 	ipc, err := ipcutil.DecodeIPCLabel(lab[labels.IPC])
 	if err != nil {
 		return err

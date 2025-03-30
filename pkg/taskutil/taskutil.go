@@ -42,8 +42,16 @@ import (
 )
 
 // NewTask is from https://github.com/containerd/containerd/blob/v1.4.3/cmd/ctr/commands/tasks/tasks_unix.go#L70-L108
-func NewTask(ctx context.Context, client *containerd.Client, container containerd.Container,
-	attachStreamOpt []string, flagI, flagT, flagD bool, con console.Console, logURI, detachKeys, namespace string, detachC chan<- struct{}) (containerd.Task, error) {
+func NewTask(
+	ctx context.Context,
+	client *containerd.Client,
+	container containerd.Container,
+	attachStreamOpt []string,
+	flagI, flagT, flagD bool,
+	con console.Console,
+	logURI, detachKeys, namespace string,
+	detachC chan<- struct{},
+) (containerd.Task, error) {
 
 	var t containerd.Task
 	closer := func() {
@@ -55,7 +63,8 @@ func NewTask(ctx context.Context, client *containerd.Client, container container
 		// We cannot use container.Task(ctx, cio.Load) to get the IO here
 		// because the `cancel` field of the returned `*cio` is nil. [1]
 		//
-		// [1] https://github.com/containerd/containerd/blob/8f756bc8c26465bd93e78d9cd42082b66f276e10/cio/io.go#L358-L359
+		// [1]
+		// https://github.com/containerd/containerd/blob/8f756bc8c26465bd93e78d9cd42082b66f276e10/cio/io.go#L358-L359
 		io := t.IO()
 		if io == nil {
 			log.G(ctx).Errorf("got a nil io")

@@ -211,7 +211,8 @@ func TestRunSeccompCapSysPtrace(t *testing.T) {
 	base.Cmd("run", "--rm", "--cap-add", "sys_ptrace", testutil.AlpineImage, "sh", "-euxc", "apk add -q strace && strace true").
 		AssertOK()
 
-	// Docker/Moby 's seccomp profile allows ptrace(2) by default, but containerd does not (yet): https://github.com/containerd/containerd/issues/6802
+	// Docker/Moby 's seccomp profile allows ptrace(2) by default, but containerd does not (yet):
+	// https://github.com/containerd/containerd/issues/6802
 }
 
 func TestRunSystemPathsUnconfined(t *testing.T) {

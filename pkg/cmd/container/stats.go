@@ -52,7 +52,8 @@ type statsStruct struct {
 	cs []*stats2.Stats
 }
 
-// add is from https://github.com/docker/cli/blob/3fb4fb83dfb5db0c0753a8316f21aea54dab32c5/cli/command/container/stats_helpers.go#L26-L34
+// add is from
+// https://github.com/docker/cli/blob/3fb4fb83dfb5db0c0753a8316f21aea54dab32c5/cli/command/container/stats_helpers.go#L26-L34
 func (s *statsStruct) add(cs *stats2.Stats) bool {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -63,7 +64,8 @@ func (s *statsStruct) add(cs *stats2.Stats) bool {
 	return false
 }
 
-// remove is from https://github.com/docker/cli/blob/3fb4fb83dfb5db0c0753a8316f21aea54dab32c5/cli/command/container/stats_helpers.go#L36-L42
+// remove is from
+// https://github.com/docker/cli/blob/3fb4fb83dfb5db0c0753a8316f21aea54dab32c5/cli/command/container/stats_helpers.go#L36-L42
 func (s *statsStruct) remove(id string) {
 	s.mu.Lock()
 	if i, exists := s.isKnownContainer(id); exists {
@@ -72,7 +74,8 @@ func (s *statsStruct) remove(id string) {
 	s.mu.Unlock()
 }
 
-// isKnownContainer is from https://github.com/docker/cli/blob/3fb4fb83dfb5db0c0753a8316f21aea54dab32c5/cli/command/container/stats_helpers.go#L44-L51
+// isKnownContainer is from
+// https://github.com/docker/cli/blob/3fb4fb83dfb5db0c0753a8316f21aea54dab32c5/cli/command/container/stats_helpers.go#L44-L51
 func (s *statsStruct) isKnownContainer(cid string) (int, bool) {
 	for i, c := range s.cs {
 		if c.ID == cid {
@@ -83,9 +86,16 @@ func (s *statsStruct) isKnownContainer(cid string) (int, bool) {
 }
 
 // Stats displays a live stream of container(s) resource usage statistics.
-func Stats(ctx context.Context, client *containerd.Client, containerIDs []string, options options.ContainerStats) error {
+func Stats(
+	ctx context.Context,
+	client *containerd.Client,
+	containerIDs []string,
+	options options.ContainerStats,
+) error {
 	if rootlessutil.IsRootless() && cgroups.Version() < 2 {
-		return errors.New("stats requires cgroup v2 for rootless containers, see https://rootlesscontaine.rs/getting-started/common/cgroup2/")
+		return errors.New(
+			"stats requires cgroup v2 for rootless containers, see https://rootlesscontaine.rs/getting-started/common/cgroup2/",
+		)
 	}
 
 	showAll := len(containerIDs) == 0
@@ -322,7 +332,14 @@ func Stats(ctx context.Context, client *containerd.Client, containerIDs []string
 	return err
 }
 
-func collect(ctx context.Context, globalOptions *options.Global, s *stats2.Stats, waitFirst *sync.WaitGroup, id string, _noStream bool) {
+func collect(
+	ctx context.Context,
+	globalOptions *options.Global,
+	s *stats2.Stats,
+	waitFirst *sync.WaitGroup,
+	id string,
+	_noStream bool,
+) {
 	log.G(ctx).Debugf("collecting stats for %s", s.ID)
 	var (
 		getFirst = true

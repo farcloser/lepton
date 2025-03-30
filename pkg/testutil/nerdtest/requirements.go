@@ -302,7 +302,8 @@ var Build = &test.Requirement{
 	},
 }
 
-// Private makes a test run inside a dedicated namespace, with a private config.toml, hosts directory, and DOCKER_CONFIG path
+// Private makes a test run inside a dedicated namespace, with a private config.toml, hosts directory, and DOCKER_CONFIG
+// path
 // If the target is docker, parallelism is forcefully disabled
 var Private = &test.Requirement{
 	Check: func(data test.Data, helpers test.Helpers) (ret bool, mess string) {

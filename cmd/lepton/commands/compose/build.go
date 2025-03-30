@@ -36,7 +36,8 @@ func buildCommand() *cobra.Command {
 
 	cmd.Flags().StringArray("build-arg", nil, "Set build-time variables for services.")
 	cmd.Flags().Bool("no-cache", false, "Do not use cache when building the image.")
-	cmd.Flags().String("progress", "", "Set type of progress output (auto, plain, tty). Use plain to show container output")
+	cmd.Flags().
+		String("progress", "", "Set type of progress output (auto, plain, tty). Use plain to show container output")
 
 	return cmd
 }

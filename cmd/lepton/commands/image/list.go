@@ -63,9 +63,16 @@ Properties:
 	cmd.Flags().Bool("names", false, "Show image names")
 	cmd.Flags().BoolP("all", "a", true, "(unimplemented yet, always true)")
 
-	_ = cmd.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{formatter.FormatJSON, formatter.FormatTable, formatter.FormatWide}, cobra.ShellCompDirectiveNoFileComp
-	})
+	_ = cmd.RegisterFlagCompletionFunc(
+		"format",
+		func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			return []string{
+				formatter.FormatJSON,
+				formatter.FormatTable,
+				formatter.FormatWide,
+			}, cobra.ShellCompDirectiveNoFileComp
+		},
+	)
 
 	return cmd
 }

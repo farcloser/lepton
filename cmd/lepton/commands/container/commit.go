@@ -39,7 +39,8 @@ func CommitCommand() *cobra.Command {
 
 	cmd.Flags().StringP("author", "a", "", `Author (e.g., "contributor <dev@example.com>")`)
 	cmd.Flags().StringP("message", "m", "", "Commit message")
-	cmd.Flags().StringArrayP("change", "c", nil, "Apply Dockerfile instruction to the created image (supported directives: [CMD, ENTRYPOINT])")
+	cmd.Flags().
+		StringArrayP("change", "c", nil, "Apply Dockerfile instruction to the created image (supported directives: [CMD, ENTRYPOINT])")
 	cmd.Flags().BoolP("pause", "p", true, "Pause container during commit")
 
 	return cmd

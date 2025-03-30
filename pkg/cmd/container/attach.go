@@ -103,7 +103,8 @@ func Attach(ctx context.Context, client *containerd.Client, req string, options 
 			// We cannot use container.Task(ctx, cio.Load) to get the IO here
 			// because the `cancel` field of the returned `*cio` is nil. [1]
 			//
-			// [1] https://github.com/containerd/containerd/blob/8f756bc8c26465bd93e78d9cd42082b66f276e10/cio/io.go#L358-L359
+			// [1]
+			// https://github.com/containerd/containerd/blob/8f756bc8c26465bd93e78d9cd42082b66f276e10/cio/io.go#L358-L359
 			io := task.IO()
 			if io == nil {
 				log.G(ctx).Errorf("got a nil io")

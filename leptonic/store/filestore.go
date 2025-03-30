@@ -130,7 +130,10 @@ func (vs *fileStore) Release() error {
 
 	if err := filesystem.Unlock(vs.locked); err != nil {
 		if errors.Is(err, filesystem.ErrLockIsNil) {
-			return errors.Join(errs.ErrFaultyImplementation, fmt.Errorf("cannot unlock already unlocked volume store %q", vs.dir))
+			return errors.Join(
+				errs.ErrFaultyImplementation,
+				fmt.Errorf("cannot unlock already unlocked volume store %q", vs.dir),
+			)
 		}
 
 		return err
@@ -183,7 +186,10 @@ func (vs *fileStore) Get(key ...string) ([]byte, error) {
 	}
 
 	if st.IsDir() {
-		return nil, errors.Join(errs.ErrFaultyImplementation, fmt.Errorf("%q is a directory and cannot be read as a file", path))
+		return nil, errors.Join(
+			errs.ErrFaultyImplementation,
+			fmt.Errorf("%q is a directory and cannot be read as a file", path),
+		)
 	}
 
 	content, err := os.ReadFile(path)
@@ -234,7 +240,10 @@ func (vs *fileStore) Set(data []byte, key ...string) error {
 	st, err := os.Stat(path)
 	if err == nil {
 		if st.IsDir() {
-			return errors.Join(errs.ErrFaultyImplementation, fmt.Errorf("%q is a directory and cannot be written to", path))
+			return errors.Join(
+				errs.ErrFaultyImplementation,
+				fmt.Errorf("%q is a directory and cannot be written to", path),
+			)
 		}
 	}
 
@@ -268,7 +277,10 @@ func (vs *fileStore) List(key ...string) ([]string, error) {
 	}
 
 	if !st.IsDir() {
-		return nil, errors.Join(errs.ErrFaultyImplementation, fmt.Errorf("%q is not a directory and cannot be enumerated", path))
+		return nil, errors.Join(
+			errs.ErrFaultyImplementation,
+			fmt.Errorf("%q is not a directory and cannot be enumerated", path),
+		)
 	}
 
 	dirEntries, err := os.ReadDir(path)

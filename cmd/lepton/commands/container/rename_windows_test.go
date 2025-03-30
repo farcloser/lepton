@@ -29,7 +29,8 @@ func TestRenameProcessContainer(t *testing.T) {
 	base := testutil.NewBase(t)
 
 	defer base.Cmd("rm", "-f", testContainerName).Run()
-	base.Cmd("run", "--isolation", "process", "-d", "--name", testContainerName, testutil.CommonImage, "sleep", nerdtest.Infinity).AssertOK()
+	base.Cmd("run", "--isolation", "process", "-d", "--name", testContainerName, testutil.CommonImage, "sleep", nerdtest.Infinity).
+		AssertOK()
 
 	defer base.Cmd("rm", "-f", testContainerName+"_new").Run()
 	base.Cmd("rename", testContainerName, testContainerName+"_new").AssertOK()
@@ -47,7 +48,8 @@ func TestRenameHyperVContainer(t *testing.T) {
 	}
 
 	defer base.Cmd("rm", "-f", testContainerName).Run()
-	base.Cmd("run", "--isolation", "hyperv", "-d", "--name", testContainerName, testutil.CommonImage, "sleep", nerdtest.Infinity).AssertOK()
+	base.Cmd("run", "--isolation", "hyperv", "-d", "--name", testContainerName, testutil.CommonImage, "sleep", nerdtest.Infinity).
+		AssertOK()
 
 	defer base.Cmd("rm", "-f", testContainerName+"_new").Run()
 	base.Cmd("rename", testContainerName, testContainerName+"_new").AssertOK()

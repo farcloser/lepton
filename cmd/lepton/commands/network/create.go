@@ -42,7 +42,8 @@ func createCommand() *cobra.Command {
 	cmd.Flags().StringArrayP("opt", "o", nil, "Set driver specific options")
 	cmd.Flags().String("ipam-driver", "default", "IP Address helpers.Management Driver")
 	cmd.Flags().StringArray("ipam-opt", nil, "Set IPAM driver specific options")
-	cmd.Flags().StringArray("subnet", nil, `Subnet in CIDR format that represents a network segment, e.g. "10.5.0.0/16"`)
+	cmd.Flags().
+		StringArray("subnet", nil, `Subnet in CIDR format that represents a network segment, e.g. "10.5.0.0/16"`)
 	cmd.Flags().String("gateway", "", `Gateway for the master subnet`)
 	cmd.Flags().String("ip-range", "", `Allocate container ip from a sub-range`)
 	cmd.Flags().StringArray("label", nil, "Set metadata for a network")

@@ -127,7 +127,12 @@ type imagePrintable struct {
 	Platform string // extension
 }
 
-func printImages(ctx context.Context, client *containerd.Client, imageList []images.Image, options *options.ImageList) error {
+func printImages(
+	ctx context.Context,
+	client *containerd.Client,
+	imageList []images.Image,
+	options *options.ImageList,
+) error {
 	w := options.Stdout
 	var finalImageList []images.Image
 	/*
@@ -240,7 +245,12 @@ type imageStruct struct {
 	config   *specs.Descriptor
 }
 
-func readManifest(ctx context.Context, provider content.Provider, snapshotter snapshots.Snapshotter, desc specs.Descriptor) (*imageStruct, error) {
+func readManifest(
+	ctx context.Context,
+	provider content.Provider,
+	snapshotter snapshots.Snapshotter,
+	desc specs.Descriptor,
+) (*imageStruct, error) {
 	// Read the manifest blob from the descriptor
 	manifestData, err := containerdutil.ReadBlob(ctx, provider, desc)
 	if err != nil {
@@ -275,7 +285,9 @@ func readManifest(ctx context.Context, provider content.Provider, snapshotter sn
 	}
 
 	// Get the platform
-	plt := platforms.Normalize(specs.Platform{OS: config.OS, Architecture: config.Architecture, Variant: config.Variant})
+	plt := platforms.Normalize(
+		specs.Platform{OS: config.OS, Architecture: config.Architecture, Variant: config.Variant},
+	)
 
 	// Get the filesystem size for all layers
 	chainID := specs.ChainID(config.RootFS.DiffIDs).String()
@@ -292,7 +304,12 @@ func readManifest(ctx context.Context, provider content.Provider, snapshotter sn
 	}, nil
 }
 
-func readIndex(ctx context.Context, provider content.Provider, snapshotter snapshots.Snapshotter, desc specs.Descriptor) (map[string]*imageStruct, error) {
+func readIndex(
+	ctx context.Context,
+	provider content.Provider,
+	snapshotter snapshots.Snapshotter,
+	desc specs.Descriptor,
+) (map[string]*imageStruct, error) {
 	descs := map[string]*imageStruct{}
 
 	// Read the index
@@ -318,7 +335,12 @@ func readIndex(ctx context.Context, provider content.Provider, snapshotter snaps
 	return descs, err
 }
 
-func read(ctx context.Context, provider content.Provider, snapshotter snapshots.Snapshotter, desc specs.Descriptor) (map[string]*imageStruct, error) {
+func read(
+	ctx context.Context,
+	provider content.Provider,
+	snapshotter snapshots.Snapshotter,
+	desc specs.Descriptor,
+) (map[string]*imageStruct, error) {
 	if images.IsManifestType(desc.MediaType) {
 		manifest, err := readManifest(ctx, provider, snapshotter, desc)
 		if err != nil {
@@ -349,7 +371,13 @@ func (x *imagePrinter) printImage(ctx context.Context, img images.Image) error {
 	return nil
 }
 
-func (x *imagePrinter) printImageSinglePlatform(desc specs.Descriptor, img images.Image, blobSize int64, size int64, plt platforms.Platform) error {
+func (x *imagePrinter) printImageSinglePlatform(
+	desc specs.Descriptor,
+	img images.Image,
+	blobSize int64,
+	size int64,
+	plt platforms.Platform,
+) error {
 	var (
 		repository string
 		tag        string

@@ -20,7 +20,8 @@ package signalutil
 
 import "os"
 
-// canIgnoreSignal is from https://github.com/containerd/containerd/blob/v1.7.0-rc.2/cmd/ctr/commands/signals_notlinux.go#L23-L25
+// canIgnoreSignal is from
+// https://github.com/containerd/containerd/blob/v1.7.0-rc.2/cmd/ctr/commands/signals_notlinux.go#L23-L25
 func canIgnoreSignal(_ os.Signal) bool {
 	return false
 }

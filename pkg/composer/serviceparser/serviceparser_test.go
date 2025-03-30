@@ -533,11 +533,26 @@ configs:
 
 	t.Logf("foo: %+v", foo)
 	for _, c := range foo.Containers {
-		assert.Assert(t, in(c.RunArgs, fmt.Sprintf("-v=%s:/run/secrets/secret1:ro", filepath.Join(project.WorkingDir, "secret1"))))
-		assert.Assert(t, in(c.RunArgs, fmt.Sprintf("-v=%s:/run/secrets/secret2-foo:ro", filepath.Join(project.WorkingDir, "secret2"))))
-		assert.Assert(t, in(c.RunArgs, fmt.Sprintf("-v=%s:/mnt/secret3-foo:ro", filepath.Join(project.WorkingDir, "secret3"))))
+		assert.Assert(
+			t,
+			in(c.RunArgs, fmt.Sprintf("-v=%s:/run/secrets/secret1:ro", filepath.Join(project.WorkingDir, "secret1"))),
+		)
+		assert.Assert(
+			t,
+			in(
+				c.RunArgs,
+				fmt.Sprintf("-v=%s:/run/secrets/secret2-foo:ro", filepath.Join(project.WorkingDir, "secret2")),
+			),
+		)
+		assert.Assert(
+			t,
+			in(c.RunArgs, fmt.Sprintf("-v=%s:/mnt/secret3-foo:ro", filepath.Join(project.WorkingDir, "secret3"))),
+		)
 		assert.Assert(t, in(c.RunArgs, fmt.Sprintf("-v=%s:/config1:ro", filepath.Join(project.WorkingDir, "config1"))))
-		assert.Assert(t, in(c.RunArgs, fmt.Sprintf("-v=%s:/mnt/config2-foo:ro", filepath.Join(project.WorkingDir, "config2"))))
+		assert.Assert(
+			t,
+			in(c.RunArgs, fmt.Sprintf("-v=%s:/mnt/config2-foo:ro", filepath.Join(project.WorkingDir, "config2"))),
+		)
 	}
 }
 

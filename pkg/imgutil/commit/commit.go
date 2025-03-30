@@ -68,7 +68,13 @@ var (
 	emptyDigest  = digest.Digest("")
 )
 
-func Commit(ctx context.Context, client *containerd.Client, container containerd.Container, opts *Opts, globalOptions *options.Global) (digest.Digest, error) {
+func Commit(
+	ctx context.Context,
+	client *containerd.Client,
+	container containerd.Container,
+	opts *Opts,
+	globalOptions *options.Global,
+) (digest.Digest, error) {
 	// Get labels
 	containerLabels, err := container.Labels(ctx)
 	if err != nil {
@@ -219,7 +225,13 @@ func Commit(ctx context.Context, client *containerd.Client, container containerd
 }
 
 // generateCommitImageConfig returns commit oci image config based on the container's image.
-func generateCommitImageConfig(ctx context.Context, container containerd.Container, img containerd.Image, diffID digest.Digest, opts *Opts) (specs.Image, error) {
+func generateCommitImageConfig(
+	ctx context.Context,
+	container containerd.Container,
+	img containerd.Image,
+	diffID digest.Digest,
+	opts *Opts,
+) (specs.Image, error) {
 	spec, err := container.Spec(ctx)
 	if err != nil {
 		return specs.Image{}, err
@@ -282,7 +294,13 @@ func generateCommitImageConfig(ctx context.Context, container containerd.Contain
 }
 
 // writeContentsForImage will commit oci image config and manifest into containerd's content store.
-func writeContentsForImage(ctx context.Context, snName string, baseImg containerd.Image, newConfig specs.Image, diffLayerDesc specs.Descriptor) (specs.Descriptor, digest.Digest, error) {
+func writeContentsForImage(
+	ctx context.Context,
+	snName string,
+	baseImg containerd.Image,
+	newConfig specs.Image,
+	diffLayerDesc specs.Descriptor,
+) (specs.Descriptor, digest.Digest, error) {
 	newConfigJSON, err := json.Marshal(newConfig)
 	if err != nil {
 		return specs.Descriptor{}, emptyDigest, err
@@ -334,7 +352,14 @@ func writeContentsForImage(ctx context.Context, snName string, baseImg container
 		labels[fmt.Sprintf("containerd.io/gc.ref.content.%d", i+1)] = l.Digest.String()
 	}
 
-	err = content.WriteBlob(ctx, cs, newMfstDesc.Digest.String(), bytes.NewReader(newMfstJSON), newMfstDesc, content.WithLabels(labels))
+	err = content.WriteBlob(
+		ctx,
+		cs,
+		newMfstDesc.Digest.String(),
+		bytes.NewReader(newMfstJSON),
+		newMfstDesc,
+		content.WithLabels(labels),
+	)
 	if err != nil {
 		return specs.Descriptor{}, emptyDigest, err
 	}
@@ -352,7 +377,13 @@ func writeContentsForImage(ctx context.Context, snName string, baseImg container
 }
 
 // createDiff creates a layer diff into containerd's content store.
-func createDiff(ctx context.Context, name string, sn snapshots.Snapshotter, cs content.Store, comparer diff.Comparer) (specs.Descriptor, digest.Digest, error) {
+func createDiff(
+	ctx context.Context,
+	name string,
+	sn snapshots.Snapshotter,
+	cs content.Store,
+	comparer diff.Comparer,
+) (specs.Descriptor, digest.Digest, error) {
 	newDesc, err := rootfs.CreateDiff(ctx, name, sn, comparer)
 	if err != nil {
 		return specs.Descriptor{}, digest.Digest(""), err
@@ -381,7 +412,14 @@ func createDiff(ctx context.Context, name string, sn snapshots.Snapshotter, cs c
 }
 
 // applyDiffLayer will apply diff layer content created by createDiff into the snapshotter.
-func applyDiffLayer(ctx context.Context, name string, baseImg specs.Image, sn snapshots.Snapshotter, differ diff.Applier, diffDesc specs.Descriptor) (retErr error) {
+func applyDiffLayer(
+	ctx context.Context,
+	name string,
+	baseImg specs.Image,
+	sn snapshots.Snapshotter,
+	differ diff.Applier,
+	diffDesc specs.Descriptor,
+) (retErr error) {
 	var (
 		key    = uniquePart() + "-" + name
 		parent = specs.ChainID(baseImg.RootFS.DiffIDs).String()

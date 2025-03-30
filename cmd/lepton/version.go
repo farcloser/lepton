@@ -43,10 +43,14 @@ func newVersionCommand() *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
-	versionCommand.Flags().StringP("format", "f", "", "Format the output using the given Go template, e.g, '{{json .}}'")
-	versionCommand.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{formatter.FormatJSON}, cobra.ShellCompDirectiveNoFileComp
-	})
+	versionCommand.Flags().
+		StringP("format", "f", "", "Format the output using the given Go template, e.g, '{{json .}}'")
+	versionCommand.RegisterFlagCompletionFunc(
+		"format",
+		func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			return []string{formatter.FormatJSON}, cobra.ShellCompDirectiveNoFileComp
+		},
+	)
 	return versionCommand
 }
 

@@ -44,7 +44,13 @@ type namespaceInspectOutput struct {
 	Labels     map[string]string     `json:"labels,omitempty"`
 }
 
-func Inspect(ctx context.Context, client *client.Client, output io.Writer, globalOptions *options.Global, opts *options.NamespaceInspect) error {
+func Inspect(
+	ctx context.Context,
+	client *client.Client,
+	output io.Writer,
+	globalOptions *options.Global,
+	opts *options.NamespaceInspect,
+) error {
 	namespaces, errs := namespace.Inspect(ctx, client, opts.NamesList)
 	if len(errs) > 0 {
 		for _, err := range errs {

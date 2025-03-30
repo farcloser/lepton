@@ -99,6 +99,9 @@ func (dsn *defaultSnapshotterOpts) isRemote() bool {
 	return false
 }
 
-func sociExtraLabels(f func(images.Handler) images.Handler, rFlags options.RemoteSnapshotterFlags) func(images.Handler) images.Handler {
+func sociExtraLabels(
+	f func(images.Handler) images.Handler,
+	rFlags options.RemoteSnapshotterFlags,
+) func(images.Handler) images.Handler {
 	return snapshotterutil.SociAppendDefaultLabelsHandlerWrapper(rFlags.SociIndexDigest, f)
 }

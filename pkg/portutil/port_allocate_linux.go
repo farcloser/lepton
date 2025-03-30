@@ -24,7 +24,8 @@ import (
 )
 
 const (
-	// This port range is compatible with Docker, FYI https://github.com/moby/moby/blob/eb9e42a09ee123af1d95bf7d46dd738258fa2109/libnetwork/portallocator/portallocator_unix.go#L7-L12
+	// This port range is compatible with Docker, FYI
+	// https://github.com/moby/moby/blob/eb9e42a09ee123af1d95bf7d46dd738258fa2109/libnetwork/portallocator/portallocator_unix.go#L7-L12
 	allocateEnd = 60999
 )
 
@@ -32,7 +33,10 @@ var (
 	allocateStart = 49153
 )
 
-func filter(ss []procnet.NetworkDetail, filterFunc func(detail procnet.NetworkDetail) bool) (ret []procnet.NetworkDetail) {
+func filter(
+	ss []procnet.NetworkDetail,
+	filterFunc func(detail procnet.NetworkDetail) bool,
+) (ret []procnet.NetworkDetail) {
 	for _, s := range ss {
 		if filterFunc(s) {
 			ret = append(ret, s)
@@ -47,7 +51,8 @@ func portAllocate(protocol string, ip string, count uint64) (uint64, uint64, err
 		return 0, 0, err
 	}
 	netprocItems := procnet.Parse(netprocData)
-	// In some circumstances, when we bind address like "0.0.0.0:80", we will get the formation of ":::80" in /proc/net/tcp6.
+	// In some circumstances, when we bind address like "0.0.0.0:80", we will get the formation of ":::80" in
+	// /proc/net/tcp6.
 	// So we need some trick to process this situation.
 	if protocol == "tcp" {
 		tempTCPV6Data, err := procnet.ReadStatsFileData("tcp6")
@@ -65,7 +70,8 @@ func portAllocate(protocol string, ip string, count uint64) (uint64, uint64, err
 	}
 	if ip != "" {
 		netprocItems = filter(netprocItems, func(s procnet.NetworkDetail) bool {
-			// In some circumstances, when we bind address like "0.0.0.0:80", we will get the formation of ":::80" in /proc/net/tcp6.
+			// In some circumstances, when we bind address like "0.0.0.0:80", we will get the formation of ":::80" in
+			// /proc/net/tcp6.
 			// So we need some trick to process this situation.
 			return s.LocalIP.String() == "::" || s.LocalIP.String() == ip
 		})

@@ -42,7 +42,11 @@ func parseBuildConfig(c *types.BuildConfig, project *types.Project, imageName st
 		return nil, errors.New("build: context must be specified")
 	}
 	if strings.Contains(c.Context, "://") {
-		return nil, fmt.Errorf("build: URL-style context (%q) is not supported yet: %w", c.Context, errdefs.ErrNotImplemented)
+		return nil, fmt.Errorf(
+			"build: URL-style context (%q) is not supported yet: %w",
+			c.Context,
+			errdefs.ErrNotImplemented,
+		)
 	}
 	ctxDir := project.RelativePath(c.Context)
 

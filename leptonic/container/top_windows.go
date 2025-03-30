@@ -65,7 +65,13 @@ func containerTop(ctx context.Context, stdio io.Writer, client *containerd.Clien
 		procList.Processes = append(procList.Processes, []string{
 			info.ImageName,
 			strconv.FormatUint(uint64(info.ProcessID), 10),
-			fmt.Sprintf("%02d:%02d:%02d.%03d", int(d.Hours()), int(d.Minutes())%60, int(d.Seconds())%60, int(d.Nanoseconds()/1000000)%1000),
+			fmt.Sprintf(
+				"%02d:%02d:%02d.%03d",
+				int(d.Hours()),
+				int(d.Minutes())%60,
+				int(d.Seconds())%60,
+				int(d.Nanoseconds()/1000000)%1000,
+			),
 			units.HumanSize(float64(info.MemoryWorkingSetPrivateBytes))})
 
 	}

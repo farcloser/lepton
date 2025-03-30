@@ -33,7 +33,9 @@ func CreateSoci(rawRef string, gOpts *options.Global, allPlatform bool, platform
 	sociExecutable, err := exec.LookPath("soci")
 	if err != nil {
 		log.L.WithError(err).Error("soci executable not found in path $PATH")
-		log.L.Info("you might consider installing soci from: https://github.com/awslabs/soci-snapshotter/blob/main/docs/install.md")
+		log.L.Info(
+			"you might consider installing soci from: https://github.com/awslabs/soci-snapshotter/blob/main/docs/install.md",
+		)
 		return err
 	}
 
@@ -91,7 +93,9 @@ func PushSoci(rawRef string, gOpts *options.Global, allPlatform bool, platforms 
 	sociExecutable, err := exec.LookPath("soci")
 	if err != nil {
 		log.L.WithError(err).Error("soci executable not found in path $PATH")
-		log.L.Info("you might consider installing soci from: https://github.com/awslabs/soci-snapshotter/blob/main/docs/install.md")
+		log.L.Info(
+			"you might consider installing soci from: https://github.com/awslabs/soci-snapshotter/blob/main/docs/install.md",
+		)
 		return err
 	}
 

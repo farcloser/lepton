@@ -28,7 +28,8 @@ import (
 	"go.farcloser.world/tigron/test"
 )
 
-// Auth describes a struct able to serialize authenticator information into arguments to be fed to a registry container run
+// Auth describes a struct able to serialize authenticator information into arguments to be fed to a registry container
+// run
 type Auth interface {
 	Params(data test.Data) []string
 }

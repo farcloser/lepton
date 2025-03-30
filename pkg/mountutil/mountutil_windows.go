@@ -86,7 +86,12 @@ func ProcessFlagMount(s string, volStore volumestore.VolumeService) (*Processed,
 	return nil, errdefs.ErrNotImplemented
 }
 
-func handleVolumeToMount(source string, dst string, volStore volumestore.VolumeService, createDir bool) (volumeSpec, error) {
+func handleVolumeToMount(
+	source string,
+	dst string,
+	volStore volumestore.VolumeService,
+	createDir bool,
+) (volumeSpec, error) {
 	// Validate source and destination types
 	if _, err := (validateNamedPipeSpec(source, dst)); err != nil {
 		return volumeSpec{}, err
@@ -174,7 +179,10 @@ to be mounted into a container.
 */
 func validateAnonymousVolumeDestination(s string) (bool, error) {
 	if isNamedPipe(s) || isNamedVolume(s) {
-		return false, fmt.Errorf("invalid volume specification: %q. only directories can be mapped as anonymous volumes", s)
+		return false, fmt.Errorf(
+			"invalid volume specification: %q. only directories can be mapped as anonymous volumes",
+			s,
+		)
 	}
 
 	if filepath.IsAbs(s) {

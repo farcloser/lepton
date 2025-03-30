@@ -40,9 +40,16 @@ func listCommand() *cobra.Command {
 	cmd.Flags().StringSliceP("filter", "f", []string{}, "Provide filter values (e.g. \"name=default\")")
 	cmd.Flags().String("format", "", "Format the output using the given Go template, e.g, '{{json .}}'")
 
-	_ = cmd.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{formatter.FormatJSON, formatter.FormatTable, formatter.FormatWide}, cobra.ShellCompDirectiveNoFileComp
-	})
+	_ = cmd.RegisterFlagCompletionFunc(
+		"format",
+		func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			return []string{
+				formatter.FormatJSON,
+				formatter.FormatTable,
+				formatter.FormatWide,
+			}, cobra.ShellCompDirectiveNoFileComp
+		},
+	)
 
 	return cmd
 }

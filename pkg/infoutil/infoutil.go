@@ -74,7 +74,12 @@ func NativeDaemonInfo(ctx context.Context, client *containerd.Client) (*native.D
 	}, nil
 }
 
-func Info(ctx context.Context, client *containerd.Client, snapshotter string, cgroupManager cgroups.Manager) (*dockercompat.Info, error) {
+func Info(
+	ctx context.Context,
+	client *containerd.Client,
+	snapshotter string,
+	cgroupManager cgroups.Manager,
+) (*dockercompat.Info, error) {
 	introService := client.IntrospectionService()
 
 	plugins, err := introService.Plugins(ctx)

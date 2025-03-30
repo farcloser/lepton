@@ -28,7 +28,12 @@ import (
 )
 
 // Restart will restart one or more containers.
-func Restart(ctx context.Context, client *containerd.Client, containers []string, options options.ContainerRestart) error {
+func Restart(
+	ctx context.Context,
+	client *containerd.Client,
+	containers []string,
+	options options.ContainerRestart,
+) error {
 	walker := &containerwalker.ContainerWalker{
 		Client: client,
 		OnFound: func(ctx context.Context, found containerwalker.Found) error {

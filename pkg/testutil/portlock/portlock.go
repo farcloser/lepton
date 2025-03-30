@@ -17,10 +17,12 @@
 // portlock provides a mechanism for containers to acquire and release ports they plan to expose, and a wait mechanism
 // This allows tests dependent on running containers to always parallelize without having to worry about port collision
 // with any other test
-// Note that this does NOT protect against trying to use a port that is already used by an unrelated third-party service or container
+// Note that this does NOT protect against trying to use a port that is already used by an unrelated third-party service
+// or container
 // Also note that *generally* finding a free port is not easy:
-// - to just "listen" and see if it works won't work for containerized services that are DNAT-ed (plus, that would be racy)
-// - inspecting iptables instead (or in addition to) may work for containers, but this depends on how networking has been set (and yes, it is also racy)
+// - to just "listen" and see if it works won't work for containerized services that are DNAT-ed (plus, that would be
+// racy) - inspecting iptables instead (or in addition to) may work for containers, but this depends on how networking
+// has been set (and yes, it is also racy)
 // Our approach here is optimistic: tests are responsible for calling Acquire and Release
 package portlock
 

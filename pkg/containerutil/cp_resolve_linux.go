@@ -39,9 +39,15 @@ func volumeNameLen(_ string) int {
 }
 
 var (
-	errDoesNotExist           = errors.New("resource does not exist")                                            // when a path parent dir does not exist
-	errIsNotADir              = errors.New("is not a dir")                                                       // when a path is a file, ending with path separator
-	errCannotResolvePathNoCwd = errors.New("unable to resolve path against undefined current working directory") // relative host path, no cwd
+	errDoesNotExist = errors.New(
+		"resource does not exist",
+	) // when a path parent dir does not exist
+	errIsNotADir = errors.New(
+		"is not a dir",
+	) // when a path is a file, ending with path separator
+	errCannotResolvePathNoCwd = errors.New(
+		"unable to resolve path against undefined current working directory",
+	) // relative host path, no cwd
 )
 
 // pathSpecifier represents a path to be used by cp
@@ -58,7 +64,8 @@ type pathSpecifier struct {
 }
 
 // getPathSpecFromHost builds a pathSpecifier from a host location
-// errors with errDoesNotExist, errIsNotADir, "EvalSymlinks: too many links", or other hard filesystem errors from lstat/stat
+// errors with errDoesNotExist, errIsNotADir, "EvalSymlinks: too many links", or other hard filesystem errors from
+// lstat/stat
 func getPathSpecFromHost(originalPath string) (*pathSpecifier, error) {
 	pathSpec := &pathSpecifier{
 		originalPath:         originalPath,
@@ -98,7 +105,10 @@ func getPathSpecFromHost(originalPath string) (*pathSpecifier, error) {
 		cleaned := strings.TrimRight(strings.TrimSuffix(path, string(os.PathSeparator)+"."), string(os.PathSeparator))
 		for len(cleaned) < len(path) {
 			path = cleaned
-			cleaned = strings.TrimRight(strings.TrimSuffix(path, string(os.PathSeparator)+"."), string(os.PathSeparator))
+			cleaned = strings.TrimRight(
+				strings.TrimSuffix(path, string(os.PathSeparator)+"."),
+				string(os.PathSeparator),
+			)
 		}
 
 		base := filepath.Base(path)
@@ -133,7 +143,11 @@ func getPathSpecFromHost(originalPath string) (*pathSpecifier, error) {
 }
 
 // getPathSpecFromHost builds a pathSpecifier from a container location
-func getPathSpecFromContainer(originalPath string, conSpec *oci.Spec, containerHostRoot string) (*pathSpecifier, error) {
+func getPathSpecFromContainer(
+	originalPath string,
+	conSpec *oci.Spec,
+	containerHostRoot string,
+) (*pathSpecifier, error) {
 	pathSpec := &pathSpecifier{
 		originalPath:         originalPath,
 		endsWithSeparator:    strings.HasSuffix(originalPath, string(os.PathSeparator)),
@@ -174,7 +188,10 @@ func getPathSpecFromContainer(originalPath string, conSpec *oci.Spec, containerH
 		cleaned := strings.TrimRight(strings.TrimSuffix(path, string(os.PathSeparator)+"."), string(os.PathSeparator))
 		for len(cleaned) < len(path) {
 			path = cleaned
-			cleaned = strings.TrimRight(strings.TrimSuffix(path, string(os.PathSeparator)+"."), string(os.PathSeparator))
+			cleaned = strings.TrimRight(
+				strings.TrimSuffix(path, string(os.PathSeparator)+"."),
+				string(os.PathSeparator),
+			)
 		}
 
 		base := filepath.Base(path)
@@ -305,7 +322,8 @@ func (res *resolver) getMount(path string) (*locator, string) {
 }
 
 // resolvePath is adapted from https://cs.opensource.google/go/go/+/go1.23.0:src/path/filepath/path.go;l=147
-// The (only) changes are on Lstat and ReadLink, which are fed the actual host path, that is computed by `res.pathOnHost`
+// The (only) changes are on Lstat and ReadLink, which are fed the actual host path, that is computed by
+// `res.pathOnHost`
 func (res *resolver) resolvePath(path string) (string, error) {
 	volLen := volumeNameLen(path)
 	pathSeparator := string(os.PathSeparator)

@@ -41,9 +41,12 @@ func configCommand() *cobra.Command {
 	cmd.Flags().Bool("volumes", false, "Print the volume names, one per line.")
 	cmd.Flags().String("hash", "", "Print the service config hash, one per line.")
 
-	_ = cmd.RegisterFlagCompletionFunc("hash", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{"\"*\""}, cobra.ShellCompDirectiveNoFileComp
-	})
+	_ = cmd.RegisterFlagCompletionFunc(
+		"hash",
+		func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			return []string{"\"*\""}, cobra.ShellCompDirectiveNoFileComp
+		},
+	)
 
 	return cmd
 }

@@ -14,7 +14,8 @@
    limitations under the License.
 */
 
-// originally from https://github.com/moby/moby/blob/6014c1e29dc34dffa77fb5749cc3281c1b4854ac/libnetwork/resolvconf/resolvconf_linux_test.go
+// originally from
+// https://github.com/moby/moby/blob/6014c1e29dc34dffa77fb5749cc3281c1b4854ac/libnetwork/resolvconf/resolvconf_linux_test.go
 package resolvconf_test
 
 import (
@@ -171,7 +172,10 @@ func TestBuild(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if expected := "search search1\nnameserver ns1\nnameserver ns2\nnameserver ns3\noptions opt1\n"; !bytes.Contains(content, []byte(expected)) {
+	if expected := "search search1\nnameserver ns1\nnameserver ns2\nnameserver ns3\noptions opt1\n"; !bytes.Contains(
+		content,
+		[]byte(expected),
+	) {
 		t.Fatalf("Expected to find '%s' got '%s'", expected, content)
 	}
 }
@@ -193,7 +197,10 @@ func TestBuildWithZeroLengthDomainSearch(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if expected := "nameserver ns1\nnameserver ns2\nnameserver ns3\noptions opt1\n"; !bytes.Contains(content, []byte(expected)) {
+	if expected := "nameserver ns1\nnameserver ns2\nnameserver ns3\noptions opt1\n"; !bytes.Contains(
+		content,
+		[]byte(expected),
+	) {
 		t.Fatalf("Expected to find '%s' got '%s'", expected, content)
 	}
 	if notExpected := "search ."; bytes.Contains(content, []byte(notExpected)) {
@@ -218,7 +225,10 @@ func TestBuildWithNoOptions(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if expected := "search search1\nnameserver ns1\nnameserver ns2\nnameserver ns3\n"; !bytes.Contains(content, []byte(expected)) {
+	if expected := "search search1\nnameserver ns1\nnameserver ns2\nnameserver ns3\n"; !bytes.Contains(
+		content,
+		[]byte(expected),
+	) {
 		t.Fatalf("Expected to find '%s' got '%s'", expected, content)
 	}
 	if notExpected := "search ."; bytes.Contains(content, []byte(notExpected)) {

@@ -83,7 +83,10 @@ func (c *Composer) stopContainers(ctx context.Context, containers []containerd.C
 	return nil
 }
 
-func (c *Composer) stopContainersFromParsedServices(ctx context.Context, containers map[string]serviceparser.Container) {
+func (c *Composer) stopContainersFromParsedServices(
+	ctx context.Context,
+	containers map[string]serviceparser.Container,
+) {
 	var rmWG sync.WaitGroup
 	for id, container := range containers {
 		rmWG.Add(1)

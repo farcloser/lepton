@@ -26,7 +26,11 @@ import (
 	"go.farcloser.world/containers/stats"
 )
 
-func setContainerStatsAndRenderStatsEntry(ctx context.Context, container client.Container, previousStats *stats.ContainerStats) (statsEntry stats.Entry, err error) {
+func setContainerStatsAndRenderStatsEntry(
+	ctx context.Context,
+	container client.Container,
+	previousStats *stats.ContainerStats,
+) (statsEntry stats.Entry, err error) {
 	task, err := container.Task(ctx, nil)
 	if err != nil {
 		return statsEntry, err

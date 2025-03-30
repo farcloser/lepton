@@ -49,7 +49,8 @@ type Store interface {
 
 // Manager describes operations that can be performed on the store
 type Manager interface {
-	// List will return a slice of all subgroups (eg: subdirectories), or keys (eg: files), under a specific group (eg: dir)
+	// List will return a slice of all subgroups (eg: subdirectories), or keys (eg: files), under a specific group (eg:
+	// dir)
 	// Note that `key...` may be omitted, in which case, all objects' names at the root of the store are returned.
 	// Example, in the volumestore, List() will return all existing volumes names
 	List(key ...string) ([]string, error)

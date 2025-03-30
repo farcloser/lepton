@@ -70,7 +70,8 @@ func createOptions(cmd *cobra.Command, args []string) (*options.ContainerCreate,
 	opt.CliCmd, opt.CliArgs = helpers.GlobalFlags(cmd)
 
 	// #region for basic flags
-	// The command `container start` doesn't support the flag `--interactive`. Set the default value of `opt.Interactive` false.
+	// The command `container start` doesn't support the flag `--interactive`. Set the default value of
+	// `opt.Interactive` false.
 	opt.Interactive = false
 	opt.TTY, err = cmd.Flags().GetBool("tty")
 	if err != nil {
@@ -284,7 +285,8 @@ func createOptions(cmd *cobra.Command, args []string) (*options.ContainerCreate,
 	if err != nil {
 		return opt, err
 	}
-	// tmpfs needs to be StringArray, not StringSlice, to prevent "/foo:size=64m,exec" from being split to {"/foo:size=64m", "exec"}
+	// tmpfs needs to be StringArray, not StringSlice, to prevent "/foo:size=64m,exec" from being split to
+	// {"/foo:size=64m", "exec"}
 	opt.Tmpfs, err = cmd.Flags().GetStringArray("tmpfs")
 	if err != nil {
 		return opt, err
@@ -428,7 +430,12 @@ func createAction(cmd *cobra.Command, args []string) error {
 	if createOpt.Platform == "windows" && !createOpt.GOptions.Experimental {
 		return fmt.Errorf("%s requires experimental mode to be enabled", createOpt.Platform)
 	}
-	cli, ctx, cancel, err := clientutil.NewClientWithPlatform(cmd.Context(), createOpt.GOptions.Namespace, createOpt.GOptions.Address, createOpt.Platform)
+	cli, ctx, cancel, err := clientutil.NewClientWithPlatform(
+		cmd.Context(),
+		createOpt.GOptions.Namespace,
+		createOpt.GOptions.Address,
+		createOpt.Platform,
+	)
 	if err != nil {
 		return err
 	}

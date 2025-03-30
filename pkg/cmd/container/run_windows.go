@@ -103,7 +103,10 @@ func setPlatformOptions(
 		// no op
 		// use containerd's default runtime option `default_runtime` set in the config.toml
 	default:
-		return nil, fmt.Errorf("unknown isolation value %q. valid values are 'host', 'process' or 'default'", options.Isolation)
+		return nil, fmt.Errorf(
+			"unknown isolation value %q. valid values are 'host', 'process' or 'default'",
+			options.Isolation,
+		)
 	}
 
 	opts = append(opts,

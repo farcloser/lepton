@@ -174,12 +174,17 @@ func TestParseVolumeOptions(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			opts, specOpts, err := mountutil.ParseVolumeOptionsWithMountInfo(tt.vType, tt.src, tt.optsRaw, func(string) (mount.Info, error) {
-				return mount.Info{
-					Mountpoint: tt.src,
-					Optional:   strings.Join(tt.srcOptional, " "),
-				}, nil
-			})
+			opts, specOpts, err := mountutil.ParseVolumeOptionsWithMountInfo(
+				tt.vType,
+				tt.src,
+				tt.optsRaw,
+				func(string) (mount.Info, error) {
+					return mount.Info{
+						Mountpoint: tt.src,
+						Optional:   strings.Join(tt.srcOptional, " "),
+					}, nil
+				},
+			)
 			if err != nil {
 				if tt.wantFail {
 					return

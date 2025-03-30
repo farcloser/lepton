@@ -63,9 +63,18 @@ func SignCosign(rawRef string, keyRef string) error {
 
 // VerifyCosign verifies an image(`rawRef`) with a cosign public key(`keyRef`)
 // `hostsDirs` are used to resolve image `rawRef`
-// Either --cosign-certificate-identity or --cosign-certificate-identity-regexp and either --cosign-certificate-oidc-issuer or --cosign-certificate-oidc-issuer-regexp must be set for keyless flows.
-func VerifyCosign(ctx context.Context, rawRef string, keyRef string, hostsDirs []string,
-	certIdentity string, certIdentityRegexp string, certOidcIssuer string, certOidcIssuerRegexp string) (string, error) {
+// Either --cosign-certificate-identity or --cosign-certificate-identity-regexp and either
+// --cosign-certificate-oidc-issuer or --cosign-certificate-oidc-issuer-regexp must be set for keyless flows.
+func VerifyCosign(
+	ctx context.Context,
+	rawRef string,
+	keyRef string,
+	hostsDirs []string,
+	certIdentity string,
+	certIdentityRegexp string,
+	certOidcIssuer string,
+	certOidcIssuerRegexp string,
+) (string, error) {
 	digest, err := imgutil.ResolveDigest(ctx, rawRef, false, hostsDirs)
 	if err != nil {
 		log.G(ctx).WithError(err).Errorf("unable to resolve digest for an image %s: %v", rawRef, err)

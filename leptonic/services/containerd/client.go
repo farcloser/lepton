@@ -45,7 +45,8 @@ var (
 	ErrSocketNotAccessible = errors.New("cannot access containerd socket")
 )
 
-// RootlessContainredSockAddress returns sock address of rootless containerd based on https://github.com/farcloser/lepton/blob/main/docs/faq.md#containerd-socket-address
+// RootlessContainredSockAddress returns sock address of rootless containerd based on
+// https://github.com/farcloser/lepton/blob/main/docs/faq.md#containerd-socket-address
 func rootlessContainerdSockAddress() (string, error) {
 	stateDir, err := rootlesskit.StateDir()
 	if err != nil {
@@ -61,7 +62,12 @@ func rootlessContainerdSockAddress() (string, error) {
 	return filepath.Join("/proc", cpid, "root", defaults.DefaultAddress), nil
 }
 
-func NewClient(ctx context.Context, ns string, address string, clientOpts ...containerd.Opt) (*containerd.Client, context.Context, context.CancelFunc, error) {
+func NewClient(
+	ctx context.Context,
+	ns string,
+	address string,
+	clientOpts ...containerd.Opt,
+) (*containerd.Client, context.Context, context.CancelFunc, error) {
 	tryAddress := address
 	if address == "" {
 		tryAddress = defaults.DefaultAddress

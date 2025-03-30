@@ -28,7 +28,8 @@ import (
 
 // ReplaceOrAppendEnvValues returns the defaults with the overrides either
 // replaced by env key or appended to the list
-// FYI: https://github.com/containerd/containerd/blob/698622b89a053294593b9b5a363efff7715e9394/oci/spec_opts.go#L186-L222
+// FYI:
+// https://github.com/containerd/containerd/blob/698622b89a053294593b9b5a363efff7715e9394/oci/spec_opts.go#L186-L222
 // defaults should have valid `k=v` strings.
 // overrides may have the following formats: `k=v` (override k), `k=` (emptify k), `k` (remove k).
 func ReplaceOrAppendEnvValues(defaults, overrides []string) []string {

@@ -71,7 +71,14 @@ func Encode(stdout <-chan string, stderr <-chan string, writer io.Writer) error 
 	return nil
 }
 
-func writeEntry(e *Entry, stdout, stderr io.Writer, refTime time.Time, timestamps bool, since string, until string) error {
+func writeEntry(
+	e *Entry,
+	stdout, stderr io.Writer,
+	refTime time.Time,
+	timestamps bool,
+	since string,
+	until string,
+) error {
 	output := []byte{}
 
 	if since != "" {

@@ -47,7 +47,8 @@ func ExecCommand() *cobra.Command {
 	cmd.Flags().StringP("workdir", "w", "", "Working directory inside the container")
 	// env needs to be StringArray, not StringSlice, to prevent "FOO=foo1,foo2" from being split to {"FOO=foo1", "foo2"}
 	cmd.Flags().StringArrayP("env", "e", nil, "Set environment variables")
-	// env-file is defined as StringSlice, not StringArray, to allow specifying "--env-file=FILE1,FILE2" (compatible with Podman)
+	// env-file is defined as StringSlice, not StringArray, to allow specifying "--env-file=FILE1,FILE2" (compatible
+	// with Podman)
 	cmd.Flags().StringSlice("env-file", nil, "Set environment variables from file")
 	cmd.Flags().Bool("privileged", false, "Give extended privileges to the command")
 	cmd.Flags().StringP("user", "u", "", "Username or UID (format: <name|uid>[:<group|gid>])")

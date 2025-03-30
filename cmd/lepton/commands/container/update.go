@@ -80,12 +80,17 @@ func UpdateCommand() *cobra.Command {
 	cmd.Flags().String("cpuset-cpus", "", "CPUs in which to allow execution (0-3, 0,1)")
 	cmd.Flags().String("cpuset-mems", "", "MEMs in which to allow execution (0-3, 0,1)")
 	cmd.Flags().Int64("pids-limit", -1, "Tune container pids limit (set -1 for unlimited)")
-	cmd.Flags().Uint16("blkio-weight", 0, "Block IO (relative weight), between 10 and 1000, or 0 to disable (default 0)")
-	cmd.Flags().String("restart", "no", `Restart policy to apply when a container exits (implemented values: "no"|"always|on-failure:n|unless-stopped")`)
+	cmd.Flags().
+		Uint16("blkio-weight", 0, "Block IO (relative weight), between 10 and 1000, or 0 to disable (default 0)")
+	cmd.Flags().
+		String("restart", "no", `Restart policy to apply when a container exits (implemented values: "no"|"always|on-failure:n|unless-stopped")`)
 
-	_ = cmd.RegisterFlagCompletionFunc("restart", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{"no", "always", "on-failure", "unless-stopped"}, cobra.ShellCompDirectiveNoFileComp
-	})
+	_ = cmd.RegisterFlagCompletionFunc(
+		"restart",
+		func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			return []string{"no", "always", "on-failure", "unless-stopped"}, cobra.ShellCompDirectiveNoFileComp
+		},
+	)
 
 	return cmd
 }
@@ -241,7 +246,13 @@ func getUpdateOption(cmd *cobra.Command, globalOptions *options.Global) (updateR
 	return opts, nil
 }
 
-func updateContainer(ctx context.Context, cli *client.Client, id string, opts updateResourceOptions, cmd *cobra.Command) (retErr error) {
+func updateContainer(
+	ctx context.Context,
+	cli *client.Client,
+	id string,
+	opts updateResourceOptions,
+	cmd *cobra.Command,
+) (retErr error) {
 	container, err := cli.LoadContainer(ctx, id)
 	if err != nil {
 		return err
@@ -274,7 +285,10 @@ func updateContainer(ctx context.Context, cli *client.Client, id string, opts up
 				spec.Linux.Resources.BlockIO.Weight = &opts.BlkioWeight
 			}
 		}
-		if cmd.Flags().Changed("cpu-shares") || cmd.Flags().Changed("cpu-quota") || cmd.Flags().Changed("cpu-period") || cmd.Flags().Changed("cpus") || cmd.Flags().Changed("cpuset-mems") || cmd.Flags().Changed("cpuset-cpus") {
+		if cmd.Flags().Changed("cpu-shares") || cmd.Flags().Changed("cpu-quota") || cmd.Flags().Changed("cpu-period") ||
+			cmd.Flags().Changed("cpus") ||
+			cmd.Flags().Changed("cpuset-mems") ||
+			cmd.Flags().Changed("cpuset-cpus") {
 			if spec.Linux.Resources.CPU == nil {
 				spec.Linux.Resources.CPU = &specs.LinuxCPU{}
 			}

@@ -95,7 +95,16 @@ func (c *Composer) Copy(ctx context.Context, co CopyOptions) error {
 	return nil
 }
 
-func (c *Composer) logCopyMsg(ctx context.Context, container containerd.Container, direction copyDirection, _srcService string, srcPath string, _destService string, dstPath string, dryRun bool) error {
+func (c *Composer) logCopyMsg(
+	ctx context.Context,
+	container containerd.Container,
+	direction copyDirection,
+	_srcService string,
+	srcPath string,
+	_destService string,
+	dstPath string,
+	dryRun bool,
+) error {
 	containerLabels, err := container.Labels(ctx)
 	if err != nil {
 		return err
@@ -115,7 +124,12 @@ func (c *Composer) logCopyMsg(ctx context.Context, container containerd.Containe
 	return nil
 }
 
-func (c *Composer) listContainersTargetedForCopy(ctx context.Context, index int, direction copyDirection, serviceName string) ([]containerd.Container, error) {
+func (c *Composer) listContainersTargetedForCopy(
+	ctx context.Context,
+	index int,
+	direction copyDirection,
+	serviceName string,
+) ([]containerd.Container, error) {
 	var containers []containerd.Container
 	var err error
 

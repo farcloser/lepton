@@ -63,7 +63,8 @@ func RunSigProxyContainer(
 	args = append([]string{"run"}, args...)
 
 	cmd := helpers.Command(args...)
-	// NOTE: because of a test like TestStopWithStopSignal, we need to wait enough for nerdctl to terminate the container
+	// NOTE: because of a test like TestStopWithStopSignal, we need to wait enough for nerdctl to terminate the
+	// container
 	cmd.WithTimeout(20 * time.Second)
 	cmd.Background()
 	EnsureContainerStarted(helpers, data.Identifier())

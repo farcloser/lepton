@@ -42,7 +42,13 @@ import (
 	"go.farcloser.world/lepton/pkg/strutil"
 )
 
-func Info(ctx context.Context, client *containerd.Client, output io.Writer, globalOptions *options.Global, opts *options.SystemInfo) error {
+func Info(
+	ctx context.Context,
+	client *containerd.Client,
+	output io.Writer,
+	globalOptions *options.Global,
+	opts *options.SystemInfo,
+) error {
 	var (
 		tmpl *template.Template
 		err  error
@@ -141,7 +147,12 @@ func prettyPrintInfoNative(w io.Writer, info *native.Info) error {
 	return nil
 }
 
-func prettyPrintInfoDockerCompat(stdout io.Writer, stderr io.Writer, info *dockercompat.Info, globalOptions *options.Global) error {
+func prettyPrintInfoDockerCompat(
+	stdout io.Writer,
+	stderr io.Writer,
+	info *dockercompat.Info,
+	globalOptions *options.Global,
+) error {
 	w := stdout
 	debug := globalOptions.Debug
 	fmt.Fprintf(w, "Client:\n")

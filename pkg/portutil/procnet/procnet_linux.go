@@ -27,7 +27,8 @@ const (
 	udpProto  = "udp"
 	tcp6Proto = "tcp6"
 	udp6Proto = "udp6"
-	// FIXME: The /proc/net/tcp is not recommended by the kernel, FYI https://www.kernel.org/doc/Documentation/networking/proc_net_tcp.txt
+	// FIXME: The /proc/net/tcp is not recommended by the kernel, FYI
+	// https://www.kernel.org/doc/Documentation/networking/proc_net_tcp.txt
 	// In the future, we should use netlink instead of /proc/net/tcp
 	netTCPStats  = "/proc/net/tcp"
 	netUDPStats  = "/proc/net/udp"

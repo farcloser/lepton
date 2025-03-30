@@ -206,7 +206,13 @@ func TestCompletion(t *testing.T) {
 				Description: "namespace space empty",
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 					// mind {"--namespace=test"} vs {"--namespace", "test"}
-					return helpers.Custom(nerdtest.Binary(), "__complete", "--namespace", string(helpers.Read(nerdtest.Namespace)), "")
+					return helpers.Custom(
+						nerdtest.Binary(),
+						"__complete",
+						"--namespace",
+						string(helpers.Read(nerdtest.Namespace)),
+						"",
+					)
 				},
 				Expected: test.Expects(0, nil, expect.Contains("run\t")),
 			},
@@ -229,7 +235,15 @@ func TestCompletion(t *testing.T) {
 				Description: "namespace run -i",
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 					// mind {"--namespace=test"} vs {"--namespace", "test"}
-					return helpers.Custom(nerdtest.Binary(), "__complete", "--namespace", string(helpers.Read(nerdtest.Namespace)), "run", "-i", "")
+					return helpers.Custom(
+						nerdtest.Binary(),
+						"__complete",
+						"--namespace",
+						string(helpers.Read(nerdtest.Namespace)),
+						"run",
+						"-i",
+						"",
+					)
 				},
 				Expected: test.Expects(0, nil, expect.Contains(testutil.CommonImage+"\n")),
 			},

@@ -32,7 +32,12 @@ func SplitVolumeSpec(s string) ([]string, error) {
 	return split, nil
 }
 
-func handleVolumeToMount(source string, dst string, volStore volumestore.VolumeService, createDir bool) (volumeSpec, error) {
+func handleVolumeToMount(
+	source string,
+	dst string,
+	volStore volumestore.VolumeService,
+	createDir bool,
+) (volumeSpec, error) {
 	switch {
 	// Handle named volumes
 	case isNamedVolume(source):

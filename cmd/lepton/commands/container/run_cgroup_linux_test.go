@@ -137,7 +137,8 @@ func TestRunCgroupV2(t *testing.T) {
 	if nerdtest.IsDocker() && info.CgroupVersion == strconv.Itoa(int(cgroups.Version2)) &&
 		info.SwapLimit {
 		// Workaround for Docker with cgroup v2:
-		// > Error response from daemon: Cannot update container 67c13276a13dd6a091cdfdebb355aa4e1ecb15fbf39c2b5c9abee89053e88fce:
+		// > Error response from daemon: Cannot update container
+		// 67c13276a13dd6a091cdfdebb355aa4e1ecb15fbf39c2b5c9abee89053e88fce:
 		// > Memory limit should be smaller than already set memoryswap limit, update the memoryswap at the same time
 		update = append(update, "--memory-swap=84m")
 	}

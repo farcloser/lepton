@@ -15,7 +15,8 @@
 */
 
 // https://docs.docker.com/reference/cli/dockerd/#insecure-registries
-// Local registries, whose IP address falls in the 127.0.0.0/8 range, are automatically marked as insecure as of Docker 1.3.2.
+// Local registries, whose IP address falls in the 127.0.0.0/8 range, are automatically marked as insecure as of Docker
+// 1.3.2.
 // It isn't recommended to rely on this, as it may change in the future.
 // "--insecure" means that either the certificates are untrusted, or that the protocol is plain http
 package registry_test
@@ -313,7 +314,8 @@ func TestLoginAgainstVariants(t *testing.T) {
 			},
 		}
 
-		// Iterate through all cases, that will present a variety of port (80, 443, random), TLS (yes or no), and authentication (basic, token) type combinations
+		// Iterate through all cases, that will present a variety of port (80, 443, random), TLS (yes or no), and
+		// authentication (basic, token) type combinations
 		for _, tc := range testCases {
 			port := tc.port
 			tls := tc.tls
@@ -322,7 +324,8 @@ func TestLoginAgainstVariants(t *testing.T) {
 			t.Run(
 				fmt.Sprintf("Login against `tls: %t port: %d auth: %s`", tls, port, auth),
 				func(t *testing.T) {
-					// Tests with fixed ports should not be parallelized (although the port locking mechanism will prevent conflicts)
+					// Tests with fixed ports should not be parallelized (although the port locking mechanism will
+					// prevent conflicts)
 					// as their children tests are parallelized, and this might deadlock given the way `Parallel` works
 					if port == 0 {
 						t.Parallel()
@@ -499,8 +502,9 @@ func TestLoginAgainstVariants(t *testing.T) {
 									c := (&Client{}).
 										WithCredentials(username, password).
 										WithHostsDir(reg.HostsDir).
-										// Just use insecure here for all servers - it does not matter for what we are testing here
-										// in this case, which is whether we can successfully log in against any of these variants
+										// Just use insecure here for all servers - it does not matter for what we are
+										// testing here in this case, which is whether we can successfully log in
+										// against any of these variants
 										WithInsecure(true)
 
 									// TODO: remove specialization when we fix the localhost mess

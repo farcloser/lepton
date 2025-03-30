@@ -83,7 +83,13 @@ func withMounts(mounts []specs.Mount) oci.SpecOpts {
 		sort.Slice(s.Mounts, func(i, j int) bool {
 			// Consistent with the less function in Docker.
 			// https://github.com/moby/moby/blob/0db417451313474133c5ed62bbf95e2d3c92444d/daemon/volumes.go#L34
-			return strings.Count(filepath.Clean(s.Mounts[i].Destination), string(os.PathSeparator)) < strings.Count(filepath.Clean(s.Mounts[j].Destination), string(os.PathSeparator))
+			return strings.Count(
+				filepath.Clean(s.Mounts[i].Destination),
+				string(os.PathSeparator),
+			) < strings.Count(
+				filepath.Clean(s.Mounts[j].Destination),
+				string(os.PathSeparator),
+			)
 		})
 
 		return nil
@@ -91,7 +97,10 @@ func withMounts(mounts []specs.Mount) oci.SpecOpts {
 }
 
 // parseMountFlags parses --volume, --mount and --tmpfs.
-func parseMountFlags(volStore volumestore.VolumeService, options *options.ContainerCreate) ([]*mountutil.Processed, error) {
+func parseMountFlags(
+	volStore volumestore.VolumeService,
+	options *options.ContainerCreate,
+) ([]*mountutil.Processed, error) {
 	var parsed []*mountutil.Processed //nolint:prealloc
 	for _, v := range strutil.DedupeStrSlice(options.Volume) {
 		// createDir=true for -v option to allow creation of directory on host if not found.
@@ -123,8 +132,13 @@ func parseMountFlags(volStore volumestore.VolumeService, options *options.Contai
 
 // generateMountOpts generates volume-related mount opts.
 // Other mounts such as procfs mount are not handled here.
-func generateMountOpts(ctx context.Context, client *containerd.Client, ensuredImage *imgutil.EnsuredImage,
-	volStore volumestore.VolumeService, options *options.ContainerCreate) ([]oci.SpecOpts, []string, []*mountutil.Processed, error) {
+func generateMountOpts(
+	ctx context.Context,
+	client *containerd.Client,
+	ensuredImage *imgutil.EnsuredImage,
+	volStore volumestore.VolumeService,
+	options *options.ContainerCreate,
+) ([]oci.SpecOpts, []string, []*mountutil.Processed, error) {
 	var (
 		opts        []oci.SpecOpts
 		anonVolumes []string

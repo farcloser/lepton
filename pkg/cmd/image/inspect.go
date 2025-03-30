@@ -37,7 +37,11 @@ import (
 	"go.farcloser.world/lepton/pkg/inspecttypes/dockercompat"
 )
 
-func inspectIdentifier(ctx context.Context, client *containerd.Client, identifier string) ([]*api.Image, string, string, error) {
+func inspectIdentifier(
+	ctx context.Context,
+	client *containerd.Client,
+	identifier string,
+) ([]*api.Image, string, string, error) {
 	return image.Inspect(ctx, client, identifier)
 }
 
@@ -95,18 +99,23 @@ func Inspect(ctx context.Context, client *containerd.Client, identifiers []strin
 			// If dockercompat: does the candidate have a name? Get it if so
 			parsedReference, err := reference.Parse(candidateNativeImage.Image.Name)
 			if err != nil {
-				log.G(ctx).WithError(err).WithField("name", candidateNativeImage.Image.Name).Error("the found image has an unparsable name")
+				log.G(ctx).
+					WithError(err).
+					WithField("name", candidateNativeImage.Image.Name).
+					Error("the found image has an unparsable name")
 				continue
 			}
 
-			// If we were ALSO asked for a specific name on top of the digest, we need to make sure we keep only the image with that name
+			// If we were ALSO asked for a specific name on top of the digest, we need to make sure we keep only the
+			// image with that name
 			if requestedName != "" {
 				// If the candidate did not have a name, then we should ignore this one and continue
 				if parsedReference.Name() == "" {
 					continue
 				}
 
-				// Otherwise, the candidate has a name. If it is the one we want, store it and continue, otherwise, fall through
+				// Otherwise, the candidate has a name. If it is the one we want, store it and continue, otherwise, fall
+				// through
 				candidateTag := parsedReference.Tag
 				// If the name had a digest, an empty tag is not normalized to latest, so, account for that here
 				if requestedTag == "" {
@@ -115,12 +124,16 @@ func Inspect(ctx context.Context, client *containerd.Client, identifiers []strin
 				if parsedReference.Name() == requestedName && candidateTag == requestedTag {
 					validatedImage, err = dockercompat.ImageFromNative(candidateNativeImage)
 					if err != nil {
-						log.G(ctx).WithError(err).WithField("name", candidateNativeImage.Image.Name).Error("could not get a docker compat version of the native image")
+						log.G(ctx).
+							WithError(err).
+							WithField("name", candidateNativeImage.Image.Name).
+							Error("could not get a docker compat version of the native image")
 					}
 					continue
 				}
 			} else if validatedImage == nil {
-				// Alternatively, we got a request by digest only, so, if we do not know about it already, store it and continue
+				// Alternatively, we got a request by digest only, so, if we do not know about it already, store it and
+				// continue
 				validatedImage, err = dockercompat.ImageFromNative(candidateNativeImage)
 				if err != nil {
 					log.G(ctx).WithError(err).WithField("name", candidateNativeImage.Image.Name).Error("could not get a docker compat version of the native image")
@@ -138,7 +151,10 @@ func Inspect(ctx context.Context, client *containerd.Client, identifiers []strin
 					tag = "latest"
 				}
 				repoTags = append(repoTags, fmt.Sprintf("%s:%s", parsedReference.FamiliarName(), tag))
-				repoDigests = append(repoDigests, fmt.Sprintf("%s@%s", parsedReference.FamiliarName(), candidateImage.Target.Digest.String()))
+				repoDigests = append(
+					repoDigests,
+					fmt.Sprintf("%s@%s", parsedReference.FamiliarName(), candidateImage.Target.Digest.String()),
+				)
 			}
 		}
 

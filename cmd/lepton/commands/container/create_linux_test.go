@@ -127,7 +127,8 @@ func TestCreateWithMACAddress(t *testing.T) {
 			tearDown()
 			tt.Cleanup(tearDown)
 			// This is currently blocked by https://github.com/containerd/nerdctl/pull/3104
-			// res := base.Cmd("create", "-i", "--network", network, "--mac-address", macAddress, testutil.CommonImage).Run()
+			// res := base.Cmd("create", "-i", "--network", network, "--mac-address", macAddress,
+			// testutil.CommonImage).Run()
 			res := base.Cmd("create", "--network", network, "--name", containerName,
 				"--mac-address", macAddress, testutil.CommonImage,
 				"sh", "-c", "--", "ip addr show").Run()
@@ -136,7 +137,8 @@ func TestCreateWithMACAddress(t *testing.T) {
 				assert.Assert(t, res.ExitCode == 0, "Command should have succeeded", res)
 				// This is currently blocked by: https://github.com/containerd/nerdctl/pull/3104
 				// res = base.Cmd("start", "-i", containerName).
-				//	CmdOption(testutil.WithStdin(strings.NewReader("ip addr show eth0 | grep ether | awk '{printf $2}'"))).Run()
+				// 	CmdOption(testutil.WithStdin(strings.NewReader("ip addr show eth0 | grep ether | awk '{printf
+				// $2}'"))).Run()
 				res = base.Cmd("start", "-a", containerName).Run()
 				// FIXME: flaky - this has failed on the CI once, with the output NOT containing anything
 				// https://github.com/containerd/nerdctl/actions/runs/11392051487/job/31697214002?pr=3535#step:7:271
