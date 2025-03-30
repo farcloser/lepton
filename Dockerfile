@@ -142,7 +142,8 @@ RUN         echo "force-unsafe-io" > /etc/dpkg/dpkg.cfg.d/farcloser-speedup && \
 FROM        --platform=$BUILDPLATFORM tooling-base AS tooling-downloader-golang
 ARG         GO_VERSION
 ARG         SUPPORTED_ARCHS
-RUN         apt-get install -qq --no-install-recommends \
+RUN         apt-get update -qq >/dev/null && \
+            apt-get install -qq --no-install-recommends \
                curl \
                jq \
                    >/dev/null; \
@@ -169,6 +170,7 @@ FROM        --platform=$BUILDPLATFORM tooling-base AS tooling-builder
 ARG         BUILDPLATFORM
 WORKDIR     /src
 RUN         mkdir -p /out/bin; mkdir -p /metadata && \
+            apt-get update -qq >/dev/null && \
             apt-get install -qq --no-install-recommends \
                 git \
                 make \
@@ -233,7 +235,8 @@ ARG         SUPPORTED_ARCHS
 # meson: libslirp
 # automake: slirp4netns
 # libseccomp: runc, bypass4netns, slirp4netns
-RUN         apt-get install -qq --no-install-recommends \
+RUN         apt-get update -qq >/dev/null && \
+            apt-get install -qq --no-install-recommends \
                 cmake \
                 meson \
                 automake \
@@ -704,6 +707,7 @@ ARG         PKG=github.com/awslabs/soci-snapshotter
 #            sed 's/WantedBy=multi-user.target/RequiredBy=entrypoint.target/' soci-snapshotter.service > /out/lib/systemd/system/soci-snapshotter.service; \
 RUN         --mount=from=dependencies-download-soci,type=bind,target=/src,source=/src \
             --mount=from=dependencies-download-soci,type=bind,target=/metadata,source=/metadata \
+            apt-get update -qq >/dev/null && \
             apt-get install -qq --no-install-recommends \
                 zlib1g-dev:"$TARGETARCH" \
                     >/dev/null; \
@@ -763,6 +767,7 @@ RUN         --mount=from=dependencies-download-slirp4netns,type=bind,target=/src
             --mount=from=dependencies-download-slirp4netns,type=bind,target=/metadata,source=/metadata \
             --mount=from=dependencies-download-libslirp,type=bind,target=/src,source=/src \
             --mount=type=tmpfs,target=/build \
+            apt-get update -qq >/dev/null && \
             apt-get install -qq --no-install-recommends \
                 libglib2.0-dev:$TARGETARCH \
                 libcap-dev:$TARGETARCH \
@@ -954,6 +959,7 @@ ENV         PATH="/root/go/bin:/usr/local/go/bin:$PATH"
 ENV         NAMESPACE=cli-test
 RUN         --mount=target=/root/go/pkg/mod,type=cache \
             --mount=target=/src/Makefile,source=./Makefile,type=bind \
+            apt-get update -qq >/dev/null && \
             apt-get install -qq --no-install-recommends \
                 make >/dev/null; \
             NO_COLOR=true GOFLAGS= make install-dev-gotestsum; chmod -R a+rx /root/go/bin; \
@@ -961,7 +967,8 @@ RUN         --mount=target=/root/go/pkg/mod,type=cache \
                 make >/dev/null
 #           FIXME: finish removing unbuffer from the test codebase and then remove expect
 #           FIXME: curl is only necessary for a single netns test. Fix the test and remove curl.
-RUN         apt-get install -qq --no-install-recommends \
+RUN         apt-get update -qq >/dev/null && \
+            apt-get install -qq --no-install-recommends \
                  curl \
                  expect >/dev/null
 
@@ -1014,7 +1021,8 @@ RUN         chown -R rootless:rootless /home/rootless/.config
 # - verify all binaries are static and running
 FROM        tooling-runtime AS release-full-sanity
 ARG         TARGETARCH
-RUN         apt-get install -qq --no-install-recommends \
+RUN         apt-get update -qq >/dev/null && \
+            apt-get install -qq --no-install-recommends \
                 binutils \
                 patchelf \
                 devscripts \
