@@ -213,7 +213,7 @@ func FilterResolvDNS(resolvConf []byte, ipv6Enabled bool) (*File, error) {
 }
 
 // getLines parses input into lines and strips away comments.
-func getLines(input []byte, commentMarker []byte) [][]byte {
+func getLines(input, commentMarker []byte) [][]byte {
 	lines := bytes.Split(input, []byte("\n"))
 	var output [][]byte
 	for _, currentLine := range lines {

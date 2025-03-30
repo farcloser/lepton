@@ -286,7 +286,7 @@ func TestCreateSuccess(t *testing.T) {
 				return &test.Expected{
 					ExitCode: 0,
 					Errors:   nil,
-					Output: func(stdout string, info string, t *testing.T) {
+					Output: func(stdout, info string, t *testing.T) {
 						var expected []api.Namespace
 						err := json.Unmarshal([]byte(stdout), &expected)
 						assert.NilError(t, err, info)
@@ -305,7 +305,7 @@ func TestCreateSuccess(t *testing.T) {
 				return &test.Expected{
 					ExitCode: 0,
 					Errors:   nil,
-					Output: func(stdout string, info string, t *testing.T) {
+					Output: func(stdout, info string, t *testing.T) {
 						var expected []api.Namespace
 						err := json.Unmarshal([]byte(stdout), &expected)
 						assert.NilError(t, err, info)
@@ -336,7 +336,7 @@ func TestCreateSuccess(t *testing.T) {
 				return &test.Expected{
 					ExitCode: 0,
 					Errors:   nil,
-					Output: func(stdout string, info string, t *testing.T) {
+					Output: func(stdout, info string, t *testing.T) {
 						var expected []api.Namespace
 						err := json.Unmarshal([]byte(stdout), &expected)
 						assert.NilError(t, err, info)

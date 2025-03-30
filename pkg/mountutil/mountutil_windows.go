@@ -249,7 +249,7 @@ func parseSourceType(source string) string {
 	}
 }
 
-func validateNamedPipeSpec(source string, dst string) (bool, error) {
+func validateNamedPipeSpec(source, dst string) (bool, error) {
 	// Validate source and destination types
 	sourceType := parseSourceType(source)
 	destType := parseSourceType(dst)

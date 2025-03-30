@@ -42,7 +42,7 @@ func (m *MockDriver) PreProcess(ctx context.Context, dataStore string, config *l
 	return nil
 }
 
-func (m *MockDriver) Process(stdout <-chan string, stderr <-chan string) error {
+func (m *MockDriver) Process(stdout, stderr <-chan string) error {
 	for line := range stdout {
 		m.receivedStdout = append(m.receivedStdout, line)
 	}

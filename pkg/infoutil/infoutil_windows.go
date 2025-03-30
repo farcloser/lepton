@@ -42,8 +42,8 @@ const (
 
 type windowsInfoUtil interface {
 	RtlGetVersion() *windows.OsVersionInfoEx
-	GetRegistryStringValue(key registry.Key, path string, name string) (string, error)
-	GetRegistryIntValue(key registry.Key, path string, name string) (int, error)
+	GetRegistryStringValue(key registry.Key, path, name string) (string, error)
+	GetRegistryIntValue(key registry.Key, path, name string) (int, error)
 }
 
 type winInfoUtil struct{}
@@ -159,7 +159,7 @@ func getKernelVersion(sw windowsInfoUtil) (string, error) {
 }
 
 // GetRegistryStringValue retrieves a string value from the Windows registry
-func (sw *winInfoUtil) GetRegistryStringValue(key registry.Key, path string, name string) (string, error) {
+func (sw *winInfoUtil) GetRegistryStringValue(key registry.Key, path, name string) (string, error) {
 	k, err := registry.OpenKey(key, path, registry.QUERY_VALUE)
 	if err != nil {
 		return "", err
@@ -174,7 +174,7 @@ func (sw *winInfoUtil) GetRegistryStringValue(key registry.Key, path string, nam
 }
 
 // GetRegistryIntValue retrieves an integer value from the Windows registry
-func (sw *winInfoUtil) GetRegistryIntValue(key registry.Key, path string, name string) (int, error) {
+func (sw *winInfoUtil) GetRegistryIntValue(key registry.Key, path, name string) (int, error) {
 	k, err := registry.OpenKey(key, path, registry.QUERY_VALUE)
 	if err != nil {
 		return 0, err

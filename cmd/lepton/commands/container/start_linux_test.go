@@ -74,7 +74,7 @@ func TestStartDetachKeys(t *testing.T) {
 			ExitCode: 0,
 			Errors:   []error{errors.New("detach keys")},
 			Output: expect.All(
-				func(stdout string, info string, t *testing.T) {
+				func(stdout, info string, t *testing.T) {
 					assert.Assert(
 						t,
 						strings.Contains(

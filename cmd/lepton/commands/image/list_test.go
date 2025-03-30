@@ -52,7 +52,7 @@ func TestImages(t *testing.T) {
 				Command:     test.Command("images"),
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
-						Output: func(stdout string, info string, t *testing.T) {
+						Output: func(stdout, info string, t *testing.T) {
 							lines := strings.Split(strings.TrimSpace(stdout), "\n")
 							assert.Assert(t, len(lines) >= 2, info)
 							header := "REPOSITORY\tTAG\tIMAGE ID\tCREATED\tPLATFORM\tSIZE\tBLOB SIZE"
@@ -83,7 +83,7 @@ func TestImages(t *testing.T) {
 					return &test.Expected{
 						Output: expect.All(
 							expect.Contains(testutil.CommonImage),
-							func(stdout string, info string, t *testing.T) {
+							func(stdout, info string, t *testing.T) {
 								lines := strings.Split(strings.TrimSpace(stdout), "\n")
 								assert.Assert(t, len(lines) >= 2, info)
 								tab := tabutil.NewReader(
@@ -111,7 +111,7 @@ func TestImages(t *testing.T) {
 				Command:     test.Command("images", "--format", "'{{json .CreatedAt}}'"),
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
-						Output: func(stdout string, info string, t *testing.T) {
+						Output: func(stdout, info string, t *testing.T) {
 							lines := strings.Split(strings.TrimSpace(stdout), "\n")
 							assert.Assert(t, len(lines) >= 2, info)
 							createdTimes := lines
@@ -375,7 +375,7 @@ func TestImagesKubeWithKubeHideDupe(t *testing.T) {
 				Command:     test.Command("--kube-hide-dupe", "images"),
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
-						Output: func(stdout string, info string, t *testing.T) {
+						Output: func(stdout, info string, t *testing.T) {
 							var imageID string
 							var skipLine int
 							lines := strings.Split(strings.TrimSpace(stdout), "\n")

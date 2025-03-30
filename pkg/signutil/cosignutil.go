@@ -30,7 +30,7 @@ import (
 )
 
 // SignCosign signs an image(`rawRef`) using a cosign private key (`keyRef`)
-func SignCosign(rawRef string, keyRef string) error {
+func SignCosign(rawRef, keyRef string) error {
 	cosignExecutable, err := exec.LookPath("cosign")
 	if err != nil {
 		log.L.WithError(err).Error("cosign executable not found in path $PATH")

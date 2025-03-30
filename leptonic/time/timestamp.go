@@ -113,7 +113,7 @@ func GetTimestamp(value string, reference time.Time) (string, error) {
 	return fmt.Sprintf("%d.%09d", t.Unix(), int64(t.Nanosecond())), nil
 }
 
-func parseTimestamp(value string) (sec int64, nsec int64, err error) {
+func parseTimestamp(value string) (sec, nsec int64, err error) {
 	s, n, ok := strings.Cut(value, ".")
 	sec, err = strconv.ParseInt(s, 10, 64)
 	if err != nil {

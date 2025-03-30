@@ -72,7 +72,7 @@ func Destroy() error {
 	return nil
 }
 
-func WriteLogs(metadata map[string]string, stdout <-chan string, stderr <-chan string) error {
+func WriteLogs(metadata map[string]string, stdout, stderr <-chan string) error {
 	var wg sync.WaitGroup
 	wg.Add(2)
 

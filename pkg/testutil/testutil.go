@@ -787,7 +787,7 @@ func NewBase(t *testing.T) *Base {
 	return newBase(t, Namespace, false, false)
 }
 
-func newBase(t *testing.T, ns string, ipv6Compatible bool, kubernetesCompatible bool) *Base {
+func newBase(t *testing.T, ns string, ipv6Compatible, kubernetesCompatible bool) *Base {
 	base := &Base{
 		T:                    t,
 		Target:               GetTarget(),

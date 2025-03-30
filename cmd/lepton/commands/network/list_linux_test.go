@@ -61,7 +61,7 @@ func TestNetworkLsFilter(t *testing.T) {
 			},
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 				return &test.Expected{
-					Output: func(stdout string, info string, t *testing.T) {
+					Output: func(stdout, info string, t *testing.T) {
 						lines := strings.Split(strings.TrimSpace(stdout), "\n")
 						assert.Assert(t, len(lines) >= 1, info)
 						netNames := map[string]struct{}{
@@ -89,7 +89,7 @@ func TestNetworkLsFilter(t *testing.T) {
 			},
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 				return &test.Expected{
-					Output: func(stdout string, info string, t *testing.T) {
+					Output: func(stdout, info string, t *testing.T) {
 						lines := strings.Split(strings.TrimSpace(stdout), "\n")
 						assert.Assert(t, len(lines) >= 1, info)
 						netNames := map[string]struct{}{

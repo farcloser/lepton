@@ -68,7 +68,7 @@ func IsExactArgs(number int) cobra.PositionalArgs {
 }
 
 // AddStringFlag is similar to cmd.Flags().String but supports aliases and env var
-func AddStringFlag(cmd *cobra.Command, name string, aliases []string, value string, env, usage string) {
+func AddStringFlag(cmd *cobra.Command, name string, aliases []string, value, env, usage string) {
 	if env != "" {
 		usage = fmt.Sprintf("%s [$%s]", usage, env)
 	}

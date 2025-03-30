@@ -38,7 +38,7 @@ import (
 // ContainerTop lists the processes running inside the given
 // container. An error is returned if the container
 // is not found, or is not running.
-func containerTop(ctx context.Context, stdio io.Writer, client *containerd.Client, id string, psArgs string) error {
+func containerTop(ctx context.Context, stdio io.Writer, client *containerd.Client, id, psArgs string) error {
 	container, err := client.LoadContainer(ctx, id)
 	if err != nil {
 		return err

@@ -80,7 +80,7 @@ func (f *FluentdLogger) PreProcess(ctx context.Context, _ string, config *loggin
 	return nil
 }
 
-func (f *FluentdLogger) Process(stdout <-chan string, stderr <-chan string) error {
+func (f *FluentdLogger) Process(stdout, stderr <-chan string) error {
 	metadata := map[string]string{
 		"container_id": f.id,
 		"namespace":    f.namespace,

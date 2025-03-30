@@ -119,7 +119,7 @@ func (jsonLogger *JSONLogger) PreProcess(ctx context.Context, dataStore string, 
 	return nil
 }
 
-func (jsonLogger *JSONLogger) Process(stdout <-chan string, stderr <-chan string) error {
+func (jsonLogger *JSONLogger) Process(stdout, stderr <-chan string) error {
 	return jsonfile.Encode(stdout, stderr, jsonLogger.logger)
 }
 

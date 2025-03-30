@@ -198,7 +198,7 @@ func inspect(ctx context.Context, service namespaces.Store, name string) (*api.N
 	}, nil
 }
 
-func update(ctx context.Context, service namespaces.Store, name string, key string, value string) error {
+func update(ctx context.Context, service namespaces.Store, name, key, value string) error {
 	err := service.SetLabel(NamespacedContext(ctx, name), name, key, value)
 	if err != nil {
 		return helpers.ErrConvert(err)

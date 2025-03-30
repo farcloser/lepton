@@ -409,7 +409,7 @@ COPY %s /`, testFileName)
 				},
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
-						Output: func(stdout string, info string, t *testing.T) {
+						Output: func(stdout, info string, t *testing.T) {
 							testFilePath := filepath.Join(data.TempDir(), testFileName)
 							_, err := os.Stat(testFilePath)
 							assert.NilError(helpers.T(), err, info)
@@ -427,7 +427,7 @@ COPY %s /`, testFileName)
 				},
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
-						Output: func(stdout string, info string, t *testing.T) {
+						Output: func(stdout, info string, t *testing.T) {
 							testFilePath := filepath.Join(data.TempDir(), testFileName)
 							_, err := os.Stat(testFilePath)
 							assert.NilError(helpers.T(), err, info)
@@ -1092,7 +1092,7 @@ func TestBuildAttestation(t *testing.T) {
 				},
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
-						Output: func(stdout string, info string, t *testing.T) {
+						Output: func(stdout, info string, t *testing.T) {
 							_, err := os.Stat(data.Get("outputSBOMFile"))
 							assert.NilError(t, err, info)
 						},
@@ -1122,7 +1122,7 @@ func TestBuildAttestation(t *testing.T) {
 				},
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
-						Output: func(stdout string, info string, t *testing.T) {
+						Output: func(stdout, info string, t *testing.T) {
 							_, err := os.Stat(data.Get("outputProvenanceFile"))
 							assert.NilError(t, err, info)
 						},
@@ -1157,7 +1157,7 @@ func TestBuildAttestation(t *testing.T) {
 				},
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
-						Output: func(stdout string, info string, t *testing.T) {
+						Output: func(stdout, info string, t *testing.T) {
 							_, err := os.Stat(data.Get("outputSBOMFile"))
 							assert.NilError(t, err, info)
 							_, err = os.Stat(data.Get("outputProvenanceFile"))

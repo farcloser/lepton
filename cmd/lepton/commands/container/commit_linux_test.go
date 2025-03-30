@@ -46,7 +46,7 @@ func TestKubeCommitSave(t *testing.T) {
 			Run(&test.Expected{})
 		nerdtest.KubeCtlCommand(helpers, "get", "pods", identifier, "-o", "jsonpath={ .status.containerStatuses[0].containerID }").
 			Run(&test.Expected{
-				Output: func(stdout string, info string, t *testing.T) {
+				Output: func(stdout, info string, t *testing.T) {
 					containerID = strings.TrimPrefix(stdout, "containerd://")
 				},
 			})

@@ -33,7 +33,7 @@ import (
 	"go.farcloser.world/lepton/pkg/testutil/nerdtest"
 )
 
-func testInfoComparator(stdout string, info string, t *testing.T) {
+func testInfoComparator(stdout, info string, t *testing.T) {
 	var dinf dockercompat.Info
 	err := json.Unmarshal([]byte(stdout), &dinf)
 	assert.NilError(t, err, "failed to unmarshal stdout"+info)

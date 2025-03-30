@@ -249,7 +249,7 @@ type locator struct {
 	readonly      bool
 }
 
-func isParent(child []string, candidate []string) (bool, []string) {
+func isParent(child, candidate []string) (bool, []string) {
 	if len(child) < len(candidate) {
 		return false, child
 	}

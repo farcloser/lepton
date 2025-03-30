@@ -20,7 +20,7 @@ import (
 	"go.farcloser.world/lepton/pkg/testutil/nerdtest/hoststoml"
 )
 
-func generateCertsd(dir string, certPath string, hostIP string, port int) error {
+func generateCertsd(dir, certPath, hostIP string, port int) error {
 	return (&hoststoml.HostsToml{
 		CA: certPath,
 	}).Save(dir, hostIP, port)

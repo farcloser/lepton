@@ -189,7 +189,7 @@ func prettyPrintInfoDockerCompat(
 	return nil
 }
 
-func printF(w io.Writer, label string, dockerCompatInfo string) {
+func printF(w io.Writer, label, dockerCompatInfo string) {
 	if dockerCompatInfo == "" {
 		return
 	}

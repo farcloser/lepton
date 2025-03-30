@@ -127,7 +127,7 @@ func (journaldLogger *JournaldLogger) PreProcess(ctx context.Context, dataStore 
 	return nil
 }
 
-func (journaldLogger *JournaldLogger) Process(stdout <-chan string, stderr <-chan string) error {
+func (journaldLogger *JournaldLogger) Process(stdout, stderr <-chan string) error {
 	return journald.WriteLogs(journaldLogger.vars, stdout, stderr)
 }
 

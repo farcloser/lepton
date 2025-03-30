@@ -20,6 +20,6 @@ package portutil
 
 import "errors"
 
-func portAllocate(protocol string, ip string, count uint64) (uint64, uint64, error) {
+func portAllocate(protocol, ip string, count uint64) (uint64, uint64, error) {
 	return 0, 0, errors.New("auto port allocate are not support Non-Linux platform yet")
 }

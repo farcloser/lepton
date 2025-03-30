@@ -73,7 +73,7 @@ func TestVolumePrune(t *testing.T) {
 						expect.Contains(data.Get("anonIDDangling")),
 						expect.DoesNotContain(data.Get("namedBusy")),
 						expect.DoesNotContain(data.Get("namedDangling")),
-						func(stdout string, info string, t *testing.T) {
+						func(stdout, info string, t *testing.T) {
 							helpers.Ensure("volume", "inspect", data.Get("anonIDBusy"))
 							helpers.Fail("volume", "inspect", data.Get("anonIDDangling"))
 							helpers.Ensure("volume", "inspect", data.Get("namedBusy"))
@@ -96,7 +96,7 @@ func TestVolumePrune(t *testing.T) {
 						expect.Contains(data.Get("anonIDDangling")),
 						expect.DoesNotContain(data.Get("namedBusy")),
 						expect.Contains(data.Get("namedDangling")),
-						func(stdout string, info string, t *testing.T) {
+						func(stdout, info string, t *testing.T) {
 							helpers.Ensure("volume", "inspect", data.Get("anonIDBusy"))
 							helpers.Fail("volume", "inspect", data.Get("anonIDDangling"))
 							helpers.Ensure("volume", "inspect", data.Get("namedBusy"))

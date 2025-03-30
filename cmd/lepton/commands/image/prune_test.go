@@ -91,10 +91,10 @@ func TestImagePrune(t *testing.T) {
 				identifier := data.Identifier()
 				return &test.Expected{
 					Output: expect.All(
-						func(stdout string, info string, t *testing.T) {
+						func(stdout, info string, t *testing.T) {
 							assert.Assert(t, !strings.Contains(stdout, identifier), info)
 						},
-						func(stdout string, info string, t *testing.T) {
+						func(stdout, info string, t *testing.T) {
 							imgList := helpers.Capture("images")
 							assert.Assert(t, !strings.Contains(imgList, "<none>"), imgList)
 							assert.Assert(t, strings.Contains(imgList, identifier), info)
@@ -141,10 +141,10 @@ func TestImagePrune(t *testing.T) {
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 				return &test.Expected{
 					Output: expect.All(
-						func(stdout string, info string, t *testing.T) {
+						func(stdout, info string, t *testing.T) {
 							assert.Assert(t, !strings.Contains(stdout, data.Identifier()), info)
 						},
-						func(stdout string, info string, t *testing.T) {
+						func(stdout, info string, t *testing.T) {
 							imgList := helpers.Capture("images")
 							assert.Assert(t, strings.Contains(imgList, data.Identifier()), info)
 							assert.Assert(t, !strings.Contains(imgList, "<none>"), imgList)
@@ -197,14 +197,14 @@ LABEL version=0.1`, testutil.CommonImage)
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 				return &test.Expected{
 					Output: expect.All(
-						func(stdout string, info string, t *testing.T) {
+						func(stdout, info string, t *testing.T) {
 							assert.Assert(t, !strings.Contains(stdout, data.Identifier()), info)
 						},
-						func(stdout string, info string, t *testing.T) {
+						func(stdout, info string, t *testing.T) {
 							imgList := helpers.Capture("images")
 							assert.Assert(t, strings.Contains(imgList, data.Identifier()), info)
 						},
-						func(stdout string, info string, t *testing.T) {
+						func(stdout, info string, t *testing.T) {
 							prune := helpers.Capture(
 								"image",
 								"prune",
@@ -254,7 +254,7 @@ CMD ["echo", "test-image-prune-until"]`, testutil.CommonImage)
 				return &test.Expected{
 					Output: expect.All(
 						expect.DoesNotContain(data.Get("imageID")),
-						func(stdout string, info string, t *testing.T) {
+						func(stdout, info string, t *testing.T) {
 							imgList := helpers.Capture("images")
 							assert.Assert(t, strings.Contains(imgList, data.Get("imageID")), info)
 						},
@@ -280,7 +280,7 @@ CMD ["echo", "test-image-prune-until"]`, testutil.CommonImage)
 						return &test.Expected{
 							Output: expect.All(
 								expect.Contains(data.Get("imageID")),
-								func(stdout string, info string, t *testing.T) {
+								func(stdout, info string, t *testing.T) {
 									imgList := helpers.Capture("images")
 									assert.Assert(
 										t,

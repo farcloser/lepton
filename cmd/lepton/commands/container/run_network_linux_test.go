@@ -48,7 +48,7 @@ import (
 	"go.farcloser.world/lepton/pkg/testutil/various"
 )
 
-func extractHostPort(portMapping string, port string) (string, error) {
+func extractHostPort(portMapping, port string) (string, error) {
 	// Regular expression to extract host port from port mapping information
 	re := regexp.MustCompile(`(?P<containerPort>\d{1,5})/tcp ->.*?0.0.0.0:(?P<hostPort>\d{1,5}).*?`)
 	portMappingLines := strings.Split(portMapping, "\n")
@@ -397,7 +397,7 @@ func TestRunWithInvalidPortThenCleanUp(t *testing.T) {
 				return &test.Expected{
 					ExitCode: 1,
 					Errors:   []error{errs.ErrInvalidArgument},
-					Output: func(stdout string, info string, t *testing.T) {
+					Output: func(stdout, info string, t *testing.T) {
 						getAddrHash := func(addr string) string {
 							const addrHashLen = 8
 
@@ -589,7 +589,7 @@ func TestSharedNetworkSetup(t *testing.T) {
 				},
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
-						Output: func(stdout string, info string, t *testing.T) {
+						Output: func(stdout, info string, t *testing.T) {
 							containerName2 := data.Identifier()
 							assert.Assert(
 								t,
@@ -686,7 +686,7 @@ func TestSharedNetworkSetup(t *testing.T) {
 					// The Option doesnt throw an error but is never inserted to the resolv.conf
 					return &test.Expected{
 						ExitCode: 0,
-						Output: func(stdout string, info string, t *testing.T) {
+						Output: func(stdout, info string, t *testing.T) {
 							assert.Assert(t, !strings.Contains(stdout, "attempts:5"), info)
 						},
 					}
@@ -1061,7 +1061,7 @@ func TestHostNetworkHostName(t *testing.T) {
 		},
 		Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 			return &test.Expected{
-				Output: func(stdout string, info string, t *testing.T) {
+				Output: func(stdout, info string, t *testing.T) {
 					hostname := stdout
 					assert.Assert(
 						t,
@@ -1120,7 +1120,7 @@ func TestNoneNetworkDnsConfigs(t *testing.T) {
 		},
 		Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 			return &test.Expected{
-				Output: func(stdout string, info string, t *testing.T) {
+				Output: func(stdout, info string, t *testing.T) {
 					out := helpers.Capture("exec", data.Identifier(), "cat", "/etc/resolv.conf")
 					assert.Assert(t, strings.Contains(out, "0.1.2.3"), info)
 					assert.Assert(t, strings.Contains(out, "example.com"), info)
@@ -1164,7 +1164,7 @@ func TestHostNetworkDnsConfigs(t *testing.T) {
 		},
 		Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 			return &test.Expected{
-				Output: func(stdout string, info string, t *testing.T) {
+				Output: func(stdout, info string, t *testing.T) {
 					out := helpers.Capture("exec", data.Identifier(), "cat", "/etc/resolv.conf")
 					assert.Assert(t, strings.Contains(out, "0.1.2.3"), info)
 					assert.Assert(t, strings.Contains(out, "example.com"), info)

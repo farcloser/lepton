@@ -77,7 +77,7 @@ func TestNetworkCreate(t *testing.T) {
 				return &test.Expected{
 					ExitCode: 0,
 					Errors:   nil,
-					Output: func(stdout string, info string, t *testing.T) {
+					Output: func(stdout, info string, t *testing.T) {
 						assert.Assert(t, strings.Contains(stdout, data.Get("subnet")), info)
 						assert.Assert(
 							t,
@@ -155,7 +155,7 @@ func TestNetworkCreate(t *testing.T) {
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 				return &test.Expected{
 					ExitCode: 0,
-					Output: func(stdout string, info string, t *testing.T) {
+					Output: func(stdout, info string, t *testing.T) {
 						_, subnet, _ := net.ParseCIDR(data.Get("subnetStr"))
 						ip := ipv6helper.FindIPv6(stdout)
 						assert.Assert(t, subnet.Contains(ip), info)

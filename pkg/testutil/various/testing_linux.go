@@ -94,7 +94,7 @@ type CosignKeyPair struct {
 	Cleanup    func()
 }
 
-func NewCosignKeyPair(t testing.TB, path string, password string) *CosignKeyPair {
+func NewCosignKeyPair(t testing.TB, path, password string) *CosignKeyPair {
 	td := t.TempDir()
 
 	cmd := exec.Command("cosign", "generate-key-pair")

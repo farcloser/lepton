@@ -162,7 +162,7 @@ func TestRestartWithSignal(t *testing.T) {
 			Output: expect.All(
 				// Check that we saw SIGUSR1 inside the container
 				expect.Contains(nerdtest.SignalCaught),
-				func(stdout string, info string, t *testing.T) {
+				func(stdout, info string, t *testing.T) {
 					// Ensure the container was restarted
 					nerdtest.EnsureContainerStarted(helpers, data.Identifier())
 					// Check the new pid is different

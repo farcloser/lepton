@@ -45,7 +45,7 @@ func TestImageInspectSimpleCases(t *testing.T) {
 			{
 				Description: "Contains some stuff",
 				Command:     test.Command("image", "inspect", testutil.CommonImage),
-				Expected: test.Expects(0, nil, func(stdout string, info string, t *testing.T) {
+				Expected: test.Expects(0, nil, func(stdout, info string, t *testing.T) {
 					var dc []dockercompat.Image
 					err := json.Unmarshal([]byte(stdout), &dc)
 					assert.NilError(t, err, "Unable to unmarshal output\n"+info)
@@ -127,7 +127,7 @@ func TestImageInspectDifferentValidReferencesForTheSameImage(t *testing.T) {
 				Command:     test.Command("image", "inspect", "busybox"),
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
-						Output: func(stdout string, info string, t *testing.T) {
+						Output: func(stdout, info string, t *testing.T) {
 							var dc []dockercompat.Image
 							err := json.Unmarshal([]byte(stdout), &dc)
 							assert.NilError(t, err, "Unable to unmarshal output\n"+info)
@@ -152,7 +152,7 @@ func TestImageInspectDifferentValidReferencesForTheSameImage(t *testing.T) {
 				Command:     test.Command("image", "inspect", "busybox"),
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
-						Output: func(stdout string, info string, t *testing.T) {
+						Output: func(stdout, info string, t *testing.T) {
 							var dc []dockercompat.Image
 							err := json.Unmarshal([]byte(stdout), &dc)
 							assert.NilError(t, err, "Unable to unmarshal output\n"+info)
@@ -185,7 +185,7 @@ func TestImageInspectDifferentValidReferencesForTheSameImage(t *testing.T) {
 				Command:     test.Command("image", "inspect", "busybox"),
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
-						Output: func(stdout string, info string, t *testing.T) {
+						Output: func(stdout, info string, t *testing.T) {
 							var dc []dockercompat.Image
 							err := json.Unmarshal([]byte(stdout), &dc)
 							assert.NilError(t, err, "Unable to unmarshal output\n"+info)
@@ -210,7 +210,7 @@ func TestImageInspectDifferentValidReferencesForTheSameImage(t *testing.T) {
 				Command:     test.Command("image", "inspect", "busybox"),
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
-						Output: func(stdout string, info string, t *testing.T) {
+						Output: func(stdout, info string, t *testing.T) {
 							var dc []dockercompat.Image
 							err := json.Unmarshal([]byte(stdout), &dc)
 							assert.NilError(t, err, "Unable to unmarshal output\n"+info)
@@ -234,7 +234,7 @@ func TestImageInspectDifferentValidReferencesForTheSameImage(t *testing.T) {
 				Command:     test.Command("image", "inspect", "busybox", "busybox"),
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
-						Output: func(stdout string, info string, t *testing.T) {
+						Output: func(stdout, info string, t *testing.T) {
 							var dc []dockercompat.Image
 							err := json.Unmarshal([]byte(stdout), &dc)
 							assert.NilError(t, err, "Unable to unmarshal output\n"+info)

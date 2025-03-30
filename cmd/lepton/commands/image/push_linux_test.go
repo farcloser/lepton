@@ -276,7 +276,7 @@ func TestPush(t *testing.T) {
 				},
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
-						Output: func(stdout string, info string, t *testing.T) {
+						Output: func(stdout, info string, t *testing.T) {
 							blobURL := fmt.Sprintf(
 								"http://%s/v2/%s/blobs/%s",
 								net.JoinHostPort(
@@ -331,7 +331,7 @@ func TestPush(t *testing.T) {
 				},
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
-						Output: func(stdout string, info string, t *testing.T) {
+						Output: func(stdout, info string, t *testing.T) {
 							blobURL := fmt.Sprintf(
 								"http://%s/v2/%s/blobs/%s",
 								net.JoinHostPort(

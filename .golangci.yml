@@ -280,14 +280,15 @@ formatters:
       no-inline-comments: true
       no-prefix-comments: true
       custom-order: true
+    gofumpt:
+      extra-rules: true
     golines:
       max-len: 120
       tab-len: 4
       shorten-comments: true
   enable:
     - gci
+    - gofumpt
     - golines
-#    - gofmt
-#    - gofumpt
   exclusions:
     generated: disable

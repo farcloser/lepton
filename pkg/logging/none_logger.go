@@ -34,7 +34,7 @@ func (n *NoneLogger) PreProcess(ctx context.Context, dataStore string, config *l
 	return nil
 }
 
-func (n *NoneLogger) Process(stdout <-chan string, stderr <-chan string) error {
+func (n *NoneLogger) Process(stdout, stderr <-chan string) error {
 	return nil
 }
 

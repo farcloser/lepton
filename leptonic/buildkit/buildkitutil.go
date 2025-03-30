@@ -178,7 +178,7 @@ func WriteTempDockerfile(rc io.Reader) (dockerfileDir string, err error) {
 // File returns the values for the following buildctl args
 // --localfilename=dockerfile={absDir}
 // --opt=filename={file}
-func File(dir, inputfile string) (absDir string, file string, err error) {
+func File(dir, inputfile string) (absDir, file string, err error) {
 	file = inputfile
 	if file == "" || file == "." {
 		file = DefaultDockerfileName

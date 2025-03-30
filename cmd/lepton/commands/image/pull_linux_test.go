@@ -198,7 +198,7 @@ func TestImagePullSoci(t *testing.T) {
 				Setup: func(data test.Data, helpers test.Helpers) {
 					cmd := helpers.Custom("mount")
 					cmd.Run(&test.Expected{
-						Output: func(stdout string, info string, t *testing.T) {
+						Output: func(stdout, info string, t *testing.T) {
 							data.Set(
 								"remoteSnapshotsInitialCount",
 								strconv.Itoa(strings.Count(stdout, "fuse.rawBridge")),
@@ -215,7 +215,7 @@ func TestImagePullSoci(t *testing.T) {
 				},
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
-						Output: func(stdout string, info string, t *testing.T) {
+						Output: func(stdout, info string, t *testing.T) {
 							remoteSnapshotsInitialCount, _ := strconv.Atoi(
 								data.Get("remoteSnapshotsInitialCount"),
 							)
@@ -240,7 +240,7 @@ func TestImagePullSoci(t *testing.T) {
 				Setup: func(data test.Data, helpers test.Helpers) {
 					cmd := helpers.Custom("mount")
 					cmd.Run(&test.Expected{
-						Output: func(stdout string, info string, t *testing.T) {
+						Output: func(stdout, info string, t *testing.T) {
 							data.Set(
 								"remoteSnapshotsInitialCount",
 								strconv.Itoa(strings.Count(stdout, "fuse.rawBridge")),
@@ -257,7 +257,7 @@ func TestImagePullSoci(t *testing.T) {
 				},
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
-						Output: func(stdout string, info string, t *testing.T) {
+						Output: func(stdout, info string, t *testing.T) {
 							remoteSnapshotsInitialCount, _ := strconv.Atoi(
 								data.Get("remoteSnapshotsInitialCount"),
 							)

@@ -97,7 +97,7 @@ func TestImageHistory(t *testing.T) {
 					"--format=json",
 					testutil.CommonImage,
 				),
-				Expected: test.Expects(0, nil, func(stdout string, info string, t *testing.T) {
+				Expected: test.Expects(0, nil, func(stdout, info string, t *testing.T) {
 					history, err := decode(stdout)
 					assert.NilError(t, err, info)
 					assert.Equal(t, len(history), 2, info)
@@ -146,7 +146,7 @@ func TestImageHistory(t *testing.T) {
 					"--format=json",
 					testutil.CommonImage,
 				),
-				Expected: test.Expects(0, nil, func(stdout string, info string, t *testing.T) {
+				Expected: test.Expects(0, nil, func(stdout, info string, t *testing.T) {
 					history, err := decode(stdout)
 					assert.NilError(t, err, info)
 					assert.Equal(t, history[0].Size, "0", info)
@@ -165,7 +165,7 @@ func TestImageHistory(t *testing.T) {
 					"--format=json",
 					testutil.CommonImage,
 				),
-				Expected: test.Expects(0, nil, func(stdout string, info string, t *testing.T) {
+				Expected: test.Expects(0, nil, func(stdout, info string, t *testing.T) {
 					history, err := decode(stdout)
 					assert.NilError(t, err, info)
 					assert.Equal(
@@ -190,7 +190,7 @@ func TestImageHistory(t *testing.T) {
 					"--quiet",
 					testutil.CommonImage,
 				),
-				Expected: test.Expects(0, nil, func(stdout string, info string, t *testing.T) {
+				Expected: test.Expects(0, nil, func(stdout, info string, t *testing.T) {
 					assert.Equal(
 						t,
 						stdout,
@@ -208,7 +208,7 @@ func TestImageHistory(t *testing.T) {
 					"--quiet",
 					testutil.CommonImage,
 				),
-				Expected: test.Expects(0, nil, func(stdout string, info string, t *testing.T) {
+				Expected: test.Expects(0, nil, func(stdout, info string, t *testing.T) {
 					assert.Equal(
 						t,
 						stdout,

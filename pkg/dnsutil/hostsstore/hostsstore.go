@@ -54,7 +54,7 @@ const (
 // ErrHostsStore will wrap all errors here
 var ErrHostsStore = errors.New("hosts-store error")
 
-func New(dataStore string, namespace string) (retStore Store, err error) {
+func New(dataStore, namespace string) (retStore Store, err error) {
 	defer func() {
 		if err != nil {
 			err = errors.Join(ErrHostsStore, err)

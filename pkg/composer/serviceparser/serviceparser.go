@@ -925,7 +925,7 @@ func fileReferenceConfigToFlagV(c types.FileReferenceConfig, project *types.Proj
 }
 
 // DefaultImageName returns the image name following compose naming logic.
-func DefaultImageName(projectName string, serviceName string) string {
+func DefaultImageName(projectName, serviceName string) string {
 	return projectName + Separator + serviceName
 }
 

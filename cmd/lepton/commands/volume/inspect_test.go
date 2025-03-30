@@ -112,7 +112,7 @@ func TestVolumeInspect(t *testing.T) {
 				return &test.Expected{
 					Output: expect.All(
 						expect.Contains(data.Get("vol1")),
-						func(stdout string, info string, t *testing.T) {
+						func(stdout, info string, t *testing.T) {
 							var dc []api.Volume
 							if err := json.Unmarshal([]byte(stdout), &dc); err != nil {
 								t.Fatal(err)
@@ -153,7 +153,7 @@ func TestVolumeInspect(t *testing.T) {
 				return &test.Expected{
 					Output: expect.All(
 						expect.Contains(data.Get("vol2")),
-						func(stdout string, info string, t *testing.T) {
+						func(stdout, info string, t *testing.T) {
 							var dc []api.Volume
 							if err := json.Unmarshal([]byte(stdout), &dc); err != nil {
 								t.Fatal(err)
@@ -189,7 +189,7 @@ func TestVolumeInspect(t *testing.T) {
 				return &test.Expected{
 					Output: expect.All(
 						expect.Contains(data.Get("vol1")),
-						func(stdout string, info string, t *testing.T) {
+						func(stdout, info string, t *testing.T) {
 							var dc []api.Volume
 							if err := json.Unmarshal([]byte(stdout), &dc); err != nil {
 								t.Fatal(err)
@@ -214,7 +214,7 @@ func TestVolumeInspect(t *testing.T) {
 					Output: expect.All(
 						expect.Contains(data.Get("vol1")),
 						expect.Contains(data.Get("vol2")),
-						func(stdout string, info string, t *testing.T) {
+						func(stdout, info string, t *testing.T) {
 							var dc []api.Volume
 							if err := json.Unmarshal([]byte(stdout), &dc); err != nil {
 								t.Fatal(err)
@@ -264,7 +264,7 @@ func TestVolumeInspect(t *testing.T) {
 					Errors:   []error{errs.ErrNotFound, errs.ErrInvalidArgument},
 					Output: expect.All(
 						expect.Contains(data.Get("vol1")),
-						func(stdout string, info string, t *testing.T) {
+						func(stdout, info string, t *testing.T) {
 							var dc []api.Volume
 							if err := json.Unmarshal([]byte(stdout), &dc); err != nil {
 								t.Fatal(err)

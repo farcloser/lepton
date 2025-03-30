@@ -261,7 +261,7 @@ func TestRunDevice(t *testing.T) {
 			Expected: test.Expects(
 				expect.ExitCodeSuccess,
 				nil,
-				func(stdout string, info string, t *testing.T) {
+				func(stdout, info string, t *testing.T) {
 					lo1Read, err := os.ReadFile(lo[1].Device)
 					assert.NilError(t, err)
 					assert.Equal(t, string(bytes.Trim(lo1Read, "\x00")), "overwritten-lo1-content")

@@ -52,7 +52,7 @@ var MagicArgv1 = fmt.Sprintf("_%s_INTERNAL_LOGGING", version.EnvPrefix)
 type Driver interface {
 	Init(dataStore, ns, id string) error
 	PreProcess(ctx context.Context, dataStore string, config *logging.Config) error
-	Process(stdout <-chan string, stderr <-chan string) error
+	Process(stdout, stderr <-chan string) error
 	PostProcess() error
 }
 

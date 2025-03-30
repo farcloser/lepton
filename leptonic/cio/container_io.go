@@ -112,7 +112,7 @@ func (c *ncio) Cancel() {
 	}
 }
 
-func NewContainerIO(namespace string, logURI string, tty bool, stdin io.Reader, stdout, stderr io.Writer) cio.Creator {
+func NewContainerIO(namespace, logURI string, tty bool, stdin io.Reader, stdout, stderr io.Writer) cio.Creator {
 	return func(id string) (_ cio.IO, err error) {
 		var (
 			cmd     *exec.Cmd

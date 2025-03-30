@@ -242,7 +242,7 @@ var errMaximumWrite = errors.New("maximum write")
 // errShortWrite is returned when the message is not fully written.
 var errShortWrite = errors.New("short write")
 
-func newLogWriter(stdout io.Writer, stderr io.Writer, opts *LogViewOptions) *logWriter {
+func newLogWriter(stdout, stderr io.Writer, opts *LogViewOptions) *logWriter {
 	w := &logWriter{
 		stdout: stdout,
 		stderr: stderr,

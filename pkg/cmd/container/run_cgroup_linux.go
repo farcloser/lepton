@@ -262,7 +262,7 @@ func generateCgroupPath(id, cgroupManager, cgroupParent string) (string, error) 
 }
 
 // ParseDevice parses the give device string into hostDevPath, containerPath and mode(defaults: "rwm").
-func ParseDevice(s string) (hostDevPath string, containerPath string, mode string, err error) {
+func ParseDevice(s string) (hostDevPath, containerPath, mode string, err error) {
 	mode = "rwm"
 	split := strings.Split(s, ":")
 	var containerDevPath string

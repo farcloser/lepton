@@ -71,7 +71,7 @@ func TestAttach(t *testing.T) {
 		cmd.Run(&test.Expected{
 			ExitCode: 0,
 			Errors:   []error{errors.New("read detach keys")},
-			Output: func(stdout string, info string, t *testing.T) {
+			Output: func(stdout, info string, t *testing.T) {
 				assert.Assert(
 					t,
 					strings.Contains(
@@ -106,7 +106,7 @@ func TestAttach(t *testing.T) {
 			Errors:   []error{errors.New("read detach keys")},
 			Output: expect.All(
 				expect.Contains("markmark"),
-				func(stdout string, info string, t *testing.T) {
+				func(stdout, info string, t *testing.T) {
 					assert.Assert(
 						t,
 						strings.Contains(
@@ -153,7 +153,7 @@ func TestAttachDetachKeys(t *testing.T) {
 		cmd.Run(&test.Expected{
 			ExitCode: 0,
 			Errors:   []error{errors.New("read detach keys")},
-			Output: func(stdout string, info string, t *testing.T) {
+			Output: func(stdout, info string, t *testing.T) {
 				assert.Assert(
 					t,
 					strings.Contains(
@@ -187,7 +187,7 @@ func TestAttachDetachKeys(t *testing.T) {
 			Errors:   []error{errors.New("read detach keys")},
 			Output: expect.All(
 				expect.Contains("markmark"),
-				func(stdout string, info string, t *testing.T) {
+				func(stdout, info string, t *testing.T) {
 					assert.Assert(
 						t,
 						strings.Contains(
@@ -230,7 +230,7 @@ func TestAttachForAutoRemovedContainer(t *testing.T) {
 		cmd.Run(&test.Expected{
 			ExitCode: 0,
 			Errors:   []error{errors.New("read detach keys")},
-			Output: func(stdout string, info string, t *testing.T) {
+			Output: func(stdout, info string, t *testing.T) {
 				assert.Assert(
 					t,
 					strings.Contains(
@@ -257,7 +257,7 @@ func TestAttachForAutoRemovedContainer(t *testing.T) {
 			ExitCode: 42,
 			Output: expect.All(
 				expect.Contains("markmark"),
-				func(stdout string, info string, t *testing.T) {
+				func(stdout, info string, t *testing.T) {
 					assert.Assert(
 						t,
 						!strings.Contains(helpers.Capture("ps", "-a"), data.Identifier()),

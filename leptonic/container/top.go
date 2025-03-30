@@ -48,6 +48,6 @@ type ContainerTopOKBody struct {
 }
 
 // Top performs the equivalent of running `top` inside of container(s)
-func Top(ctx context.Context, stdio io.Writer, client *containerd.Client, id string, psArgs string) error {
+func Top(ctx context.Context, stdio io.Writer, client *containerd.Client, id, psArgs string) error {
 	return containerTop(ctx, stdio, client, id, psArgs)
 }

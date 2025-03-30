@@ -55,7 +55,7 @@ func InspectContainer(helpers test.Helpers, name string) dockercompat.Container 
 	var dc []dockercompat.Container
 	cmd := helpers.Command("container", "inspect", name)
 	cmd.Run(&test.Expected{
-		Output: func(stdout string, info string, t *testing.T) {
+		Output: func(stdout, info string, t *testing.T) {
 			err := json.Unmarshal([]byte(stdout), &dc)
 			assert.NilError(t, err, "Unable to unmarshal output\n"+info)
 			assert.Equal(t, 1, len(dc), "Unexpectedly got multiple results\n"+info)
@@ -68,7 +68,7 @@ func InspectVolume(helpers test.Helpers, name string) api.Volume {
 	var dc []api.Volume
 	cmd := helpers.Command("volume", "inspect", name)
 	cmd.Run(&test.Expected{
-		Output: func(stdout string, info string, t *testing.T) {
+		Output: func(stdout, info string, t *testing.T) {
 			err := json.Unmarshal([]byte(stdout), &dc)
 			assert.NilError(t, err, "Unable to unmarshal output\n"+info)
 			assert.Equal(t, 1, len(dc), "Unexpectedly got multiple results\n"+info)
@@ -81,7 +81,7 @@ func InspectNetwork(helpers test.Helpers, name string) dockercompat.Network {
 	var dc []dockercompat.Network
 	cmd := helpers.Command("network", "inspect", name)
 	cmd.Run(&test.Expected{
-		Output: func(stdout string, info string, t *testing.T) {
+		Output: func(stdout, info string, t *testing.T) {
 			err := json.Unmarshal([]byte(stdout), &dc)
 			assert.NilError(t, err, "Unable to unmarshal output\n"+info)
 			assert.Equal(t, 1, len(dc), "Unexpectedly got multiple results\n"+info)
@@ -94,7 +94,7 @@ func InspectImage(helpers test.Helpers, name string) dockercompat.Image {
 	var dc []dockercompat.Image
 	cmd := helpers.Command("image", "inspect", name)
 	cmd.Run(&test.Expected{
-		Output: func(stdout string, info string, t *testing.T) {
+		Output: func(stdout, info string, t *testing.T) {
 			err := json.Unmarshal([]byte(stdout), &dc)
 			assert.NilError(t, err, "Unable to unmarshal output\n"+info)
 			assert.Equal(t, 1, len(dc), "Unexpectedly got multiple results\n"+info)
@@ -115,7 +115,7 @@ func EnsureContainerStarted(helpers test.Helpers, con string) {
 		helpers.Command("container", "inspect", con).
 			Run(&test.Expected{
 				ExitCode: expect.ExitCodeNoCheck,
-				Output: func(stdout string, info string, t *testing.T) {
+				Output: func(stdout, info string, t *testing.T) {
 					var dc []dockercompat.Container
 					err := json.Unmarshal([]byte(stdout), &dc)
 					if err != nil || len(dc) == 0 {

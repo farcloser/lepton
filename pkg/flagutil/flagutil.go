@@ -125,7 +125,7 @@ func withOSEnv(envs []string) ([]string, error) {
 
 // MergeEnvFileAndOSEnv combines environment variables from `--env-file` and `--env`.
 // Pass an empty slice if any arg is not used.
-func MergeEnvFileAndOSEnv(envFile []string, env []string) ([]string, error) {
+func MergeEnvFileAndOSEnv(envFile, env []string) ([]string, error) {
 	var envs []string
 	var err error
 

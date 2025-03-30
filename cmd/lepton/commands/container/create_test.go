@@ -122,7 +122,7 @@ func TestCreateHyperVContainer(t *testing.T) {
 					helpers.Command("container", "inspect", data.Get("cID")).
 						Run(&test.Expected{
 							ExitCode: expect.ExitCodeNoCheck,
-							Output: func(stdout string, info string, t *testing.T) {
+							Output: func(stdout, info string, t *testing.T) {
 								var dc []dockercompat.Container
 								err := json.Unmarshal([]byte(stdout), &dc)
 								if err != nil || len(dc) == 0 {

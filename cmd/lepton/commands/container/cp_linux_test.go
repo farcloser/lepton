@@ -80,10 +80,10 @@ type testcases struct {
 	expect          icmd.Expected // expectation
 
 	// Optional
-	catFile  string                                                       // path that we "cat" - defaults to destinationSpec if not specified
-	setup    func(base *testutil.Base, container string, destPath string) // additional test setup if needed
-	tearDown func()                                                       // additional cleanup if needed
-	volume   func(base *testutil.Base, id string) (string, string, bool)  // volume creation function if needed (should return the volume name, mountPoint, readonly flag)
+	catFile  string                                                      // path that we "cat" - defaults to destinationSpec if not specified
+	setup    func(base *testutil.Base, container, destPath string)       // additional test setup if needed
+	tearDown func()                                                      // additional cleanup if needed
+	volume   func(base *testutil.Base, id string) (string, string, bool) // volume creation function if needed (should return the volume name, mountPoint, readonly flag)
 }
 
 func TestCopyToContainer(t *testing.T) {
@@ -137,7 +137,7 @@ func TestCopyToContainer(t *testing.T) {
 					expect: icmd.Expected{
 						ExitCode: 0,
 					},
-					setup: func(base *testutil.Base, container string, destPath string) {
+					setup: func(base *testutil.Base, container, destPath string) {
 						base.Cmd("exec", container, "touch", destPath).AssertOK()
 					},
 				},
@@ -147,7 +147,7 @@ func TestCopyToContainer(t *testing.T) {
 					expect: icmd.Expected{
 						ExitCode: 0,
 					},
-					setup: func(base *testutil.Base, container string, destPath string) {
+					setup: func(base *testutil.Base, container, destPath string) {
 						base.Cmd("exec", container, "touch", destPath).AssertOK()
 					},
 				},
@@ -160,7 +160,7 @@ func TestCopyToContainer(t *testing.T) {
 						ExitCode: 1,
 						Err:      containerutil.ErrDestinationIsNotADir.Error(),
 					},
-					setup: func(base *testutil.Base, container string, destPath string) {
+					setup: func(base *testutil.Base, container, destPath string) {
 						base.Cmd("exec", container, "touch", destPath).AssertOK()
 					},
 				},
@@ -178,7 +178,7 @@ func TestCopyToContainer(t *testing.T) {
 						// frustrating
 						Err: containerutil.ErrDestinationIsNotADir.Error(),
 					},
-					setup: func(base *testutil.Base, container string, destPath string) {
+					setup: func(base *testutil.Base, container, destPath string) {
 						base.Cmd("exec", container, "touch", destPath).AssertOK()
 					},
 				},
@@ -189,7 +189,7 @@ func TestCopyToContainer(t *testing.T) {
 					expect: icmd.Expected{
 						ExitCode: 0,
 					},
-					setup: func(base *testutil.Base, container string, destPath string) {
+					setup: func(base *testutil.Base, container, destPath string) {
 						base.Cmd("exec", container, "mkdir", "-p", destPath).AssertOK()
 					},
 				},
@@ -200,7 +200,7 @@ func TestCopyToContainer(t *testing.T) {
 					expect: icmd.Expected{
 						ExitCode: 0,
 					},
-					setup: func(base *testutil.Base, container string, destPath string) {
+					setup: func(base *testutil.Base, container, destPath string) {
 						base.Cmd("exec", container, "mkdir", "-p", destPath).AssertOK()
 					},
 				},
@@ -213,7 +213,7 @@ func TestCopyToContainer(t *testing.T) {
 					expect: icmd.Expected{
 						ExitCode: 0,
 					},
-					setup: func(base *testutil.Base, container string, destPath string) {
+					setup: func(base *testutil.Base, container, destPath string) {
 						base.Cmd("exec", container, "mkdir", "-p", destPath).AssertOK()
 					},
 				},
@@ -226,7 +226,7 @@ func TestCopyToContainer(t *testing.T) {
 					expect: icmd.Expected{
 						ExitCode: 0,
 					},
-					setup: func(base *testutil.Base, container string, destPath string) {
+					setup: func(base *testutil.Base, container, destPath string) {
 						base.Cmd("exec", container, "mkdir", "-p", destPath).AssertOK()
 					},
 				},
@@ -305,7 +305,7 @@ func TestCopyToContainer(t *testing.T) {
 						ExitCode: 1,
 						Err:      containerutil.ErrCannotCopyDirToFile.Error(),
 					},
-					setup: func(base *testutil.Base, container string, destPath string) {
+					setup: func(base *testutil.Base, container, destPath string) {
 						base.Cmd("exec", container, "touch", destPath).AssertOK()
 					},
 				},
@@ -316,7 +316,7 @@ func TestCopyToContainer(t *testing.T) {
 						ExitCode: 1,
 						Err:      containerutil.ErrCannotCopyDirToFile.Error(),
 					},
-					setup: func(base *testutil.Base, container string, destPath string) {
+					setup: func(base *testutil.Base, container, destPath string) {
 						base.Cmd("exec", container, "touch", destPath).AssertOK()
 					},
 				},
@@ -329,7 +329,7 @@ func TestCopyToContainer(t *testing.T) {
 						ExitCode: 1,
 						Err:      containerutil.ErrDestinationIsNotADir.Error(),
 					},
-					setup: func(base *testutil.Base, container string, destPath string) {
+					setup: func(base *testutil.Base, container, destPath string) {
 						base.Cmd("exec", container, "touch", destPath).AssertOK()
 					},
 				},
@@ -347,7 +347,7 @@ func TestCopyToContainer(t *testing.T) {
 						// frustrating
 						Err: containerutil.ErrDestinationIsNotADir.Error(),
 					},
-					setup: func(base *testutil.Base, container string, destPath string) {
+					setup: func(base *testutil.Base, container, destPath string) {
 						base.Cmd("exec", container, "touch", destPath).AssertOK()
 					},
 				},
@@ -362,7 +362,7 @@ func TestCopyToContainer(t *testing.T) {
 					expect: icmd.Expected{
 						ExitCode: 0,
 					},
-					setup: func(base *testutil.Base, container string, destPath string) {
+					setup: func(base *testutil.Base, container, destPath string) {
 						base.Cmd("exec", container, "mkdir", "-p", destPath).AssertOK()
 					},
 				},
@@ -377,7 +377,7 @@ func TestCopyToContainer(t *testing.T) {
 					expect: icmd.Expected{
 						ExitCode: 0,
 					},
-					setup: func(base *testutil.Base, container string, destPath string) {
+					setup: func(base *testutil.Base, container, destPath string) {
 						base.Cmd("exec", container, "mkdir", "-p", destPath).AssertOK()
 					},
 				},
@@ -394,7 +394,7 @@ func TestCopyToContainer(t *testing.T) {
 					expect: icmd.Expected{
 						ExitCode: 0,
 					},
-					setup: func(base *testutil.Base, container string, destPath string) {
+					setup: func(base *testutil.Base, container, destPath string) {
 						base.Cmd("exec", container, "mkdir", "-p", destPath).AssertOK()
 					},
 				},
@@ -411,7 +411,7 @@ func TestCopyToContainer(t *testing.T) {
 					expect: icmd.Expected{
 						ExitCode: 0,
 					},
-					setup: func(base *testutil.Base, container string, destPath string) {
+					setup: func(base *testutil.Base, container, destPath string) {
 						base.Cmd("exec", container, "mkdir", "-p", destPath).AssertOK()
 					},
 				},
@@ -426,7 +426,7 @@ func TestCopyToContainer(t *testing.T) {
 					description:     "DEST_PATH is a directory, relative",
 					destinationSpec: pathIsADirRelative,
 					catFile:         filepath.Join(pathIsADirRelative, srcFileName),
-					setup: func(base *testutil.Base, container string, destPath string) {
+					setup: func(base *testutil.Base, container, destPath string) {
 						base.Cmd("exec", container, "mkdir", "-p", destPath).AssertOK()
 					},
 				},
@@ -434,7 +434,7 @@ func TestCopyToContainer(t *testing.T) {
 					description:     "DEST_PATH is a directory, absolute",
 					destinationSpec: pathIsADirAbsolute,
 					catFile:         filepath.Join(pathIsADirAbsolute, srcFileName),
-					setup: func(base *testutil.Base, container string, destPath string) {
+					setup: func(base *testutil.Base, container, destPath string) {
 						base.Cmd("exec", container, "mkdir", "-p", destPath).AssertOK()
 					},
 				},
@@ -492,7 +492,7 @@ func TestCopyFromContainer(t *testing.T) {
 					expect: icmd.Expected{
 						ExitCode: 0,
 					},
-					setup: func(base *testutil.Base, container string, destPath string) {
+					setup: func(base *testutil.Base, container, destPath string) {
 						err := os.WriteFile(destPath, []byte(""), filePerm)
 						assert.NilError(t, err)
 					},
@@ -503,7 +503,7 @@ func TestCopyFromContainer(t *testing.T) {
 					expect: icmd.Expected{
 						ExitCode: 0,
 					},
-					setup: func(base *testutil.Base, container string, destPath string) {
+					setup: func(base *testutil.Base, container, destPath string) {
 						err := os.WriteFile(destPath, []byte(""), filePerm)
 						assert.NilError(t, err)
 					},
@@ -515,7 +515,7 @@ func TestCopyFromContainer(t *testing.T) {
 						ExitCode: 1,
 						Err:      containerutil.ErrDestinationIsNotADir.Error(),
 					},
-					setup: func(base *testutil.Base, container string, destPath string) {
+					setup: func(base *testutil.Base, container, destPath string) {
 						err := os.WriteFile(destPath, []byte(""), filePerm)
 						assert.NilError(t, err)
 					},
@@ -527,7 +527,7 @@ func TestCopyFromContainer(t *testing.T) {
 						ExitCode: 1,
 						Err:      containerutil.ErrDestinationIsNotADir.Error(),
 					},
-					setup: func(base *testutil.Base, container string, destPath string) {
+					setup: func(base *testutil.Base, container, destPath string) {
 						err := os.WriteFile(destPath, []byte(""), filePerm)
 						assert.NilError(t, err)
 					},
@@ -539,7 +539,7 @@ func TestCopyFromContainer(t *testing.T) {
 					expect: icmd.Expected{
 						ExitCode: 0,
 					},
-					setup: func(base *testutil.Base, container string, destPath string) {
+					setup: func(base *testutil.Base, container, destPath string) {
 						err := os.MkdirAll(destPath, dirPerm)
 						assert.NilError(t, err)
 					},
@@ -551,7 +551,7 @@ func TestCopyFromContainer(t *testing.T) {
 					expect: icmd.Expected{
 						ExitCode: 0,
 					},
-					setup: func(base *testutil.Base, container string, destPath string) {
+					setup: func(base *testutil.Base, container, destPath string) {
 						err := os.MkdirAll(destPath, dirPerm)
 						assert.NilError(t, err)
 					},
@@ -563,7 +563,7 @@ func TestCopyFromContainer(t *testing.T) {
 					expect: icmd.Expected{
 						ExitCode: 0,
 					},
-					setup: func(base *testutil.Base, container string, destPath string) {
+					setup: func(base *testutil.Base, container, destPath string) {
 						err := os.MkdirAll(destPath, dirPerm)
 						assert.NilError(t, err)
 					},
@@ -575,7 +575,7 @@ func TestCopyFromContainer(t *testing.T) {
 					expect: icmd.Expected{
 						ExitCode: 0,
 					},
-					setup: func(base *testutil.Base, container string, destPath string) {
+					setup: func(base *testutil.Base, container, destPath string) {
 						err := os.MkdirAll(destPath, dirPerm)
 						assert.NilError(t, err)
 					},
@@ -625,7 +625,7 @@ func TestCopyFromContainer(t *testing.T) {
 						ExitCode: 1,
 						Err:      containerutil.ErrCannotCopyDirToFile.Error(),
 					},
-					setup: func(base *testutil.Base, container string, destPath string) {
+					setup: func(base *testutil.Base, container, destPath string) {
 						err := os.MkdirAll(filepath.Dir(destPath), dirPerm)
 						assert.NilError(t, err)
 						err = os.WriteFile(destPath, []byte(""), filePerm)
@@ -639,7 +639,7 @@ func TestCopyFromContainer(t *testing.T) {
 						ExitCode: 1,
 						Err:      containerutil.ErrCannotCopyDirToFile.Error(),
 					},
-					setup: func(base *testutil.Base, container string, destPath string) {
+					setup: func(base *testutil.Base, container, destPath string) {
 						err := os.MkdirAll(filepath.Dir(destPath), dirPerm)
 						assert.NilError(t, err)
 						err = os.WriteFile(destPath, []byte(""), filePerm)
@@ -653,7 +653,7 @@ func TestCopyFromContainer(t *testing.T) {
 						ExitCode: 1,
 						Err:      containerutil.ErrDestinationIsNotADir.Error(),
 					},
-					setup: func(base *testutil.Base, container string, destPath string) {
+					setup: func(base *testutil.Base, container, destPath string) {
 						err := os.MkdirAll(filepath.Dir(destPath), dirPerm)
 						assert.NilError(t, err)
 						err = os.WriteFile(destPath, []byte(""), filePerm)
@@ -667,7 +667,7 @@ func TestCopyFromContainer(t *testing.T) {
 						ExitCode: 1,
 						Err:      containerutil.ErrDestinationIsNotADir.Error(),
 					},
-					setup: func(base *testutil.Base, container string, destPath string) {
+					setup: func(base *testutil.Base, container, destPath string) {
 						err := os.MkdirAll(filepath.Dir(destPath), dirPerm)
 						assert.NilError(t, err)
 						err = os.WriteFile(destPath, []byte(""), filePerm)
@@ -685,7 +685,7 @@ func TestCopyFromContainer(t *testing.T) {
 					expect: icmd.Expected{
 						ExitCode: 0,
 					},
-					setup: func(base *testutil.Base, container string, destPath string) {
+					setup: func(base *testutil.Base, container, destPath string) {
 						err := os.MkdirAll(destPath, dirPerm)
 						assert.NilError(t, err)
 					},
@@ -701,7 +701,7 @@ func TestCopyFromContainer(t *testing.T) {
 					expect: icmd.Expected{
 						ExitCode: 0,
 					},
-					setup: func(base *testutil.Base, container string, destPath string) {
+					setup: func(base *testutil.Base, container, destPath string) {
 						err := os.MkdirAll(destPath, dirPerm)
 						assert.NilError(t, err)
 					},
@@ -717,7 +717,7 @@ func TestCopyFromContainer(t *testing.T) {
 					expect: icmd.Expected{
 						ExitCode: 0,
 					},
-					setup: func(base *testutil.Base, container string, destPath string) {
+					setup: func(base *testutil.Base, container, destPath string) {
 						err := os.MkdirAll(destPath, dirPerm)
 						assert.NilError(t, err)
 					},
@@ -733,7 +733,7 @@ func TestCopyFromContainer(t *testing.T) {
 					expect: icmd.Expected{
 						ExitCode: 0,
 					},
-					setup: func(base *testutil.Base, container string, destPath string) {
+					setup: func(base *testutil.Base, container, destPath string) {
 						err := os.MkdirAll(destPath, dirPerm)
 						assert.NilError(t, err)
 					},
@@ -752,7 +752,7 @@ func TestCopyFromContainer(t *testing.T) {
 					expect: icmd.Expected{
 						ExitCode: 0,
 					},
-					setup: func(base *testutil.Base, container string, destPath string) {
+					setup: func(base *testutil.Base, container, destPath string) {
 						err := os.MkdirAll(destPath, dirPerm)
 						assert.NilError(t, err)
 					},
@@ -764,7 +764,7 @@ func TestCopyFromContainer(t *testing.T) {
 					expect: icmd.Expected{
 						ExitCode: 0,
 					},
-					setup: func(base *testutil.Base, container string, destPath string) {
+					setup: func(base *testutil.Base, container, destPath string) {
 						err := os.MkdirAll(destPath, dirPerm)
 						assert.NilError(t, err)
 					},

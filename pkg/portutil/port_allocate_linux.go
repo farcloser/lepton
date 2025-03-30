@@ -43,7 +43,7 @@ func filter(
 	return
 }
 
-func portAllocate(protocol string, ip string, count uint64) (uint64, uint64, error) {
+func portAllocate(protocol, ip string, count uint64) (uint64, uint64, error) {
 	netprocData, err := procnet.ReadStatsFileData(protocol)
 	if err != nil {
 		return 0, 0, err

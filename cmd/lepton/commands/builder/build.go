@@ -292,7 +292,7 @@ func buildAction(cmd *cobra.Command, args []string) error {
 }
 
 // canonicalizeAttest is from https://github.com/docker/buildx/blob/v0.12/util/buildflags/attests.go#L13-L21
-func canonicalizeAttest(attestType string, in string) string {
+func canonicalizeAttest(attestType, in string) string {
 	if in == "" {
 		return ""
 	}

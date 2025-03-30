@@ -56,7 +56,7 @@ func transform(keys ...string) []string {
 // Note that atomicity is "guaranteed" by `os.Rename`, which arguably is not *always* atomic.
 // In particular, operating-system crashes may break that promise, and windows behavior is probably questionable.
 // That being said, this is still a much better solution than writing directly to the destination file.
-func New(rootPath string, hashPath bool, dirPerm os.FileMode, filePerm os.FileMode) (Store, error) {
+func New(rootPath string, hashPath bool, dirPerm, filePerm os.FileMode) (Store, error) {
 	if rootPath == "" {
 		return nil, errors.Join(errs.ErrInvalidArgument, errors.New("FileStore rootPath cannot be empty"))
 	}

@@ -67,7 +67,7 @@ func TestNetworkInspect(t *testing.T) {
 			Description: "none",
 			Require:     nerdtest.NerdishctlNeedsFixing("no issue opened"),
 			Command:     test.Command("network", "inspect", "none"),
-			Expected: test.Expects(0, nil, func(stdout string, info string, t *testing.T) {
+			Expected: test.Expects(0, nil, func(stdout, info string, t *testing.T) {
 				var dc []dockercompat.Network
 				err := json.Unmarshal([]byte(stdout), &dc)
 				assert.NilError(t, err, "Unable to unmarshal output\n"+info)
@@ -79,7 +79,7 @@ func TestNetworkInspect(t *testing.T) {
 			Description: "host",
 			Require:     nerdtest.NerdishctlNeedsFixing("no issue opened"),
 			Command:     test.Command("network", "inspect", "host"),
-			Expected: test.Expects(0, nil, func(stdout string, info string, t *testing.T) {
+			Expected: test.Expects(0, nil, func(stdout, info string, t *testing.T) {
 				var dc []dockercompat.Network
 				err := json.Unmarshal([]byte(stdout), &dc)
 				assert.NilError(t, err, "Unable to unmarshal output\n"+info)
@@ -91,7 +91,7 @@ func TestNetworkInspect(t *testing.T) {
 			Description: "bridge",
 			Require:     require.Not(require.Windows),
 			Command:     test.Command("network", "inspect", "bridge"),
-			Expected: test.Expects(0, nil, func(stdout string, info string, t *testing.T) {
+			Expected: test.Expects(0, nil, func(stdout, info string, t *testing.T) {
 				var dc []dockercompat.Network
 				err := json.Unmarshal([]byte(stdout), &dc)
 				assert.NilError(t, err, "Unable to unmarshal output\n"+info)
@@ -103,7 +103,7 @@ func TestNetworkInspect(t *testing.T) {
 			Description: "nat",
 			Require:     require.Windows,
 			Command:     test.Command("network", "inspect", "nat"),
-			Expected: test.Expects(0, nil, func(stdout string, info string, t *testing.T) {
+			Expected: test.Expects(0, nil, func(stdout, info string, t *testing.T) {
 				var dc []dockercompat.Network
 				err := json.Unmarshal([]byte(stdout), &dc)
 				assert.NilError(t, err, "Unable to unmarshal output\n"+info)
@@ -120,7 +120,7 @@ func TestNetworkInspect(t *testing.T) {
 				helpers.Anyhow("network", "remove", "custom")
 			},
 			Command: test.Command("network", "inspect", "custom"),
-			Expected: test.Expects(0, nil, func(stdout string, info string, t *testing.T) {
+			Expected: test.Expects(0, nil, func(stdout, info string, t *testing.T) {
 				var dc []dockercompat.Network
 				err := json.Unmarshal([]byte(stdout), &dc)
 				assert.NilError(t, err, "Unable to unmarshal output\n"+info)
@@ -145,7 +145,7 @@ func TestNetworkInspect(t *testing.T) {
 			},
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 				return &test.Expected{
-					Output: func(stdout string, info string, t *testing.T) {
+					Output: func(stdout, info string, t *testing.T) {
 						var dc []dockercompat.Network
 						err := json.Unmarshal([]byte(stdout), &dc)
 						assert.NilError(t, err, "Unable to unmarshal output\n"+info)
@@ -175,7 +175,7 @@ func TestNetworkInspect(t *testing.T) {
 			},
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 				return &test.Expected{
-					Output: func(stdout string, info string, t *testing.T) {
+					Output: func(stdout, info string, t *testing.T) {
 						var dc []dockercompat.Network
 						err := json.Unmarshal([]byte(stdout), &dc)
 						assert.NilError(t, err, "Unable to unmarshal output\n"+info)
@@ -212,7 +212,7 @@ func TestNetworkInspect(t *testing.T) {
 			},
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 				return &test.Expected{
-					Output: func(stdout string, info string, t *testing.T) {
+					Output: func(stdout, info string, t *testing.T) {
 						var dc []dockercompat.Network
 						err := json.Unmarshal([]byte(stdout), &dc)
 						assert.NilError(t, err, "Unable to unmarshal output\n"+info)
@@ -250,7 +250,7 @@ func TestNetworkInspect(t *testing.T) {
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 				return &test.Expected{
 					ExitCode: 0,
-					Output: func(stdout string, info string, t *testing.T) {
+					Output: func(stdout, info string, t *testing.T) {
 						var dc []dockercompat.Network
 
 						err := json.Unmarshal([]byte(stdout), &dc)
@@ -283,7 +283,7 @@ func TestNetworkInspect(t *testing.T) {
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 				return &test.Expected{
 					ExitCode: 0,
-					Output: func(stdout string, info string, t *testing.T) {
+					Output: func(stdout, info string, t *testing.T) {
 						cmd := helpers.Custom(nerdtest.Binary(), "--namespace", data.Identifier())
 
 						com := cmd.Clone()

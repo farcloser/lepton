@@ -104,7 +104,7 @@ CMD ["echo", "test-build-context-oci-layout"]`
 		},
 		Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 			return &test.Expected{
-				Output: func(stdout string, info string, t *testing.T) {
+				Output: func(stdout, info string, t *testing.T) {
 					assert.Assert(
 						t,
 						strings.Contains(
