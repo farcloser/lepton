@@ -33,7 +33,7 @@ import (
 )
 
 func BuildCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "build [flags] PATH",
 		Short: "Build an image from a Dockerfile. Needs buildkitd to be running.",
 		Long: `Build an image from a Dockerfile. Needs buildkitd to be running.

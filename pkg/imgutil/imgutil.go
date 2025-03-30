@@ -272,7 +272,6 @@ func PullImage(
 		Remote:      snOpt.isRemote(),
 	}
 	return res, nil
-
 }
 
 func getImageConfig(ctx context.Context, image containerd.Image) (*specs.ImageConfig, error) {
@@ -476,9 +475,7 @@ func GetUnusedImages(ctx context.Context, client *containerd.Client, filters ...
 
 // GetDanglingImages returns the list of all images which are not tagged.
 func GetDanglingImages(ctx context.Context, client *containerd.Client, filters ...Filter) ([]images.Image, error) {
-	var (
-		imageStore = client.ImageService()
-	)
+	imageStore := client.ImageService()
 
 	allImages, err := imageStore.List(ctx)
 	if err != nil {

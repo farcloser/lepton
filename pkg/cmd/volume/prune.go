@@ -77,7 +77,6 @@ func Prune(
 
 		return toRemove, nil
 	})
-
 	if err != nil {
 		return err
 	}

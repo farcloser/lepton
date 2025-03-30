@@ -29,9 +29,7 @@ const (
 	allocateEnd = 60999
 )
 
-var (
-	allocateStart = 49153
-)
+var allocateStart = 49153
 
 func filter(
 	ss []procnet.NetworkDetail,

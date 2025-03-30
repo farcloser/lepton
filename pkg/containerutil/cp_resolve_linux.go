@@ -198,7 +198,6 @@ func getPathSpecFromContainer(
 		path = strings.TrimSuffix(path, string(os.PathSeparator)+base)
 
 		resolvedContainerPath, err = pathResolver.resolvePath(path)
-
 		// Error? That is the end
 		if err != nil {
 			if errors.Is(err, os.ErrNotExist) {

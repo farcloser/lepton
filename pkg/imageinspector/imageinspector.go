@@ -35,7 +35,6 @@ func Inspect(
 	image images.Image,
 	snapshotter snapshots.Snapshotter,
 ) (*native.Image, error) {
-
 	n := &native.Image{}
 
 	img := containerd.NewImage(client, image)

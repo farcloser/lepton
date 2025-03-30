@@ -68,7 +68,7 @@ func Crypt(
 	globalOptions *options.Global,
 	opts options.ImageCrypt,
 ) error {
-	var convertOpts = []converter.Opt{}
+	convertOpts := []converter.Opt{}
 	if opts.SourceRef == "" || opts.DestinationRef == "" {
 		return errors.New("src and target image need to be specified")
 	}

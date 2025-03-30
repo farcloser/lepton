@@ -34,7 +34,7 @@ import (
 )
 
 func PsCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:           "ps",
 		Args:          cobra.NoArgs,
 		Short:         "List containers",
@@ -233,7 +233,6 @@ func formatAndPrintContainerInfo(containers []container.ListItem, options Format
 				return err
 			}
 		}
-
 	}
 	if f, ok := w.(formatter.Flusher); ok {
 		return f.Flush()

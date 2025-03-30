@@ -63,7 +63,6 @@ func (c *ncio) Wait() {
 }
 
 func (c *ncio) Close() error {
-
 	var lastErr error
 
 	if c.cmd != nil && c.cmd.Process != nil {

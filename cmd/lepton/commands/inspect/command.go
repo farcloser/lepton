@@ -36,7 +36,7 @@ import (
 )
 
 func Command() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:               "inspect",
 		Short:             "Return low-level information on objects.",
 		Args:              cobra.MinimumNArgs(1),

@@ -33,7 +33,6 @@ func TestDedupeStrSlice(t *testing.T) {
 	assert.DeepEqual(t,
 		[]string{"apple", "banana", "chocolate"},
 		strutil.DedupeStrSlice([]string{"apple", "apple", "banana", "chocolate", "apple"}))
-
 }
 
 func TestSliceToSet(t *testing.T) {
@@ -44,7 +43,6 @@ func TestSliceToSet(t *testing.T) {
 	assert.DeepEqual(t,
 		map[string]bool{"apple": true, "banana": true, "chocolate": true},
 		strutil.SliceToSet([]string{"apple", "apple", "banana", "chocolate", "apple"}))
-
 }
 
 func TestReverseStrSlice(t *testing.T) {
@@ -54,8 +52,8 @@ func TestReverseStrSlice(t *testing.T) {
 }
 
 func TestParseBoolOrAuto(t *testing.T) {
-	var xtrue = true
-	var xfalse = false
+	xtrue := true
+	xfalse := false
 
 	type args struct {
 		s string

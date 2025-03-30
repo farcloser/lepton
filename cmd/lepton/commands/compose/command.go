@@ -24,7 +24,7 @@ import (
 )
 
 func Command() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:              "compose [flags] COMMAND",
 		Short:            "Compose",
 		RunE:             helpers.UnknownSubcommandAction,

@@ -28,7 +28,7 @@ import (
 )
 
 func configCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:           "config",
 		Short:         "Validate and view the Compose file",
 		RunE:          configAction,

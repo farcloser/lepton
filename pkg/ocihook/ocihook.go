@@ -49,18 +49,16 @@ import (
 	"go.farcloser.world/lepton/pkg/version"
 )
 
-var (
-	// NetworkNamespace is the network namespace path to be passed to the CNI plugins.
-	// When this annotation is set from the runtime spec.State payload, it takes
-	// precedence over the PID based resolution (/proc/<pid>/ns/net) where pid is
-	// spec.State.Pid.
-	// This is mostly used for VM based runtime, where the spec.State PID does not
-	// necessarily live in the created container networking namespace.
-	//
-	// On Windows, this label will contain the UUID of a namespace managed by
-	// the Host Compute Network Service (HCN) API.
-	NetworkNamespace = labels.Prefix + "network-namespace"
-)
+// NetworkNamespace is the network namespace path to be passed to the CNI plugins.
+// When this annotation is set from the runtime spec.State payload, it takes
+// precedence over the PID based resolution (/proc/<pid>/ns/net) where pid is
+// spec.State.Pid.
+// This is mostly used for VM based runtime, where the spec.State PID does not
+// necessarily live in the created container networking namespace.
+//
+// On Windows, this label will contain the UUID of a namespace managed by
+// the Host Compute Network Service (HCN) API.
+var NetworkNamespace = labels.Prefix + "network-namespace"
 
 func Run(stdin io.Reader, stderr io.Writer, event, dataStore, cniPath, cniNetconfPath, bridgeIP string) error {
 	if stdin == nil || event == "" || dataStore == "" || cniPath == "" || cniNetconfPath == "" {

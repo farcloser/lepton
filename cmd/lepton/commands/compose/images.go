@@ -39,7 +39,7 @@ import (
 )
 
 func imagesCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:           "images [flags] [SERVICE...]",
 		Short:         "List images used by created containers in services",
 		RunE:          imagesAction,

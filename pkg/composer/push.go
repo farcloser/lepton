@@ -27,8 +27,7 @@ import (
 	"go.farcloser.world/lepton/pkg/composer/serviceparser"
 )
 
-type PushOptions struct {
-}
+type PushOptions struct{}
 
 func (c *Composer) Push(ctx context.Context, po PushOptions, services []string) error {
 	return c.project.ForEachService(services, func(name string, svc *types.ServiceConfig) error {

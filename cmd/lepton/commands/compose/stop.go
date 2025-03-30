@@ -26,7 +26,7 @@ import (
 )
 
 func stopCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:           "stop [flags] [SERVICE...]",
 		Short:         "Stop running containers without removing them.",
 		RunE:          stopAction,

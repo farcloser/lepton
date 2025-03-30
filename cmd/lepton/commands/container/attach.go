@@ -44,7 +44,7 @@ Caveats:
 - Until dual logging (issue #1946) is implemented,
   a container that is spun up by either 'nerdctl run -d' or 'nerdctl start' (without '--attach') cannot be attached to.`
 
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:               "attach [flags] CONTAINER",
 		Args:              cobra.ExactArgs(1),
 		Short:             shortHelp,

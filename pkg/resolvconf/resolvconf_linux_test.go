@@ -41,7 +41,8 @@ func TestGet(t *testing.T) {
 }
 
 func TestGetNameservers(t *testing.T) {
-	for resolv, result := range map[string][]string{`
+	for resolv, result := range map[string][]string{
+		`
 nameserver 1.2.3.4
 nameserver 40.3.200.10
 search example.com`: {"1.2.3.4", "40.3.200.10"},
@@ -65,7 +66,8 @@ nameserver 1.2.3.4 # not 4.3.2.1`: {"1.2.3.4"},
 }
 
 func TestGetNameserversAsCIDR(t *testing.T) {
-	for resolv, result := range map[string][]string{`
+	for resolv, result := range map[string][]string{
+		`
 nameserver 1.2.3.4
 nameserver 40.3.200.10
 search example.com`: {"1.2.3.4/32", "40.3.200.10/32"},

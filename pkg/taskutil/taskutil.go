@@ -52,7 +52,6 @@ func NewTask(
 	logURI, detachKeys, namespace string,
 	detachC chan<- struct{},
 ) (containerd.Task, error) {
-
 	var t containerd.Task
 	closer := func() {
 		if detachC != nil {

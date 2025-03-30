@@ -42,7 +42,7 @@ Using 'nerdctl cp' with untrusted or malicious containers is unsupported and may
 
 	usage := `cp [flags] CONTAINER:SRC_PATH DEST_PATH|-
   nerdctl cp [flags] SRC_PATH|- CONTAINER:DEST_PATH`
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:               usage,
 		Args:              helpers.IsExactArgs(2),
 		Short:             "Copy files/folders between a running container and the local filesystem.",

@@ -28,11 +28,9 @@ import (
 	"errors"
 )
 
-var (
-	// ErrLockFailure may be returned by ReadLock, WriteLock, or Unlock, when the underlying locking mechanism fails.
-	// In the case of the filesystem implementation, inability to lock the directory will return it.
-	ErrLockFailure = errors.New("lock failure")
-)
+// ErrLockFailure may be returned by ReadLock, WriteLock, or Unlock, when the underlying locking mechanism fails.
+// In the case of the filesystem implementation, inability to lock the directory will return it.
+var ErrLockFailure = errors.New("lock failure")
 
 // Store represents a store that is able to grant an exclusive lock (ensuring concurrency safety,
 // both between go routines and across multiple binaries invocations), and is performing atomic operations.

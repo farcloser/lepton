@@ -33,7 +33,7 @@ import (
 func copyCommand() *cobra.Command {
 	usage := fmt.Sprintf(`cp [OPTIONS] SERVICE:SRC_PATH DEST_PATH|-
        %s compose cp [OPTIONS] SRC_PATH|- SERVICE:DEST_PATH`, version.RootName)
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:           usage,
 		Short:         "Copy files/folders between a service container and the local filesystem",
 		Args:          cobra.ExactArgs(2),
@@ -105,5 +105,4 @@ func copyAction(cmd *cobra.Command, args []string) error {
 		DryRun:      dryRun,
 	}
 	return c.Copy(ctx, co)
-
 }

@@ -35,8 +35,7 @@ import (
 	"go.farcloser.world/lepton/pkg/rootlessutil"
 )
 
-type cniNetworkManagerPlatform struct {
-}
+type cniNetworkManagerPlatform struct{}
 
 // VerifyNetworkOptions checks that the internal network settings are correct.
 func (m *cniNetworkManager) VerifyNetworkOptions(_ context.Context) error {

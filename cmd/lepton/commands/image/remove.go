@@ -27,7 +27,7 @@ import (
 )
 
 func RemoveCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:               "rmi [flags] IMAGE [IMAGE, ...]",
 		Short:             "Remove one or more images",
 		Args:              cobra.MinimumNArgs(1),

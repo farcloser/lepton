@@ -28,7 +28,7 @@ import (
 )
 
 func inspectCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:               "inspect [flags] IMAGE [IMAGE...]",
 		Args:              cobra.MinimumNArgs(1),
 		Short:             "Display detailed information on one or more images.",

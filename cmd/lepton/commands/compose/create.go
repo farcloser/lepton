@@ -28,7 +28,7 @@ import (
 )
 
 func createCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:           "create [flags] [SERVICE...]",
 		Short:         "Creates containers for one or more services",
 		RunE:          createAction,

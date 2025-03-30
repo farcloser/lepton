@@ -64,7 +64,6 @@ func RootlessContainredSockAddress() (string, error) {
 		return "", err
 	}
 	childPid, err := rootlesskit.ChildPid(stateDir)
-
 	if err != nil {
 		return "", err
 	}

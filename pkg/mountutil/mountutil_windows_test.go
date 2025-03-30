@@ -221,7 +221,8 @@ func TestProcessFlagV(t *testing.T) {
 					Destination: `C:\TestVolume\Path`,
 					Source:      `C:\TestVolume\Path`,
 					Options:     []string{"ro", "rbind"},
-				}},
+				},
+			},
 		},
 		// Bind volumes: relative path
 		{
@@ -233,7 +234,8 @@ func TestProcessFlagV(t *testing.T) {
 					Source:      "", // will not check source of relative paths
 					Destination: `C:\TestVolume\Path`,
 					Options:     []string{"rbind"},
-				}},
+				},
+			},
 		},
 		// Named volumes
 		{
@@ -246,7 +248,8 @@ func TestProcessFlagV(t *testing.T) {
 					Source:      "", // source of anonymous volume is a generated path, so here will not check it.
 					Destination: `C:\TestVolume\Path`,
 					Options:     []string{"rbind"},
-				}},
+				},
+			},
 		},
 		// Named pipes
 		{
@@ -258,7 +261,8 @@ func TestProcessFlagV(t *testing.T) {
 					Source:      `\\.\pipe\containerd-containerd`,
 					Destination: `\\.\pipe\containerd-containerd`,
 					Options:     []string{"rbind"},
-				}},
+				},
+			},
 		},
 		{
 			rawSpec: `\\.\pipe\containerd-containerd:C:\TestVolume\Path`,
@@ -307,7 +311,8 @@ func TestProcessFlagVAnonymousVolumes(t *testing.T) {
 					Type:        "",
 					Source:      "", // source of anonymous volume is a generated path, so here will not check it.
 					Destination: `C:\TestVolume\Path`,
-				}},
+				},
+			},
 		},
 		{
 			rawSpec: `.\TestVolume\Path`,

@@ -27,7 +27,7 @@ import (
 )
 
 func InfoCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:           "info",
 		Args:          cobra.NoArgs,
 		Short:         "Display information about the system",

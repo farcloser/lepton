@@ -26,7 +26,7 @@ import (
 )
 
 func buildCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:           "build [flags] [SERVICE...]",
 		Short:         "Build or rebuild services",
 		RunE:          buildAction,

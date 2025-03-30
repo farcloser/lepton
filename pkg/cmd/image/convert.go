@@ -49,9 +49,7 @@ func Convert(
 	globalOptions *options.Global,
 	opts *options.ImageConvert,
 ) error {
-	var (
-		convertOpts = []converter.Opt{}
-	)
+	convertOpts := []converter.Opt{}
 	if opts.SourceRef == "" || opts.DestinationRef == "" {
 		return errors.New("src and target image need to be specified")
 	}
@@ -146,7 +144,6 @@ func getZstdConverter(options *options.ImageConvert) (converter.ConvertFunc, err
 }
 
 func getZstdchunkedConverter(globalOptions *options.Global, opts *options.ImageConvert) (converter.ConvertFunc, error) {
-
 	esgzOpts := []estargz.Option{
 		estargz.WithChunkSize(opts.ZstdChunkedChunkSize),
 	}

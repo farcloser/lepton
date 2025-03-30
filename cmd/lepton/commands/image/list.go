@@ -42,7 +42,7 @@ Properties:
 - SIZE:       Size of the unpacked snapshots
 - BLOB SIZE:  Size of the blobs (such as layer tarballs) in the content store
 `
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:                   "images [flags] [REPOSITORY[:TAG]]",
 		Short:                 "List images",
 		Long:                  longHelp,
@@ -129,7 +129,6 @@ func listOptions(cmd *cobra.Command, args []string) (*options.ImageList, error) 
 		All:              true,
 		Stdout:           cmd.OutOrStdout(),
 	}, nil
-
 }
 
 func imagesAction(cmd *cobra.Command, args []string) error {

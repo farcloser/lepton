@@ -170,5 +170,4 @@ func checkSociSnapshotterAnnotataions(t *testing.T, a map[string]string) {
 	assert.Equal(t, ok, true)
 	_, ok = a["containerd.io/snapshot/remote/soci.index.digest"]
 	assert.Equal(t, ok, true)
-
 }

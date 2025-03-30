@@ -28,9 +28,7 @@ import (
 	"go.farcloser.world/lepton/leptonic/errs"
 )
 
-var (
-	ErrUnknownOCIArchitecture = errors.New("unknown OCI architecture")
-)
+var ErrUnknownOCIArchitecture = errors.New("unknown OCI architecture")
 
 func CanExecProbably(pp ...specs.Platform) (bool, error) {
 	for _, p := range pp {

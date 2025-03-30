@@ -334,7 +334,6 @@ services:
 
 	t.Logf("qux: %+v", qux)
 	assert.Assert(t, len(qux.Containers) == 0)
-
 }
 
 func TestParseDevices(t *testing.T) {
@@ -479,7 +478,6 @@ services:
 		assert.Assert(t, in(c.RunArgs, "--net=container:nginx"))
 		assert.Assert(t, !in(c.RunArgs, "--hostname=bar"))
 	}
-
 }
 
 func TestParseConfigs(t *testing.T) {

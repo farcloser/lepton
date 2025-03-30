@@ -70,7 +70,7 @@ func ListCommandHandler(ctx context.Context, client *containerd.Client, options 
 // while the remaining filters are only applied after getting images from containerd,
 // which means that having nameAndRefFilter may speed up the process if there are a lot of images in containerd.
 func List(ctx context.Context, client *containerd.Client, filters, nameAndRefFilter []string) ([]images.Image, error) {
-	var imageStore = client.ImageService()
+	imageStore := client.ImageService()
 	imageList, err := imageStore.List(ctx, nameAndRefFilter...)
 	if err != nil {
 		return nil, err

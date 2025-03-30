@@ -41,7 +41,7 @@ import (
 )
 
 func psCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:           "ps [flags] [SERVICE...]",
 		Short:         "List containers of services",
 		RunE:          psAction,

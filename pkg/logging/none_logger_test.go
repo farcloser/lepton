@@ -70,6 +70,5 @@ func TestNoneLogger(t *testing.T) {
 		assert.NilError(t, err, "Failed to read temp dir after operations")
 
 		assert.Equal(t, len(afterFiles), len(initialFiles), "Expected no new files, but directory content changed")
-
 	})
 }

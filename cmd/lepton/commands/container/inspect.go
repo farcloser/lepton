@@ -30,7 +30,7 @@ import (
 )
 
 func inspectCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:               "inspect [flags] CONTAINER [CONTAINER, ...]",
 		Short:             "Display detailed information on one or more containers.",
 		Long:              "Hint: set `--mode=native` for showing the full output",

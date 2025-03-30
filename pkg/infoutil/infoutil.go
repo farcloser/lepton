@@ -109,7 +109,7 @@ func Info(
 		return nil, errors.Join(ErrUnableToRetrieveHostname, err)
 	}
 
-	var info = &dockercompat.Info{
+	info := &dockercompat.Info{
 		ID:   server.UUID,
 		Name: hostname,
 		// Storage drivers and logging drivers are not really Server concept here, but mimics `docker info` output
@@ -262,7 +262,7 @@ func runcVersion() dockercompat.ComponentVersion {
 }
 
 func parseRuncVersion(runcVersionStdout []byte) (*dockercompat.ComponentVersion, error) {
-	var versionList = strings.Split(strings.TrimSpace(string(runcVersionStdout)), "\n")
+	versionList := strings.Split(strings.TrimSpace(string(runcVersionStdout)), "\n")
 	firstLine := strings.Fields(versionList[0])
 	if len(firstLine) != 3 || firstLine[0] != "runc" {
 		return nil, fmt.Errorf("unable to determine runc version, got: %s", string(runcVersionStdout))

@@ -375,7 +375,7 @@ func (vs *fileStore) GroupSize(key ...string) (int64, error) {
 	}
 
 	var size int64
-	var walkFn = func(_ string, info os.FileInfo, err error) error {
+	walkFn := func(_ string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}

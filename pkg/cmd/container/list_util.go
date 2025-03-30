@@ -76,10 +76,14 @@ func (cl *containerFilterContext) foldFilters(ctx context.Context, filters []str
 		filterType string
 		foldFunc   func(context.Context, string, string) error
 	}{
-		{"id", cl.foldIDFilter}, {"name", cl.foldNameFilter},
-		{"before", cl.foldBeforeFilter}, {"since", cl.foldSinceFilter},
-		{"network", cl.foldNetworkFilter}, {"label", cl.foldLabelFilter},
-		{"volume", cl.foldVolumeFilter}, {"status", cl.foldStatusFilter},
+		{"id", cl.foldIDFilter},
+		{"name", cl.foldNameFilter},
+		{"before", cl.foldBeforeFilter},
+		{"since", cl.foldSinceFilter},
+		{"network", cl.foldNetworkFilter},
+		{"label", cl.foldLabelFilter},
+		{"volume", cl.foldVolumeFilter},
+		{"status", cl.foldStatusFilter},
 		{"exited", cl.foldExitedFilter},
 	}
 	for _, filter := range filters {

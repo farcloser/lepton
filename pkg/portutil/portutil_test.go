@@ -162,7 +162,6 @@ func TestTestParseFlagPWithPlatformSpec(t *testing.T) {
 			}
 		})
 	}
-
 }
 
 func TestParsePortsLabel(t *testing.T) {

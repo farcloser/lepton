@@ -46,10 +46,8 @@ const (
 	Tag     = "tag"
 )
 
-var (
-	// MagicArgv1 is the magic argv1 for the containerd runtime v2 logging plugin mode.
-	MagicArgv1 = fmt.Sprintf("_%s_INTERNAL_LOGGING", version.EnvPrefix)
-)
+// MagicArgv1 is the magic argv1 for the containerd runtime v2 logging plugin mode.
+var MagicArgv1 = fmt.Sprintf("_%s_INTERNAL_LOGGING", version.EnvPrefix)
 
 type Driver interface {
 	Init(dataStore, ns, id string) error
@@ -58,11 +56,15 @@ type Driver interface {
 	PostProcess() error
 }
 
-type DriverFactory func(map[string]string, string) (Driver, error)
-type LogOptsValidateFunc func(logOptMap map[string]string) error
+type (
+	DriverFactory       func(map[string]string, string) (Driver, error)
+	LogOptsValidateFunc func(logOptMap map[string]string) error
+)
 
-var drivers = make(map[string]DriverFactory)
-var driversLogOptsValidateFunctions = make(map[string]LogOptsValidateFunc)
+var (
+	drivers                         = make(map[string]DriverFactory)
+	driversLogOptsValidateFunctions = make(map[string]LogOptsValidateFunc)
+)
 
 func ValidateLogOpts(logDriver string, logOpts map[string]string) error {
 	if value, ok := driversLogOptsValidateFunctions[logDriver]; ok && value != nil {

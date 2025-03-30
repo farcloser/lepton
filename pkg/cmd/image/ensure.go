@@ -109,7 +109,6 @@ func ensureOne(
 		}
 
 		err = fetch.Fetch(ctx, client, rawRef, config)
-
 		if err != nil {
 			// In some circumstance (e.g. people just use 80 port to support pure http), the error will contain message
 			// like "dial tcp <port>: connection refused".

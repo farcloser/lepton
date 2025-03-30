@@ -44,7 +44,7 @@ import (
 )
 
 func HistoryCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:               "history [flags] IMAGE",
 		Short:             "Show the history of an image",
 		Args:              helpers.IsExactArgs(1),

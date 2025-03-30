@@ -27,7 +27,7 @@ import (
 )
 
 func EventsCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:           "events",
 		Args:          cobra.NoArgs,
 		Short:         "Get real time events from the server",

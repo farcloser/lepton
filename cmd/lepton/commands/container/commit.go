@@ -27,7 +27,7 @@ import (
 )
 
 func CommitCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:               "commit [flags] CONTAINER REPOSITORY[:TAG]",
 		Short:             "Create a new image from a container's changes",
 		Args:              helpers.IsExactArgs(2),
@@ -80,7 +80,6 @@ func commitOptions(cmd *cobra.Command, _ []string) (options.ContainerCommit, err
 		Pause:    pause,
 		Change:   change,
 	}, nil
-
 }
 
 func commitAction(cmd *cobra.Command, args []string) error {

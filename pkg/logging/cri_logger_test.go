@@ -90,7 +90,6 @@ func TestReadLogs(t *testing.T) {
 			stdoutBuf := bytes.NewBuffer(nil)
 			stderrBuf := bytes.NewBuffer(nil)
 			err = ReadLogs(&tc.logViewOptions, stdoutBuf, stderrBuf, stopChan)
-
 			if err != nil {
 				t.Fatal(err.Error())
 			}
@@ -106,7 +105,6 @@ func TestReadLogs(t *testing.T) {
 
 func TestParseLog(t *testing.T) {
 	timestamp, err := time.Parse(time.RFC3339Nano, "2016-10-20T18:39:20.57606443Z")
-
 	if err != nil {
 		t.Fatalf("Parse Time err %s", err.Error())
 	}

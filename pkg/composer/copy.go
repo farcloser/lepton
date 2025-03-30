@@ -152,7 +152,6 @@ func (c *Composer) listContainersTargetedForCopy(
 	}
 	if direction == fromService {
 		return containers[:1], err
-
 	}
 	return containers, err
 }

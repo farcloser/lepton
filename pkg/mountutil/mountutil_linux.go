@@ -313,7 +313,7 @@ func ProcessFlagMount(s string, volStore volumestore.VolumeService) (*Processed,
 
 	// set default values
 	mountType = Volume
-	tmpfsMode = os.FileMode(01777)
+	tmpfsMode = os.FileMode(0o1777)
 
 	// three types of mount(and examples):
 	// --mount type=bind,source="$(pwd)"/target,target=/app2,readonly,bind-propagation=shared

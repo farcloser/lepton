@@ -27,7 +27,6 @@ import (
 )
 
 func TestGuessFirewallPluginVersion(t *testing.T) {
-
 	type testCase struct {
 		stderr   string
 		expected string

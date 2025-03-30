@@ -36,7 +36,6 @@ import (
 //
 // ContainerTopOKBody OK response to ContainerTop operation
 type ContainerTopOKBody struct {
-
 	// Each process running in the container, where each is process
 	// is an array of values corresponding to the titles.
 	//

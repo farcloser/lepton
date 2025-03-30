@@ -35,7 +35,7 @@ import (
 )
 
 func newVersionCommand() *cobra.Command {
-	var versionCommand = &cobra.Command{
+	versionCommand := &cobra.Command{
 		Use:           "version",
 		Args:          cobra.NoArgs,
 		Short:         "Show version information",

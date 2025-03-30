@@ -29,7 +29,7 @@ import (
 )
 
 func PullCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:           "pull [flags] NAME[:TAG]",
 		Short:         "Pull an image from a registry.",
 		Args:          helpers.IsExactArgs(1),

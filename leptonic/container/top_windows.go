@@ -72,7 +72,8 @@ func containerTop(ctx context.Context, stdio io.Writer, client *containerd.Clien
 				int(d.Seconds())%60,
 				int(d.Nanoseconds()/1000000)%1000,
 			),
-			units.HumanSize(float64(info.MemoryWorkingSetPrivateBytes))})
+			units.HumanSize(float64(info.MemoryWorkingSetPrivateBytes)),
+		})
 
 	}
 

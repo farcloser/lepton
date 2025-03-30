@@ -31,7 +31,7 @@ import (
 )
 
 func execCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:           "exec [flags] SERVICE COMMAND [ARGS...]",
 		Short:         "Execute a command in a running container of the service",
 		Args:          cobra.MinimumNArgs(2),

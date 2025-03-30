@@ -58,7 +58,7 @@ type updateResourceOptions struct {
 }
 
 func UpdateCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:               "update [flags] CONTAINER [CONTAINER, ...]",
 		Args:              cobra.MinimumNArgs(1),
 		Short:             "Update one or more running containers",

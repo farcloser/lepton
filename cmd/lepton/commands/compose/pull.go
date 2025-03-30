@@ -26,7 +26,7 @@ import (
 )
 
 func pullCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:           "pull [flags] [SERVICE...]",
 		Short:         "Pull service images",
 		RunE:          pullAction,

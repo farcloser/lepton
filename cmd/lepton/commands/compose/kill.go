@@ -26,7 +26,7 @@ import (
 )
 
 func killCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:           "kill [flags] [SERVICE...]",
 		Short:         "Force stop service containers",
 		RunE:          killAction,

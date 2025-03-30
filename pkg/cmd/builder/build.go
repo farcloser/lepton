@@ -229,8 +229,8 @@ func generateBuildctlArgs(
 	globalOptions *options.Global,
 	opts *options.BuilderBuild,
 ) (buildCtlBinary string,
-	buildctlArgs []string, needsLoading bool, metaFile string, tags []string, cleanup func(), err error) {
-
+	buildctlArgs []string, needsLoading bool, metaFile string, tags []string, cleanup func(), err error,
+) {
 	buildctlBinary, err := buildkit.BuildctlBinary()
 	if err != nil {
 		return "", nil, false, "", nil, nil, err

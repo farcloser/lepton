@@ -55,7 +55,7 @@ func RunCommand() *cobra.Command {
 		longHelp += "WARNING: `run` is experimental on Windows and currently broken (https://github.com/containerd/nerdctl/issues/28)"
 	}
 
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:               "run [flags] IMAGE [COMMAND] [ARG...]",
 		Args:              cobra.MinimumNArgs(1),
 		Short:             "Run a command in a new container.",
@@ -75,7 +75,6 @@ func RunCommand() *cobra.Command {
 }
 
 func setCreateFlags(cmd *cobra.Command) {
-
 	// No "-h" alias for "--help", because "-h" for "--hostname".
 	cmd.Flags().Bool("help", false, "show help")
 
@@ -219,7 +218,8 @@ func setCreateFlags(cmd *cobra.Command) {
 				"apparmor=", "apparmor=" + defaults.AppArmorProfileName, "apparmor=unconfined",
 				"no-new-privileges",
 				"systempaths=unconfined",
-				"privileged-without-host-devices"}, cobra.ShellCompDirectiveNoFileComp
+				"privileged-without-host-devices",
+			}, cobra.ShellCompDirectiveNoFileComp
 		},
 	)
 	// cap-add and cap-drop are defined as StringSlice, not StringArray, to allow specifying
@@ -354,7 +354,6 @@ func setCreateFlags(cmd *cobra.Command) {
 			return []string{"default"}, cobra.ShellCompDirectiveNoFileComp
 		},
 	)
-
 }
 
 func runOptions(cmd *cobra.Command, args []string) (*options.ContainerCreate, error) {

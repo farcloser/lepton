@@ -30,7 +30,7 @@ import (
 )
 
 func ExecCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:               "exec [flags] CONTAINER COMMAND [ARG...]",
 		Args:              cobra.MinimumNArgs(2),
 		Short:             "Run a command in a running container",

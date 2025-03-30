@@ -189,7 +189,6 @@ func TestListProcessContainerWideMode(t *testing.T) {
 
 	// hope there are no tests running parallel
 	base.Cmd("ps", "-n", "1", "--format", formatter.FormatWide).AssertOutWithFunc(func(stdout string) error {
-
 		// An example of ps --format wide
 		// CONTAINER ID    IMAGE                               PLATFORM       COMMAND    CREATED              STATUS
 		// PORTS    NAMES            RUNTIME                  SIZE 17181f208b61    docker.io/library/busybox:latest
@@ -230,7 +229,6 @@ func TestListProcessContainerWithLabels(t *testing.T) {
 
 	// hope there are no tests running parallel
 	base.Cmd("ps", "-n", "1", "--format", "{{.Labels}}").AssertOutWithFunc(func(stdout string) error {
-
 		// An example of ps --format "{{.Labels}}"
 		// key1=value1,key2=value2,key3=value3
 		lines := strings.Split(strings.TrimSpace(stdout), "\n")

@@ -31,7 +31,7 @@ import (
 )
 
 func upCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:           "up [flags] [SERVICE...]",
 		Short:         "Create and start containers",
 		RunE:          upAction,

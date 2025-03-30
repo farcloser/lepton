@@ -102,7 +102,7 @@ func Stats(
 	closeChan := make(chan error)
 
 	var err error
-	var w = options.Stdout
+	w := options.Stdout
 	var tmpl *template.Template
 	switch options.Format {
 	case formatter.FormatNone, formatter.FormatTable:
@@ -135,7 +135,6 @@ func Stats(
 				return
 			}
 		}
-
 	}
 
 	// getContainerList get all existing containers (only used when calling `stats` without arguments).
@@ -256,7 +255,7 @@ func Stats(
 
 	// firstTick is for creating distant CPU readings.
 	// firstTick stats are not displayed.
-	var firstTick = true
+	firstTick := true
 	for range ticker.C {
 		cleanScreen()
 		ccstats := []stats2.Entry{}

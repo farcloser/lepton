@@ -224,8 +224,8 @@ func generateBuildctlArgs(
 	globalOptions *options.Global,
 	opts *options.BuilderBuild,
 ) (
-	buildctlArgs []string, needsLoading bool, metaFile string, tags []string, cleanup func(), err error) {
-
+	buildctlArgs []string, needsLoading bool, metaFile string, tags []string, cleanup func(), err error,
+) {
 	output := opts.Output
 	if output == "" {
 		info, err := cli.Server(ctx)

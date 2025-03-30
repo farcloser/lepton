@@ -34,9 +34,7 @@ func TestTabReader(t *testing.T) {
 	err := reader.ParseHeader(tabRows[0])
 	assert.NilError(t, err)
 
-	var (
-		value string
-	)
+	var value string
 	value, _ = reader.ReadRow(tabRows[1], "a")
 	assert.Equal(t, value, "1")
 

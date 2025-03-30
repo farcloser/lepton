@@ -46,9 +46,7 @@ const (
 	Default = namespaces.Default
 )
 
-var (
-	ErrServiceNamespace = errors.New("namespace error")
-)
+var ErrServiceNamespace = errors.New("namespace error")
 
 // FIXME will probably have to share this across
 func validate(name string) error {

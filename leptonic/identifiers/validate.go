@@ -37,9 +37,7 @@ const (
 	separators = `[._-]`
 )
 
-var (
-	identifierRe = regexp.MustCompile(reAnchor(alphanum + reGroup(separators+reGroup(alphanum)) + "*"))
-)
+var identifierRe = regexp.MustCompile(reAnchor(alphanum + reGroup(separators+reGroup(alphanum)) + "*"))
 
 func Validate(s string) error {
 	if len(s) == 0 {

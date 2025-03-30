@@ -23,7 +23,7 @@ import (
 )
 
 func Command() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Annotations:   map[string]string{helpers.Category: helpers.Management},
 		Use:           "registry",
 		Short:         "Manage registry credentials",

@@ -30,7 +30,7 @@ import (
 )
 
 func debugCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:           "debug",
 		Short:         "Debug Dockerfile",
 		PreRunE:       helpers.RequireExperimental("`builder debug`"),

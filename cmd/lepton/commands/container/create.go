@@ -38,7 +38,7 @@ func CreateCommand() *cobra.Command {
 		longHelp += "WARNING: `create` is experimental on Windows and currently broken (https://github.com/containerd/nerdctl/issues/28)"
 	}
 
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:               "create [flags] IMAGE [COMMAND] [ARG...]",
 		Args:              cobra.MinimumNArgs(1),
 		Short:             "Create a new container.",

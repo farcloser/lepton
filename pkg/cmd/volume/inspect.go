@@ -37,7 +37,7 @@ func Inspect(ctx context.Context, output io.Writer, globalOptions *options.Globa
 	warns := []error{}
 
 	for _, name := range opts.NamesList {
-		var vol, err = volStore.Get(name, opts.Size)
+		vol, err := volStore.Get(name, opts.Size)
 		if err != nil {
 			warns = append(warns, err)
 			continue

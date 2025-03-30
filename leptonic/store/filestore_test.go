@@ -180,7 +180,6 @@ func TestFileStoreGroups(t *testing.T) {
 	doesExist, err = tempStore.Exists("group", "subgroup")
 	assert.NilError(t, err, "exist should not error")
 	assert.Assert(t, !doesExist, "should not exist")
-
 }
 
 func TestFileStoreConcurrent(t *testing.T) {

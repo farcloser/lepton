@@ -298,8 +298,7 @@ type ContainerPause struct {
 }
 
 // ContainerPrune specifies options for `(container) prune`.
-type ContainerPrune struct {
-}
+type ContainerPrune struct{}
 
 // ContainerUnpauseOptions specifies options for `(container) unpause`.
 type ContainerUnpauseOptions ContainerPause

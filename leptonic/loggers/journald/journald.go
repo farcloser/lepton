@@ -103,7 +103,7 @@ func ReadLogs(lvopts LogViewOptions, stdout, stderr io.Writer, stopChannel chan 
 	}
 
 	shortID := lvopts.ID[:12]
-	var journalctlArgs = []string{"SYSLOG_IDENTIFIER=" + shortID, "--output=cat"}
+	journalctlArgs := []string{"SYSLOG_IDENTIFIER=" + shortID, "--output=cat"}
 	if lvopts.Follow {
 		journalctlArgs = append(journalctlArgs, "-f")
 	}

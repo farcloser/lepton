@@ -53,9 +53,7 @@ import (
 	"go.farcloser.world/lepton/pkg/version"
 )
 
-var (
-	Bold = color.New(color.Bold).SprintfFunc()
-)
+var Bold = color.New(color.Bold).SprintfFunc()
 
 // usage was derived from https://github.com/spf13/cobra/blob/v1.2.1/command.go#L491-L514
 func usage(c *cobra.Command) error {
@@ -279,7 +277,6 @@ func initRootCmdFlags(rootCmd *cobra.Command, tomlPath string) (*pflag.FlagSet, 
 }
 
 func newApp() (*cobra.Command, error) {
-
 	tomlPath := ncdefaults.CliTOML()
 	if v, ok := os.LookupEnv(version.EnvPrefix + "_TOML"); ok {
 		tomlPath = v
@@ -290,7 +287,7 @@ func newApp() (*cobra.Command, error) {
 
 Config file ($%s_TOML): %s
 `, short, version.EnvPrefix, tomlPath)
-	var rootCmd = &cobra.Command{
+	rootCmd := &cobra.Command{
 		Use:              version.RootName,
 		Short:            short,
 		Long:             long,

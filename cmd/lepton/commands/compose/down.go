@@ -26,7 +26,7 @@ import (
 )
 
 func downCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:           "down",
 		Short:         "Remove containers and associated resources",
 		Args:          cobra.NoArgs,

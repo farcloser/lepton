@@ -21,7 +21,7 @@ import (
 )
 
 func Command() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:           "internal",
 		Short:         "DO NOT EXECUTE MANUALLY",
 		Hidden:        true,

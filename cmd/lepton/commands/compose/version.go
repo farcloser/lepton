@@ -27,7 +27,7 @@ import (
 )
 
 func versionCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:           "version",
 		Short:         "Show the Compose version information",
 		Args:          cobra.NoArgs,

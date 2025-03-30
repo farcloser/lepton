@@ -32,9 +32,7 @@ import (
 	"go.farcloser.world/lepton/leptonic/services/helpers"
 )
 
-var (
-	ErrServiceImage = errors.New("image error")
-)
+var ErrServiceImage = errors.New("image error")
 
 /*
 	Get(ctx context.Context, name string) (Image, error)
