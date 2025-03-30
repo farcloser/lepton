@@ -26,6 +26,7 @@ import (
 
 	"gotest.tools/v3/assert"
 
+	"go.farcloser.world/tigron/expect"
 	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
@@ -59,7 +60,7 @@ CMD ["echo", "test-builder-prune"]`, testutil.CommonImage)
 					helpers.Ensure("build", buildCtx)
 				},
 				Command:  test.Command("builder", "prune", "--force"),
-				Expected: test.Expects(0, nil, nil),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 			},
 			{
 				Description: "PruneForceAll",
@@ -77,7 +78,7 @@ CMD ["echo", "test-builder-prune"]`, testutil.CommonImage)
 					helpers.Ensure("build", buildCtx)
 				},
 				Command:  test.Command("builder", "prune", "--force", "--all"),
-				Expected: test.Expects(0, nil, nil),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 			},
 			{
 				Description: "Debug",
@@ -98,7 +99,7 @@ CMD ["echo", "builder-debug-test-string"]`, testutil.CommonImage)
 					cmd.Feed(bytes.NewReader([]byte("c\n")))
 					return cmd
 				},
-				Expected: test.Expects(0, nil, nil),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 			},
 			{
 				Description: "WithPull",

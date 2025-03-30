@@ -263,7 +263,7 @@ func TestCreateSuccess(t *testing.T) {
 		return helpers.Command("namespace", "create", data.Identifier())
 	}
 
-	testCase.Expected = test.Expects(0, nil, expect.Equals(""))
+	testCase.Expected = test.Expects(expect.ExitCodeSuccess, nil, expect.Equals(""))
 
 	testCase.Cleanup = func(data test.Data, helpers test.Helpers) {
 		helpers.Anyhow("namespace", "remove", data.Identifier())
@@ -326,7 +326,7 @@ func TestCreateSuccess(t *testing.T) {
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("namespace", "remove", data.Get("namespace"))
 			},
-			Expected: test.Expects(0, nil, expect.Equals("")),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Equals("")),
 		},
 		{
 			Description: "not visible in list anymore",
@@ -375,7 +375,7 @@ func TestCreateWithLabelsSuccess(t *testing.T) {
 		return helpers.Command("namespace", "create", data.Identifier())
 	}
 
-	testCase.Expected = test.Expects(0, nil, expect.Equals(""))
+	testCase.Expected = test.Expects(expect.ExitCodeSuccess, nil, expect.Equals(""))
 
 	testCase.Cleanup = func(data test.Data, helpers test.Helpers) {
 		helpers.Anyhow("namespace", "remove", data.Identifier())

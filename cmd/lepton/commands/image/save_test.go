@@ -114,7 +114,7 @@ func TestSave(t *testing.T) {
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("run", "--rm", data.Get("id"), "sh", "-euxc", "echo foo")
 			},
-			Expected: test.Expects(0, nil, expect.Equals("foo\n")),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Equals("foo\n")),
 		},
 		{
 			Description: "Image with different names, by id",
@@ -143,7 +143,7 @@ func TestSave(t *testing.T) {
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("run", "--rm", data.Get("id"), "sh", "-euxc", "echo foo")
 			},
-			Expected: test.Expects(0, nil, expect.Equals("foo\n")),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Equals("foo\n")),
 		},
 	}
 

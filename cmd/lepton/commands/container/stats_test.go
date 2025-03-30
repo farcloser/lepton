@@ -108,14 +108,14 @@ func TestStats(t *testing.T) {
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("stats", "--no-stream", data.Get("id"))
 			},
-			Expected: test.Expects(0, nil, nil),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 		},
 		{
 			Description: "container stats ID",
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("container", "stats", "--no-stream", data.Get("id"))
 			},
-			Expected: test.Expects(0, nil, nil),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 		},
 		{
 			Description: "no mem limit set",
@@ -124,14 +124,14 @@ func TestStats(t *testing.T) {
 			},
 			// https://github.com/containerd/nerdctl/issues/1240
 			// used to print UINT64_MAX as the memory limit, so, ensure it does no more
-			Expected: test.Expects(0, nil, expect.DoesNotContain("16EiB")),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.DoesNotContain("16EiB")),
 		},
 		{
 			Description: "mem limit set",
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("stats", "--no-stream")
 			},
-			Expected: test.Expects(0, nil, expect.Contains("1GiB")),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("1GiB")),
 		},
 	}
 

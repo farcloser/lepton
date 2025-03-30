@@ -197,7 +197,7 @@ func TestLogsWithForegroundContainers(t *testing.T) {
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("logs", data.Identifier())
 			},
-			Expected: test.Expects(0, nil, expect.All(
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.All(
 				expect.Contains("foo"),
 				expect.Contains("bar"),
 				expect.DoesNotContain("baz"),
@@ -223,7 +223,7 @@ func TestLogsWithForegroundContainers(t *testing.T) {
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("logs", data.Identifier())
 			},
-			Expected: test.Expects(0, nil, expect.All(
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.All(
 				expect.Contains("foo"),
 				expect.Contains("bar"),
 				expect.DoesNotContain("baz"),
@@ -251,7 +251,7 @@ func TestLogsWithForegroundContainers(t *testing.T) {
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("logs", data.Identifier())
 			},
-			Expected: test.Expects(0, nil, expect.All(
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.All(
 				expect.Contains("foo"),
 				expect.Contains("bar"),
 				expect.DoesNotContain("baz"),
@@ -280,7 +280,7 @@ func TestLogsWithForegroundContainers(t *testing.T) {
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("logs", data.Identifier())
 			},
-			Expected: test.Expects(0, nil, expect.All(
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.All(
 				expect.Contains("foo"),
 				expect.Contains("bar"),
 				expect.DoesNotContain("baz"),

@@ -20,6 +20,7 @@ import (
 	"strings"
 	"testing"
 
+	"go.farcloser.world/tigron/expect"
 	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/pkg/testutil"
@@ -62,7 +63,7 @@ func TestKubeCommitSave(t *testing.T) {
 		return helpers.Command("save", "testcommitsave")
 	}
 
-	testCase.Expected = test.Expects(0, nil, nil)
+	testCase.Expected = test.Expects(expect.ExitCodeSuccess, nil, nil)
 
 	testCase.Run(t)
 

@@ -27,6 +27,7 @@ import (
 
 	"gotest.tools/v3/assert"
 
+	"go.farcloser.world/tigron/expect"
 	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
@@ -124,7 +125,7 @@ func TestPush(t *testing.T) {
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 					return helpers.Command("push", "--insecure-registry", data.Get("testImageRef"))
 				},
-				Expected: test.Expects(0, nil, nil),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 			},
 			{
 				Description: "plain http with localhost",
@@ -143,7 +144,7 @@ func TestPush(t *testing.T) {
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 					return helpers.Command("push", data.Get("testImageRef"))
 				},
-				Expected: test.Expects(0, nil, nil),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 			},
 			{
 				Description: "plain http with insecure, default port",
@@ -167,7 +168,7 @@ func TestPush(t *testing.T) {
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 					return helpers.Command("push", "--insecure-registry", data.Get("testImageRef"))
 				},
-				Expected: test.Expects(0, nil, nil),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 			},
 			{
 				Description: "with insecure, with login",
@@ -205,7 +206,7 @@ func TestPush(t *testing.T) {
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 					return helpers.Command("push", "--insecure-registry", data.Get("testImageRef"))
 				},
-				Expected: test.Expects(0, nil, nil),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 			},
 			{
 				Description: "with hosts dir, with login",
@@ -249,7 +250,7 @@ func TestPush(t *testing.T) {
 						data.Get("testImageRef"),
 					)
 				},
-				Expected: test.Expects(0, nil, nil),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 			},
 			{
 				Description: "non distributable artifacts",
@@ -389,7 +390,7 @@ func TestPush(t *testing.T) {
 						data.Get("testImageRef"),
 					)
 				},
-				Expected: test.Expects(0, nil, nil),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 			},
 		},
 	}

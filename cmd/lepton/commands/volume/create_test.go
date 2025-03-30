@@ -35,7 +35,11 @@ func TestVolumeCreate(t *testing.T) {
 		{
 			Description: "arg missing should create anonymous volume",
 			Command:     test.Command("volume", "create"),
-			Expected:    test.Expects(0, nil, expect.Match(regexp.MustCompile("^[a-f0-9]{64}\n$"))),
+			Expected: test.Expects(
+				expect.ExitCodeSuccess,
+				nil,
+				expect.Match(regexp.MustCompile("^[a-f0-9]{64}\n$")),
+			),
 		},
 		{
 			Description: "invalid identifier should fail",

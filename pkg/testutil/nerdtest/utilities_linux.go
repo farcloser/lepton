@@ -55,7 +55,8 @@ func RunSigProxyContainer(
 	trap sig_msg ` + sig + `
 	printf "` + ready + `\n"
 	while true; do
-		sleep 0.1
+		printf "waiting...\n"
+		sleep 0.5
 	done
 `
 

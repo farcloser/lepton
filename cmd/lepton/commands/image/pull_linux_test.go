@@ -107,7 +107,7 @@ CMD ["echo", "build-test-string"]
 						data.Get("imageref")+":one",
 					)
 				},
-				Expected: test.Expects(0, nil, nil),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 			},
 			{
 				Description: "Pull with unrelated key",
@@ -163,7 +163,7 @@ CMD ["echo", "build-test-string"]
 				reg.IP.String(), data.Identifier(), strings.Split(testutil.CommonImage, ":")[1])
 			return helpers.Command("--insecure-registry", "pull", testImageRef)
 		},
-		Expected: test.Expects(0, nil, nil),
+		Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 		Cleanup: func(data test.Data, helpers test.Helpers) {
 			if reg != nil {
 				reg.Cleanup(nil)
@@ -294,7 +294,7 @@ func TestImagePullProcessOutput(t *testing.T) {
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 					return helpers.Command("pull", testutil.BusyboxImage)
 				},
-				Expected: test.Expects(0, nil, expect.Contains(testutil.BusyboxImage)),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains(testutil.BusyboxImage)),
 			},
 			{
 				Description: "Run Container with image pull - output should be in stderr",
@@ -305,7 +305,7 @@ func TestImagePullProcessOutput(t *testing.T) {
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 					return helpers.Command("run", "--rm", testutil.BusyboxImage)
 				},
-				Expected: test.Expects(0, nil, expect.DoesNotContain(testutil.BusyboxImage)),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.DoesNotContain(testutil.BusyboxImage)),
 			},
 		},
 	}

@@ -57,7 +57,7 @@ func TestCreate(t *testing.T) {
 			NoParallel:  true,
 			Command:     test.Command("ps", "-a"),
 			// FIXME: this might get a false positive if other tests have created a container
-			Expected: test.Expects(0, nil, expect.Contains("Created")),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("Created")),
 		},
 		{
 			Description: "start",
@@ -65,7 +65,7 @@ func TestCreate(t *testing.T) {
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("start", data.Get("cID"))
 			},
-			Expected: test.Expects(0, nil, nil),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 		},
 		{
 			Description: "logs",
@@ -73,7 +73,7 @@ func TestCreate(t *testing.T) {
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("logs", data.Get("cID"))
 			},
-			Expected: test.Expects(0, nil, expect.Contains("foo")),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("foo")),
 		},
 	}
 
@@ -110,7 +110,7 @@ func TestCreateHyperVContainer(t *testing.T) {
 			NoParallel:  true,
 			Command:     test.Command("ps", "-a"),
 			// FIXME: this might get a false positive if other tests have created a container
-			Expected: test.Expects(0, nil, expect.Contains("Created")),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("Created")),
 		},
 		{
 			Description: "start",
@@ -144,7 +144,7 @@ func TestCreateHyperVContainer(t *testing.T) {
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("logs", data.Get("cID"))
 			},
-			Expected: test.Expects(0, nil, expect.Contains("foo")),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("foo")),
 		},
 	}
 

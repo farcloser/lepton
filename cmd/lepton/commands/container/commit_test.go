@@ -63,7 +63,7 @@ func TestCommit(t *testing.T) {
 					identifier, identifier)
 				return helpers.Command("run", "--rm", identifier)
 			},
-			Expected: test.Expects(0, nil, expect.Equals("hello-test-commit\n")),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Equals("hello-test-commit\n")),
 		},
 		{
 			Description: "no pause",
@@ -98,7 +98,7 @@ func TestCommit(t *testing.T) {
 					identifier, identifier)
 				return helpers.Command("run", "--rm", identifier)
 			},
-			Expected: test.Expects(0, nil, expect.Equals("hello-test-commit\n")),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Equals("hello-test-commit\n")),
 		},
 	}
 

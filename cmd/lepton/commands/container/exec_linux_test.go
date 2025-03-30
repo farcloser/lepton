@@ -85,7 +85,7 @@ func TestExecTTY(t *testing.T) {
 				cmd.WithPseudoTTY()
 				return cmd
 			},
-			Expected: test.Expects(0, nil, expect.Contains(sttyPartialOutput)),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains(sttyPartialOutput)),
 		},
 		{
 			Description: "stty with -t",
@@ -94,7 +94,7 @@ func TestExecTTY(t *testing.T) {
 				cmd.WithPseudoTTY()
 				return cmd
 			},
-			Expected: test.Expects(0, nil, expect.Contains(sttyPartialOutput)),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains(sttyPartialOutput)),
 		},
 		{
 			Description: "stty with -i",

@@ -55,7 +55,7 @@ services:
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("compose", "-f", data.Get("compyaml"), "config")
 			},
-			Expected: test.Expects(0, nil, expect.Contains("hello:")),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("hello:")),
 		},
 		{
 			Description: "config --services is exactly service name",
@@ -68,14 +68,14 @@ services:
 					"--services",
 				)
 			},
-			Expected: test.Expects(0, nil, expect.Equals("hello\n")),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Equals("hello\n")),
 		},
 		{
 			Description: "config --hash=* contains service name",
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("compose", "-f", data.Get("compyaml"), "config", "--hash=*")
 			},
-			Expected: test.Expects(0, nil, expect.Contains("hello")),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("hello")),
 		},
 	}
 
@@ -239,7 +239,7 @@ image: hello-world
 		)
 	}
 
-	testCase.Expected = test.Expects(0, nil, expect.Contains("image: hello-world"))
+	testCase.Expected = test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("image: hello-world"))
 
 	testCase.Run(t)
 }

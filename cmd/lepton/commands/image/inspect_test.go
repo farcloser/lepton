@@ -26,6 +26,7 @@ import (
 
 	"gotest.tools/v3/assert"
 
+	"go.farcloser.world/tigron/expect"
 	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
@@ -45,7 +46,7 @@ func TestImageInspectSimpleCases(t *testing.T) {
 			{
 				Description: "Contains some stuff",
 				Command:     test.Command("image", "inspect", testutil.CommonImage),
-				Expected: test.Expects(0, nil, func(stdout, info string, t *testing.T) {
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, func(stdout, info string, t *testing.T) {
 					var dc []dockercompat.Image
 					err := json.Unmarshal([]byte(stdout), &dc)
 					assert.NilError(t, err, "Unable to unmarshal output\n"+info)
@@ -64,7 +65,7 @@ func TestImageInspectSimpleCases(t *testing.T) {
 					"--format",
 					"{{.Id}}",
 				),
-				Expected: test.Expects(0, nil, nil),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 			},
 			{
 				Description: "typedFormat support (.ID)",
@@ -75,7 +76,7 @@ func TestImageInspectSimpleCases(t *testing.T) {
 					"--format",
 					"{{.ID}}",
 				),
-				Expected: test.Expects(0, nil, nil),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 			},
 			{
 				Description: "Error for image not found",

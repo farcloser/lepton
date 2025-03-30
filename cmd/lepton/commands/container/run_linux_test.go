@@ -382,7 +382,7 @@ func TestRunTTY(t *testing.T) {
 				cmd.WithPseudoTTY()
 				return cmd
 			},
-			Expected: test.Expects(0, nil, expect.Contains(sttyPartialOutput)),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains(sttyPartialOutput)),
 		},
 		{
 			Description: "stty with -t",
@@ -394,7 +394,7 @@ func TestRunTTY(t *testing.T) {
 				cmd.WithPseudoTTY()
 				return cmd
 			},
-			Expected: test.Expects(0, nil, expect.Contains(sttyPartialOutput)),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains(sttyPartialOutput)),
 		},
 		{
 			Description: "stty with -i",
@@ -435,13 +435,14 @@ func TestRunSigProxy(t *testing.T) {
 			},
 
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
+				// FIXME: os.Interrupt will likely not work on Windows
 				cmd := nerdtest.RunSigProxyContainer(os.Interrupt, true, nil, data, helpers)
 				err := cmd.Signal(os.Interrupt)
 				assert.NilError(helpers.T(), err)
 				return cmd
 			},
 
-			Expected: test.Expects(0, nil, expect.Contains(nerdtest.SignalCaught)),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains(nerdtest.SignalCaught)),
 		},
 		{
 			Description: "SigProxyTrue",
@@ -463,7 +464,7 @@ func TestRunSigProxy(t *testing.T) {
 				return cmd
 			},
 
-			Expected: test.Expects(0, nil, expect.Contains(nerdtest.SignalCaught)),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains(nerdtest.SignalCaught)),
 		},
 		{
 			Description: "SigProxyFalse",
@@ -485,7 +486,7 @@ func TestRunSigProxy(t *testing.T) {
 				return cmd
 			},
 
-			Expected: test.Expects(127, nil, expect.DoesNotContain(nerdtest.SignalCaught)),
+			Expected: test.Expects(expect.ExitCodeSignaled, nil, expect.DoesNotContain(nerdtest.SignalCaught)),
 		},
 	}
 

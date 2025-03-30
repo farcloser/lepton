@@ -67,7 +67,7 @@ func TestWait(t *testing.T) {
 		)
 	}
 
-	testCase.Expected = test.Expects(0, nil, expect.Equals(`0
+	testCase.Expected = test.Expects(expect.ExitCodeSuccess, nil, expect.Equals(`0
 0
 123
 `))

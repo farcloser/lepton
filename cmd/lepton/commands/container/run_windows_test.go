@@ -160,7 +160,7 @@ func TestRunWithTtyAndDetached(t *testing.T) {
 		return helpers.Command("logs", data.Identifier("with-terminal"))
 	}
 
-	testCase.Expected = test.Expects(0, nil, expect.Contains("Hello, World with TTY!"))
+	testCase.Expected = test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("Hello, World with TTY!"))
 
 	testCase.Run(t)
 }

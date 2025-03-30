@@ -68,7 +68,7 @@ CMD ["echo", "build-test-string"]`, testutil.CommonImage)
 				Cleanup: func(data test.Data, helpers test.Helpers) {
 					helpers.Anyhow("rmi", "-f", data.Identifier())
 				},
-				Expected: test.Expects(0, nil, expect.Equals("build-test-string\n")),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Equals("build-test-string\n")),
 			},
 			{
 				Description: "Successfully build with 'buildctx first', 'tag second'",
@@ -81,7 +81,7 @@ CMD ["echo", "build-test-string"]`, testutil.CommonImage)
 				Cleanup: func(data test.Data, helpers test.Helpers) {
 					helpers.Anyhow("rmi", "-f", data.Identifier())
 				},
-				Expected: test.Expects(0, nil, expect.Equals("build-test-string\n")),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Equals("build-test-string\n")),
 			},
 			{
 				Description: "Successfully build with output docker, main tag still works",
@@ -100,7 +100,7 @@ CMD ["echo", "build-test-string"]`, testutil.CommonImage)
 				Cleanup: func(data test.Data, helpers test.Helpers) {
 					helpers.Anyhow("rmi", "-f", data.Identifier())
 				},
-				Expected: test.Expects(0, nil, expect.Equals("build-test-string\n")),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Equals("build-test-string\n")),
 			},
 			{
 				Description: "Successfully build with output docker, name cannot be used",
@@ -119,7 +119,7 @@ CMD ["echo", "build-test-string"]`, testutil.CommonImage)
 				Cleanup: func(data test.Data, helpers test.Helpers) {
 					helpers.Anyhow("rmi", "-f", data.Identifier())
 				},
-				Expected: test.Expects(-1, nil, nil),
+				Expected: test.Expects(expect.ExitCodeGenericFail, nil, nil),
 			},
 		},
 	}
@@ -176,7 +176,7 @@ CMD ["echo", "build-test-string"]`, testutil.CommonImage)
 		Cleanup: func(data test.Data, helpers test.Helpers) {
 			helpers.Anyhow("rmi", "-f", data.Identifier())
 		},
-		Expected: test.Expects(0, nil, nil),
+		Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 	}
 
 	testCase.Run(t)
@@ -219,7 +219,7 @@ CMD ["cat", "/hello2"]`, data.Identifier("first"))
 		Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 			return helpers.Command("run", "--rm", data.Identifier("second"))
 		},
-		Expected: test.Expects(0, nil, expect.Equals("hello2\n")),
+		Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Equals("hello2\n")),
 	}
 
 	testCase.Run(t)
@@ -257,7 +257,7 @@ CMD ["cat", "/hello2"]`, data.Identifier("first"))
 		Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 			return helpers.Command("run", "--rm", data.Identifier("second"))
 		},
-		Expected: test.Expects(0, nil, expect.Equals("hello2\n")),
+		Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Equals("hello2\n")),
 	}
 
 	testCase.Run(t)
@@ -325,7 +325,7 @@ CMD ["echo", "build-test-dockerfile"]
 					cmd.WithCwd(data.Get("buildCtx"))
 					return cmd
 				},
-				Expected: test.Expects(0, nil, nil),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 			},
 			{
 				Description: "Dockerfile .",
@@ -344,7 +344,7 @@ CMD ["echo", "build-test-dockerfile"]
 					cmd.WithCwd(data.Get("buildCtx"))
 					return cmd
 				},
-				Expected: test.Expects(0, nil, nil),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 			},
 			{
 				Description: "../Dockerfile .",
@@ -475,7 +475,7 @@ CMD echo $TEST_STRING
 				Cleanup: func(data test.Data, helpers test.Helpers) {
 					helpers.Anyhow("rmi", "-f", data.Identifier())
 				},
-				Expected: test.Expects(0, nil, expect.Equals("1\n")),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Equals("1\n")),
 			},
 			{
 				Description: "ArgValueOverridesDefault",
@@ -495,7 +495,7 @@ CMD echo $TEST_STRING
 				Cleanup: func(data test.Data, helpers test.Helpers) {
 					helpers.Anyhow("rmi", "-f", data.Identifier())
 				},
-				Expected: test.Expects(0, nil, expect.Equals("2\n")),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Equals("2\n")),
 			},
 			{
 				Description: "EmptyArgValueOverridesDefault",
@@ -515,7 +515,7 @@ CMD echo $TEST_STRING
 				Cleanup: func(data test.Data, helpers test.Helpers) {
 					helpers.Anyhow("rmi", "-f", data.Identifier())
 				},
-				Expected: test.Expects(0, nil, expect.Equals("\n")),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Equals("\n")),
 			},
 			{
 				Description: "UnsetArgKeyPreservesDefault",
@@ -535,7 +535,7 @@ CMD echo $TEST_STRING
 				Cleanup: func(data test.Data, helpers test.Helpers) {
 					helpers.Anyhow("rmi", "-f", data.Identifier())
 				},
-				Expected: test.Expects(0, nil, expect.Equals("1\n")),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Equals("1\n")),
 			},
 			{
 				Description: "EnvValueOverridesDefault",
@@ -558,7 +558,7 @@ CMD echo $TEST_STRING
 				Cleanup: func(data test.Data, helpers test.Helpers) {
 					helpers.Anyhow("rmi", "-f", data.Identifier())
 				},
-				Expected: test.Expects(0, nil, expect.Equals("3\n")),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Equals("3\n")),
 			},
 			{
 				Description: "EmptyEnvValueOverridesDefault",
@@ -581,7 +581,7 @@ CMD echo $TEST_STRING
 				Cleanup: func(data test.Data, helpers test.Helpers) {
 					helpers.Anyhow("rmi", "-f", data.Identifier())
 				},
-				Expected: test.Expects(0, nil, expect.Equals("\n")),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Equals("\n")),
 			},
 		},
 	}
@@ -619,7 +619,7 @@ CMD ["echo", "build-test-string"]
 			return helpers.Command("run", "--rm", string(imageID))
 		},
 
-		Expected: test.Expects(0, nil, expect.Equals("build-test-string\n")),
+		Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Equals("build-test-string\n")),
 	}
 
 	testCase.Run(t)
@@ -699,7 +699,7 @@ CMD ["echo", "build-test-string"]
 					return helpers.Command("run", "--rm", data.Get("i1"))
 				},
 
-				Expected: test.Expects(0, nil, expect.Equals("build-test-string\n")),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Equals("build-test-string\n")),
 			},
 			{
 				Description: "i2",
@@ -707,7 +707,7 @@ CMD ["echo", "build-test-string"]
 					return helpers.Command("run", "--rm", data.Get("i2"))
 				},
 
-				Expected: test.Expects(0, nil, expect.Equals("build-test-string\n")),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Equals("build-test-string\n")),
 			},
 			{
 				Description: "i3",
@@ -715,7 +715,7 @@ CMD ["echo", "build-test-string"]
 					return helpers.Command("run", "--rm", data.Get("i3"))
 				},
 
-				Expected: test.Expects(0, nil, expect.Equals("build-test-string\n")),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Equals("build-test-string\n")),
 			},
 		},
 	}
@@ -746,7 +746,7 @@ CMD ["echo", "build-test-string"]
 		Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 			return helpers.Command("run", "--rm", data.Identifier())
 		},
-		Expected: test.Expects(0, nil, expect.Equals("build-test-string\n")),
+		Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Equals("build-test-string\n")),
 	}
 
 	testCase.Run(t)
@@ -777,7 +777,7 @@ CMD ["echo", "containerfile"]
 		Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 			return helpers.Command("run", "--rm", data.Identifier())
 		},
-		Expected: test.Expects(0, nil, expect.Equals("dockerfile\n")),
+		Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Equals("dockerfile\n")),
 	}
 
 	testCase.Run(t)
@@ -804,7 +804,7 @@ CMD ["echo", "build-test-string"]
 			helpers.Ensure("build", buildCtx)
 		},
 		Command:  test.Command("images"),
-		Expected: test.Expects(0, nil, expect.Contains("<none>")),
+		Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("<none>")),
 	}
 
 	testCase.Run(t)
@@ -835,7 +835,7 @@ CMD ["echo", "build-myorg/myapp"]`
 				"--build-context=myorg/myapp=docker-image://"+testutil.CommonImage,
 			)
 		},
-		Expected: test.Expects(0, nil, nil),
+		Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 	}
 
 	testCase.Run(t)
@@ -878,7 +878,7 @@ RUN ["cat", "/hello_from_dir2.txt"]`, testutil.CommonImage, filename)
 				"--build-context=dir2="+data.Get("dir2"),
 			)
 		},
-		Expected: test.Expects(0, nil, nil),
+		Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 	}
 
 	testCase.Run(t)
@@ -923,7 +923,7 @@ CMD ["cat", "/source-date-epoch"]
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 					return helpers.Command("run", "--rm", data.Identifier())
 				},
-				Expected: test.Expects(0, nil, expect.Equals("1111111111\n")),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Equals("1111111111\n")),
 			},
 			{
 				Description: "2222222222",
@@ -946,7 +946,7 @@ CMD ["cat", "/source-date-epoch"]
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 					return helpers.Command("run", "--rm", data.Identifier())
 				},
-				Expected: test.Expects(0, nil, expect.Equals("2222222222\n")),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Equals("2222222222\n")),
 			},
 		},
 	}
@@ -1010,7 +1010,7 @@ RUN curl -I http://google.com
 				Cleanup: func(data test.Data, helpers test.Helpers) {
 					helpers.Anyhow("rmi", "-f", data.Identifier())
 				},
-				Expected: test.Expects(0, nil, nil),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 			},
 			{
 				Description: "default",
@@ -1028,7 +1028,7 @@ RUN curl -I http://google.com
 				Cleanup: func(data test.Data, helpers test.Helpers) {
 					helpers.Anyhow("rmi", "-f", data.Identifier())
 				},
-				Expected: test.Expects(0, nil, nil),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 			},
 		},
 	}
@@ -1204,7 +1204,7 @@ RUN ping -c 5 beta
 				"beta:127.0.0.1",
 			)
 		},
-		Expected: test.Expects(0, nil, nil),
+		Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 	}
 
 	testCase.Run(t)

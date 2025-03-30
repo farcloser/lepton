@@ -19,6 +19,7 @@ package image_test
 import (
 	"testing"
 
+	"go.farcloser.world/tigron/expect"
 	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
@@ -54,7 +55,7 @@ func TestImageConvert(t *testing.T) {
 						data.Identifier("converted-image"),
 					)
 				},
-				Expected: test.Expects(0, nil, nil),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 			},
 			{
 				Description: "zstdchunked",
@@ -73,7 +74,7 @@ func TestImageConvert(t *testing.T) {
 						data.Identifier("converted-image"),
 					)
 				},
-				Expected: test.Expects(0, nil, nil),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 			},
 		},
 	}

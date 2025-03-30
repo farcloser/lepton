@@ -52,12 +52,12 @@ func TestInfo(t *testing.T) {
 		{
 			Description: "info",
 			Command:     test.Command("info", "--format", "{{json .}}"),
-			Expected:    test.Expects(0, nil, testInfoComparator),
+			Expected:    test.Expects(expect.ExitCodeSuccess, nil, testInfoComparator),
 		},
 		{
 			Description: "info convenience form",
 			Command:     test.Command("info", "--format", formatter.FormatJSON),
-			Expected:    test.Expects(0, nil, testInfoComparator),
+			Expected:    test.Expects(expect.ExitCodeSuccess, nil, testInfoComparator),
 		},
 		{
 			Description: "info with namespace",
@@ -65,7 +65,7 @@ func TestInfo(t *testing.T) {
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Custom(nerdtest.Binary(), "info")
 			},
-			Expected: test.Expects(0, nil, expect.Contains("Namespace:	default")),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("Namespace:	default")),
 		},
 		{
 			Description: "info with namespace env var",
@@ -76,7 +76,7 @@ func TestInfo(t *testing.T) {
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Custom(nerdtest.Binary(), "info")
 			},
-			Expected: test.Expects(0, nil, expect.Contains("Namespace:	test")),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("Namespace:	test")),
 		},
 	}
 

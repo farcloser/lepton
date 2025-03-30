@@ -23,6 +23,7 @@ import (
 
 	"gotest.tools/v3/assert"
 
+	"go.farcloser.world/tigron/expect"
 	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
@@ -110,7 +111,7 @@ func TestImageEncryptJWE(t *testing.T) {
 				data.Identifier("decrypted"),
 			)
 		},
-		Expected: test.Expects(0, nil, nil),
+		Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 	}
 
 	testCase.Run(t)

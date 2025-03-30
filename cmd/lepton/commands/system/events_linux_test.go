@@ -37,8 +37,8 @@ func testEventFilterExecutor(data test.Data, helpers test.Helpers) test.Testable
 		"--format",
 		formatter.FormatJSON,
 	)
-	// XXX this is arbitrary, and a function of the overall pressure on the machine
-	cmd.WithTimeout(2 * time.Second)
+	// 3 seconds is too short on slow rig (EL8)
+	cmd.WithTimeout(10 * time.Second)
 	cmd.Background()
 	helpers.Ensure("run", "--quiet", "--rm", testutil.CommonImage)
 	return cmd

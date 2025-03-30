@@ -164,7 +164,7 @@ RUN echo "actually creating a layer so that docker sets the createdAt time"
 			data.Set("builtImageID", data.Identifier())
 			return helpers.Command("build", "-t", data.Identifier(), data.Get("buildCtx"))
 		},
-		Expected: test.Expects(0, nil, nil),
+		Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 		SubTests: []*test.Case{
 			{
 				Description: "label=foo=bar",
@@ -241,7 +241,7 @@ RUN echo "actually creating a layer so that docker sets the createdAt time"
 			{
 				Description: "reference=tagged*:*fragment*",
 				Command:     test.Command("images", "--filter", "reference=tagged*:*fragment*"),
-				Expected: test.Expects(0, nil, expect.All(
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.All(
 					expect.Contains("one-"),
 					expect.Contains("two-"),
 				)),
@@ -300,7 +300,7 @@ RUN echo "actually creating a layer so that docker sets the createdAt time"
 					"https://github.com/containerd/nerdctl/issues/3511",
 				),
 				Command:  test.Command("images", "--filter", "since=non-exists-image"),
-				Expected: test.Expects(-1, []error{errors.New("No such image: ")}, nil),
+				Expected: test.Expects(expect.ExitCodeGenericFail, []error{errors.New("No such image: ")}, nil),
 			},
 			{
 				Description: "before=non-exists-image",
@@ -309,7 +309,7 @@ RUN echo "actually creating a layer so that docker sets the createdAt time"
 					"https://github.com/containerd/nerdctl/issues/3511",
 				),
 				Command:  test.Command("images", "--filter", "before=non-exists-image"),
-				Expected: test.Expects(-1, []error{errors.New("No such image: ")}, nil),
+				Expected: test.Expects(expect.ExitCodeGenericFail, []error{errors.New("No such image: ")}, nil),
 			},
 		},
 	}
@@ -341,17 +341,17 @@ CMD ["echo", "build-notag-string"]
 		Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 			return helpers.Command("build", data.Get("buildCtx"))
 		},
-		Expected: test.Expects(0, nil, nil),
+		Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 		SubTests: []*test.Case{
 			{
 				Description: "dangling",
 				Command:     test.Command("images", "--filter", "dangling=true"),
-				Expected:    test.Expects(0, nil, expect.Contains("<none>")),
+				Expected:    test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("<none>")),
 			},
 			{
 				Description: "not dangling",
 				Command:     test.Command("images", "--filter", "dangling=false"),
-				Expected:    test.Expects(0, nil, expect.DoesNotContain("<none>")),
+				Expected:    test.Expects(expect.ExitCodeSuccess, nil, expect.DoesNotContain("<none>")),
 			},
 		},
 	}

@@ -115,7 +115,7 @@ func TestNetworkCreate(t *testing.T) {
 					"eth0",
 				)
 			},
-			Expected: test.Expects(0, nil, expect.Contains("MTU:9216")),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("MTU:9216")),
 		},
 		{
 			Description: "with ipv6",

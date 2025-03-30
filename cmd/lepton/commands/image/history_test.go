@@ -26,6 +26,7 @@ import (
 
 	"gotest.tools/v3/assert"
 
+	"go.farcloser.world/tigron/expect"
 	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
@@ -97,7 +98,7 @@ func TestImageHistory(t *testing.T) {
 					"--format=json",
 					testutil.CommonImage,
 				),
-				Expected: test.Expects(0, nil, func(stdout, info string, t *testing.T) {
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, func(stdout, info string, t *testing.T) {
 					history, err := decode(stdout)
 					assert.NilError(t, err, info)
 					assert.Equal(t, len(history), 2, info)
@@ -146,7 +147,7 @@ func TestImageHistory(t *testing.T) {
 					"--format=json",
 					testutil.CommonImage,
 				),
-				Expected: test.Expects(0, nil, func(stdout, info string, t *testing.T) {
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, func(stdout, info string, t *testing.T) {
 					history, err := decode(stdout)
 					assert.NilError(t, err, info)
 					assert.Equal(t, history[0].Size, "0", info)
@@ -165,7 +166,7 @@ func TestImageHistory(t *testing.T) {
 					"--format=json",
 					testutil.CommonImage,
 				),
-				Expected: test.Expects(0, nil, func(stdout, info string, t *testing.T) {
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, func(stdout, info string, t *testing.T) {
 					history, err := decode(stdout)
 					assert.NilError(t, err, info)
 					assert.Equal(
@@ -190,7 +191,7 @@ func TestImageHistory(t *testing.T) {
 					"--quiet",
 					testutil.CommonImage,
 				),
-				Expected: test.Expects(0, nil, func(stdout, info string, t *testing.T) {
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, func(stdout, info string, t *testing.T) {
 					assert.Equal(
 						t,
 						stdout,
@@ -208,7 +209,7 @@ func TestImageHistory(t *testing.T) {
 					"--quiet",
 					testutil.CommonImage,
 				),
-				Expected: test.Expects(0, nil, func(stdout, info string, t *testing.T) {
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, func(stdout, info string, t *testing.T) {
 					assert.Equal(
 						t,
 						stdout,

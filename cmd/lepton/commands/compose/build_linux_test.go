@@ -82,7 +82,7 @@ services:
 				return helpers.Command("images")
 			},
 
-			Expected: test.Expects(0, nil, expect.All(
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.All(
 				expect.Contains(imageSvc0),
 				expect.DoesNotContain(imageSvc1),
 			)),
@@ -98,7 +98,7 @@ services:
 				return helpers.Command("images")
 			},
 
-			Expected: test.Expects(0, nil, expect.All(
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.All(
 				expect.Contains(imageSvc0),
 				expect.Contains(imageSvc1),
 			)),
@@ -109,7 +109,7 @@ services:
 				return helpers.Command("compose", "-f", data.Get("composeYaml"), "build")
 			},
 
-			Expected: test.Expects(0, nil, nil),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 		},
 		{
 			Description: "build bogus",

@@ -64,17 +64,17 @@ func TestUnknownCommand(t *testing.T) {
 		{
 			Description: "system",
 			Command:     test.Command("system"),
-			Expected:    test.Expects(0, nil, nil),
+			Expected:    test.Expects(expect.ExitCodeSuccess, nil, nil),
 		},
 		{
 			Description: "system info",
 			Command:     test.Command("system", "info"),
-			Expected:    test.Expects(0, nil, expect.Contains("Kernel Version:")),
+			Expected:    test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("Kernel Version:")),
 		},
 		{
 			Description: "info",
 			Command:     test.Command("info"),
-			Expected:    test.Expects(0, nil, expect.Contains("Kernel Version:")),
+			Expected:    test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("Kernel Version:")),
 		},
 	}
 
@@ -92,12 +92,12 @@ func TestConfig(t *testing.T) {
 		{
 			Description: "Default",
 			Command:     test.Command("info", "-f", "{{.Driver}}"),
-			Expected:    test.Expects(0, nil, expect.Equals(defaults.DefaultSnapshotter+"\n")),
+			Expected:    test.Expects(expect.ExitCodeSuccess, nil, expect.Equals(defaults.DefaultSnapshotter+"\n")),
 		},
 		{
 			Description: "TOML > Default",
 			Command:     test.Command("info", "-f", "{{.Driver}}"),
-			Expected:    test.Expects(0, nil, expect.Equals("dummy-snapshotter-via-toml\n")),
+			Expected:    test.Expects(expect.ExitCodeSuccess, nil, expect.Equals("dummy-snapshotter-via-toml\n")),
 			Config: test.WithConfig(
 				nerdtest.NerdishctlToml,
 				`snapshotter = "dummy-snapshotter-via-toml"`,
@@ -111,7 +111,7 @@ func TestConfig(t *testing.T) {
 				"{{.Driver}}",
 				"--snapshotter=dummy-snapshotter-via-cli",
 			),
-			Expected: test.Expects(0, nil, expect.Equals("dummy-snapshotter-via-cli\n")),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Equals("dummy-snapshotter-via-cli\n")),
 			Config: test.WithConfig(
 				nerdtest.NerdishctlToml,
 				`snapshotter = "dummy-snapshotter-via-toml"`,
@@ -121,7 +121,7 @@ func TestConfig(t *testing.T) {
 			Description: "Env > TOML > Default",
 			Command:     test.Command("info", "-f", "{{.Driver}}"),
 			Env:         map[string]string{"CONTAINERD_SNAPSHOTTER": "dummy-snapshotter-via-env"},
-			Expected:    test.Expects(0, nil, expect.Equals("dummy-snapshotter-via-env\n")),
+			Expected:    test.Expects(expect.ExitCodeSuccess, nil, expect.Equals("dummy-snapshotter-via-env\n")),
 			Config: test.WithConfig(
 				nerdtest.NerdishctlToml,
 				`snapshotter = "dummy-snapshotter-via-toml"`,
@@ -136,7 +136,7 @@ func TestConfig(t *testing.T) {
 				"--snapshotter=dummy-snapshotter-via-cli",
 			),
 			Env:      map[string]string{"CONTAINERD_SNAPSHOTTER": "dummy-snapshotter-via-env"},
-			Expected: test.Expects(0, nil, expect.Equals("dummy-snapshotter-via-cli\n")),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Equals("dummy-snapshotter-via-cli\n")),
 			Config: test.WithConfig(
 				nerdtest.NerdishctlToml,
 				`snapshotter = "dummy-snapshotter-via-toml"`,

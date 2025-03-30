@@ -96,7 +96,7 @@ func TestSystemPrune(t *testing.T) {
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return nerdtest.BuildCtlCommand(helpers, "du")
 			},
-			Expected: test.Expects(0, nil, expect.Contains("Total:\t\t0B")),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("Total:\t\t0B")),
 		},
 	}
 
