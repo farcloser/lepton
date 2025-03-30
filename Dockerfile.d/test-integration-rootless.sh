@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #   Copyright Farcloser.
 
@@ -14,43 +14,66 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-set -eux -o pipefail
+# shellcheck disable=SC2034
+set -o errexit -o errtrace -o functrace -o nounset -o pipefail
+
 if [[ "$(id -u)" = "0" ]]; then
-  # Ensure securityfs is mounted for apparmor to work
-  if ! mountpoint -q /sys/kernel/security; then
-    mount -tsecurityfs securityfs /sys/kernel/security
-  fi
 	if [ -e /sys/kernel/security/apparmor/profiles ]; then
 		# Load the "prefix-default" profile for TestRunApparmor
 		lepton apparmor load
 	fi
 
-	: "${WORKAROUND_ISSUE_622:=}"
-	if [[ "$WORKAROUND_ISSUE_622" = "1" ]]; then
-		touch /workaround-issue-622
-	fi
+  sysctl -w net.ipv4.ip_unprivileged_port_start=0
 
-	# Switch to the rootless user via SSH
-	systemctl start ssh
-	exec ssh -o StrictHostKeyChecking=no rootless@localhost "$0" "$@"
+  # Get what we want to passthrough from the environment in the whitelist and bypass variables
+  export BYPATH="$PATH"
+  export BYPWD="$PWD"
+  whitelist="BYPATH,BYPWD"
+  while read -r line; do
+    ! grep -Eq "^(GO|LEPTON|NAMESPACE).*" <<<"$line" || whitelist+=",${line%%=*}"
+  done < <(env)
+
+  # Login as rootless and restart the script
+  loginctl enable-linger rootless
+	exec systemd-run --system --scope su --whitelist-environment="$whitelist" --pty --login rootless -c "$0 $*"
 else
+  # Recover the path and current working directory (PATH cannot be whitelisted with su)
+  cd "${BYPWD:-.}"
+  export PATH="$BYPATH"
+  # Set dbus and XDG runtime
+  DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$(id -u)/bus"
+  XDG_RUNTIME_DIR="/run/user/$(id -u)"
+  export DBUS_SESSION_BUS_ADDRESS
+  export XDG_RUNTIME_DIR
+  export XDG_SESSION_CLASS=user
+
+  # Wait for systemd to be active...
+  x=0
+  while ! systemctl --user show-environment >/dev/null 2>&1 && [ "$x" -lt 20 ]; do
+    x=$((x+1))
+    sleep 0.5
+  done
+  [ "$x" -lt 20 ] || {
+    echo "failed waiting for systemd --user to be active"
+    exit 42
+  }
+
+	# why would we need this?
+  #	if grep -q "options use-vc" /etc/resolv.conf; then
+  #		containerd-rootless-setuptool.sh nsenter -- sh -euc 'echo "options use-vc" >>/etc/resolv.conf'
+  #	fi
+
+  # Setup rootless services
 	containerd-rootless-setuptool.sh install
-	if grep -q "options use-vc" /etc/resolv.conf; then
-		containerd-rootless-setuptool.sh nsenter -- sh -euc 'echo "options use-vc" >>/etc/resolv.conf'
+	CONTAINERD_NAMESPACE="$NAMESPACE" containerd-rootless-setuptool.sh install-buildkit-containerd
+	containerd-rootless-setuptool.sh install-bypass4netnsd
+
+	if [ ! -f "/home/rootless/.config/containerd/config.toml" ] ; then
+	  echo "version = 2" > /home/rootless/.config/containerd/config.toml
+	  # cp /etc/containerd/config.toml /home/rootless/.config/containerd/config.toml
 	fi
 
-	if [[ -e /workaround-issue-622 ]]; then
-		echo "WORKAROUND_ISSUE_622: Not enabling BuildKit (https://github.com/containerd/nerdctl/issues/622)" >&2
-	else
-		CONTAINERD_NAMESPACE="cli-test" containerd-rootless-setuptool.sh install-buildkit-containerd
-	fi
-	if [ ! -f "/home/rootless/.config/containerd/config.toml" ] ; then
-		echo "version = 2" > /home/rootless/.config/containerd/config.toml
-	fi
 	systemctl --user restart containerd.service
-	containerd-rootless-setuptool.sh install-bypass4netnsd
-	# Once ssh-ed, we lost the Dockerfile working dir, so, get back in the checkout
-	cd /src
-	# We also lose the PATH (and SendEnv=PATH would require sshd config changes)
-	exec env PATH="/root/go/bin:/usr/local/go/bin:$PATH" "$@"
+
+  exec "$@"
 fi
