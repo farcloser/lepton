@@ -32,7 +32,7 @@ func TestComposeCopy(t *testing.T) {
 
 	base := testutil.NewBase(t)
 
-	var dockerComposeYAML = fmt.Sprintf(`
+	dockerComposeYAML := fmt.Sprintf(`
 version: '3.1'
 
 services:
@@ -67,5 +67,4 @@ services:
 	destFileContent, err := os.ReadFile(destFile)
 	assert.NilError(t, err)
 	assert.DeepEqual(t, srcFileContent, destFileContent)
-
 }

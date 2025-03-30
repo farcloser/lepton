@@ -65,7 +65,7 @@ bar`
 	base.Cmd("logs", "-n", "all", containerName).AssertOutContains(expected)
 
 	base.Cmd("logs", "-n", "1", containerName).AssertOutWithFunc(func(stdout string) error {
-		if !(stdout == "bar\n" || stdout == "") {
+		if stdout != "bar\n" && stdout != "" {
 			return fmt.Errorf("expected %q or %q, got %q", "bar", "", stdout)
 		}
 		return nil
@@ -87,7 +87,8 @@ func TestLogsOutStreamsSeparated(t *testing.T) {
 		"sh", "-euc", "echo stdout1; echo stderr1 >&2; echo stdout2; echo stderr2 >&2").AssertOK()
 	time.Sleep(3 * time.Second)
 
-	base.Cmd("logs", containerName).AssertOutStreamsExactly("stdout1\nstdout2\n", "stderr1\nstderr2\n")
+	base.Cmd("logs", containerName).
+		AssertOutStreamsExactly("stdout1\nstdout2\n", "stderr1\nstderr2\n")
 }
 
 func TestLogsWithInheritedFlags(t *testing.T) {
@@ -111,7 +112,7 @@ func TestLogsWithInheritedFlags(t *testing.T) {
 	time.Sleep(time.Second)
 	// test rootCmd alias `-n` already used in logs subcommand
 	base.Cmd("logs", "-n", "1", containerName).AssertOutWithFunc(func(stdout string) error {
-		if !(stdout == "bar\n" || stdout == "") {
+		if stdout != "bar\n" && stdout != "" {
 			return fmt.Errorf("expected %q or %q, got %q", "bar", "", stdout)
 		}
 		return nil
@@ -132,7 +133,8 @@ func TestLogsOfJournaldDriver(t *testing.T) {
 
 	defer base.Cmd("rm", containerName).Run()
 	base.Cmd("run", "-d", "--network", "none", "--log-driver", "journald", "--name", containerName, testutil.CommonImage,
-		"sh", "-euxc", "echo foo; echo bar").AssertOK()
+		"sh", "-euxc", "echo foo; echo bar").
+		AssertOK()
 
 	time.Sleep(3 * time.Second)
 	base.Cmd("logs", containerName).AssertOutContains("bar")
@@ -182,7 +184,15 @@ func TestLogsWithForegroundContainers(t *testing.T) {
 				helpers.Anyhow("rm", "-f", data.Identifier())
 			},
 			Setup: func(data test.Data, helpers test.Helpers) {
-				helpers.Ensure("run", "--name", data.Identifier(), testutil.CommonImage, "sh", "-euxc", "echo foo; echo bar")
+				helpers.Ensure(
+					"run",
+					"--name",
+					data.Identifier(),
+					testutil.CommonImage,
+					"sh",
+					"-euxc",
+					"echo foo; echo bar",
+				)
 			},
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("logs", data.Identifier())
@@ -199,7 +209,16 @@ func TestLogsWithForegroundContainers(t *testing.T) {
 				helpers.Anyhow("rm", "-f", data.Identifier())
 			},
 			Setup: func(data test.Data, helpers test.Helpers) {
-				helpers.Ensure("run", "-i", "--name", data.Identifier(), testutil.CommonImage, "sh", "-euxc", "echo foo; echo bar")
+				helpers.Ensure(
+					"run",
+					"-i",
+					"--name",
+					data.Identifier(),
+					testutil.CommonImage,
+					"sh",
+					"-euxc",
+					"echo foo; echo bar",
+				)
 			},
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("logs", data.Identifier())
@@ -216,7 +235,16 @@ func TestLogsWithForegroundContainers(t *testing.T) {
 				helpers.Anyhow("rm", "-f", data.Identifier())
 			},
 			Setup: func(data test.Data, helpers test.Helpers) {
-				cmd := helpers.Command("run", "-t", "--name", data.Identifier(), testutil.CommonImage, "sh", "-euxc", "echo foo; echo bar")
+				cmd := helpers.Command(
+					"run",
+					"-t",
+					"--name",
+					data.Identifier(),
+					testutil.CommonImage,
+					"sh",
+					"-euxc",
+					"echo foo; echo bar",
+				)
 				cmd.WithPseudoTTY()
 				cmd.Run(&test.Expected{ExitCode: 0})
 			},
@@ -235,7 +263,17 @@ func TestLogsWithForegroundContainers(t *testing.T) {
 				helpers.Anyhow("rm", "-f", data.Identifier())
 			},
 			Setup: func(data test.Data, helpers test.Helpers) {
-				cmd := helpers.Command("run", "-i", "-t", "--name", data.Identifier(), testutil.CommonImage, "sh", "-euxc", "echo foo; echo bar")
+				cmd := helpers.Command(
+					"run",
+					"-i",
+					"-t",
+					"--name",
+					data.Identifier(),
+					testutil.CommonImage,
+					"sh",
+					"-euxc",
+					"echo foo; echo bar",
+				)
 				cmd.WithPseudoTTY()
 				cmd.Run(&test.Expected{ExitCode: 0})
 			},

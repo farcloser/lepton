@@ -28,7 +28,11 @@ import (
 )
 
 func BuildCtlCommand(helpers test.Helpers, args ...string) test.TestableCommand {
-	assert.Assert(helpers.T(), string(helpers.Read(BuildkitHost)) != "", "You first need to Require Build to use buildctl")
+	assert.Assert(
+		helpers.T(),
+		string(helpers.Read(BuildkitHost)) != "",
+		"You first need to Require Build to use buildctl",
+	)
 	buildctl, _ := exec.LookPath("buildctl")
 	cmd := helpers.Custom(buildctl)
 	cmd.WithArgs("--addr=" + string(helpers.Read(BuildkitHost)))
@@ -44,7 +48,13 @@ func KubeCtlCommand(helpers test.Helpers, args ...string) test.TestableCommand {
 	return cmd
 }
 
-func RegistryWithTokenAuth(data test.Data, helpers test.Helpers, user, pass string, port int, tls bool) (*registry.Server, *registry.TokenAuthServer) {
+func RegistryWithTokenAuth(
+	data test.Data,
+	helpers test.Helpers,
+	user, pass string,
+	port int,
+	tls bool,
+) (*registry.Server, *registry.TokenAuthServer) {
 	rca := ca.New(data, helpers.T())
 	as := registry.NewCesantaAuthServer(data, helpers, rca, 0, user, pass, tls)
 	re := registry.NewDockerRegistry(data, helpers, rca, port, as.Auth)
@@ -59,7 +69,13 @@ func RegistryWithNoAuth(data test.Data, helpers test.Helpers, port int, tls bool
 	return registry.NewDockerRegistry(data, helpers, rca, port, &registry.NoAuth{})
 }
 
-func RegistryWithBasicAuth(data test.Data, helpers test.Helpers, user, pass string, port int, tls bool) *registry.Server {
+func RegistryWithBasicAuth(
+	data test.Data,
+	helpers test.Helpers,
+	user, pass string,
+	port int,
+	tls bool,
+) *registry.Server {
 	auth := &registry.BasicAuth{
 		Username: user,
 		Password: pass,

@@ -27,7 +27,7 @@ func TestComposeRestart(t *testing.T) {
 	t.Parallel()
 
 	base := testutil.NewBase(t)
-	var dockerComposeYAML = fmt.Sprintf(`
+	dockerComposeYAML := fmt.Sprintf(`
 version: '3.1'
 
 services:
@@ -67,14 +67,17 @@ volumes:
 
 	// stop and restart a single service.
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "stop", "db").AssertOK()
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "db", "-a").AssertOutContainsAny("Exit", "exited")
+	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "db", "-a").
+		AssertOutContainsAny("Exit", "exited")
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "restart", "db").AssertOK()
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "db").AssertOutContainsAny("Up", "running")
 
 	// stop one service and restart all (also check `--timeout` arg).
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "stop", "db").AssertOK()
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "db", "-a").AssertOutContainsAny("Exit", "exited")
+	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "db", "-a").
+		AssertOutContainsAny("Exit", "exited")
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "restart", "--timeout", "5").AssertOK()
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "db").AssertOutContainsAny("Up", "running")
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "wordpress").AssertOutContainsAny("Up", "running")
+	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "wordpress").
+		AssertOutContainsAny("Up", "running")
 }

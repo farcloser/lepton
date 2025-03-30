@@ -121,7 +121,7 @@ func TestComposeUpNetWithStaticIP(t *testing.T) {
 	}
 	base := testutil.NewBase(t)
 	staticIP := "172.20.0.12"
-	var dockerComposeYAML = fmt.Sprintf(`
+	dockerComposeYAML := fmt.Sprintf(`
 version: '3.1'
 
 services:
@@ -145,10 +145,15 @@ networks:
 	defer base.ComposeCmd("-f", comp.YAMLFullPath(), "down", "-v").Run()
 
 	svc0 := serviceparser.DefaultContainerName(projectName, "svc0", "1")
-	inspectCmd := base.Cmd("inspect", svc0, "--format", "\"{{range .NetworkSettings.Networks}} {{.IPAddress}}{{end}}\"")
+	inspectCmd := base.Cmd(
+		"inspect",
+		svc0,
+		"--format",
+		"\"{{range .NetworkSettings.Networks}} {{.IPAddress}}{{end}}\"",
+	)
 	result := inspectCmd.Run()
 	stdoutContent := result.Stdout() + result.Stderr()
-	assert.Assert(inspectCmd.Base.T, result.ExitCode == 0, stdoutContent)
+	assert.Assert(inspectCmd.T, result.ExitCode == 0, stdoutContent)
 	if !strings.Contains(stdoutContent, staticIP) {
 		log.L.Errorf("test failed, the actual container ip is %s", stdoutContent)
 		t.Fail()
@@ -161,7 +166,7 @@ func TestComposeUpMultiNet(t *testing.T) {
 
 	base := testutil.NewBase(t)
 
-	var dockerComposeYAML = fmt.Sprintf(`
+	dockerComposeYAML := fmt.Sprintf(`
 version: '3.1'
 
 services:
@@ -212,7 +217,7 @@ func TestComposeUpOsEnvVar(t *testing.T) {
 
 	base := testutil.NewBase(t)
 	const containerName = "nginxAlpine"
-	var dockerComposeYAML = fmt.Sprintf(`
+	dockerComposeYAML := fmt.Sprintf(`
 version: '3.1'
 
 services:
@@ -247,7 +252,7 @@ func TestComposeUpDotEnvFile(t *testing.T) {
 
 	base := testutil.NewBase(t)
 
-	var dockerComposeYAML = `
+	dockerComposeYAML := `
 version: '3.1'
 
 services:
@@ -272,7 +277,7 @@ func TestComposeUpEnvFileNotFoundError(t *testing.T) {
 
 	base := testutil.NewBase(t)
 
-	var dockerComposeYAML = `
+	dockerComposeYAML := `
 version: '3.1'
 
 services:
@@ -298,7 +303,7 @@ func TestComposeUpWithScale(t *testing.T) {
 
 	base := testutil.NewBase(t)
 
-	var dockerComposeYAML = fmt.Sprintf(`
+	dockerComposeYAML := fmt.Sprintf(`
 version: '3.1'
 
 services:
@@ -315,7 +320,8 @@ services:
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "up", "-d", "--scale", "test=2").AssertOK()
 	defer base.ComposeCmd("-f", comp.YAMLFullPath(), "down", "-v").Run()
 
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps").AssertOutContains(serviceparser.DefaultContainerName(projectName, "test", "2"))
+	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps").
+		AssertOutContains(serviceparser.DefaultContainerName(projectName, "test", "2"))
 }
 
 func TestComposeIPAMConfig(t *testing.T) {
@@ -323,7 +329,7 @@ func TestComposeIPAMConfig(t *testing.T) {
 
 	base := testutil.NewBase(t)
 
-	var dockerComposeYAML = fmt.Sprintf(`
+	dockerComposeYAML := fmt.Sprintf(`
 version: '3.1'
 
 services:
@@ -386,9 +392,12 @@ services:
 	base.ComposeCmd("-p", projectName, "-f", compFull.YAMLFullPath(), "up", "-d").AssertOK()
 	defer base.ComposeCmd("-p", projectName, "-f", compFull.YAMLFullPath(), "down", "-v").Run()
 	base.ComposeCmd("-p", projectName, "-f", compOrphan.YAMLFullPath(), "up", "-d").AssertOK()
-	base.ComposeCmd("-p", projectName, "-f", compFull.YAMLFullPath(), "ps").AssertOutContains(orphanContainer)
-	base.ComposeCmd("-p", projectName, "-f", compOrphan.YAMLFullPath(), "up", "-d", "--remove-orphans").AssertOK()
-	base.ComposeCmd("-p", projectName, "-f", compFull.YAMLFullPath(), "ps").AssertOutNotContains(orphanContainer)
+	base.ComposeCmd("-p", projectName, "-f", compFull.YAMLFullPath(), "ps").
+		AssertOutContains(orphanContainer)
+	base.ComposeCmd("-p", projectName, "-f", compOrphan.YAMLFullPath(), "up", "-d", "--remove-orphans").
+		AssertOK()
+	base.ComposeCmd("-p", projectName, "-f", compFull.YAMLFullPath(), "ps").
+		AssertOutNotContains(orphanContainer)
 }
 
 func TestComposeUpIdempotent(t *testing.T) {
@@ -396,7 +405,7 @@ func TestComposeUpIdempotent(t *testing.T) {
 
 	base := testutil.NewBase(t)
 
-	var dockerComposeYAML = fmt.Sprintf(`
+	dockerComposeYAML := fmt.Sprintf(`
 version: '3.1'
 
 services:
@@ -422,7 +431,7 @@ func TestComposeUpWithExternalNetwork(t *testing.T) {
 	containerName1 := testutil.Identifier(t) + "-1"
 	containerName2 := testutil.Identifier(t) + "-2"
 	networkName := testutil.Identifier(t) + "-network"
-	var dockerComposeYaml1 = fmt.Sprintf(`
+	dockerComposeYaml1 := fmt.Sprintf(`
 version: "3"
 services:
   %s:
@@ -436,7 +445,7 @@ networks:
   %s:
     external: true
 `, containerName1, testutil.NginxAlpineImage, containerName1, networkName, networkName)
-	var dockerComposeYaml2 = fmt.Sprintf(`
+	dockerComposeYaml2 := fmt.Sprintf(`
 version: "3"
 services:
   %s:
@@ -468,7 +477,8 @@ networks:
 	base.ComposeCmd("-f", comp2.YAMLFullPath(), "down", "-v").AssertOK()
 	// Run the second compose again
 	base.ComposeCmd("-f", comp2.YAMLFullPath(), "up", "-d").AssertOK()
-	base.Cmd("exec", containerName1, "wget", "-qO-", "http://"+containerName2).AssertOutContains(testutil.NginxAlpineIndexHTMLSnippet)
+	base.Cmd("exec", containerName1, "wget", "-qO-", "http://"+containerName2).
+		AssertOutContains(testutil.NginxAlpineIndexHTMLSnippet)
 }
 
 func TestComposeUpWithBypass4netns(t *testing.T) {
@@ -549,7 +559,8 @@ services:
 	psCmd := base.Cmd("ps", "-a", "--format={{.Names}}")
 	psCmd.AssertOutContains(serviceRegular)
 	psCmd.AssertOutContains(serviceProfiled)
-	base.ComposeCmd("-f", comp1.YAMLFullPath(), "--profile", "test-profile", "down", "-v").AssertOK()
+	base.ComposeCmd("-f", comp1.YAMLFullPath(), "--profile", "test-profile", "down", "-v").
+		AssertOK()
 
 	// * Test without profile
 	//   Should run:
@@ -616,7 +627,7 @@ func TestComposeUpPull(t *testing.T) {
 
 	base := testutil.NewBase(t)
 
-	var dockerComposeYAML = fmt.Sprintf(`
+	dockerComposeYAML := fmt.Sprintf(`
 services:
   test:
     image: %s
@@ -651,7 +662,7 @@ services:
 func TestComposeUpServicePullPolicy(t *testing.T) {
 	base := testutil.NewBase(t)
 
-	var dockerComposeYAML = fmt.Sprintf(`
+	dockerComposeYAML := fmt.Sprintf(`
 services:
   test:
     image: %s

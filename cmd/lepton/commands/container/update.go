@@ -38,7 +38,7 @@ import (
 	"go.farcloser.world/lepton/cmd/lepton/helpers"
 	"go.farcloser.world/lepton/leptonic/services/containerd"
 	"go.farcloser.world/lepton/pkg/api/options"
-	containerCommand "go.farcloser.world/lepton/pkg/cmd/container"
+	containercommand "go.farcloser.world/lepton/pkg/cmd/container"
 	"go.farcloser.world/lepton/pkg/formatter"
 	"go.farcloser.world/lepton/pkg/idutil/containerwalker"
 	"go.farcloser.world/lepton/pkg/infoutil"
@@ -357,7 +357,7 @@ func updateContainer(ctx context.Context, cli *client.Client, id string, opts up
 		return err
 	}
 	if cmd.Flags().Changed("restart") && restart != "" {
-		if err := containerCommand.UpdateContainerRestartPolicyLabel(ctx, cli, container, restart); err != nil {
+		if err := containercommand.UpdateContainerRestartPolicyLabel(ctx, cli, container, restart); err != nil {
 			return err
 		}
 	}

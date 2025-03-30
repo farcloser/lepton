@@ -73,7 +73,11 @@ func NonLoopbackIPv4() (net.IP, error) {
 		}
 		return ipv4, nil
 	}
-	return nil, fmt.Errorf("non-loopback IPv4 address not found, attempted=%+v: %w", addrs, errs.ErrNotFound)
+	return nil, fmt.Errorf(
+		"non-loopback IPv4 address not found, attempted=%+v: %w",
+		addrs,
+		errs.ErrNotFound,
+	)
 }
 
 func GenerateMACAddress() (string, error) {
@@ -84,5 +88,13 @@ func GenerateMACAddress() (string, error) {
 	// make sure byte 0 (broadcast) of the first byte is not set
 	// and byte 1 (local) is set
 	buf[0] = buf[0]&254 | 2
-	return fmt.Sprintf("%02x:%02x:%02x:%02x:%02x:%02x", buf[0], buf[1], buf[2], buf[3], buf[4], buf[5]), nil
+	return fmt.Sprintf(
+		"%02x:%02x:%02x:%02x:%02x:%02x",
+		buf[0],
+		buf[1],
+		buf[2],
+		buf[3],
+		buf[4],
+		buf[5],
+	), nil
 }

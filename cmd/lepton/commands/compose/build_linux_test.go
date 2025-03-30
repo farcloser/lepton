@@ -59,7 +59,11 @@ services:
 	testCase.Require = nerdtest.Build
 
 	testCase.Setup = func(data test.Data, helpers test.Helpers) {
-		err := os.WriteFile(filepath.Join(data.TempDir(), "compose.yaml"), []byte(dockerComposeYAML), 0o600)
+		err := os.WriteFile(
+			filepath.Join(data.TempDir(), "compose.yaml"),
+			[]byte(dockerComposeYAML),
+			0o600,
+		)
 		assert.NilError(t, err)
 		err = os.WriteFile(filepath.Join(data.TempDir(), "Dockerfile"), []byte(dockerfile), 0o600)
 		assert.NilError(t, err)
@@ -110,7 +114,14 @@ services:
 		{
 			Description: "build bogus",
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-				return helpers.Command("compose", "-f", data.Get("composeYaml"), "build", "svc0", "svc100")
+				return helpers.Command(
+					"compose",
+					"-f",
+					data.Get("composeYaml"),
+					"build",
+					"svc0",
+					"svc100",
+				)
 			},
 
 			Expected: test.Expects(1, []error{errors.New("no such service: svc100")}, nil),

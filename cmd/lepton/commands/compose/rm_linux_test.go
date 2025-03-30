@@ -28,7 +28,7 @@ func TestComposeRemove(t *testing.T) {
 	t.Parallel()
 
 	base := testutil.NewBase(t)
-	var dockerComposeYAML = fmt.Sprintf(`
+	dockerComposeYAML := fmt.Sprintf(`
 version: '3.1'
 
 services:
@@ -71,7 +71,8 @@ volumes:
 	// no stopped containers
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "rm", "-f").AssertOK()
 	time.Sleep(3 * time.Second)
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "wordpress").AssertOutContainsAny("Up", "running")
+	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "wordpress").
+		AssertOutContainsAny("Up", "running")
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "db").AssertOutContainsAny("Up", "running")
 	// remove one stopped service
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "stop", "wordpress").AssertOK()

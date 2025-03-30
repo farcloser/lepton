@@ -14,6 +14,7 @@
    limitations under the License.
 */
 
+// Package nerdtest
 package nerdtest
 
 import (
@@ -22,7 +23,6 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
-	"time"
 
 	"gotest.tools/v3/assert"
 
@@ -78,7 +78,10 @@ func newNerdCommand(conf test.Config, t *testing.T) *nerdCommand {
 	}
 
 	// Create the base command, with the right binary, t
-	ret := &nerdCommand{}
+	ret := &nerdCommand{
+		GenericCommand: *(test.NewGenericCommand().(*test.GenericCommand)),
+	}
+
 	ret.WithBinary(binary)
 	// Not interested in these - and insulate us from parent environment side effects
 	ret.WithBlacklist([]string{
@@ -113,9 +116,9 @@ func (nc *nerdCommand) Run(expect *test.Expected) {
 	nc.GenericCommand.Run(expect)
 }
 
-func (nc *nerdCommand) Background(timeout time.Duration) {
+func (nc *nerdCommand) Background() {
 	nc.prep()
-	nc.GenericCommand.Background(timeout)
+	nc.GenericCommand.Background()
 }
 
 // Run does override the generic command run
@@ -124,10 +127,10 @@ func (nc *nerdCommand) prep() {
 
 	// If no DOCKER_CONFIG was explicitly provided, set ourselves inside the current working directory
 	if nc.Env["DOCKER_CONFIG"] == "" {
-		nc.Env["DOCKER_CONFIG"] = nc.GenericCommand.TempDir
+		nc.Env["DOCKER_CONFIG"] = nc.TempDir
 	}
 
-	if customDCConfig := nc.GenericCommand.Config.Read(DockerConfig); customDCConfig != "" {
+	if customDCConfig := nc.Config.Read(DockerConfig); customDCConfig != "" {
 		if !nc.hasWrittenDockerConfig {
 			dest := filepath.Join(nc.Env["DOCKER_CONFIG"], "config.json")
 			err := os.WriteFile(dest, []byte(customDCConfig), 0o400)
@@ -137,12 +140,13 @@ func (nc *nerdCommand) prep() {
 	}
 
 	trgt := getTarget()
-	if trgt == targetDocker {
+	switch trgt {
+	case targetDocker:
 		// Allow debugging with docker syntax
 		if nc.Config.Read(Debug) != "" {
 			nc.PrependArgs("--log-level=debug")
 		}
-	} else if trgt == targetNerdishctl || trgt == targetNerdctl {
+	case targetNerdishctl, targetNerdctl:
 		// Set the namespace
 		if nc.Config.Read(Namespace) != "" {
 			nc.PrependArgs("--namespace=" + string(nc.Config.Read(Namespace)))
@@ -151,7 +155,7 @@ func (nc *nerdCommand) prep() {
 		envPrefix := strings.ToUpper(trgt)
 		// If no PREFIX_TOML was explicitly provided, set it to the private dir
 		if nc.Env[envPrefix+"_TOML"] == "" {
-			nc.Env[envPrefix+"_TOML"] = filepath.Join(nc.GenericCommand.TempDir, trgt+".toml")
+			nc.Env[envPrefix+"_TOML"] = filepath.Join(nc.TempDir, trgt+".toml")
 		}
 
 		// If we have custom toml content, write it if it does not exist already

@@ -30,7 +30,8 @@ func TestRename(t *testing.T) {
 	base := testutil.NewBase(t)
 
 	defer base.Cmd("rm", "-f", testContainerName).Run()
-	base.Cmd("run", "-d", "--name", testContainerName, testutil.CommonImage, "sleep", nerdtest.Infinity).AssertOK()
+	base.Cmd("run", "-d", "--name", testContainerName, testutil.CommonImage, "sleep", nerdtest.Infinity).
+		AssertOK()
 
 	defer base.Cmd("rm", "-f", testContainerName+"_new").Run()
 	base.Cmd("rename", testContainerName, testContainerName+"_new").AssertOK()
@@ -47,16 +48,21 @@ func TestRenameUpdateHosts(t *testing.T) {
 	base := testutil.NewBase(t)
 
 	defer base.Cmd("rm", "-f", testContainerName).Run()
-	base.Cmd("run", "-d", "--name", testContainerName, testutil.CommonImage, "sleep", nerdtest.Infinity).AssertOK()
+	base.Cmd("run", "-d", "--name", testContainerName, testutil.CommonImage, "sleep", nerdtest.Infinity).
+		AssertOK()
 	base.EnsureContainerStarted(testContainerName)
 
 	defer base.Cmd("rm", "-f", testContainerName+"_1").Run()
-	base.Cmd("run", "-d", "--name", testContainerName+"_1", testutil.CommonImage, "sleep", nerdtest.Infinity).AssertOK()
+	base.Cmd("run", "-d", "--name", testContainerName+"_1", testutil.CommonImage, "sleep", nerdtest.Infinity).
+		AssertOK()
 	base.EnsureContainerStarted(testContainerName + "_1")
 
 	defer base.Cmd("rm", "-f", testContainerName+"_new").Run()
-	base.Cmd("exec", testContainerName, "cat", "/etc/hosts").AssertOutContains(testContainerName + "_1")
+	base.Cmd("exec", testContainerName, "cat", "/etc/hosts").
+		AssertOutContains(testContainerName + "_1")
 	base.Cmd("rename", testContainerName, testContainerName+"_new").AssertOK()
-	base.Cmd("exec", testContainerName+"_new", "cat", "/etc/hosts").AssertOutContains(testContainerName + "_new")
-	base.Cmd("exec", testContainerName+"_1", "cat", "/etc/hosts").AssertOutContains(testContainerName + "_new")
+	base.Cmd("exec", testContainerName+"_new", "cat", "/etc/hosts").
+		AssertOutContains(testContainerName + "_new")
+	base.Cmd("exec", testContainerName+"_1", "cat", "/etc/hosts").
+		AssertOutContains(testContainerName + "_new")
 }

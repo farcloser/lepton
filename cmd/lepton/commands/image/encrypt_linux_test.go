@@ -64,10 +64,28 @@ func TestImageEncryptJWE(t *testing.T) {
 			keyPair = various.NewJWEKeyPair(t)
 			helpers.Ensure("pull", "--quiet", testutil.CommonImage)
 			encryptImageRef := fmt.Sprintf("127.0.0.1:%d/%s:encrypted", reg.Port, data.Identifier())
-			helpers.Ensure("image", "encrypt", "--recipient=jwe:"+keyPair.Pub, testutil.CommonImage, encryptImageRef)
-			inspector := helpers.Capture("image", "inspect", "--mode=native", "--format={{len .Index.Manifests}}", encryptImageRef)
+			helpers.Ensure(
+				"image",
+				"encrypt",
+				"--recipient=jwe:"+keyPair.Pub,
+				testutil.CommonImage,
+				encryptImageRef,
+			)
+			inspector := helpers.Capture(
+				"image",
+				"inspect",
+				"--mode=native",
+				"--format={{len .Index.Manifests}}",
+				encryptImageRef,
+			)
 			assert.Equal(t, inspector, "1\n")
-			inspector = helpers.Capture("image", "inspect", "--mode=native", "--format={{json .Manifest.Layers}}", encryptImageRef)
+			inspector = helpers.Capture(
+				"image",
+				"inspect",
+				"--mode=native",
+				"--format={{json .Manifest.Layers}}",
+				encryptImageRef,
+			)
 			assert.Assert(t, strings.Contains(inspector, "org.opencontainers.image.enc.keys.jwe"))
 			helpers.Ensure("push", encryptImageRef)
 			helpers.Anyhow("rmi", "-f", encryptImageRef)
@@ -77,8 +95,20 @@ func TestImageEncryptJWE(t *testing.T) {
 		Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 			helpers.Fail("pull", data.Get(remoteImageKey))
 			helpers.Ensure("pull", "--quiet", "--unpack=false", data.Get(remoteImageKey))
-			helpers.Fail("image", "decrypt", "--key="+keyPair.Pub, data.Get(remoteImageKey), data.Identifier("decrypted")) // decryption needs prv key, not pub key
-			return helpers.Command("image", "decrypt", "--key="+keyPair.Prv, data.Get(remoteImageKey), data.Identifier("decrypted"))
+			helpers.Fail(
+				"image",
+				"decrypt",
+				"--key="+keyPair.Pub,
+				data.Get(remoteImageKey),
+				data.Identifier("decrypted"),
+			) // decryption needs prv key, not pub key
+			return helpers.Command(
+				"image",
+				"decrypt",
+				"--key="+keyPair.Prv,
+				data.Get(remoteImageKey),
+				data.Identifier("decrypted"),
+			)
 		},
 		Expected: test.Expects(0, nil, nil),
 	}

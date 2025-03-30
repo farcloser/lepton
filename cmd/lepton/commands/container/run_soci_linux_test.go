@@ -56,7 +56,8 @@ func TestRunSoci(t *testing.T) {
 
 			remoteSnapshotsInitialCount := strings.Count(string(initialMounts), "fuse.rawBridge")
 
-			runOutput := base.Cmd("--snapshotter=soci", "run", "--rm", testutil.FfmpegSociImage).Out()
+			runOutput := base.Cmd("--snapshotter=soci", "run", "--rm", testutil.FfmpegSociImage).
+				Out()
 			base.T.Logf("run output: %s", runOutput)
 
 			actualMounts, err := exec.Command("mount").Output()
@@ -72,8 +73,11 @@ func TestRunSoci(t *testing.T) {
 			base.T.Logf("number of expected mounts: %v", tt.remoteSnapshotsExpectedCount)
 
 			if tt.remoteSnapshotsExpectedCount != (remoteSnapshotsActualCount - remoteSnapshotsInitialCount) {
-				t.Fatalf("incorrect number of remote snapshots; expected=%d, actual=%d",
-					tt.remoteSnapshotsExpectedCount, remoteSnapshotsActualCount-remoteSnapshotsInitialCount)
+				t.Fatalf(
+					"incorrect number of remote snapshots; expected=%d, actual=%d",
+					tt.remoteSnapshotsExpectedCount,
+					remoteSnapshotsActualCount-remoteSnapshotsInitialCount,
+				)
 			}
 		})
 	}

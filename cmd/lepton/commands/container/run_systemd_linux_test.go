@@ -31,26 +31,31 @@ func TestRunWithSystemdAlways(t *testing.T) {
 	containerName := testutil.Identifier(t)
 	defer base.Cmd("container", "rm", "-f", containerName).AssertOK()
 
-	base.Cmd("run", "--name", containerName, "--systemd=always", "--entrypoint=/bin/bash", testutil.UbuntuImage, "-c", "mount | grep cgroup").AssertOutContains("(rw,")
+	base.Cmd("run", "--name", containerName, "--systemd=always", "--entrypoint=/bin/bash", testutil.UbuntuImage, "-c", "mount | grep cgroup").
+		AssertOutContains("(rw,")
 
-	base.Cmd("inspect", "--format", "{{json .Config.Labels}}", containerName).AssertOutContains("SIGRTMIN+3")
-
+	base.Cmd("inspect", "--format", "{{json .Config.Labels}}", containerName).
+		AssertOutContains("SIGRTMIN+3")
 }
 
 func TestRunWithSystemdTrueEnabled(t *testing.T) {
 	t.Parallel()
 
 	if runtime.GOARCH != "amd64" {
-		t.Skip("This test is currently broken on arm with no emulation, as the Systemd image being used is amd64 only")
+		t.Skip(
+			"This test is currently broken on arm with no emulation, as the Systemd image being used is amd64 only",
+		)
 	}
 	testutil.DockerIncompatible(t)
 	base := testutil.NewBase(t)
 	containerName := testutil.Identifier(t)
 	defer base.Cmd("container", "rm", "-f", containerName).AssertOK()
 
-	base.Cmd("run", "-d", "--name", containerName, "--systemd=true", "--entrypoint=/sbin/init", testutil.SystemdImage).AssertOK()
+	base.Cmd("run", "-d", "--name", containerName, "--systemd=true", "--entrypoint=/sbin/init", testutil.SystemdImage).
+		AssertOK()
 
-	base.Cmd("inspect", "--format", "{{json .Config.Labels}}", containerName).AssertOutContains("SIGRTMIN+3")
+	base.Cmd("inspect", "--format", "{{json .Config.Labels}}", containerName).
+		AssertOutContains("SIGRTMIN+3")
 
 	base.Cmd("exec", containerName, "sh", "-c", "--", `tries=0
 until systemctl is-system-running >/dev/null 2>&1; do
@@ -69,14 +74,17 @@ func TestRunWithSystemdTrueDisabled(t *testing.T) {
 	t.Parallel()
 
 	if runtime.GOARCH != "amd64" {
-		t.Skip("This test is currently broken on arm with no emulation, as the Systemd image being used is amd64 only")
+		t.Skip(
+			"This test is currently broken on arm with no emulation, as the Systemd image being used is amd64 only",
+		)
 	}
 	testutil.DockerIncompatible(t)
 	base := testutil.NewBase(t)
 	containerName := testutil.Identifier(t)
 	defer base.Cmd("rm", "-f", containerName).AssertOK()
 
-	base.Cmd("run", "--name", containerName, "--systemd=true", "--entrypoint=/bin/bash", testutil.SystemdImage, "-c", "systemctl list-jobs || true").AssertCombinedOutContains("System has not been booted with systemd as init system")
+	base.Cmd("run", "--name", containerName, "--systemd=true", "--entrypoint=/bin/bash", testutil.SystemdImage, "-c", "systemctl list-jobs || true").
+		AssertCombinedOutContains("System has not been booted with systemd as init system")
 }
 
 func TestRunWithSystemdFalse(t *testing.T) {
@@ -87,9 +95,11 @@ func TestRunWithSystemdFalse(t *testing.T) {
 	containerName := testutil.Identifier(t)
 	defer base.Cmd("rm", "-f", containerName).AssertOK()
 
-	base.Cmd("run", "--name", containerName, "--systemd=false", "--entrypoint=/bin/bash", testutil.UbuntuImage, "-c", "mount | grep cgroup").AssertOutContains("(ro,")
+	base.Cmd("run", "--name", containerName, "--systemd=false", "--entrypoint=/bin/bash", testutil.UbuntuImage, "-c", "mount | grep cgroup").
+		AssertOutContains("(ro,")
 
-	base.Cmd("inspect", "--format", "{{json .Config.Labels}}", containerName).AssertOutContains("SIGTERM")
+	base.Cmd("inspect", "--format", "{{json .Config.Labels}}", containerName).
+		AssertOutContains("SIGTERM")
 }
 
 func TestRunWithNoSystemd(t *testing.T) {
@@ -100,35 +110,44 @@ func TestRunWithNoSystemd(t *testing.T) {
 	containerName := testutil.Identifier(t)
 	defer base.Cmd("rm", "-f", containerName).AssertOK()
 
-	base.Cmd("run", "--name", containerName, "--entrypoint=/bin/bash", testutil.UbuntuImage, "-c", "mount | grep cgroup").AssertOutContains("(ro,")
+	base.Cmd("run", "--name", containerName, "--entrypoint=/bin/bash", testutil.UbuntuImage, "-c", "mount | grep cgroup").
+		AssertOutContains("(ro,")
 
-	base.Cmd("inspect", "--format", "{{json .Config.Labels}}", containerName).AssertOutContains("SIGTERM")
+	base.Cmd("inspect", "--format", "{{json .Config.Labels}}", containerName).
+		AssertOutContains("SIGTERM")
 }
 
 func TestRunWithSystemdPrivilegedError(t *testing.T) {
 	t.Parallel()
 
 	if runtime.GOARCH != "amd64" {
-		t.Skip("This test is currently broken on arm with no emulation, as the Systemd image being used is amd64 only")
+		t.Skip(
+			"This test is currently broken on arm with no emulation, as the Systemd image being used is amd64 only",
+		)
 	}
 	testutil.DockerIncompatible(t)
 	base := testutil.NewBase(t)
 
-	base.Cmd("run", "--privileged", "--rm", "--systemd=always", "--entrypoint=/sbin/init", testutil.SystemdImage).AssertCombinedOutContains("if --privileged is used with systemd `--security-opt privileged-without-host-devices` must also be used")
+	base.Cmd("run", "--privileged", "--rm", "--systemd=always", "--entrypoint=/sbin/init", testutil.SystemdImage).
+		AssertCombinedOutContains("if --privileged is used with systemd `--security-opt privileged-without-host-devices` must also be used")
 }
 
 func TestRunWithSystemdPrivilegedSuccess(t *testing.T) {
 	t.Parallel()
 
 	if runtime.GOARCH != "amd64" {
-		t.Skip("This test is currently broken on arm with no emulation, as the Systemd image being used is amd64 only")
+		t.Skip(
+			"This test is currently broken on arm with no emulation, as the Systemd image being used is amd64 only",
+		)
 	}
 	testutil.DockerIncompatible(t)
 	base := testutil.NewBase(t)
 	containerName := testutil.Identifier(t)
 	defer base.Cmd("container", "rm", "-f", containerName).AssertOK()
 
-	base.Cmd("run", "-d", "--name", containerName, "--privileged", "--security-opt", "privileged-without-host-devices", "--systemd=true", "--entrypoint=/sbin/init", testutil.SystemdImage).AssertOK()
+	base.Cmd("run", "-d", "--name", containerName, "--privileged", "--security-opt", "privileged-without-host-devices", "--systemd=true", "--entrypoint=/sbin/init", testutil.SystemdImage).
+		AssertOK()
 
-	base.Cmd("inspect", "--format", "{{json .Config.Labels}}", containerName).AssertOutContains("SIGRTMIN+3")
+	base.Cmd("inspect", "--format", "{{json .Config.Labels}}", containerName).
+		AssertOutContains("SIGRTMIN+3")
 }

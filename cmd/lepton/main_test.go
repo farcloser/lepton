@@ -38,7 +38,7 @@ func TestMain(m *testing.M) {
 func TestUnknownCommand(t *testing.T) {
 	testCase := nerdtest.Setup()
 
-	var unknownSubCommand = errors.New("unknown subcommand")
+	unknownSubCommand := errors.New("unknown subcommand")
 
 	testCase.SubTests = []*test.Case{
 		{
@@ -98,27 +98,49 @@ func TestConfig(t *testing.T) {
 			Description: "TOML > Default",
 			Command:     test.Command("info", "-f", "{{.Driver}}"),
 			Expected:    test.Expects(0, nil, expect.Equals("dummy-snapshotter-via-toml\n")),
-			Config:      test.WithConfig(nerdtest.NerdishctlToml, `snapshotter = "dummy-snapshotter-via-toml"`),
+			Config: test.WithConfig(
+				nerdtest.NerdishctlToml,
+				`snapshotter = "dummy-snapshotter-via-toml"`,
+			),
 		},
 		{
 			Description: "Cli > TOML > Default",
-			Command:     test.Command("info", "-f", "{{.Driver}}", "--snapshotter=dummy-snapshotter-via-cli"),
-			Expected:    test.Expects(0, nil, expect.Equals("dummy-snapshotter-via-cli\n")),
-			Config:      test.WithConfig(nerdtest.NerdishctlToml, `snapshotter = "dummy-snapshotter-via-toml"`),
+			Command: test.Command(
+				"info",
+				"-f",
+				"{{.Driver}}",
+				"--snapshotter=dummy-snapshotter-via-cli",
+			),
+			Expected: test.Expects(0, nil, expect.Equals("dummy-snapshotter-via-cli\n")),
+			Config: test.WithConfig(
+				nerdtest.NerdishctlToml,
+				`snapshotter = "dummy-snapshotter-via-toml"`,
+			),
 		},
 		{
 			Description: "Env > TOML > Default",
 			Command:     test.Command("info", "-f", "{{.Driver}}"),
 			Env:         map[string]string{"CONTAINERD_SNAPSHOTTER": "dummy-snapshotter-via-env"},
 			Expected:    test.Expects(0, nil, expect.Equals("dummy-snapshotter-via-env\n")),
-			Config:      test.WithConfig(nerdtest.NerdishctlToml, `snapshotter = "dummy-snapshotter-via-toml"`),
+			Config: test.WithConfig(
+				nerdtest.NerdishctlToml,
+				`snapshotter = "dummy-snapshotter-via-toml"`,
+			),
 		},
 		{
 			Description: "Cli > Env > TOML > Default",
-			Command:     test.Command("info", "-f", "{{.Driver}}", "--snapshotter=dummy-snapshotter-via-cli"),
-			Env:         map[string]string{"CONTAINERD_SNAPSHOTTER": "dummy-snapshotter-via-env"},
-			Expected:    test.Expects(0, nil, expect.Equals("dummy-snapshotter-via-cli\n")),
-			Config:      test.WithConfig(nerdtest.NerdishctlToml, `snapshotter = "dummy-snapshotter-via-toml"`),
+			Command: test.Command(
+				"info",
+				"-f",
+				"{{.Driver}}",
+				"--snapshotter=dummy-snapshotter-via-cli",
+			),
+			Env:      map[string]string{"CONTAINERD_SNAPSHOTTER": "dummy-snapshotter-via-env"},
+			Expected: test.Expects(0, nil, expect.Equals("dummy-snapshotter-via-cli\n")),
+			Config: test.WithConfig(
+				nerdtest.NerdishctlToml,
+				`snapshotter = "dummy-snapshotter-via-toml"`,
+			),
 		},
 		{
 			Description: "Broken config",

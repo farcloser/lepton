@@ -77,7 +77,13 @@ func TestVolumeNamespace(t *testing.T) {
 					Output: expect.All(
 						expect.DoesNotContain(data.Get("root_volume")),
 						func(stdout string, info string, t *testing.T) {
-							helpers.Ensure("--namespace", data.Get("root_namespace"), "volume", "inspect", data.Get("root_volume"))
+							helpers.Ensure(
+								"--namespace",
+								data.Get("root_namespace"),
+								"volume",
+								"inspect",
+								data.Get("root_volume"),
+							)
 						},
 					),
 				}
@@ -97,7 +103,13 @@ func TestVolumeNamespace(t *testing.T) {
 					Output: func(stdout string, info string, t *testing.T) {
 						helpers.Ensure("volume", "inspect", data.Get("root_volume"))
 						helpers.Ensure("volume", "rm", data.Get("root_volume"))
-						helpers.Ensure("--namespace", data.Get("root_namespace"), "volume", "inspect", data.Get("root_volume"))
+						helpers.Ensure(
+							"--namespace",
+							data.Get("root_namespace"),
+							"volume",
+							"inspect",
+							data.Get("root_volume"),
+						)
 					},
 				}
 			},

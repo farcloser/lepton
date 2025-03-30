@@ -35,7 +35,7 @@ import (
 // ContainerTopOKBody is from https://github.com/moby/moby/blob/v20.10.6/api/types/container/container_top.go
 //
 // ContainerTopOKBody OK response to ContainerTop operation
-type ContainerTopOKBody struct { //nolint:revive
+type ContainerTopOKBody struct {
 
 	// Each process running in the container, where each is process
 	// is an array of values corresponding to the titles.

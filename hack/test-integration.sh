@@ -23,7 +23,8 @@ readonly binary=lepton
 
 # This is mildly annoying
 x=0
-! command -v systemctl >/dev/null || while ! systemctl is-active containerd >/dev/null && [ "$x" -lt 20 ]; do
+# FIXME: this won't work in rootless
+! command -v systemctl >/dev/null || while ! systemctl --user is-active containerd >/dev/null && [ "$x" -lt 20 ]; do
   x=$((x+1))
   sleep 0.5
 done

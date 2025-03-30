@@ -42,12 +42,17 @@ func TestCreateWithLabel(t *testing.T) {
 	base := testutil.NewBase(t)
 	tID := testutil.Identifier(t)
 
-	base.Cmd("create", "--name", tID, "--label", "foo=bar", testutil.NginxAlpineImage, "echo", "foo").AssertOK()
+	base.Cmd("create", "--name", tID, "--label", "foo=bar", testutil.NginxAlpineImage, "echo", "foo").
+		AssertOK()
 	defer base.Cmd("rm", "-f", tID).Run()
 	inspect := base.InspectContainer(tID)
 	assert.Equal(base.T, "bar", inspect.Config.Labels["foo"])
 	// the label `maintainer`` is defined by image
-	assert.Equal(base.T, "NGINX Docker Maintainers <docker-maint@nginx.com>", inspect.Config.Labels["maintainer"])
+	assert.Equal(
+		base.T,
+		"NGINX Docker Maintainers <docker-maint@nginx.com>",
+		inspect.Config.Labels["maintainer"],
+	)
 }
 
 func TestCreateWithMACAddress(t *testing.T) {
@@ -84,7 +89,11 @@ func TestCreateWithMACAddress(t *testing.T) {
 	}{
 		{"host", false, defaultMac}, // anything but the actual address being passed
 		{"none", false, ""},
-		{"container:whatever" + tID, true, "container"}, // "No such container" vs. "could not find container"
+		{
+			"container:whatever" + tID,
+			true,
+			"container",
+		}, // "No such container" vs. "could not find container"
 		{"bridge", false, passedMac},
 		{networkBridge, false, passedMac},
 		{networkMACvlan, false, passedMac},
@@ -92,7 +101,13 @@ func TestCreateWithMACAddress(t *testing.T) {
 	}
 	for i, testCase := range tests {
 		containerName := fmt.Sprintf("%s_%d", tID, i)
-		testName := fmt.Sprintf("%s_container:%s_network:%s_expect:%s", tID, containerName, testCase.Network, testCase.Expect)
+		testName := fmt.Sprintf(
+			"%s_container:%s_network:%s_expect:%s",
+			tID,
+			containerName,
+			testCase.Network,
+			testCase.Expect,
+		)
 		expect := testCase.Expect
 		network := testCase.Network
 		wantErr := testCase.WantErr
@@ -125,7 +140,11 @@ func TestCreateWithMACAddress(t *testing.T) {
 				res = base.Cmd("start", "-a", containerName).Run()
 				// FIXME: flaky - this has failed on the CI once, with the output NOT containing anything
 				// https://github.com/containerd/nerdctl/actions/runs/11392051487/job/31697214002?pr=3535#step:7:271
-				assert.Assert(t, strings.Contains(res.Stdout(), expect), fmt.Sprintf("expected output to contain %q: %q", expect, res.Stdout()))
+				assert.Assert(
+					t,
+					strings.Contains(res.Stdout(), expect),
+					fmt.Sprintf("expected output to contain %q: %q", expect, res.Stdout()),
+				)
 				assert.Assert(t, res.ExitCode == 0, "Command should have succeeded")
 			} else {
 				if nerdtest.IsDocker() &&
@@ -166,7 +185,8 @@ func TestCreateWithTty(t *testing.T) {
 	base.Cmd("create", "--name", withoutTtyContainerName, imageName, "stty").AssertOK()
 	base.Cmd("start", withoutTtyContainerName).AssertOK()
 	defer base.Cmd("container", "rm", "-f", withoutTtyContainerName).AssertOK()
-	base.Cmd("logs", withoutTtyContainerName).AssertCombinedOutContains("stty: standard input: Not a tty")
+	base.Cmd("logs", withoutTtyContainerName).
+		AssertCombinedOutContains("stty: standard input: Not a tty")
 	withoutTtyContainer := base.InspectContainer(withoutTtyContainerName)
 	assert.Equal(base.T, 1, withoutTtyContainer.State.ExitCode)
 
@@ -205,7 +225,18 @@ func TestIssue2993(t *testing.T) {
 			Setup: func(data test.Data, helpers test.Helpers) {
 				dataRoot := data.TempDir()
 
-				helpers.Ensure("run", "--quiet", "--data-root", dataRoot, "--name", data.Identifier(), "-d", testutil.AlpineImage, "sleep", nerdtest.Infinity)
+				helpers.Ensure(
+					"run",
+					"--quiet",
+					"--data-root",
+					dataRoot,
+					"--name",
+					data.Identifier(),
+					"-d",
+					testutil.AlpineImage,
+					"sleep",
+					nerdtest.Infinity,
+				)
 
 				h := getAddrHash(defaults.DefaultAddress)
 				dataStore := filepath.Join(dataRoot, h)
@@ -229,7 +260,17 @@ func TestIssue2993(t *testing.T) {
 				helpers.Anyhow("rm", "--data-root", data.TempDir(), "-f", data.Identifier())
 			},
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-				return helpers.Command("run", "--data-root", data.TempDir(), "--name", data.Identifier(), "-d", testutil.AlpineImage, "sleep", nerdtest.Infinity)
+				return helpers.Command(
+					"run",
+					"--data-root",
+					data.TempDir(),
+					"--name",
+					data.Identifier(),
+					"-d",
+					testutil.AlpineImage,
+					"sleep",
+					nerdtest.Infinity,
+				)
 			},
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 				return &test.Expected{
@@ -252,7 +293,18 @@ func TestIssue2993(t *testing.T) {
 			Setup: func(data test.Data, helpers test.Helpers) {
 				dataRoot := data.TempDir()
 
-				helpers.Ensure("run", "--quiet", "--data-root", dataRoot, "--name", data.Identifier(), "-d", testutil.AlpineImage, "sleep", nerdtest.Infinity)
+				helpers.Ensure(
+					"run",
+					"--quiet",
+					"--data-root",
+					dataRoot,
+					"--name",
+					data.Identifier(),
+					"-d",
+					testutil.AlpineImage,
+					"sleep",
+					nerdtest.Infinity,
+				)
 
 				h := getAddrHash(defaults.DefaultAddress)
 				dataStore := filepath.Join(dataRoot, h)
@@ -329,5 +381,6 @@ func TestCreateFromOCIArchive(t *testing.T) {
 
 	base.Cmd("build", "--tag", tag, "--output=type=oci,dest="+tarPath, buildCtx).AssertOK()
 	base.Cmd("create", "--rm", "--name", containerName, "oci-archive://"+tarPath).AssertOK()
-	base.Cmd("start", "--attach", containerName).AssertOutContains("test-nerdctl-create-from-oci-archive")
+	base.Cmd("start", "--attach", containerName).
+		AssertOutContains("test-nerdctl-create-from-oci-archive")
 }

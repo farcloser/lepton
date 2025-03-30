@@ -58,11 +58,13 @@ func TestRestartPIDContainer(t *testing.T) {
 	base := testutil.NewBase(t)
 
 	baseContainerName := testutil.Identifier(t)
-	base.Cmd("run", "-d", "--name", baseContainerName, testutil.AlpineImage, "sleep", nerdtest.Infinity).AssertOK()
+	base.Cmd("run", "-d", "--name", baseContainerName, testutil.AlpineImage, "sleep", nerdtest.Infinity).
+		AssertOK()
 	defer base.Cmd("rm", "-f", baseContainerName).Run()
 
 	sharedContainerName := baseContainerName + "-shared"
-	base.Cmd("run", "-d", "--name", sharedContainerName, "--pid=container:"+baseContainerName, testutil.AlpineImage, "sleep", nerdtest.Infinity).AssertOK()
+	base.Cmd("run", "-d", "--name", sharedContainerName, "--pid=container:"+baseContainerName, testutil.AlpineImage, "sleep", nerdtest.Infinity).
+		AssertOK()
 	defer base.Cmd("rm", "-f", sharedContainerName).Run()
 
 	base.Cmd("restart", baseContainerName).AssertOK()
@@ -86,11 +88,13 @@ func TestRestartIPCContainer(t *testing.T) {
 	const shmSize = "32m"
 	baseContainerName := testutil.Identifier(t)
 	defer base.Cmd("rm", "-f", baseContainerName).Run()
-	base.Cmd("run", "-d", "--shm-size", shmSize, "--ipc", "shareable", "--name", baseContainerName, testutil.AlpineImage, "sleep", nerdtest.Infinity).AssertOK()
+	base.Cmd("run", "-d", "--shm-size", shmSize, "--ipc", "shareable", "--name", baseContainerName, testutil.AlpineImage, "sleep", nerdtest.Infinity).
+		AssertOK()
 
 	sharedContainerName := baseContainerName + "-shared"
 	defer base.Cmd("rm", "-f", sharedContainerName).Run()
-	base.Cmd("run", "-d", "--name", sharedContainerName, "--ipc=container:"+baseContainerName, testutil.AlpineImage, "sleep", nerdtest.Infinity).AssertOK()
+	base.Cmd("run", "-d", "--name", sharedContainerName, "--ipc=container:"+baseContainerName, testutil.AlpineImage, "sleep", nerdtest.Infinity).
+		AssertOK()
 
 	base.Cmd("stop", baseContainerName).Run()
 	base.Cmd("stop", sharedContainerName).Run()
@@ -98,9 +102,11 @@ func TestRestartIPCContainer(t *testing.T) {
 	base.Cmd("restart", baseContainerName).AssertOK()
 	base.Cmd("restart", sharedContainerName).AssertOK()
 
-	baseShmSizeResult := base.Cmd("exec", baseContainerName, "/bin/grep", "shm", "/proc/self/mounts").Run()
+	baseShmSizeResult := base.Cmd("exec", baseContainerName, "/bin/grep", "shm", "/proc/self/mounts").
+		Run()
 	baseOutput := strings.TrimSpace(baseShmSizeResult.Stdout())
-	sharedShmSizeResult := base.Cmd("exec", sharedContainerName, "/bin/grep", "shm", "/proc/self/mounts").Run()
+	sharedShmSizeResult := base.Cmd("exec", sharedContainerName, "/bin/grep", "shm", "/proc/self/mounts").
+		Run()
 	sharedOutput := strings.TrimSpace(sharedShmSizeResult.Stdout())
 
 	assert.Equal(t, baseOutput, sharedOutput)
@@ -112,7 +118,8 @@ func TestRestartWithTime(t *testing.T) {
 	base := testutil.NewBase(t)
 	tID := testutil.Identifier(t)
 
-	base.Cmd("run", "-d", "--name", tID, testutil.AlpineImage, "sleep", nerdtest.Infinity).AssertOK()
+	base.Cmd("run", "-d", "--name", tID, testutil.AlpineImage, "sleep", nerdtest.Infinity).
+		AssertOK()
 	defer base.Cmd("rm", "-f", tID).AssertOK()
 
 	inspect := base.InspectContainer(tID)
@@ -139,7 +146,10 @@ func TestRestartWithSignal(t *testing.T) {
 	testCase.Command = func(data test.Data, helpers test.Helpers) test.TestableCommand {
 		cmd := nerdtest.RunSigProxyContainer(nerdtest.SigUsr1, false, nil, data, helpers)
 		// Capture the current pid
-		data.Set("oldpid", strconv.Itoa(nerdtest.InspectContainer(helpers, data.Identifier()).State.Pid))
+		data.Set(
+			"oldpid",
+			strconv.Itoa(nerdtest.InspectContainer(helpers, data.Identifier()).State.Pid),
+		)
 		// Send the signal
 		helpers.Ensure("restart", "--signal", "SIGUSR1", data.Identifier())
 		return cmd
@@ -156,7 +166,9 @@ func TestRestartWithSignal(t *testing.T) {
 					// Ensure the container was restarted
 					nerdtest.EnsureContainerStarted(helpers, data.Identifier())
 					// Check the new pid is different
-					newpid := strconv.Itoa(nerdtest.InspectContainer(helpers, data.Identifier()).State.Pid)
+					newpid := strconv.Itoa(
+						nerdtest.InspectContainer(helpers, data.Identifier()).State.Pid,
+					)
 					assert.Assert(helpers.T(), newpid != data.Get("oldpid"), info)
 				},
 			),

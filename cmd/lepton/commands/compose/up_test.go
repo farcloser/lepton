@@ -35,7 +35,9 @@ func TestComposeUpDetailedError(t *testing.T) {
 	t.Parallel()
 
 	if runtime.GOOS != "linux" {
-		t.Skip("FIXME: test does not work on Windows yet (runtime \"io.containerd.runc.v2\" binary not installed \"containerd-shim-runc-v2.exe\": file does not exist)")
+		t.Skip(
+			"FIXME: test does not work on Windows yet (runtime \"io.containerd.runc.v2\" binary not installed \"containerd-shim-runc-v2.exe\": file does not exist)",
+		)
 	}
 	base := testutil.NewBase(t)
 	dockerComposeYAML := fmt.Sprintf(`
@@ -64,12 +66,14 @@ func TestComposeUpBindCreateHostPath(t *testing.T) {
 	// t.Parallel()
 
 	if runtime.GOOS == "windows" {
-		t.Skip(`FIXME: no support for Windows path: (error: "volume target must be an absolute path, got \"/mnt\")`)
+		t.Skip(
+			`FIXME: no support for Windows path: (error: "volume target must be an absolute path, got \"/mnt\")`,
+		)
 	}
 
 	base := testutil.NewBase(t)
 
-	var dockerComposeYAML = fmt.Sprintf(`
+	dockerComposeYAML := fmt.Sprintf(`
 services:
   test:
     image: %s

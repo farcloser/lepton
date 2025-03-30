@@ -30,8 +30,16 @@ import (
 )
 
 func testEventFilterExecutor(data test.Data, helpers test.Helpers) test.TestableCommand {
-	cmd := helpers.Command("events", "--filter", data.Get("filter"), "--format", formatter.FormatJSON)
-	cmd.Background(1 * time.Second)
+	cmd := helpers.Command(
+		"events",
+		"--filter",
+		data.Get("filter"),
+		"--format",
+		formatter.FormatJSON,
+	)
+	// XXX this is arbitrary, and a function of the overall pressure on the machine
+	cmd.WithTimeout(2 * time.Second)
+	cmd.Background()
 	helpers.Ensure("run", "--quiet", "--rm", testutil.CommonImage)
 	return cmd
 }

@@ -51,18 +51,28 @@ func TestVolumeInspect(t *testing.T) {
 
 	testCase := nerdtest.Setup()
 
-	testCase.Require = nerdtest.BrokenTest("This test assumes that the host-side of a volume can be written into, "+
-		"which is not always true. To be replaced by cp into the container.",
+	testCase.Require = nerdtest.BrokenTest(
+		"This test assumes that the host-side of a volume can be written into, "+
+			"which is not always true. To be replaced by cp into the container.",
 		&test.Requirement{
 			Check: func(data test.Data, helpers test.Helpers) (bool, string) {
 				isDocker, _ := nerdtest.Docker.Check(data, helpers)
 				return !isDocker || os.Geteuid() == 0, "docker cli needs to be run as root"
 			},
-		})
+		},
+	)
 
 	testCase.Setup = func(data test.Data, helpers test.Helpers) {
 		helpers.Ensure("volume", "create", data.Identifier("first"))
-		helpers.Ensure("volume", "create", "--label", "foo=fooval", "--label", "bar=barval", data.Identifier("second"))
+		helpers.Ensure(
+			"volume",
+			"create",
+			"--label",
+			"foo=fooval",
+			"--label",
+			"bar=barval",
+			data.Identifier("second"),
+		)
 		// Obviously note here that if inspect code gets totally hosed, this entire suite will
 		// probably fail right here on the Setup instead of actually testing something
 		vol := nerdtest.InspectVolume(helpers, data.Identifier("first"))
@@ -107,9 +117,28 @@ func TestVolumeInspect(t *testing.T) {
 							if err := json.Unmarshal([]byte(stdout), &dc); err != nil {
 								t.Fatal(err)
 							}
-							assert.Assert(t, len(dc) == 1, fmt.Sprintf("one result, not %d", len(dc))+info)
-							assert.Assert(t, dc[0].Name == data.Get("vol1"), fmt.Sprintf("expected name to be %q (was %q)", data.Get("vol1"), dc[0].Name)+info)
-							assert.Assert(t, dc[0].Labels == nil, fmt.Sprintf("expected labels to be nil and were %v", dc[0].Labels)+info)
+							assert.Assert(
+								t,
+								len(dc) == 1,
+								fmt.Sprintf("one result, not %d", len(dc))+info,
+							)
+							assert.Assert(
+								t,
+								dc[0].Name == data.Get("vol1"),
+								fmt.Sprintf(
+									"expected name to be %q (was %q)",
+									data.Get("vol1"),
+									dc[0].Name,
+								)+info,
+							)
+							assert.Assert(
+								t,
+								dc[0].Labels == nil,
+								fmt.Sprintf(
+									"expected labels to be nil and were %v",
+									dc[0].Labels,
+								)+info,
+							)
 						},
 					),
 				}
@@ -130,9 +159,21 @@ func TestVolumeInspect(t *testing.T) {
 								t.Fatal(err)
 							}
 							labels := dc[0].Labels
-							assert.Assert(t, len(labels) == 2, fmt.Sprintf("two results, not %d", len(labels)))
-							assert.Assert(t, labels["foo"] == "fooval", "label foo should be fooval, not "+labels["foo"])
-							assert.Assert(t, labels["bar"] == "barval", "label bar should be barval, not "+labels["bar"])
+							assert.Assert(
+								t,
+								len(labels) == 2,
+								fmt.Sprintf("two results, not %d", len(labels)),
+							)
+							assert.Assert(
+								t,
+								labels["foo"] == "fooval",
+								"label foo should be fooval, not "+labels["foo"],
+							)
+							assert.Assert(
+								t,
+								labels["bar"] == "barval",
+								"label bar should be barval, not "+labels["bar"],
+							)
 						},
 					),
 				}
@@ -153,7 +194,11 @@ func TestVolumeInspect(t *testing.T) {
 							if err := json.Unmarshal([]byte(stdout), &dc); err != nil {
 								t.Fatal(err)
 							}
-							assert.Assert(t, dc[0].Size == size, fmt.Sprintf("expected size to be %d (was %d)", size, dc[0].Size))
+							assert.Assert(
+								t,
+								dc[0].Size == size,
+								fmt.Sprintf("expected size to be %d (was %d)", size, dc[0].Size),
+							)
 						},
 					),
 				}
@@ -174,9 +219,29 @@ func TestVolumeInspect(t *testing.T) {
 							if err := json.Unmarshal([]byte(stdout), &dc); err != nil {
 								t.Fatal(err)
 							}
-							assert.Assert(t, len(dc) == 2, fmt.Sprintf("two results, not %d", len(dc)))
-							assert.Assert(t, dc[0].Name == data.Get("vol1"), fmt.Sprintf("expected name to be %q (was %q)", data.Get("vol1"), dc[0].Name))
-							assert.Assert(t, dc[1].Name == data.Get("vol2"), fmt.Sprintf("expected name to be %q (was %q)", data.Get("vol2"), dc[1].Name))
+							assert.Assert(
+								t,
+								len(dc) == 2,
+								fmt.Sprintf("two results, not %d", len(dc)),
+							)
+							assert.Assert(
+								t,
+								dc[0].Name == data.Get("vol1"),
+								fmt.Sprintf(
+									"expected name to be %q (was %q)",
+									data.Get("vol1"),
+									dc[0].Name,
+								),
+							)
+							assert.Assert(
+								t,
+								dc[1].Name == data.Get("vol2"),
+								fmt.Sprintf(
+									"expected name to be %q (was %q)",
+									data.Get("vol2"),
+									dc[1].Name,
+								),
+							)
 						},
 					),
 				}
@@ -185,7 +250,13 @@ func TestVolumeInspect(t *testing.T) {
 		{
 			Description: "part success multi",
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-				return helpers.Command("volume", "inspect", "invalid∞", "nonexistent", data.Get("vol1"))
+				return helpers.Command(
+					"volume",
+					"inspect",
+					"invalid∞",
+					"nonexistent",
+					data.Get("vol1"),
+				)
 			},
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 				return &test.Expected{
@@ -198,8 +269,20 @@ func TestVolumeInspect(t *testing.T) {
 							if err := json.Unmarshal([]byte(stdout), &dc); err != nil {
 								t.Fatal(err)
 							}
-							assert.Assert(t, len(dc) == 1, fmt.Sprintf("one result, not %d", len(dc)))
-							assert.Assert(t, dc[0].Name == data.Get("vol1"), fmt.Sprintf("expected name to be %q (was %q)", data.Get("vol1"), dc[0].Name))
+							assert.Assert(
+								t,
+								len(dc) == 1,
+								fmt.Sprintf("one result, not %d", len(dc)),
+							)
+							assert.Assert(
+								t,
+								dc[0].Name == data.Get("vol1"),
+								fmt.Sprintf(
+									"expected name to be %q (was %q)",
+									data.Get("vol1"),
+									dc[0].Name,
+								),
+							)
 						},
 					),
 				}

@@ -28,7 +28,7 @@ func TestComposePort(t *testing.T) {
 
 	base := testutil.NewBase(t)
 
-	var dockerComposeYAML = fmt.Sprintf(`
+	dockerComposeYAML := fmt.Sprintf(`
 version: '3.1'
 
 services:
@@ -49,8 +49,10 @@ services:
 	defer base.ComposeCmd("-f", comp.YAMLFullPath(), "down", "-v").AssertOK()
 
 	// `port` should work for given port and protocol
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "port", "svc0", "10000").AssertOutExactly("0.0.0.0:12345\n")
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "port", "--protocol", "udp", "svc0", "10001").AssertOutExactly("0.0.0.0:12346\n")
+	base.ComposeCmd("-f", comp.YAMLFullPath(), "port", "svc0", "10000").
+		AssertOutExactly("0.0.0.0:12345\n")
+	base.ComposeCmd("-f", comp.YAMLFullPath(), "port", "--protocol", "udp", "svc0", "10001").
+		AssertOutExactly("0.0.0.0:12346\n")
 }
 
 func TestComposePortFailure(t *testing.T) {
@@ -58,7 +60,7 @@ func TestComposePortFailure(t *testing.T) {
 
 	base := testutil.NewBase(t)
 
-	var dockerComposeYAML = fmt.Sprintf(`
+	dockerComposeYAML := fmt.Sprintf(`
 version: '3.1'
 
 services:
@@ -80,6 +82,8 @@ services:
 
 	// `port` should fail if given port and protocol don't exist
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "port", "svc0", "9999").AssertFail()
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "port", "--protocol", "udp", "svc0", "10000").AssertFail()
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "port", "--protocol", "tcp", "svc0", "10001").AssertFail()
+	base.ComposeCmd("-f", comp.YAMLFullPath(), "port", "--protocol", "udp", "svc0", "10000").
+		AssertFail()
+	base.ComposeCmd("-f", comp.YAMLFullPath(), "port", "--protocol", "tcp", "svc0", "10001").
+		AssertFail()
 }

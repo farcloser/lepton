@@ -43,8 +43,16 @@ func TestImageConvert(t *testing.T) {
 					helpers.Anyhow("rmi", "-f", data.Identifier("converted-image"))
 				},
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-					return helpers.Command("image", "convert", "--oci", "--zstd", "--zstd-compression-level", "3",
-						testutil.CommonImage, data.Identifier("converted-image"))
+					return helpers.Command(
+						"image",
+						"convert",
+						"--oci",
+						"--zstd",
+						"--zstd-compression-level",
+						"3",
+						testutil.CommonImage,
+						data.Identifier("converted-image"),
+					)
 				},
 				Expected: test.Expects(0, nil, nil),
 			},
@@ -54,8 +62,16 @@ func TestImageConvert(t *testing.T) {
 					helpers.Anyhow("rmi", "-f", data.Identifier("converted-image"))
 				},
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-					return helpers.Command("image", "convert", "--oci", "--zstdchunked", "--zstdchunked-compression-level", "3",
-						testutil.CommonImage, data.Identifier("converted-image"))
+					return helpers.Command(
+						"image",
+						"convert",
+						"--oci",
+						"--zstdchunked",
+						"--zstdchunked-compression-level",
+						"3",
+						testutil.CommonImage,
+						data.Identifier("converted-image"),
+					)
 				},
 				Expected: test.Expects(0, nil, nil),
 			},
@@ -63,5 +79,4 @@ func TestImageConvert(t *testing.T) {
 	}
 
 	testCase.Run(t)
-
 }

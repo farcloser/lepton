@@ -33,18 +33,30 @@ import (
 	"go.farcloser.world/lepton/pkg/testutil/portlock"
 )
 
-func NewDockerRegistry(data test.Data, helpers test.Helpers, currentCA *ca.CA, port int, auth Auth) *Server {
+func NewDockerRegistry(
+	data test.Data,
+	helpers test.Helpers,
+	currentCA *ca.CA,
+	port int,
+	auth Auth,
+) *Server {
 	// listen on 0.0.0.0 to enable 127.0.0.1
 	listenIP := net.ParseIP("0.0.0.0")
 	hostIP, err := nettestutil.NonLoopbackIPv4()
-	assert.NilError(helpers.T(), err, fmt.Errorf("failed finding ipv4 non loopback interface: %w", err))
+	assert.NilError(
+		helpers.T(),
+		err,
+		fmt.Errorf("failed finding ipv4 non loopback interface: %w", err),
+	)
 	// XXX RELEASE PORT IN CLEANUP HERE
 	// FIXME: this will fail in many circumstances. Review strategy on how to acquire a free port.
 	// We probably have better code for that already somewhere.
 	port, err = portlock.Acquire(port)
 	assert.NilError(helpers.T(), err, fmt.Errorf("failed acquiring port: %w", err))
 
-	containerName := data.Identifier(fmt.Sprintf("docker-registry-server-%d-%t", port, currentCA != nil))
+	containerName := data.Identifier(
+		fmt.Sprintf("docker-registry-server-%d-%t", port, currentCA != nil),
+	)
 	// Cleanup possible leftovers first
 	helpers.Ensure("rm", "-f", containerName)
 
@@ -87,7 +99,11 @@ func NewDockerRegistry(data test.Data, helpers test.Helpers, currentCA *ca.CA, p
 		errPortRelease := portlock.Release(port)
 
 		if cert != nil {
-			assert.NilError(helpers.T(), cert.Close(), fmt.Errorf("failed cleaning certificates: %w", err))
+			assert.NilError(
+				helpers.T(),
+				cert.Close(),
+				fmt.Errorf("failed cleaning certificates: %w", err),
+			)
 		}
 
 		assert.NilError(helpers.T(), errPortRelease, fmt.Errorf("failed releasing port: %w", err))
@@ -105,23 +121,47 @@ func NewDockerRegistry(data test.Data, helpers test.Helpers, currentCA *ca.CA, p
 			}
 
 			err = hostTomlContent.Save(hDir, hostIP.String(), port)
-			assert.NilError(helpers.T(), err, fmt.Errorf("failed creating hosts.toml file: %w", err))
+			assert.NilError(
+				helpers.T(),
+				err,
+				fmt.Errorf("failed creating hosts.toml file: %w", err),
+			)
 
 			err = hostTomlContent.Save(hDir, "127.0.0.1", port)
-			assert.NilError(helpers.T(), err, fmt.Errorf("failed creating hosts.toml file: %w", err))
+			assert.NilError(
+				helpers.T(),
+				err,
+				fmt.Errorf("failed creating hosts.toml file: %w", err),
+			)
 
 			err = hostTomlContent.Save(hDir, "localhost", port)
-			assert.NilError(helpers.T(), err, fmt.Errorf("failed creating hosts.toml file: %w", err))
+			assert.NilError(
+				helpers.T(),
+				err,
+				fmt.Errorf("failed creating hosts.toml file: %w", err),
+			)
 
 			if port == 443 {
 				err = hostTomlContent.Save(hDir, hostIP.String(), 0)
-				assert.NilError(helpers.T(), err, fmt.Errorf("failed creating hosts.toml file: %w", err))
+				assert.NilError(
+					helpers.T(),
+					err,
+					fmt.Errorf("failed creating hosts.toml file: %w", err),
+				)
 
 				err = hostTomlContent.Save(hDir, "127.0.0.1", 0)
-				assert.NilError(helpers.T(), err, fmt.Errorf("failed creating hosts.toml file: %w", err))
+				assert.NilError(
+					helpers.T(),
+					err,
+					fmt.Errorf("failed creating hosts.toml file: %w", err),
+				)
 
 				err = hostTomlContent.Save(hDir, "localhost", 0)
-				assert.NilError(helpers.T(), err, fmt.Errorf("failed creating hosts.toml file: %w", err))
+				assert.NilError(
+					helpers.T(),
+					err,
+					fmt.Errorf("failed creating hosts.toml file: %w", err),
+				)
 
 			}
 		}
@@ -138,7 +178,11 @@ func NewDockerRegistry(data test.Data, helpers test.Helpers, currentCA *ca.CA, p
 		),
 			10,
 			true)
-		assert.NilError(helpers.T(), err, fmt.Errorf("failed starting docker registry in a timely manner: %w", err))
+		assert.NilError(
+			helpers.T(),
+			err,
+			fmt.Errorf("failed starting docker registry in a timely manner: %w", err),
+		)
 	}
 
 	return &Server{

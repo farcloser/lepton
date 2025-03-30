@@ -33,7 +33,7 @@ func TestComposeExec(t *testing.T) {
 	t.Parallel()
 
 	base := testutil.NewBase(t)
-	var dockerComposeYAML = fmt.Sprintf(`
+	dockerComposeYAML := fmt.Sprintf(`
 version: '3.1'
 
 services:
@@ -54,8 +54,10 @@ services:
 	defer base.ComposeCmd("-f", comp.YAMLFullPath(), "down", "-v").AssertOK()
 
 	// test basic functionality and `--workdir` flag
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "exec", "-i=false", "--no-TTY", "svc0", "echo", "success").AssertOutExactly("success\n")
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "exec", "-i=false", "--no-TTY", "--workdir", "/tmp", "svc0", "pwd").AssertOutExactly("/tmp\n")
+	base.ComposeCmd("-f", comp.YAMLFullPath(), "exec", "-i=false", "--no-TTY", "svc0", "echo", "success").
+		AssertOutExactly("success\n")
+	base.ComposeCmd("-f", comp.YAMLFullPath(), "exec", "-i=false", "--no-TTY", "--workdir", "/tmp", "svc0", "pwd").
+		AssertOutExactly("/tmp\n")
 	// cannot `exec` on non-running service
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "exec", "svc1", "echo", "success").AssertFail()
 }
@@ -64,7 +66,7 @@ func TestComposeExecWithEnv(t *testing.T) {
 	t.Parallel()
 
 	base := testutil.NewBase(t)
-	var dockerComposeYAML = fmt.Sprintf(`
+	dockerComposeYAML := fmt.Sprintf(`
 version: '3.1'
 
 services:
@@ -131,7 +133,7 @@ func TestComposeExecWithUser(t *testing.T) {
 	t.Parallel()
 
 	base := testutil.NewBase(t)
-	var dockerComposeYAML = fmt.Sprintf(`
+	dockerComposeYAML := fmt.Sprintf(`
 version: '3.1'
 
 services:
@@ -173,7 +175,7 @@ func TestComposeExecTTY(t *testing.T) {
 	// `-i` in `compose run & exec` is only supported in compose v2.
 	base := testutil.NewBase(t)
 
-	var dockerComposeYAML = fmt.Sprintf(`
+	dockerComposeYAML := fmt.Sprintf(`
 version: '3.1'
 
 services:
@@ -189,7 +191,8 @@ services:
 	t.Logf("projectName=%q", projectName)
 
 	testContainer := testutil.Identifier(t)
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "run", "-d", "-i=false", "--name", testContainer, "svc0", "sleep", "1h").AssertOK()
+	base.ComposeCmd("-f", comp.YAMLFullPath(), "run", "-d", "-i=false", "--name", testContainer, "svc0", "sleep", "1h").
+		AssertOK()
 	defer base.ComposeCmd("-f", comp.YAMLFullPath(), "down", "-v").AssertOK()
 	base.EnsureContainerStarted(testContainer)
 
@@ -197,17 +200,26 @@ services:
 	// unbuffer(1) emulates tty, which is required by `run -t`.
 	// unbuffer(1) can be installed with `apt-get install expect`.
 	unbuffer := []string{"unbuffer"}
-	base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(), "exec", "svc0", "stty").AssertOutContains(sttyPartialOutput)             // `-it`
-	base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(), "exec", "-i=false", "svc0", "stty").AssertOutContains(sttyPartialOutput) // `-t`
-	base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(), "exec", "--no-TTY", "svc0", "stty").AssertFail()                         // `-i`
-	base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(), "exec", "-i=false", "--no-TTY", "svc0", "stty").AssertFail()
+	base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(), "exec", "svc0", "stty").
+		AssertOutContains(sttyPartialOutput)
+		// `-it`
+	base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(), "exec", "-i=false", "svc0", "stty").
+		AssertOutContains(sttyPartialOutput)
+
+		// `-t`
+	base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(), "exec", "--no-TTY", "svc0", "stty").
+		AssertFail()
+
+		// `-i`
+	base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(), "exec", "-i=false", "--no-TTY", "svc0", "stty").
+		AssertFail()
 }
 
 func TestComposeExecWithIndex(t *testing.T) {
 	t.Parallel()
 
 	base := testutil.NewBase(t)
-	var dockerComposeYAML = fmt.Sprintf(`
+	dockerComposeYAML := fmt.Sprintf(`
 version: '3.1'
 
 services:
@@ -242,12 +254,22 @@ services:
 			//  We have different DNS resolution behaviors compared with Docker.
 			// it uses the ID in the /etc/hosts file, so we need to fetch the ID first.
 			if nerdtest.IsDocker() {
-				base.Cmd("ps", "--filter", "name="+name, "--format", "{{.ID}}").AssertOutWithFunc(func(stdout string) error {
-					host = strings.TrimSpace(stdout)
-					return nil
-				})
+				base.Cmd("ps", "--filter", "name="+name, "--format", "{{.ID}}").
+					AssertOutWithFunc(func(stdout string) error {
+						host = strings.TrimSpace(stdout)
+						return nil
+					})
 			}
-			cmds := []string{"-f", comp.YAMLFullPath(), "exec", "-i=false", "--no-TTY", "--index", j, "svc0"}
+			cmds := []string{
+				"-f",
+				comp.YAMLFullPath(),
+				"exec",
+				"-i=false",
+				"--no-TTY",
+				"--index",
+				j,
+				"svc0",
+			}
 			base.ComposeCmd(append(cmds, "cat", "/etc/hosts")...).
 				AssertOutWithFunc(func(stdout string) error {
 					lines := strings.Split(stdout, "\n")

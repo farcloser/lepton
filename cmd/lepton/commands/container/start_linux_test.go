@@ -17,8 +17,8 @@
 package container_test
 
 import (
+	"bytes"
 	"errors"
-	"os"
 	"strings"
 	"testing"
 
@@ -40,15 +40,17 @@ func TestStartDetachKeys(t *testing.T) {
 
 	testCase.Setup = func(data test.Data, helpers test.Helpers) {
 		cmd := helpers.Command("run", "-it", "--name", data.Identifier(), testutil.CommonImage)
-		cmd.WithPseudoTTY(func(f *os.File) error {
-			_, err := f.WriteString("exit\n")
-			return err
-		})
+		cmd.WithPseudoTTY()
+		cmd.Feed(strings.NewReader("exit\n"))
 		cmd.Run(&test.Expected{
 			ExitCode: 0,
 		})
-		assert.Assert(t,
-			strings.Contains(helpers.Capture("inspect", "--format", "json", data.Identifier()), "\"Running\":false"),
+		assert.Assert(
+			t,
+			strings.Contains(
+				helpers.Capture("inspect", "--format", "json", data.Identifier()),
+				"\"Running\":false",
+			),
 		)
 	}
 
@@ -60,11 +62,9 @@ func TestStartDetachKeys(t *testing.T) {
 			flags += "i"
 		}
 		cmd := helpers.Command("start", flags, "--detach-keys=ctrl-a,ctrl-b", data.Identifier())
-		cmd.WithPseudoTTY(func(f *os.File) error {
-			// ctrl+a and ctrl+b (see https://en.wikipedia.org/wiki/C0_and_C1_control_codes)
-			_, err := f.Write([]byte{1, 2})
-			return err
-		})
+		cmd.WithPseudoTTY()
+		// ctrl+p and ctrl+q (see https://en.wikipedia.org/wiki/C0_and_C1_control_codes)
+		cmd.Feed(bytes.NewReader([]byte{1, 2}))
 
 		return cmd
 	}
@@ -75,7 +75,13 @@ func TestStartDetachKeys(t *testing.T) {
 			Errors:   []error{errors.New("detach keys")},
 			Output: expect.All(
 				func(stdout string, info string, t *testing.T) {
-					assert.Assert(t, strings.Contains(helpers.Capture("inspect", "--format", "json", data.Identifier()), "\"Running\":true"))
+					assert.Assert(
+						t,
+						strings.Contains(
+							helpers.Capture("inspect", "--format", "json", data.Identifier()),
+							"\"Running\":true",
+						),
+					)
 				},
 			),
 		}

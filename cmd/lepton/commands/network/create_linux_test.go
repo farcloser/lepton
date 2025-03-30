@@ -51,8 +51,27 @@ func TestNetworkCreate(t *testing.T) {
 				helpers.Anyhow("network", "rm", data.Identifier("1"))
 			},
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-				data.Set("container2", helpers.Capture("run", "--rm", "--net", data.Identifier("1"), testutil.CommonImage, "ip", "route"))
-				return helpers.Command("run", "--rm", "--net", data.Identifier(), testutil.CommonImage, "ip", "route")
+				data.Set(
+					"container2",
+					helpers.Capture(
+						"run",
+						"--rm",
+						"--net",
+						data.Identifier("1"),
+						testutil.CommonImage,
+						"ip",
+						"route",
+					),
+				)
+				return helpers.Command(
+					"run",
+					"--rm",
+					"--net",
+					data.Identifier(),
+					testutil.CommonImage,
+					"ip",
+					"route",
+				)
 			},
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 				return &test.Expected{
@@ -60,7 +79,11 @@ func TestNetworkCreate(t *testing.T) {
 					Errors:   nil,
 					Output: func(stdout string, info string, t *testing.T) {
 						assert.Assert(t, strings.Contains(stdout, data.Get("subnet")), info)
-						assert.Assert(t, !strings.Contains(data.Get("container2"), data.Get("subnet")), info)
+						assert.Assert(
+							t,
+							!strings.Contains(data.Get("container2"), data.Get("subnet")),
+							info,
+						)
 					},
 				}
 			},
@@ -68,13 +91,29 @@ func TestNetworkCreate(t *testing.T) {
 		{
 			Description: "with MTU",
 			Setup: func(data test.Data, helpers test.Helpers) {
-				helpers.Ensure("network", "create", data.Identifier(), "--driver", "bridge", "--opt", "com.docker.network.driver.mtu=9216")
+				helpers.Ensure(
+					"network",
+					"create",
+					data.Identifier(),
+					"--driver",
+					"bridge",
+					"--opt",
+					"com.docker.network.driver.mtu=9216",
+				)
 			},
 			Cleanup: func(data test.Data, helpers test.Helpers) {
 				helpers.Anyhow("network", "rm", data.Identifier())
 			},
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-				return helpers.Command("run", "--rm", "--net", data.Identifier(), testutil.CommonImage, "ifconfig", "eth0")
+				return helpers.Command(
+					"run",
+					"--rm",
+					"--net",
+					data.Identifier(),
+					testutil.CommonImage,
+					"ifconfig",
+					"eth0",
+				)
 			},
 			Expected: test.Expects(0, nil, expect.Contains("MTU:9216")),
 		},
@@ -87,13 +126,31 @@ func TestNetworkCreate(t *testing.T) {
 				_, _, err := net.ParseCIDR(subnetStr)
 				assert.Assert(t, err == nil)
 
-				helpers.Ensure("network", "create", data.Identifier(), "--ipv6", "--subnet", subnetStr)
+				helpers.Ensure(
+					"network",
+					"create",
+					data.Identifier(),
+					"--ipv6",
+					"--subnet",
+					subnetStr,
+				)
 			},
 			Cleanup: func(data test.Data, helpers test.Helpers) {
 				helpers.Anyhow("network", "rm", data.Identifier())
 			},
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-				return helpers.Command("run", "--rm", "--net", data.Identifier(), testutil.CommonImage, "ip", "addr", "show", "dev", "eth0")
+				return helpers.Command(
+					"run",
+					"--rm",
+					"--net",
+					data.Identifier(),
+					testutil.CommonImage,
+					"ip",
+					"addr",
+					"show",
+					"dev",
+					"eth0",
+				)
 			},
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 				return &test.Expected{

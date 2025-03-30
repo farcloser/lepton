@@ -45,7 +45,11 @@ func TestBuildBasics(t *testing.T) {
 		Setup: func(data test.Data, helpers test.Helpers) {
 			dockerfile := fmt.Sprintf(`FROM %s
 CMD ["echo", "build-test-string"]`, testutil.CommonImage)
-			err := os.WriteFile(filepath.Join(data.TempDir(), "Dockerfile"), []byte(dockerfile), 0o600)
+			err := os.WriteFile(
+				filepath.Join(data.TempDir(), "Dockerfile"),
+				[]byte(dockerfile),
+				0o600,
+			)
 			assert.NilError(helpers.T(), err)
 			data.Set("buildCtx", data.TempDir())
 		},
@@ -82,7 +86,13 @@ CMD ["echo", "build-test-string"]`, testutil.CommonImage)
 			{
 				Description: "Successfully build with output docker, main tag still works",
 				Setup: func(data test.Data, helpers test.Helpers) {
-					helpers.Ensure("build", data.Get("buildCtx"), "-t", data.Identifier(), "--output=type=docker,name="+data.Identifier("ignored"))
+					helpers.Ensure(
+						"build",
+						data.Get("buildCtx"),
+						"-t",
+						data.Identifier(),
+						"--output=type=docker,name="+data.Identifier("ignored"),
+					)
 				},
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 					return helpers.Command("run", "--rm", data.Identifier())
@@ -95,7 +105,13 @@ CMD ["echo", "build-test-string"]`, testutil.CommonImage)
 			{
 				Description: "Successfully build with output docker, name cannot be used",
 				Setup: func(data test.Data, helpers test.Helpers) {
-					helpers.Ensure("build", data.Get("buildCtx"), "-t", data.Identifier(), "--output=type=docker,name="+data.Identifier("ignored"))
+					helpers.Ensure(
+						"build",
+						data.Get("buildCtx"),
+						"-t",
+						data.Identifier(),
+						"--output=type=docker,name="+data.Identifier("ignored"),
+					)
 				},
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 					return helpers.Command("run", "--rm", data.Identifier("ignored"))
@@ -139,12 +155,23 @@ func TestCanBuildOnOtherPlatform(t *testing.T) {
 			dockerfile := fmt.Sprintf(`FROM %s
 RUN echo hello > /hello
 CMD ["echo", "build-test-string"]`, testutil.CommonImage)
-			err := os.WriteFile(filepath.Join(data.TempDir(), "Dockerfile"), []byte(dockerfile), 0o600)
+			err := os.WriteFile(
+				filepath.Join(data.TempDir(), "Dockerfile"),
+				[]byte(dockerfile),
+				0o600,
+			)
 			assert.NilError(helpers.T(), err)
 			data.Set("buildCtx", data.TempDir())
 		},
 		Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-			return helpers.Command("build", data.Get("buildCtx"), "--platform", fmt.Sprintf("%s/%s", data.Get("OS"), data.Get("Architecture")), "-t", data.Identifier())
+			return helpers.Command(
+				"build",
+				data.Get("buildCtx"),
+				"--platform",
+				fmt.Sprintf("%s/%s", data.Get("OS"), data.Get("Architecture")),
+				"-t",
+				data.Identifier(),
+			)
 		},
 		Cleanup: func(data test.Data, helpers test.Helpers) {
 			helpers.Anyhow("rmi", "-f", data.Identifier())
@@ -170,14 +197,22 @@ func TestBuildBaseImage(t *testing.T) {
 			dockerfile := fmt.Sprintf(`FROM %s
 RUN echo hello > /hello
 CMD ["echo", "build-test-string"]`, testutil.CommonImage)
-			err := os.WriteFile(filepath.Join(data.TempDir(), "Dockerfile"), []byte(dockerfile), 0o600)
+			err := os.WriteFile(
+				filepath.Join(data.TempDir(), "Dockerfile"),
+				[]byte(dockerfile),
+				0o600,
+			)
 			assert.NilError(helpers.T(), err)
 			helpers.Ensure("build", "-t", data.Identifier("first"), data.TempDir())
 
 			dockerfileSecond := fmt.Sprintf(`FROM %s
 RUN echo hello2 > /hello2
 CMD ["cat", "/hello2"]`, data.Identifier("first"))
-			err = os.WriteFile(filepath.Join(data.TempDir(), "Dockerfile"), []byte(dockerfileSecond), 0o644)
+			err = os.WriteFile(
+				filepath.Join(data.TempDir(), "Dockerfile"),
+				[]byte(dockerfileSecond),
+				0o644,
+			)
 			assert.NilError(helpers.T(), err)
 			helpers.Ensure("build", "-t", data.Identifier("second"), data.TempDir())
 		},
@@ -211,7 +246,11 @@ func TestBuildFromContainerd(t *testing.T) {
 			dockerfile := fmt.Sprintf(`FROM %s
 RUN echo hello2 > /hello2
 CMD ["cat", "/hello2"]`, data.Identifier("first"))
-			err := os.WriteFile(filepath.Join(data.TempDir(), "Dockerfile"), []byte(dockerfile), 0o600)
+			err := os.WriteFile(
+				filepath.Join(data.TempDir(), "Dockerfile"),
+				[]byte(dockerfile),
+				0o600,
+			)
 			assert.NilError(helpers.T(), err)
 			helpers.Ensure("build", "-t", data.Identifier("second"), data.TempDir())
 		},
@@ -236,7 +275,7 @@ func TestBuildFromStdin(t *testing.T) {
 			dockerfile := fmt.Sprintf(`FROM %s
 CMD ["echo", "build-test-stdin"]`, testutil.CommonImage)
 			cmd := helpers.Command("build", "-t", data.Identifier(), "-f", "-", ".")
-			cmd.WithStdin(strings.NewReader(dockerfile))
+			cmd.Feed(strings.NewReader(dockerfile))
 			return cmd
 		},
 		Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
@@ -275,7 +314,14 @@ CMD ["echo", "build-test-dockerfile"]
 					helpers.Anyhow("rmi", "-f", data.Identifier())
 				},
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-					cmd := helpers.Command("build", "-t", data.Identifier(), "-f", "Dockerfile", "..")
+					cmd := helpers.Command(
+						"build",
+						"-t",
+						data.Identifier(),
+						"-f",
+						"Dockerfile",
+						"..",
+					)
 					cmd.WithCwd(data.Get("buildCtx"))
 					return cmd
 				},
@@ -287,7 +333,14 @@ CMD ["echo", "build-test-dockerfile"]
 					helpers.Anyhow("rmi", "-f", data.Identifier())
 				},
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-					cmd := helpers.Command("build", "-t", data.Identifier(), "-f", "Dockerfile", ".")
+					cmd := helpers.Command(
+						"build",
+						"-t",
+						data.Identifier(),
+						"-f",
+						"Dockerfile",
+						".",
+					)
 					cmd.WithCwd(data.Get("buildCtx"))
 					return cmd
 				},
@@ -296,7 +349,14 @@ CMD ["echo", "build-test-dockerfile"]
 			{
 				Description: "../Dockerfile .",
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-					cmd := helpers.Command("build", "-t", data.Identifier(), "-f", "../Dockerfile", ".")
+					cmd := helpers.Command(
+						"build",
+						"-t",
+						data.Identifier(),
+						"-f",
+						"../Dockerfile",
+						".",
+					)
 					cmd.WithCwd(data.Get("buildCtx"))
 					return cmd
 				},
@@ -320,10 +380,18 @@ func TestBuildLocal(t *testing.T) {
 			dockerfile := fmt.Sprintf(`FROM scratch
 COPY %s /`, testFileName)
 
-			err := os.WriteFile(filepath.Join(data.TempDir(), "Dockerfile"), []byte(dockerfile), 0o600)
+			err := os.WriteFile(
+				filepath.Join(data.TempDir(), "Dockerfile"),
+				[]byte(dockerfile),
+				0o600,
+			)
 			assert.NilError(helpers.T(), err)
 
-			err = os.WriteFile(filepath.Join(data.TempDir(), testFileName), []byte(testContent), 0o644)
+			err = os.WriteFile(
+				filepath.Join(data.TempDir(), testFileName),
+				[]byte(testContent),
+				0o644,
+			)
 			assert.NilError(helpers.T(), err)
 
 			data.Set("buildCtx", data.TempDir())
@@ -332,7 +400,12 @@ COPY %s /`, testFileName)
 			{
 				Description: "destination 1",
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-					return helpers.Command("build", "-o", "type=local,dest="+data.TempDir(), data.Get("buildCtx"))
+					return helpers.Command(
+						"build",
+						"-o",
+						"type=local,dest="+data.TempDir(),
+						data.Get("buildCtx"),
+					)
 				},
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
@@ -407,7 +480,14 @@ CMD echo $TEST_STRING
 			{
 				Description: "ArgValueOverridesDefault",
 				Setup: func(data test.Data, helpers test.Helpers) {
-					helpers.Ensure("build", data.Get("buildCtx"), "--build-arg", "TEST_STRING=2", "-t", data.Identifier())
+					helpers.Ensure(
+						"build",
+						data.Get("buildCtx"),
+						"--build-arg",
+						"TEST_STRING=2",
+						"-t",
+						data.Identifier(),
+					)
 				},
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 					return helpers.Command("run", "--rm", data.Identifier())
@@ -420,7 +500,14 @@ CMD echo $TEST_STRING
 			{
 				Description: "EmptyArgValueOverridesDefault",
 				Setup: func(data test.Data, helpers test.Helpers) {
-					helpers.Ensure("build", data.Get("buildCtx"), "--build-arg", "TEST_STRING=", "-t", data.Identifier())
+					helpers.Ensure(
+						"build",
+						data.Get("buildCtx"),
+						"--build-arg",
+						"TEST_STRING=",
+						"-t",
+						data.Identifier(),
+					)
 				},
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 					return helpers.Command("run", "--rm", data.Identifier())
@@ -433,7 +520,14 @@ CMD echo $TEST_STRING
 			{
 				Description: "UnsetArgKeyPreservesDefault",
 				Setup: func(data test.Data, helpers test.Helpers) {
-					helpers.Ensure("build", data.Get("buildCtx"), "--build-arg", "TEST_STRING", "-t", data.Identifier())
+					helpers.Ensure(
+						"build",
+						data.Get("buildCtx"),
+						"--build-arg",
+						"TEST_STRING",
+						"-t",
+						data.Identifier(),
+					)
 				},
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 					return helpers.Command("run", "--rm", data.Identifier())
@@ -449,7 +543,14 @@ CMD echo $TEST_STRING
 					"TEST_STRING": "3",
 				},
 				Setup: func(data test.Data, helpers test.Helpers) {
-					helpers.Ensure("build", data.Get("buildCtx"), "--build-arg", "TEST_STRING", "-t", data.Identifier())
+					helpers.Ensure(
+						"build",
+						data.Get("buildCtx"),
+						"--build-arg",
+						"TEST_STRING",
+						"-t",
+						data.Identifier(),
+					)
 				},
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 					return helpers.Command("run", "--rm", data.Identifier())
@@ -465,7 +566,14 @@ CMD echo $TEST_STRING
 					"TEST_STRING": "",
 				},
 				Setup: func(data test.Data, helpers test.Helpers) {
-					helpers.Ensure("build", data.Get("buildCtx"), "--build-arg", "TEST_STRING", "-t", data.Identifier())
+					helpers.Ensure(
+						"build",
+						data.Get("buildCtx"),
+						"--build-arg",
+						"TEST_STRING",
+						"-t",
+						data.Identifier(),
+					)
 				},
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 					return helpers.Command("run", "--rm", data.Identifier())
@@ -496,7 +604,14 @@ CMD ["echo", "build-test-string"]
 			buildCtx := data.TempDir()
 			err := os.WriteFile(filepath.Join(buildCtx, "Dockerfile"), []byte(dockerfile), 0o600)
 			assert.NilError(helpers.T(), err)
-			helpers.Ensure("build", buildCtx, "--iidfile", filepath.Join(data.TempDir(), "id.txt"), "-t", data.Identifier())
+			helpers.Ensure(
+				"build",
+				buildCtx,
+				"--iidfile",
+				filepath.Join(data.TempDir(), "id.txt"),
+				"-t",
+				data.Identifier(),
+			)
 		},
 		Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 			imageID, err := os.ReadFile(filepath.Join(data.TempDir(), "id.txt"))
@@ -528,10 +643,19 @@ LABEL name=build-test-label
 			helpers.Ensure("build", buildCtx, "--label", "label=test", "-t", data.Identifier())
 		},
 		Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-			return helpers.Command("inspect", data.Identifier(), "--format", "{{json .Config.Labels }}")
+			return helpers.Command(
+				"inspect",
+				data.Identifier(),
+				"--format",
+				"{{json .Config.Labels }}",
+			)
 		},
 
-		Expected: test.Expects(0, nil, expect.Equals("{\"label\":\"test\",\"name\":\"build-test-label\"}\n")),
+		Expected: test.Expects(
+			0,
+			nil,
+			expect.Equals("{\"label\":\"test\",\"name\":\"build-test-label\"}\n"),
+		),
 	}
 
 	testCase.Run(t)
@@ -557,7 +681,16 @@ CMD ["echo", "build-test-string"]
 			buildCtx := data.TempDir()
 			err := os.WriteFile(filepath.Join(buildCtx, "Dockerfile"), []byte(dockerfile), 0o600)
 			assert.NilError(helpers.T(), err)
-			helpers.Ensure("build", buildCtx, "-t", data.Get("i1"), "-t", data.Get("i2"), "-t", data.Get("i3"))
+			helpers.Ensure(
+				"build",
+				buildCtx,
+				"-t",
+				data.Get("i1"),
+				"-t",
+				data.Get("i2"),
+				"-t",
+				data.Get("i3"),
+			)
 		},
 		SubTests: []*test.Case{
 			{
@@ -693,7 +826,13 @@ CMD ["echo", "build-myorg/myapp"]`
 			data.Set("buildCtx", buildCtx)
 		},
 		Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-			return helpers.Command("build", "-t", data.Identifier(), data.Get("buildCtx"), "--build-context=myorg/myapp=docker-image://"+testutil.CommonImage)
+			return helpers.Command(
+				"build",
+				"-t",
+				data.Identifier(),
+				data.Get("buildCtx"),
+				"--build-context=myorg/myapp=docker-image://"+testutil.CommonImage,
+			)
 		},
 		Expected: test.Expects(0, nil, nil),
 	}
@@ -730,7 +869,13 @@ RUN ["cat", "/hello_from_dir2.txt"]`, testutil.CommonImage, filename)
 			data.Set("dir2", dir2)
 		},
 		Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-			return helpers.Command("build", "-t", data.Identifier(), data.Get("buildCtx"), "--build-context=dir2="+data.Get("dir2"))
+			return helpers.Command(
+				"build",
+				"-t",
+				data.Identifier(),
+				data.Get("buildCtx"),
+				"--build-context=dir2="+data.Get("dir2"),
+			)
 		},
 		Expected: test.Expects(0, nil, nil),
 	}
@@ -785,7 +930,14 @@ CMD ["cat", "/source-date-epoch"]
 					"SOURCE_DATE_EPOCH": "1111111111",
 				},
 				Setup: func(data test.Data, helpers test.Helpers) {
-					helpers.Ensure("build", data.Get("buildCtx"), "--build-arg", "SOURCE_DATE_EPOCH=2222222222", "-t", data.Identifier())
+					helpers.Ensure(
+						"build",
+						data.Get("buildCtx"),
+						"--build-arg",
+						"SOURCE_DATE_EPOCH=2222222222",
+						"-t",
+						data.Identifier(),
+					)
 				},
 				Cleanup: func(data test.Data, helpers test.Helpers) {
 					helpers.Anyhow("rmi", "-f", data.Identifier())
@@ -826,7 +978,15 @@ RUN curl -I http://google.com
 			{
 				Description: "none",
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-					return helpers.Command("build", data.Get("buildCtx"), "-t", data.Identifier(), "--no-cache", "--network", "none")
+					return helpers.Command(
+						"build",
+						data.Get("buildCtx"),
+						"-t",
+						data.Identifier(),
+						"--no-cache",
+						"--network",
+						"none",
+					)
 				},
 				Cleanup: func(data test.Data, helpers test.Helpers) {
 					helpers.Anyhow("rmi", "-f", data.Identifier())
@@ -836,7 +996,15 @@ RUN curl -I http://google.com
 			{
 				Description: "empty",
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-					return helpers.Command("build", data.Get("buildCtx"), "-t", data.Identifier(), "--no-cache", "--network", "")
+					return helpers.Command(
+						"build",
+						data.Get("buildCtx"),
+						"-t",
+						data.Identifier(),
+						"--no-cache",
+						"--network",
+						"",
+					)
 				},
 				Cleanup: func(data test.Data, helpers test.Helpers) {
 					helpers.Anyhow("rmi", "-f", data.Identifier())
@@ -846,7 +1014,15 @@ RUN curl -I http://google.com
 			{
 				Description: "default",
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-					return helpers.Command("build", data.Get("buildCtx"), "-t", data.Identifier(), "--no-cache", "--network", "default")
+					return helpers.Command(
+						"build",
+						data.Get("buildCtx"),
+						"-t",
+						data.Identifier(),
+						"--no-cache",
+						"--network",
+						"default",
+					)
 				},
 				Cleanup: func(data test.Data, helpers test.Helpers) {
 					helpers.Anyhow("rmi", "-f", data.Identifier())
@@ -878,7 +1054,14 @@ func TestBuildAttestation(t *testing.T) {
 		},
 		Setup: func(data test.Data, helpers test.Helpers) {
 			if nerdtest.IsDocker() {
-				helpers.Anyhow("buildx", "create", "--name", data.Identifier("builder"), "--bootstrap", "--use")
+				helpers.Anyhow(
+					"buildx",
+					"create",
+					"--name",
+					data.Identifier("builder"),
+					"--bootstrap",
+					"--use",
+				)
 			}
 
 			dockerfile := "FROM " + testutil.CommonImage
@@ -898,7 +1081,12 @@ func TestBuildAttestation(t *testing.T) {
 					if nerdtest.IsDocker() {
 						cmd.WithArgs("--builder", data.Identifier("builder"))
 					}
-					cmd.WithArgs("--sbom=true", "-o", "type=local,dest="+outputSBOMDir, data.Get("buildCtx"))
+					cmd.WithArgs(
+						"--sbom=true",
+						"-o",
+						"type=local,dest="+outputSBOMDir,
+						data.Get("buildCtx"),
+					)
 					return cmd
 				},
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
@@ -914,13 +1102,21 @@ func TestBuildAttestation(t *testing.T) {
 				Description: "Provenance",
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 					outputProvenanceDir := data.TempDir()
-					data.Set("outputProvenanceFile", filepath.Join(outputProvenanceDir, testProvenanceFileName))
+					data.Set(
+						"outputProvenanceFile",
+						filepath.Join(outputProvenanceDir, testProvenanceFileName),
+					)
 
 					cmd := helpers.Command("build")
 					if nerdtest.IsDocker() {
 						cmd.WithArgs("--builder", data.Identifier("builder"))
 					}
-					cmd.WithArgs("--provenance=mode=min", "-o", "type=local,dest="+outputProvenanceDir, data.Get("buildCtx"))
+					cmd.WithArgs(
+						"--provenance=mode=min",
+						"-o",
+						"type=local,dest="+outputProvenanceDir,
+						data.Get("buildCtx"),
+					)
 					return cmd
 				},
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
@@ -936,14 +1132,26 @@ func TestBuildAttestation(t *testing.T) {
 				Description: "Attestation",
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 					outputAttestationDir := data.TempDir()
-					data.Set("outputSBOMFile", filepath.Join(outputAttestationDir, testSBOMFileName))
-					data.Set("outputProvenanceFile", filepath.Join(outputAttestationDir, testProvenanceFileName))
+					data.Set(
+						"outputSBOMFile",
+						filepath.Join(outputAttestationDir, testSBOMFileName),
+					)
+					data.Set(
+						"outputProvenanceFile",
+						filepath.Join(outputAttestationDir, testProvenanceFileName),
+					)
 
 					cmd := helpers.Command("build")
 					if nerdtest.IsDocker() {
 						cmd.WithArgs("--builder", data.Identifier("builder"))
 					}
-					cmd.WithArgs("--attest=type=provenance,mode=min", "--attest=type=sbom", "-o", "type=local,dest="+outputAttestationDir, data.Get("buildCtx"))
+					cmd.WithArgs(
+						"--attest=type=provenance,mode=min",
+						"--attest=type=sbom",
+						"-o",
+						"type=local,dest="+outputAttestationDir,
+						data.Get("buildCtx"),
+					)
 					return cmd
 				},
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
@@ -984,7 +1192,16 @@ RUN ping -c 5 beta
 			data.Set("buildCtx", buildCtx)
 		},
 		Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-			return helpers.Command("build", data.Get("buildCtx"), "-t", data.Identifier(), "--add-host", "alpha:127.0.0.1", "--add-host", "beta:127.0.0.1")
+			return helpers.Command(
+				"build",
+				data.Get("buildCtx"),
+				"-t",
+				data.Identifier(),
+				"--add-host",
+				"alpha:127.0.0.1",
+				"--add-host",
+				"beta:127.0.0.1",
+			)
 		},
 		Expected: test.Expects(0, nil, nil),
 	}

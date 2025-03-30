@@ -34,7 +34,7 @@ func TestComposeTop(t *testing.T) {
 	}
 
 	base := testutil.NewBase(t)
-	var dockerComposeYAML = fmt.Sprintf(`
+	dockerComposeYAML := fmt.Sprintf(`
 version: '3.1'
 
 services:

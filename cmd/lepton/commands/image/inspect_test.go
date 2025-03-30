@@ -57,13 +57,25 @@ func TestImageInspectSimpleCases(t *testing.T) {
 			},
 			{
 				Description: "RawFormat support (.Id)",
-				Command:     test.Command("image", "inspect", testutil.CommonImage, "--format", "{{.Id}}"),
-				Expected:    test.Expects(0, nil, nil),
+				Command: test.Command(
+					"image",
+					"inspect",
+					testutil.CommonImage,
+					"--format",
+					"{{.Id}}",
+				),
+				Expected: test.Expects(0, nil, nil),
 			},
 			{
 				Description: "typedFormat support (.ID)",
-				Command:     test.Command("image", "inspect", testutil.CommonImage, "--format", "{{.ID}}"),
-				Expected:    test.Expects(0, nil, nil),
+				Command: test.Command(
+					"image",
+					"inspect",
+					testutil.CommonImage,
+					"--format",
+					"{{.ID}}",
+				),
+				Expected: test.Expects(0, nil, nil),
 			},
 			{
 				Description: "Error for image not found",
@@ -184,7 +196,9 @@ func TestImageInspectDifferentValidReferencesForTheSameImage(t *testing.T) {
 								cmd := helpers.Command("image", "inspect", id+"@sha256:"+sha)
 								cmd.Run(&test.Expected{
 									ExitCode: 1,
-									Errors:   []error{fmt.Errorf("no such image: %s@sha256:%s", id, sha)},
+									Errors: []error{
+										fmt.Errorf("no such image: %s@sha256:%s", id, sha),
+									},
 								})
 							}
 						},
@@ -206,7 +220,9 @@ func TestImageInspectDifferentValidReferencesForTheSameImage(t *testing.T) {
 								cmd := helpers.Command("image", "inspect", id)
 								cmd.Run(&test.Expected{
 									ExitCode: 1,
-									Errors:   []error{fmt.Errorf("invalid reference format: %s", id)},
+									Errors: []error{
+										fmt.Errorf("invalid reference format: %s", id),
+									},
 								})
 							}
 						},

@@ -65,8 +65,16 @@ func TestSystemPrune(t *testing.T) {
 						images := helpers.Capture("images")
 						containers := helpers.Capture("ps", "-a")
 						assert.Assert(t, strings.Contains(volumes, data.Identifier()), volumes)
-						assert.Assert(t, !strings.Contains(volumes, data.Get("anonIdentifier")), volumes)
-						assert.Assert(t, !strings.Contains(containers, data.Identifier()), containers)
+						assert.Assert(
+							t,
+							!strings.Contains(volumes, data.Get("anonIdentifier")),
+							volumes,
+						)
+						assert.Assert(
+							t,
+							!strings.Contains(containers, data.Identifier()),
+							containers,
+						)
 						assert.Assert(t, !strings.Contains(networks, data.Identifier()), networks)
 						assert.Assert(t, !strings.Contains(images, testutil.CommonImage), images)
 					},

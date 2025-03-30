@@ -27,7 +27,7 @@ func TestComposeStop(t *testing.T) {
 	t.Parallel()
 
 	base := testutil.NewBase(t)
-	var dockerComposeYAML = fmt.Sprintf(`
+	dockerComposeYAML := fmt.Sprintf(`
 version: '3.1'
 
 services:
@@ -69,11 +69,13 @@ volumes:
 
 	// stop should (only) stop the given service.
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "stop", "db").AssertOK()
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "db", "-a").AssertOutContainsAny("Exit", "exited")
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "wordpress").AssertOutContainsAny("Up", "running")
+	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "db", "-a").
+		AssertOutContainsAny("Exit", "exited")
+	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "wordpress").
+		AssertOutContainsAny("Up", "running")
 
 	// `--timeout` arg should work properly.
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "stop", "--timeout", "5", "wordpress").AssertOK()
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "wordpress", "-a").AssertOutContainsAny("Exit", "exited")
-
+	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "wordpress", "-a").
+		AssertOutContainsAny("Exit", "exited")
 }

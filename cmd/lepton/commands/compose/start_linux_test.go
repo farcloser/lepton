@@ -29,7 +29,7 @@ func TestComposeStart(t *testing.T) {
 	t.Parallel()
 
 	base := testutil.NewBase(t)
-	var dockerComposeYAML = fmt.Sprintf(`
+	dockerComposeYAML := fmt.Sprintf(`
 version: '3.1'
 
 services:
@@ -69,7 +69,7 @@ func TestComposeStartFailWhenServicePause(t *testing.T) {
 		t.Skip("requires cgroup (for pausing)")
 	}
 
-	var dockerComposeYAML = fmt.Sprintf(`
+	dockerComposeYAML := fmt.Sprintf(`
 version: '3.1'
 
 services:

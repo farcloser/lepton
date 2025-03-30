@@ -14,6 +14,7 @@
    limitations under the License.
 */
 
+// Package testregistry
 package testregistry
 
 import (
@@ -71,17 +72,32 @@ func ensureImages(_ test.Data, helpers test.Helpers) {
 	helpers.Ensure("pull", "--quiet", platform.DockerAuthImage)
 }
 
-func NewAuthServer(data test.Data, helpers test.Helpers, ca *testca.CA, port int, user, pass string, tls bool) *TokenAuthServer {
+func NewAuthServer(
+	data test.Data,
+	helpers test.Helpers,
+	ca *testca.CA,
+	port int,
+	user, pass string,
+	tls bool,
+) *TokenAuthServer {
 	ensureImages(data, helpers)
 	name := data.Identifier()
 	// listen on 0.0.0.0 to enable 127.0.0.1
 	listenIP := net.ParseIP("0.0.0.0")
 	hostIP, err := nettestutil.NonLoopbackIPv4()
-	assert.NilError(helpers.T(), err, fmt.Errorf("failed finding ipv4 non loopback interface: %w", err))
+	assert.NilError(
+		helpers.T(),
+		err,
+		fmt.Errorf("failed finding ipv4 non loopback interface: %w", err),
+	)
 	// Prepare configuration file for authentication server
 	// Details: https://github.com/cesanta/docker_auth/blob/1.7.1/examples/simple.yml
 	configFile, err := os.CreateTemp("", "authconfig")
-	assert.NilError(helpers.T(), err, fmt.Errorf("failed creating temporary directory for config file: %w", err))
+	assert.NilError(
+		helpers.T(),
+		err,
+		fmt.Errorf("failed creating temporary directory for config file: %w", err),
+	)
 	bpass, err := bcrypt.GenerateFromPassword([]byte(pass), bcrypt.DefaultCost)
 	assert.NilError(helpers.T(), err, fmt.Errorf("failed bcrypt encrypting password: %w", err))
 	configFileName := configFile.Name()
@@ -138,10 +154,22 @@ acl:
 		errConfigRemove := os.Remove(configFileName)
 		if err == nil {
 			// assert.NilError(helpers.T(), result.Error, fmt.Errorf("failed stopping container: %w", err))
-			assert.NilError(helpers.T(), errPortRelease, fmt.Errorf("failed releasing port: %w", err))
+			assert.NilError(
+				helpers.T(),
+				errPortRelease,
+				fmt.Errorf("failed releasing port: %w", err),
+			)
 			assert.NilError(helpers.T(), errCertClose, fmt.Errorf("failed cleaning certs: %w", err))
-			assert.NilError(helpers.T(), errConfigClose, fmt.Errorf("failed closing config file: %w", err))
-			assert.NilError(helpers.T(), errConfigRemove, fmt.Errorf("failed removing config file: %w", err))
+			assert.NilError(
+				helpers.T(),
+				errConfigClose,
+				fmt.Errorf("failed closing config file: %w", err),
+			)
+			assert.NilError(
+				helpers.T(),
+				errConfigRemove,
+				fmt.Errorf("failed removing config file: %w", err),
+			)
 		}
 	}
 
@@ -168,7 +196,11 @@ acl:
 		helpers.T().Logf("%s:\n%s\n", containerName, cl)
 		cleanup(err)
 	}
-	assert.NilError(helpers.T(), err, fmt.Errorf("failed starting auth container in a timely manner: %w", err))
+	assert.NilError(
+		helpers.T(),
+		err,
+		fmt.Errorf("failed starting auth container in a timely manner: %w", err),
+	)
 
 	return &TokenAuthServer{
 		IP:       hostIP,
@@ -192,8 +224,7 @@ type Auth interface {
 	Params(data test.Data, helpers test.Helpers) []string
 }
 
-type NoAuth struct {
-}
+type NoAuth struct{}
 
 func (na *NoAuth) Params(data test.Data, helpers test.Helpers) []string {
 	return []string{}
@@ -231,7 +262,11 @@ func (ba *BasicAuth) Params(data test.Data, helpers test.Helpers) []string {
 		encryptedPass, _ := bcrypt.GenerateFromPassword([]byte(pass), bcrypt.DefaultCost)
 		tmpDir, _ := os.MkdirTemp(helpers.T().TempDir(), "htpasswd")
 		ba.HtFile = filepath.Join(tmpDir, "htpasswd")
-		_ = os.WriteFile(ba.HtFile, []byte(fmt.Sprintf(`%s:%s`, ba.Username, string(encryptedPass))), 0o600)
+		_ = os.WriteFile(
+			ba.HtFile,
+			[]byte(fmt.Sprintf(`%s:%s`, ba.Username, string(encryptedPass))),
+			0o600,
+		)
 	}
 	ret := []string{
 		"--env", "REGISTRY_AUTH=htpasswd",
@@ -244,14 +279,25 @@ func (ba *BasicAuth) Params(data test.Data, helpers test.Helpers) []string {
 	return ret
 }
 
-func NewRegistry(data test.Data, helpers test.Helpers, ca *testca.CA, port int, auth Auth, boundCleanup func(error)) *RegistryServer {
+func NewRegistry(
+	data test.Data,
+	helpers test.Helpers,
+	ca *testca.CA,
+	port int,
+	auth Auth,
+	boundCleanup func(error),
+) *RegistryServer {
 	ensureImages(data, helpers)
 
 	name := data.Identifier()
 	// listen on 0.0.0.0 to enable 127.0.0.1
 	listenIP := net.ParseIP("0.0.0.0")
 	hostIP, err := nettestutil.NonLoopbackIPv4()
-	assert.NilError(helpers.T(), err, fmt.Errorf("failed finding ipv4 non loopback interface: %w", err))
+	assert.NilError(
+		helpers.T(),
+		err,
+		fmt.Errorf("failed finding ipv4 non loopback interface: %w", err),
+	)
 	port, err = portlock.Acquire(port)
 	assert.NilError(helpers.T(), err, fmt.Errorf("failed acquiring port: %w", err))
 
@@ -302,10 +348,18 @@ func NewRegistry(data test.Data, helpers test.Helpers, ca *testca.CA, port int, 
 			boundCleanup(err)
 		}
 		if cert != nil && err == nil {
-			assert.NilError(helpers.T(), errCertClose, fmt.Errorf("failed cleaning certificates: %w", err))
+			assert.NilError(
+				helpers.T(),
+				errCertClose,
+				fmt.Errorf("failed cleaning certificates: %w", err),
+			)
 		}
 		if err == nil {
-			assert.NilError(helpers.T(), errPortRelease, fmt.Errorf("failed releasing port: %w", err))
+			assert.NilError(
+				helpers.T(),
+				errPortRelease,
+				fmt.Errorf("failed releasing port: %w", err),
+			)
 		}
 	}
 
@@ -357,7 +411,11 @@ func NewRegistry(data test.Data, helpers test.Helpers, ca *testca.CA, port int, 
 		helpers.T().Logf("%s:\n%s\n", containerName, cl)
 		cleanup(err)
 	}
-	assert.NilError(helpers.T(), err, fmt.Errorf("failed starting registry container in a timely manner: %w", err))
+	assert.NilError(
+		helpers.T(),
+		err,
+		fmt.Errorf("failed starting registry container in a timely manner: %w", err),
+	)
 
 	output := helpers.Capture("logs", containerName)
 	return &RegistryServer{
@@ -373,7 +431,13 @@ func NewRegistry(data test.Data, helpers test.Helpers, ca *testca.CA, port int, 
 	}
 }
 
-func NewWithTokenAuth(data test.Data, helpers test.Helpers, user, pass string, port int, tls bool) *RegistryServer {
+func NewWithTokenAuth(
+	data test.Data,
+	helpers test.Helpers,
+	user, pass string,
+	port int,
+	tls bool,
+) *RegistryServer {
 	ca := testca.New(data, helpers)
 	as := NewAuthServer(data, helpers, ca, 0, user, pass, tls)
 	auth := &TokenAuth{

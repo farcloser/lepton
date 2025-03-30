@@ -28,7 +28,7 @@ import (
 )
 
 func TestVolumePrune(t *testing.T) {
-	var setup = func(data test.Data, helpers test.Helpers) {
+	setup := func(data test.Data, helpers test.Helpers) {
 		anonIDBusy := strings.TrimSpace(helpers.Capture("volume", "create"))
 		anonIDDangling := strings.TrimSpace(helpers.Capture("volume", "create"))
 
@@ -47,7 +47,7 @@ func TestVolumePrune(t *testing.T) {
 		data.Set("namedDangling", namedDangling)
 	}
 
-	var cleanup = func(data test.Data, helpers test.Helpers) {
+	cleanup := func(data test.Data, helpers test.Helpers) {
 		helpers.Anyhow("rm", "-f", data.Identifier())
 		helpers.Anyhow("volume", "rm", "-f", data.Get("anonIDBusy"))
 		helpers.Anyhow("volume", "rm", "-f", data.Get("anonIDDangling"))

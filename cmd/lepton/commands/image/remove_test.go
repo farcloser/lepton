@@ -53,7 +53,15 @@ func TestRemove(t *testing.T) {
 				require.Not(nerdtest.Docker),
 			),
 			Setup: func(data test.Data, helpers test.Helpers) {
-				helpers.Ensure("run", "--quiet", "--pull", "always", "--name", data.Identifier(), testutil.CommonImage)
+				helpers.Ensure(
+					"run",
+					"--quiet",
+					"--pull",
+					"always",
+					"--name",
+					data.Identifier(),
+					testutil.CommonImage,
+				)
 			},
 			Cleanup: func(data test.Data, helpers test.Helpers) {
 				helpers.Anyhow("rm", "-f", data.Identifier())
@@ -75,7 +83,15 @@ func TestRemove(t *testing.T) {
 			Description: "Remove image with stopped container - with -f",
 			NoParallel:  true,
 			Setup: func(data test.Data, helpers test.Helpers) {
-				helpers.Ensure("run", "--quiet", "--pull", "always", "--name", data.Identifier(), testutil.CommonImage)
+				helpers.Ensure(
+					"run",
+					"--quiet",
+					"--pull",
+					"always",
+					"--name",
+					data.Identifier(),
+					testutil.CommonImage,
+				)
 			},
 			Cleanup: func(data test.Data, helpers test.Helpers) {
 				helpers.Anyhow("rm", "-f", data.Identifier())
@@ -98,7 +114,18 @@ func TestRemove(t *testing.T) {
 				require.Not(nerdtest.Docker),
 			),
 			Setup: func(data test.Data, helpers test.Helpers) {
-				helpers.Ensure("run", "--quiet", "--pull", "always", "-d", "--name", data.Identifier(), testutil.CommonImage, "sleep", nerdtest.Infinity)
+				helpers.Ensure(
+					"run",
+					"--quiet",
+					"--pull",
+					"always",
+					"-d",
+					"--name",
+					data.Identifier(),
+					testutil.CommonImage,
+					"sleep",
+					nerdtest.Infinity,
+				)
 			},
 			Cleanup: func(data test.Data, helpers test.Helpers) {
 				helpers.Anyhow("rm", "-f", data.Identifier())
@@ -123,7 +150,18 @@ func TestRemove(t *testing.T) {
 				require.Not(nerdtest.Docker),
 			),
 			Setup: func(data test.Data, helpers test.Helpers) {
-				helpers.Ensure("run", "--quiet", "--pull", "always", "-d", "--name", data.Identifier(), testutil.CommonImage, "sleep", nerdtest.Infinity)
+				helpers.Ensure(
+					"run",
+					"--quiet",
+					"--pull",
+					"always",
+					"-d",
+					"--name",
+					data.Identifier(),
+					testutil.CommonImage,
+					"sleep",
+					nerdtest.Infinity,
+				)
 
 				img := nerdtest.InspectImage(helpers, testutil.CommonImage)
 				repoName, _ := imgutil.ParseRepoTag(testutil.CommonImage)
@@ -152,7 +190,17 @@ func TestRemove(t *testing.T) {
 			Description: "Remove image with created container - without -f",
 			NoParallel:  true,
 			Setup: func(data test.Data, helpers test.Helpers) {
-				helpers.Ensure("create", "--quiet", "--pull", "always", "--name", data.Identifier(), testutil.CommonImage, "sleep", nerdtest.Infinity)
+				helpers.Ensure(
+					"create",
+					"--quiet",
+					"--pull",
+					"always",
+					"--name",
+					data.Identifier(),
+					testutil.CommonImage,
+					"sleep",
+					nerdtest.Infinity,
+				)
 			},
 			Cleanup: func(data test.Data, helpers test.Helpers) {
 				helpers.Anyhow("rm", "-f", data.Identifier())
@@ -175,7 +223,17 @@ func TestRemove(t *testing.T) {
 			NoParallel:  true,
 			Setup: func(data test.Data, helpers test.Helpers) {
 				helpers.Ensure("pull", "--quiet", testutil.NginxAlpineImage)
-				helpers.Ensure("create", "--quiet", "--pull", "always", "--name", data.Identifier(), testutil.CommonImage, "sleep", nerdtest.Infinity)
+				helpers.Ensure(
+					"create",
+					"--quiet",
+					"--pull",
+					"always",
+					"--name",
+					data.Identifier(),
+					testutil.CommonImage,
+					"sleep",
+					nerdtest.Infinity,
+				)
 				helpers.Ensure("rmi", testutil.NginxAlpineImage)
 			},
 			Cleanup: func(data test.Data, helpers test.Helpers) {
@@ -204,7 +262,18 @@ func TestRemove(t *testing.T) {
 				nerdtest.CGroup,
 			),
 			Setup: func(data test.Data, helpers test.Helpers) {
-				helpers.Ensure("run", "--quiet", "--pull", "always", "-d", "--name", data.Identifier(), testutil.CommonImage, "sleep", nerdtest.Infinity)
+				helpers.Ensure(
+					"run",
+					"--quiet",
+					"--pull",
+					"always",
+					"-d",
+					"--name",
+					data.Identifier(),
+					testutil.CommonImage,
+					"sleep",
+					nerdtest.Infinity,
+				)
 				helpers.Ensure("pause", data.Identifier())
 			},
 			Cleanup: func(data test.Data, helpers test.Helpers) {
@@ -231,7 +300,18 @@ func TestRemove(t *testing.T) {
 				require.Not(nerdtest.Docker),
 			),
 			Setup: func(data test.Data, helpers test.Helpers) {
-				helpers.Ensure("run", "--quiet", "--pull", "always", "-d", "--name", data.Identifier(), testutil.CommonImage, "sleep", nerdtest.Infinity)
+				helpers.Ensure(
+					"run",
+					"--quiet",
+					"--pull",
+					"always",
+					"-d",
+					"--name",
+					data.Identifier(),
+					testutil.CommonImage,
+					"sleep",
+					nerdtest.Infinity,
+				)
 				helpers.Ensure("pause", data.Identifier())
 
 				img := nerdtest.InspectImage(helpers, testutil.CommonImage)
@@ -264,7 +344,18 @@ func TestRemove(t *testing.T) {
 				require.Not(nerdtest.Docker),
 			),
 			Setup: func(data test.Data, helpers test.Helpers) {
-				helpers.Ensure("run", "--quiet", "--pull", "always", "-d", "--name", data.Identifier(), testutil.CommonImage, "sleep", nerdtest.Infinity)
+				helpers.Ensure(
+					"run",
+					"--quiet",
+					"--pull",
+					"always",
+					"-d",
+					"--name",
+					data.Identifier(),
+					testutil.CommonImage,
+					"sleep",
+					nerdtest.Infinity,
+				)
 				helpers.Ensure("kill", data.Identifier())
 			},
 			Cleanup: func(data test.Data, helpers test.Helpers) {
@@ -287,7 +378,18 @@ func TestRemove(t *testing.T) {
 			Description: "Remove image with killed container - with -f",
 			NoParallel:  true,
 			Setup: func(data test.Data, helpers test.Helpers) {
-				helpers.Ensure("run", "--quiet", "--pull", "always", "-d", "--name", data.Identifier(), testutil.CommonImage, "sleep", nerdtest.Infinity)
+				helpers.Ensure(
+					"run",
+					"--quiet",
+					"--pull",
+					"always",
+					"-d",
+					"--name",
+					data.Identifier(),
+					testutil.CommonImage,
+					"sleep",
+					nerdtest.Infinity,
+				)
 				helpers.Ensure("kill", data.Identifier())
 			},
 			Cleanup: func(data test.Data, helpers test.Helpers) {
@@ -363,7 +465,9 @@ func TestRemoveKubeWithKubeHideDupe(t *testing.T) {
 		helpers.Anyhow("--kube-hide-dupe", "rmi", "-f", testutil.BusyboxImage)
 	}
 	testCase.Setup = func(data test.Data, helpers test.Helpers) {
-		numTags = len(strings.Split(strings.TrimSpace(helpers.Capture("--kube-hide-dupe", "images")), "\n"))
+		numTags = len(
+			strings.Split(strings.TrimSpace(helpers.Capture("--kube-hide-dupe", "images")), "\n"),
+		)
 		numNoTags = len(strings.Split(strings.TrimSpace(helpers.Capture("images")), "\n"))
 	}
 	testCase.Require = require.All(
@@ -475,11 +579,14 @@ func TestRemoveKubeWithKubeHideDupe(t *testing.T) {
 					Output: func(stdout string, info string, t *testing.T) {
 						helpers.Command("--kube-hide-dupe", "rmi", stdout[0:12]).Run(&test.Expected{
 							ExitCode: 1,
-							Errors:   []error{errors.New("multiple IDs found with provided prefix: ")},
+							Errors: []error{
+								errors.New("multiple IDs found with provided prefix: "),
+							},
 						})
-						helpers.Command("--kube-hide-dupe", "rmi", "--force", stdout[0:12]).Run(&test.Expected{
-							ExitCode: 0,
-						})
+						helpers.Command("--kube-hide-dupe", "rmi", "--force", stdout[0:12]).
+							Run(&test.Expected{
+								ExitCode: 0,
+							})
 						helpers.Command("images").Run(&test.Expected{
 							Output: func(stdout string, info string, t *testing.T) {
 								lines := strings.Split(strings.TrimSpace(stdout), "\n")
@@ -498,7 +605,13 @@ func TestRemoveKubeWithKubeHideDupe(t *testing.T) {
 				helpers.Ensure("tag", testutil.BusyboxImage, data.Identifier())
 			},
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-				return helpers.Command("--kube-hide-dupe", "images", testutil.BusyboxImage, "-q", "--no-trunc")
+				return helpers.Command(
+					"--kube-hide-dupe",
+					"images",
+					testutil.BusyboxImage,
+					"-q",
+					"--no-trunc",
+				)
 			},
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 				return &test.Expected{
@@ -506,11 +619,14 @@ func TestRemoveKubeWithKubeHideDupe(t *testing.T) {
 						imgID := strings.Split(stdout, "\n")
 						helpers.Command("--kube-hide-dupe", "rmi", imgID[0]).Run(&test.Expected{
 							ExitCode: 1,
-							Errors:   []error{errors.New("multiple IDs found with provided prefix: ")},
+							Errors: []error{
+								errors.New("multiple IDs found with provided prefix: "),
+							},
 						})
-						helpers.Command("--kube-hide-dupe", "rmi", "--force", imgID[0]).Run(&test.Expected{
-							ExitCode: 0,
-						})
+						helpers.Command("--kube-hide-dupe", "rmi", "--force", imgID[0]).
+							Run(&test.Expected{
+								ExitCode: 0,
+							})
 						helpers.Command("images").Run(&test.Expected{
 							Output: func(stdout string, info string, t *testing.T) {
 								lines := strings.Split(strings.TrimSpace(stdout), "\n")

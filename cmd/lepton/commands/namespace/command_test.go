@@ -56,17 +56,29 @@ func TestCreateFail(t *testing.T) {
 		{
 			Description: "empty namespace name",
 			Command:     test.Command("namespace", "create", ""),
-			Expected:    test.Expects(1, []error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument}, nil),
+			Expected: test.Expects(
+				1,
+				[]error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument},
+				nil,
+			),
 		},
 		{
 			Description: "invalid namespace name, non-ascii",
 			Command:     test.Command("namespace", "create", "∞"),
-			Expected:    test.Expects(1, []error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument}, nil),
+			Expected: test.Expects(
+				1,
+				[]error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument},
+				nil,
+			),
 		},
 		{
 			Description: "invalid namespace name",
 			Command:     test.Command("namespace", "create", "_"),
-			Expected:    test.Expects(1, []error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument}, nil),
+			Expected: test.Expects(
+				1,
+				[]error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument},
+				nil,
+			),
 		},
 	}
 
@@ -85,32 +97,56 @@ func TestInspectFail(t *testing.T) {
 		{
 			Description: "missing namespace name",
 			Command:     test.Command("namespace", "inspect"),
-			Expected:    test.Expects(1, []error{errors.New("requires at least 1 arg")}, expect.Equals("")),
+			Expected: test.Expects(
+				1,
+				[]error{errors.New("requires at least 1 arg")},
+				expect.Equals(""),
+			),
 		},
 		{
 			Description: "empty namespace name",
 			Command:     test.Command("namespace", "inspect", ""),
-			Expected:    test.Expects(1, []error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument}, expect.Equals("")),
+			Expected: test.Expects(
+				1,
+				[]error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument},
+				expect.Equals(""),
+			),
 		},
 		{
 			Description: "invalid namespace name, non-ascii",
 			Command:     test.Command("namespace", "inspect", "∞"),
-			Expected:    test.Expects(1, []error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument}, expect.Equals("")),
+			Expected: test.Expects(
+				1,
+				[]error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument},
+				expect.Equals(""),
+			),
 		},
 		{
 			Description: "invalid namespace name",
 			Command:     test.Command("namespace", "inspect", "_"),
-			Expected:    test.Expects(1, []error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument}, expect.Equals("")),
+			Expected: test.Expects(
+				1,
+				[]error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument},
+				expect.Equals(""),
+			),
 		},
 		{
 			Description: "non existent namespace",
 			Command:     test.Command("namespace", "inspect", "doesnotexistandneverwill"),
-			Expected:    test.Expects(1, []error{namespace.ErrServiceNamespace, errs.ErrNotFound}, expect.Equals("")),
+			Expected: test.Expects(
+				1,
+				[]error{namespace.ErrServiceNamespace, errs.ErrNotFound},
+				expect.Equals(""),
+			),
 		},
 		{
 			Description: "mixing errors",
 			Command:     test.Command("namespace", "inspect", "doesnotexistandneverwill", "_", "∞"),
-			Expected:    test.Expects(1, []error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument, errs.ErrNotFound}, expect.Equals("")),
+			Expected: test.Expects(
+				1,
+				[]error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument, errs.ErrNotFound},
+				expect.Equals(""),
+			),
 		},
 		/*
 			// FIXME looks like for some reason windows does not have the default namespace at this point
@@ -145,37 +181,71 @@ func TestUpdateFail(t *testing.T) {
 		{
 			Description: "missing namespace name",
 			Command:     test.Command("namespace", "update", "--label", "key=value"),
-			Expected:    test.Expects(1, []error{errors.New("accepts 1 arg(s), received 0")}, expect.Equals("")),
+			Expected: test.Expects(
+				1,
+				[]error{errors.New("accepts 1 arg(s), received 0")},
+				expect.Equals(""),
+			),
 		},
 		{
 			Description: "empty namespace name",
 			Command:     test.Command("namespace", "update", "", "--label", "key=value"),
-			Expected:    test.Expects(1, []error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument}, expect.Equals("")),
+			Expected: test.Expects(
+				1,
+				[]error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument},
+				expect.Equals(""),
+			),
 		},
 		{
 			Description: "invalid namespace name, non-ascii",
 			Command:     test.Command("namespace", "update", "∞", "--label", "key=value"),
-			Expected:    test.Expects(1, []error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument}, expect.Equals("")),
+			Expected: test.Expects(
+				1,
+				[]error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument},
+				expect.Equals(""),
+			),
 		},
 		{
 			Description: "invalid namespace name",
 			Command:     test.Command("namespace", "update", "_", "--label", "key=value"),
-			Expected:    test.Expects(1, []error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument}, expect.Equals("")),
+			Expected: test.Expects(
+				1,
+				[]error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument},
+				expect.Equals(""),
+			),
 		},
 		{
 			Description: "non existent namespace",
-			Command:     test.Command("namespace", "update", "doesnotexistandneverwill", "--label", "key=value"),
-			Expected:    test.Expects(1, []error{namespace.ErrServiceNamespace, errs.ErrNotFound}, expect.Equals("")),
+			Command: test.Command(
+				"namespace",
+				"update",
+				"doesnotexistandneverwill",
+				"--label",
+				"key=value",
+			),
+			Expected: test.Expects(
+				1,
+				[]error{namespace.ErrServiceNamespace, errs.ErrNotFound},
+				expect.Equals(""),
+			),
 		},
 		{
 			Description: "exiting namespace with no label",
 			Command:     test.Command("namespace", "update", "cli-test"),
-			Expected:    test.Expects(1, []error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument}, expect.Equals("")),
+			Expected: test.Expects(
+				1,
+				[]error{namespace.ErrServiceNamespace, errs.ErrInvalidArgument},
+				expect.Equals(""),
+			),
 		},
 		{
 			Description: "exiting namespace with empty label key",
 			Command:     test.Command("namespace", "update", "cli-test", "--label"),
-			Expected:    test.Expects(1, []error{errors.New("flag needs an argument")}, expect.Equals("")),
+			Expected: test.Expects(
+				1,
+				[]error{errors.New("flag needs an argument")},
+				expect.Equals(""),
+			),
 		},
 	}
 
@@ -204,7 +274,13 @@ func TestCreateSuccess(t *testing.T) {
 			Description: "inspect works",
 			NoParallel:  true,
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-				return helpers.Command("namespace", "inspect", "--format", formatter.FormatJSON, data.Get("namespace"))
+				return helpers.Command(
+					"namespace",
+					"inspect",
+					"--format",
+					formatter.FormatJSON,
+					data.Get("namespace"),
+				)
 			},
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 				return &test.Expected{

@@ -14,6 +14,7 @@
    limitations under the License.
 */
 
+// Package registry
 package registry
 
 import (
@@ -32,8 +33,7 @@ type Auth interface {
 	Params(data test.Data) []string
 }
 
-type NoAuth struct {
-}
+type NoAuth struct{}
 
 func (na *NoAuth) Params(data test.Data) []string {
 	return []string{}
@@ -73,7 +73,11 @@ func (ba *BasicAuth) Params(data test.Data) []string {
 		encryptedPass, _ := bcrypt.GenerateFromPassword([]byte(pass), bcrypt.DefaultCost)
 		tmpDir, _ := os.MkdirTemp(data.TempDir(), "htpasswd")
 		ba.HtFile = filepath.Join(tmpDir, "htpasswd")
-		_ = os.WriteFile(ba.HtFile, []byte(fmt.Sprintf(`%s:%s`, ba.Username, string(encryptedPass))), 0o600)
+		_ = os.WriteFile(
+			ba.HtFile,
+			[]byte(fmt.Sprintf(`%s:%s`, ba.Username, string(encryptedPass))),
+			0o600,
+		)
 	}
 	ret := []string{
 		"--env", "REGISTRY_AUTH=htpasswd",

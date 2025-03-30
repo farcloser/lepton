@@ -158,7 +158,8 @@ var BrokenTest = func(message string, req *test.Requirement) *test.Requirement {
 var Rootless = &test.Requirement{
 	Check: func(data test.Data, helpers test.Helpers) (ret bool, mess string) {
 		// Make sure we DO not return "IsRootless true" for docker
-		ret = (getTarget() == targetNerdctl || getTarget() == targetNerdishctl) && rootlessutil.IsRootless()
+		ret = (getTarget() == targetNerdctl || getTarget() == targetNerdishctl) &&
+			rootlessutil.IsRootless()
 		if ret {
 			mess = "environment is root-less"
 		} else {
@@ -193,13 +194,16 @@ var CgroupsAccessible = require.All(
 	CGroup,
 	&test.Requirement{
 		Check: func(data test.Data, helpers test.Helpers) (ret bool, mess string) {
-			isRootLess := (getTarget() == targetNerdctl || getTarget() == targetNerdishctl) && rootlessutil.IsRootless()
+			isRootLess := (getTarget() == targetNerdctl || getTarget() == targetNerdishctl) &&
+				rootlessutil.IsRootless()
 			if isRootLess {
 				stdout := helpers.Capture("info", "--format", "{{ json . }}")
 				var dinf dockercompat.Info
 				err := json.Unmarshal([]byte(stdout), &dinf)
 				assert.NilError(helpers.T(), err, "failed to parse docker info")
-				return dinf.CgroupVersion == strconv.Itoa(int(cgroups.Version2)), "we are rootless, and cgroup version is not 2"
+				return dinf.CgroupVersion == strconv.Itoa(
+					int(cgroups.Version2),
+				), "we are rootless, and cgroup version is not 2"
 			}
 			return true, ""
 		},
@@ -316,7 +320,8 @@ var Private = &test.Requirement{
 			// FIXME: there are conditions where we still have some stuff in there and this fails...
 			containerList := strings.TrimSpace(helpers.Capture("ps", "-aq"))
 			if containerList != "" {
-				helpers.Ensure(append([]string{"rm", "-f"}, strings.Split(containerList, "\n")...)...)
+				helpers.Ensure(
+					append([]string{"rm", "-f"}, strings.Split(containerList, "\n")...)...)
 			}
 			helpers.Ensure("system", "prune", "-f", "--all", "--volumes")
 			helpers.Anyhow("namespace", "remove", data.Get("_deletenamespace"))

@@ -14,6 +14,7 @@
    limitations under the License.
 */
 
+// Package testutil
 package testutil
 
 import (
@@ -69,7 +70,7 @@ type Base struct {
 // WithStdin sets the standard input of Cmd to the specified reader
 func WithStdin(r io.Reader) func(*Cmd) {
 	return func(i *Cmd) {
-		i.Cmd.Stdin = r
+		i.Stdin = r
 	}
 }
 
@@ -188,7 +189,10 @@ func (b *Base) EnsureDaemonActive() {
 		b.T.Logf("(retry=%d) %s", i, string(out))
 		if err == nil {
 			// The daemon is now running, but the daemon may still refuse connections to containerd.sock
-			b.T.Logf("daemon %q is now running, checking whether the daemon can handle requests", target)
+			b.T.Logf(
+				"daemon %q is now running, checking whether the daemon can handle requests",
+				target,
+			)
 			infoRes := b.Cmd("info").Run()
 			if infoRes.ExitCode == 0 {
 				b.T.Logf("daemon %q can now handle requests", target)
@@ -204,8 +208,16 @@ func (b *Base) EnsureDaemonActive() {
 func (b *Base) DumpDaemonLogs(minutes int) {
 	b.T.Helper()
 	target := b.systemctlTarget()
-	cmd := exec.Command("journalctl",
-		append(b.systemctlArgs(), "-u", target, "--no-pager", "-S", fmt.Sprintf("%d min ago", minutes))...)
+	cmd := exec.Command(
+		"journalctl",
+		append(
+			b.systemctlArgs(),
+			"-u",
+			target,
+			"--no-pager",
+			"-S",
+			fmt.Sprintf("%d min ago", minutes),
+		)...)
 	b.T.Logf("===== %v =====", cmd.Args)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
@@ -358,7 +370,7 @@ type Cmd struct {
 }
 
 func (c *Cmd) Run() *icmd.Result {
-	c.Base.T.Helper()
+	c.T.Helper()
 	c.mu.Lock()
 	c.runResult = icmd.RunCmd(c.Cmd)
 	c.mu.Unlock()
@@ -366,7 +378,7 @@ func (c *Cmd) Run() *icmd.Result {
 }
 
 func (c *Cmd) runIfNecessary() *icmd.Result {
-	c.Base.T.Helper()
+	c.T.Helper()
 	c.mu.Lock()
 	if c.runResult == nil {
 		c.runResult = icmd.RunCmd(c.Cmd)
@@ -376,7 +388,7 @@ func (c *Cmd) runIfNecessary() *icmd.Result {
 }
 
 func (c *Cmd) Start() *icmd.Result {
-	c.Base.T.Helper()
+	c.T.Helper()
 	return icmd.StartCmd(c.Cmd)
 }
 
@@ -388,29 +400,29 @@ func (c *Cmd) CmdOption(cmdOptions ...func(*Cmd)) *Cmd {
 }
 
 func (c *Cmd) Assert(expected icmd.Expected) {
-	c.Base.T.Helper()
-	c.runIfNecessary().Assert(c.Base.T, expected)
+	c.T.Helper()
+	c.runIfNecessary().Assert(c.T, expected)
 }
 
 func (c *Cmd) AssertOK() {
-	c.Base.T.Helper()
+	c.T.Helper()
 	c.AssertExitCode(0)
 }
 
 func (c *Cmd) AssertFail() {
-	c.Base.T.Helper()
+	c.T.Helper()
 	res := c.runIfNecessary()
-	assert.Assert(c.Base.T, res.ExitCode != 0, res)
+	assert.Assert(c.T, res.ExitCode != 0, res)
 }
 
 func (c *Cmd) AssertExitCode(exitCode int) {
-	c.Base.T.Helper()
+	c.T.Helper()
 	res := c.runIfNecessary()
-	assert.Assert(c.Base.T, res.ExitCode == exitCode, res)
+	assert.Assert(c.T, res.ExitCode == exitCode, res)
 }
 
 func (c *Cmd) AssertOutContains(s string) {
-	c.Base.T.Helper()
+	c.T.Helper()
 	expected := icmd.Expected{
 		Out: s,
 	}
@@ -418,7 +430,7 @@ func (c *Cmd) AssertOutContains(s string) {
 }
 
 func (c *Cmd) AssertErrContains(s string) {
-	c.Base.T.Helper()
+	c.T.Helper()
 	expected := icmd.Expected{
 		Err: s,
 	}
@@ -426,14 +438,18 @@ func (c *Cmd) AssertErrContains(s string) {
 }
 
 func (c *Cmd) AssertCombinedOutContains(s string) {
-	c.Base.T.Helper()
+	c.T.Helper()
 	res := c.runIfNecessary()
-	assert.Assert(c.Base.T, strings.Contains(res.Combined(), s), fmt.Sprintf("expected output to contain %q: %q", s, res.Combined()))
+	assert.Assert(
+		c.T,
+		strings.Contains(res.Combined(), s),
+		fmt.Sprintf("expected output to contain %q: %q", s, res.Combined()),
+	)
 }
 
 // AssertOutContainsAll checks if command output contains All strings in `strs`.
 func (c *Cmd) AssertOutContainsAll(strs ...string) {
-	c.Base.T.Helper()
+	c.T.Helper()
 	fn := func(stdout string) error {
 		for _, s := range strs {
 			if !strings.Contains(stdout, s) {
@@ -447,7 +463,7 @@ func (c *Cmd) AssertOutContainsAll(strs ...string) {
 
 // AssertOutContainsAny checks if command output contains Any string in `strs`.
 func (c *Cmd) AssertOutContainsAny(strs ...string) {
-	c.Base.T.Helper()
+	c.T.Helper()
 	fn := func(stdout string) error {
 		for _, s := range strs {
 			if strings.Contains(stdout, s) {
@@ -460,7 +476,7 @@ func (c *Cmd) AssertOutContainsAny(strs ...string) {
 }
 
 func (c *Cmd) AssertOutNotContains(s string) {
-	c.Base.T.Helper()
+	c.T.Helper()
 	c.AssertOutWithFunc(func(stdout string) error {
 		if strings.Contains(stdout, s) {
 			return fmt.Errorf("expected stdout to not contain %q", s)
@@ -470,7 +486,7 @@ func (c *Cmd) AssertOutNotContains(s string) {
 }
 
 func (c *Cmd) AssertErrNotContains(s string) {
-	c.Base.T.Helper()
+	c.T.Helper()
 	c.AssertOutWithFunc(func(stderr string) error {
 		if strings.Contains(stderr, s) {
 			return fmt.Errorf("expected stdout to not contain %q", s)
@@ -480,7 +496,7 @@ func (c *Cmd) AssertErrNotContains(s string) {
 }
 
 func (c *Cmd) AssertOutExactly(s string) {
-	c.Base.T.Helper()
+	c.T.Helper()
 	fn := func(stdout string) error {
 		if stdout != s {
 			return fmt.Errorf("expected %q, got %q", s, stdout)
@@ -491,7 +507,7 @@ func (c *Cmd) AssertOutExactly(s string) {
 }
 
 func (c *Cmd) AssertOutStreamsExactly(stdout, stderr string) {
-	c.Base.T.Helper()
+	c.T.Helper()
 	fn := func(sout, serr string) error {
 		msg := ""
 		if sout != stdout {
@@ -509,28 +525,28 @@ func (c *Cmd) AssertOutStreamsExactly(stdout, stderr string) {
 }
 
 func (c *Cmd) AssertOutWithFunc(fn func(stdout string) error) {
-	c.Base.T.Helper()
+	c.T.Helper()
 	res := c.runIfNecessary()
-	assert.Equal(c.Base.T, 0, res.ExitCode, res)
-	assert.NilError(c.Base.T, fn(res.Stdout()), res.Combined())
+	assert.Equal(c.T, 0, res.ExitCode, res)
+	assert.NilError(c.T, fn(res.Stdout()), res.Combined())
 }
 
 func (c *Cmd) AssertOutStreamsWithFunc(fn func(stdout, stderr string) error) {
-	c.Base.T.Helper()
+	c.T.Helper()
 	res := c.runIfNecessary()
-	assert.Equal(c.Base.T, 0, res.ExitCode, res)
-	assert.NilError(c.Base.T, fn(res.Stdout(), res.Stderr()), res.Combined())
+	assert.Equal(c.T, 0, res.ExitCode, res)
+	assert.NilError(c.T, fn(res.Stdout(), res.Stderr()), res.Combined())
 }
 
 func (c *Cmd) Out() string {
-	c.Base.T.Helper()
+	c.T.Helper()
 	res := c.runIfNecessary()
-	assert.Equal(c.Base.T, 0, res.ExitCode, res)
+	assert.Equal(c.T, 0, res.ExitCode, res)
 	return res.Stdout()
 }
 
 func (c *Cmd) OutLines() []string {
-	c.Base.T.Helper()
+	c.T.Helper()
 	out := c.Out()
 	// FIXME: improve memory efficiency
 	return strings.Split(out, "\n")
@@ -558,10 +574,20 @@ var (
 
 func M(m *testing.M) {
 	flag.StringVar(&flagTestTarget, "test.target", Nerdishctl, "target to test")
-	flag.BoolVar(&flagTestKillDaemon, "test.allow-kill-daemon", false, "enable tests that kill the daemon")
+	flag.BoolVar(
+		&flagTestKillDaemon,
+		"test.allow-kill-daemon",
+		false,
+		"enable tests that kill the daemon",
+	)
 	flag.BoolVar(&flagTestIPv6, "test.only-ipv6", false, "enable tests on IPv6")
 	flag.BoolVar(&flagTestKube, "test.only-kubernetes", false, "enable tests on Kubernetes")
-	flag.BoolVar(&flagTestFlaky, "test.only-flaky", false, "enable testing of flaky tests only (if false, flaky tests are ignored)")
+	flag.BoolVar(
+		&flagTestFlaky,
+		"test.only-flaky",
+		false,
+		"enable testing of flaky tests only (if false, flaky tests are ignored)",
+	)
 	if flag.Lookup("test.v") != nil {
 		flagVerbose = true
 	}
@@ -572,13 +598,17 @@ func M(m *testing.M) {
 		// Note that this could be racy. The .lock file COULD get acquired after this and before we hit the lock section.
 		// This is not a big deal then: we will just wait for the lock to free.
 		if _, err := os.Stat(testLockFile); err == nil || !errors.Is(err, os.ErrNotExist) {
-			log.L.Errorf("Another test binary is already running. If you think this is an error, manually remove %s", testLockFile)
+			log.L.Errorf(
+				"Another test binary is already running. If you think this is an error, manually remove %s",
+				testLockFile,
+			)
 			return 1
 		}
 
 		err := os.MkdirAll(filepath.Dir(testLockFile), 0o777)
 		if err != nil {
-			log.L.WithError(err).Errorf("failed creating testing lock directory %q", filepath.Dir(testLockFile))
+			log.L.WithError(err).
+				Errorf("failed creating testing lock directory %q", filepath.Dir(testLockFile))
 			return 1
 		}
 
@@ -589,7 +619,8 @@ func M(m *testing.M) {
 		// Acquire lock
 		lock, err := filesystem.Lock(filepath.Dir(testLockFile))
 		if err != nil {
-			log.L.WithError(err).Errorf("failed acquiring testing lock %q", filepath.Dir(testLockFile))
+			log.L.WithError(err).
+				Errorf("failed acquiring testing lock %q", filepath.Dir(testLockFile))
 			return 1
 		}
 
@@ -597,7 +628,11 @@ func M(m *testing.M) {
 		defer filesystem.Unlock(lock)
 
 		// Create marker file
-		err = os.WriteFile(testLockFile, []byte("prevent testing from running in parallel for subpackages integration tests"), 0o666)
+		err = os.WriteFile(
+			testLockFile,
+			[]byte("prevent testing from running in parallel for subpackages integration tests"),
+			0o666,
+		)
 		if err != nil {
 			log.L.WithError(err).Errorf("failed writing lock file %q", testLockFile)
 			return 1
@@ -693,7 +728,13 @@ func RequireContainerdPlugin(base *Base, requiredType, requiredID string, requir
 		}
 		for _, f := range requiredCaps {
 			if _, ok := pCapMap[f]; !ok {
-				base.T.Skipf("test requires containerd plugin \"%s.%s\" with capabilities %v (missing %q)", requiredType, requiredID, requiredCaps, f)
+				base.T.Skipf(
+					"test requires containerd plugin \"%s.%s\" with capabilities %v (missing %q)",
+					requiredType,
+					requiredID,
+					requiredCaps,
+					f,
+				)
 			}
 		}
 		return
@@ -767,7 +808,9 @@ func newBase(t *testing.T, ns string, ipv6Compatible bool, kubernetesCompatible 
 		t.Skip("runner skips Kubernetes compatible tests in the non-Kubernetes environment")
 	}
 	if !GetFlakyEnvironment() && !GetEnableKubernetes() && !GetEnableIPv6() {
-		t.Skip("legacy tests are considered flaky by default and are skipped unless in the flaky environment")
+		t.Skip(
+			"legacy tests are considered flaky by default and are skipped unless in the flaky environment",
+		)
 	}
 	var err error
 	base.Binary, err = exec.LookPath(base.Target)

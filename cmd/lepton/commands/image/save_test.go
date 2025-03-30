@@ -44,13 +44,21 @@ func TestSaveContent(t *testing.T) {
 			helpers.Ensure("pull", "--quiet", testutil.CommonImage)
 		},
 		Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-			return helpers.Command("save", "-o", filepath.Join(data.TempDir(), "out.tar"), testutil.CommonImage)
+			return helpers.Command(
+				"save",
+				"-o",
+				filepath.Join(data.TempDir(), "out.tar"),
+				testutil.CommonImage,
+			)
 		},
 		Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 			return &test.Expected{
 				Output: func(stdout string, info string, t *testing.T) {
 					rootfsPath := filepath.Join(data.TempDir(), "rootfs")
-					err := testhelpers.ExtractDockerArchive(filepath.Join(data.TempDir(), "out.tar"), rootfsPath)
+					err := testhelpers.ExtractDockerArchive(
+						filepath.Join(data.TempDir(), "out.tar"),
+						rootfsPath,
+					)
 					assert.NilError(t, err)
 					etcOSReleasePath := filepath.Join(rootfsPath, "/etc/os-release")
 					etcOSReleaseBytes, err := os.ReadFile(etcOSReleasePath)

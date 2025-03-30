@@ -119,17 +119,32 @@ func ensureContainerStarted(helpers test.Helpers, con string) {
 	}
 }
 
-func NewCesantaAuthServer(data test.Data, helpers test.Helpers, authority *ca.CA, port int, user, pass string, tls bool) *TokenAuthServer {
+func NewCesantaAuthServer(
+	data test.Data,
+	helpers test.Helpers,
+	authority *ca.CA,
+	port int,
+	user, pass string,
+	tls bool,
+) *TokenAuthServer {
 	// listen on 0.0.0.0 to enable 127.0.0.1
 	listenIP := net.ParseIP("0.0.0.0")
 	hostIP, err := nettestutil.NonLoopbackIPv4()
-	assert.NilError(helpers.T(), err, fmt.Errorf("failed finding ipv4 non loopback interface: %w", err))
+	assert.NilError(
+		helpers.T(),
+		err,
+		fmt.Errorf("failed finding ipv4 non loopback interface: %w", err),
+	)
 	bpass, err := bcrypt.GenerateFromPassword([]byte(pass), bcrypt.DefaultCost)
 	assert.NilError(helpers.T(), err, fmt.Errorf("failed bcrypt encrypting password: %w", err))
 	// Prepare configuration file for authentication server
 	// Details: https://github.com/cesanta/docker_auth/blob/1.7.1/examples/simple.yml
 	configFile, err := os.CreateTemp(data.TempDir(), "authconfig")
-	assert.NilError(helpers.T(), err, fmt.Errorf("failed creating temporary directory for config file: %w", err))
+	assert.NilError(
+		helpers.T(),
+		err,
+		fmt.Errorf("failed creating temporary directory for config file: %w", err),
+	)
 	configFileName := configFile.Name()
 
 	cc := &CesantaConfig{
@@ -217,8 +232,11 @@ func NewCesantaAuthServer(data test.Data, helpers test.Helpers, authority *ca.CA
 		),
 			10,
 			true)
-		assert.NilError(helpers.T(), err, fmt.Errorf("failed starting auth container in a timely manner: %w", err))
-
+		assert.NilError(
+			helpers.T(),
+			err,
+			fmt.Errorf("failed starting auth container in a timely manner: %w", err),
+		)
 	}
 
 	return &TokenAuthServer{

@@ -102,7 +102,7 @@ services:
 	psCmd := base.Cmd("ps", "-a", "--format=\"{{.Names}}\"")
 	result := psCmd.Run()
 	stdoutContent := result.Stdout() + result.Stderr()
-	assert.Assert(psCmd.Base.T, result.ExitCode == 0, stdoutContent)
+	assert.Assert(psCmd.T, result.ExitCode == 0, stdoutContent)
 	if strings.Contains(stdoutContent, containerName) {
 		log.L.Errorf("test failed, the container %s is not removed", stdoutContent)
 		t.Fail()
@@ -402,8 +402,18 @@ services:
 	// unbuffer(1) emulates tty, which is required by `run -t`.
 	// unbuffer(1) can be installed with `apt-get install expect`.
 	unbuffer := []string{"unbuffer"}
-	base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(),
-		"run", "--entrypoint", "echo", "--name", containerName, "alpine", partialOutput).AssertOutContains(partialOutput)
+	base.ComposeCmdWithHelper(
+		unbuffer,
+		"-f",
+		comp.YAMLFullPath(),
+		"run",
+		"--entrypoint",
+		"echo",
+		"--name",
+		containerName,
+		"alpine",
+		partialOutput,
+	).AssertOutContains(partialOutput)
 }
 
 func TestComposeRunWithVolume(t *testing.T) {
@@ -446,7 +456,6 @@ services:
 		assert.Assert(t, len(container.Mounts) == 1, errMsg)
 		assert.Assert(t, container.Mounts[0].Source == tmpDir, errMsg)
 		assert.Assert(t, container.Mounts[0].Destination == destinationDir, errMsg)
-
 	}
 	testCase.Run(t)
 }
@@ -540,14 +549,19 @@ services:
 		// unbuffer(1) emulates tty, which is required by `run -t`.
 		// unbuffer(1) can be installed with `apt-get install expect`.
 		unbuffer := []string{"unbuffer"}
-		base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(), "run", "svc0").AssertOutContains(sttyPartialOutput) // key match
-		base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(), "run", "svc1").AssertFail()                         // key mismatch
-		base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(), "run", "svc2").AssertOutContains(sttyPartialOutput) // verify passed
+		base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(), "run", "svc0").
+			AssertOutContains(sttyPartialOutput)
+			// key match
+		base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(), "run", "svc1").
+			AssertFail()
+			// key mismatch
+		base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(), "run", "svc2").
+			AssertOutContains(sttyPartialOutput)
+			// verify passed
 		// 5. compose up
 		base.ComposeCmd("-f", comp.YAMLFullPath(), "up", "svc0").AssertOK()   // key match
 		base.ComposeCmd("-f", comp.YAMLFullPath(), "up", "svc1").AssertFail() // key mismatch
 		base.ComposeCmd("-f", comp.YAMLFullPath(), "up", "svc2").AssertOK()   // verify passed
-
 	}
 	testCase.Run(t)
 }

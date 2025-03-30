@@ -44,6 +44,7 @@ func TestStartAttach(t *testing.T) {
 	containerName := testutil.Identifier(t)
 
 	defer base.Cmd("rm", "-f", containerName).AssertOK()
-	base.Cmd("run", "--name", containerName, testutil.CommonImage, "sh", "-euxc", "echo foo").AssertOK()
+	base.Cmd("run", "--name", containerName, testutil.CommonImage, "sh", "-euxc", "echo foo").
+		AssertOK()
 	base.Cmd("start", "-a", containerName).AssertOutContains("foo")
 }

@@ -40,7 +40,7 @@ func TestTest(t *testing.T) {
 		{
 			Description: "success",
 			Command:     test.Command("info"),
-			Expected:    test.Expects(0, nil, nil),
+			Expected:    test.Expects(expect.ExitCodeSuccess, nil, nil),
 		},
 		{
 			Description: "failure with single error testing",
@@ -50,25 +50,29 @@ func TestTest(t *testing.T) {
 		{
 			Description: "success with contains output testing",
 			Command:     test.Command("info"),
-			Expected:    test.Expects(0, nil, expect.Contains("Kernel")),
+			Expected:    test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("Kernel")),
 		},
 		{
 			Description: "success with negative output testing",
 			Command:     test.Command("info"),
-			Expected:    test.Expects(0, nil, expect.DoesNotContain("foobar")),
+			Expected:    test.Expects(expect.ExitCodeSuccess, nil, expect.DoesNotContain("foobar")),
 		},
 		// Note that docker annoyingly returns 125 in a few conditions like this
 		{
 			Description: "failure with multiple error testing",
 			Command:     test.Command("-fail"),
-			Expected:    test.Expects(-1, []error{errors.New("unknown"), errors.New("shorthand")}, nil),
+			Expected: test.Expects(
+				expect.ExitCodeGenericFail,
+				[]error{errors.New("unknown"), errors.New("shorthand")},
+				nil,
+			),
 		},
 		{
 			Description: "success with exact output testing",
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Custom("echo", "foobar")
 			},
-			Expected: test.Expects(0, nil, expect.Equals("foobar\n")),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Equals("foobar\n")),
 		},
 		{
 			Description: "data propagation",
@@ -96,10 +100,18 @@ func TestTest(t *testing.T) {
 					Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 						return helpers.Custom("printf", data.Get("status"))
 					},
-					Expected: test.Expects(0, nil, expect.Equals("uninitialized-setup-command")),
+					Expected: test.Expects(
+						expect.ExitCodeSuccess,
+						nil,
+						expect.Equals("uninitialized-setup-command"),
+					),
 				},
 			},
-			Expected: test.Expects(0, nil, expect.Equals("uninitialized-setup")),
+			Expected: test.Expects(
+				expect.ExitCodeSuccess,
+				nil,
+				expect.Equals("uninitialized-setup"),
+			),
 		},
 	}
 

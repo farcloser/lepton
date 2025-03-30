@@ -65,7 +65,11 @@ func TestRunRestart(t *testing.T) {
 		testutil.NginxAlpineImage).AssertOK()
 
 	check := func(httpGetRetry int) error {
-		resp, err := nettestutil.HTTPGet("http://"+net.JoinHostPort("127.0.0.1", strconv.Itoa(hostPort)), httpGetRetry, false)
+		resp, err := nettestutil.HTTPGet(
+			"http://"+net.JoinHostPort("127.0.0.1", strconv.Itoa(hostPort)),
+			httpGetRetry,
+			false,
+		)
 		if err != nil {
 			return err
 		}
@@ -107,11 +111,17 @@ func TestRunRestartWithOnFailure(t *testing.T) {
 
 	base := testutil.NewBase(t)
 	if nerdtest.IsNotDocker() {
-		testutil.RequireContainerdPlugin(base, "io.containerd.internal.v1", "restart", []string{"on-failure"})
+		testutil.RequireContainerdPlugin(
+			base,
+			"io.containerd.internal.v1",
+			"restart",
+			[]string{"on-failure"},
+		)
 	}
 	tID := testutil.Identifier(t)
 	defer base.Cmd("rm", "-f", tID).Run()
-	base.Cmd("run", "-d", "--restart=on-failure:2", "--name", tID, testutil.AlpineImage, "sh", "-c", "exit 1").AssertOK()
+	base.Cmd("run", "-d", "--restart=on-failure:2", "--name", tID, testutil.AlpineImage, "sh", "-c", "exit 1").
+		AssertOK()
 
 	check := func(log poll.LogT) poll.Result {
 		inspect := base.InspectContainer(tID)
@@ -130,11 +140,17 @@ func TestRunRestartWithUnlessStopped(t *testing.T) {
 
 	base := testutil.NewBase(t)
 	if nerdtest.IsNotDocker() {
-		testutil.RequireContainerdPlugin(base, "io.containerd.internal.v1", "restart", []string{"unless-stopped"})
+		testutil.RequireContainerdPlugin(
+			base,
+			"io.containerd.internal.v1",
+			"restart",
+			[]string{"unless-stopped"},
+		)
 	}
 	tID := testutil.Identifier(t)
 	defer base.Cmd("rm", "-f", tID).Run()
-	base.Cmd("run", "-d", "--restart=unless-stopped", "--name", tID, testutil.AlpineImage, "sh", "-c", "exit 1").AssertOK()
+	base.Cmd("run", "-d", "--restart=unless-stopped", "--name", tID, testutil.AlpineImage, "sh", "-c", "exit 1").
+		AssertOK()
 
 	check := func(log poll.LogT) poll.Result {
 		inspect := base.InspectContainer(tID)
@@ -156,11 +172,17 @@ func TestUpdateRestartPolicy(t *testing.T) {
 
 	base := testutil.NewBase(t)
 	if nerdtest.IsNotDocker() {
-		testutil.RequireContainerdPlugin(base, "io.containerd.internal.v1", "restart", []string{"on-failure"})
+		testutil.RequireContainerdPlugin(
+			base,
+			"io.containerd.internal.v1",
+			"restart",
+			[]string{"on-failure"},
+		)
 	}
 	tID := testutil.Identifier(t)
 	defer base.Cmd("rm", "-f", tID).Run()
-	base.Cmd("run", "-d", "--restart=on-failure:1", "--name", tID, testutil.AlpineImage, "sh", "-c", "exit 1").AssertOK()
+	base.Cmd("run", "-d", "--restart=on-failure:1", "--name", tID, testutil.AlpineImage, "sh", "-c", "exit 1").
+		AssertOK()
 	base.Cmd("update", "--restart=on-failure:2", tID).AssertOK()
 	check := func(log poll.LogT) poll.Result {
 		inspect := base.InspectContainer(tID)
@@ -181,7 +203,12 @@ func TestAddRestartPolicy(t *testing.T) {
 
 	base := testutil.NewBase(t)
 	if nerdtest.IsNotDocker() {
-		testutil.RequireContainerdPlugin(base, "io.containerd.internal.v1", "restart", []string{"on-failure"})
+		testutil.RequireContainerdPlugin(
+			base,
+			"io.containerd.internal.v1",
+			"restart",
+			[]string{"on-failure"},
+		)
 	}
 	tID := testutil.Identifier(t)
 	defer base.Cmd("rm", "-f", tID).Run()
@@ -193,7 +220,8 @@ func TestAddRestartPolicy(t *testing.T) {
 
 	check := func(log poll.LogT) poll.Result {
 		inspect := base.InspectContainer(tID)
-		if inspect.State != nil && inspect.State.Status == "running" && inspect.State.Pid != originalPid {
+		if inspect.State != nil && inspect.State.Status == "running" &&
+			inspect.State.Pid != originalPid {
 			return poll.Success()
 		}
 		return poll.Continue("container is not yet running")

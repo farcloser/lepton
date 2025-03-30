@@ -71,10 +71,13 @@ func New(data test.Data, helpers test.Helpers) *CA {
 			Organization: []string{"test organization"},
 			CommonName:   fmt.Sprintf("CA (%s)", helpers.T().Name()),
 		},
-		NotBefore:             time.Now(),
-		NotAfter:              time.Now().Add(24 * time.Hour),
-		IsCA:                  true,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
+		NotBefore: time.Now(),
+		NotAfter:  time.Now().Add(24 * time.Hour),
+		IsCA:      true,
+		ExtKeyUsage: []x509.ExtKeyUsage{
+			x509.ExtKeyUsageClientAuth,
+			x509.ExtKeyUsageServerAuth,
+		},
 		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
 		BasicConstraintsValid: true,
 	}
@@ -138,11 +141,22 @@ func (ca *CA) NewCert(host string, additional ...string) *Cert {
 	}
 }
 
-func writePair(t *testing.T, keyPath, certPath string, cert, caCert *x509.Certificate, key, caKey *rsa.PrivateKey) {
+func writePair(
+	t *testing.T,
+	keyPath, certPath string,
+	cert, caCert *x509.Certificate,
+	key, caKey *rsa.PrivateKey,
+) {
 	keyF, err := os.Create(keyPath)
 	assert.NilError(t, err)
 	defer keyF.Close()
-	assert.NilError(t, pem.Encode(keyF, &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(key)}))
+	assert.NilError(
+		t,
+		pem.Encode(
+			keyF,
+			&pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(key)},
+		),
+	)
 	assert.NilError(t, keyF.Close())
 
 	certB, err := x509.CreateCertificate(rand.Reader, cert, caCert, &key.PublicKey, caKey)

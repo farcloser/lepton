@@ -22,8 +22,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	containerCmd "go.farcloser.world/lepton/cmd/lepton/commands/container"
-	imageCmd "go.farcloser.world/lepton/cmd/lepton/commands/image"
+	containercmd "go.farcloser.world/lepton/cmd/lepton/commands/container"
+	imagecmd "go.farcloser.world/lepton/cmd/lepton/commands/image"
 	"go.farcloser.world/lepton/cmd/lepton/completion"
 	"go.farcloser.world/lepton/cmd/lepton/helpers"
 	"go.farcloser.world/lepton/leptonic/services/containerd"
@@ -114,13 +114,13 @@ func inspectAction(cmd *cobra.Command, args []string) error {
 	var containerInspectOptions options.ContainerInspect
 	if inspectImage {
 		platform := ""
-		imageInspectOptions, err = imageCmd.ProcessImageInspectOptions(cmd, &platform)
+		imageInspectOptions, err = imagecmd.ProcessImageInspectOptions(cmd, &platform)
 		if err != nil {
 			return err
 		}
 	}
 	if inspectContainer {
-		containerInspectOptions, err = containerCmd.ProcessContainerInspectOptions(cmd, args)
+		containerInspectOptions, err = containercmd.ProcessContainerInspectOptions(cmd, args)
 		if err != nil {
 			return err
 		}

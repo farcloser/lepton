@@ -111,7 +111,9 @@ func TestCopyToContainer(t *testing.T) {
 					},
 				},
 				{
-					description:     "DEST_PATH does not exist, relative, and ends with " + string(os.PathSeparator),
+					description: "DEST_PATH does not exist, relative, and ends with " + string(
+						os.PathSeparator,
+					),
 					destinationSpec: pathDoesNotExistRelative + string(os.PathSeparator),
 					expect: icmd.Expected{
 						ExitCode: 1,
@@ -119,7 +121,9 @@ func TestCopyToContainer(t *testing.T) {
 					},
 				},
 				{
-					description:     "DEST_PATH does not exist, absolute, and ends with " + string(os.PathSeparator),
+					description: "DEST_PATH does not exist, absolute, and ends with " + string(
+						os.PathSeparator,
+					),
 					destinationSpec: pathDoesNotExistAbsolute + string(os.PathSeparator),
 					expect: icmd.Expected{
 						ExitCode: 1,
@@ -148,7 +152,9 @@ func TestCopyToContainer(t *testing.T) {
 					},
 				},
 				{
-					description:     "DEST_PATH is a file, relative, ends with improper " + string(os.PathSeparator),
+					description: "DEST_PATH is a file, relative, ends with improper " + string(
+						os.PathSeparator,
+					),
 					destinationSpec: pathIsAFileRelative + string(os.PathSeparator),
 					expect: icmd.Expected{
 						ExitCode: 1,
@@ -159,7 +165,9 @@ func TestCopyToContainer(t *testing.T) {
 					},
 				},
 				{
-					description:     "DEST_PATH is a file, absolute, ends with improper " + string(os.PathSeparator),
+					description: "DEST_PATH is a file, absolute, ends with improper " + string(
+						os.PathSeparator,
+					),
 					destinationSpec: pathIsAFileAbsolute + string(os.PathSeparator),
 					expect: icmd.Expected{
 						ExitCode: 1,
@@ -197,7 +205,9 @@ func TestCopyToContainer(t *testing.T) {
 					},
 				},
 				{
-					description:     "DEST_PATH is a directory, relative, ends with " + string(os.PathSeparator),
+					description: "DEST_PATH is a directory, relative, ends with " + string(
+						os.PathSeparator,
+					),
 					destinationSpec: pathIsADirRelative + string(os.PathSeparator),
 					catFile:         filepath.Join(pathIsADirRelative, srcFileName),
 					expect: icmd.Expected{
@@ -208,7 +218,9 @@ func TestCopyToContainer(t *testing.T) {
 					},
 				},
 				{
-					description:     "DEST_PATH is a directory, absolute, ends with " + string(os.PathSeparator),
+					description: "DEST_PATH is a directory, absolute, ends with " + string(
+						os.PathSeparator,
+					),
 					destinationSpec: pathIsADirAbsolute + string(os.PathSeparator),
 					catFile:         filepath.Join(pathIsADirAbsolute, srcFileName),
 					expect: icmd.Expected{
@@ -267,7 +279,9 @@ func TestCopyToContainer(t *testing.T) {
 					},
 				},
 				{
-					description:     "DEST_PATH does not exist, relative, and ends with " + string(os.PathSeparator),
+					description: "DEST_PATH does not exist, relative, and ends with " + string(
+						os.PathSeparator,
+					),
 					destinationSpec: pathDoesNotExistRelative + string(os.PathSeparator),
 					catFile:         filepath.Join(pathDoesNotExistRelative, srcFileName),
 					expect: icmd.Expected{
@@ -275,7 +289,9 @@ func TestCopyToContainer(t *testing.T) {
 					},
 				},
 				{
-					description:     "DEST_PATH does not exist, absolute, and ends with " + string(os.PathSeparator),
+					description: "DEST_PATH does not exist, absolute, and ends with " + string(
+						os.PathSeparator,
+					),
 					destinationSpec: pathDoesNotExistAbsolute + string(os.PathSeparator),
 					catFile:         filepath.Join(pathDoesNotExistAbsolute, srcFileName),
 					expect: icmd.Expected{
@@ -305,7 +321,9 @@ func TestCopyToContainer(t *testing.T) {
 					},
 				},
 				{
-					description:     "DEST_PATH is a file, relative, ends with improper " + string(os.PathSeparator),
+					description: "DEST_PATH is a file, relative, ends with improper " + string(
+						os.PathSeparator,
+					),
 					destinationSpec: pathIsAFileRelative + string(os.PathSeparator),
 					expect: icmd.Expected{
 						ExitCode: 1,
@@ -316,7 +334,9 @@ func TestCopyToContainer(t *testing.T) {
 					},
 				},
 				{
-					description:     "DEST_PATH is a file, absolute, ends with improper " + string(os.PathSeparator),
+					description: "DEST_PATH is a file, absolute, ends with improper " + string(
+						os.PathSeparator,
+					),
 					destinationSpec: pathIsAFileAbsolute + string(os.PathSeparator),
 					expect: icmd.Expected{
 						ExitCode: 1,
@@ -334,7 +354,11 @@ func TestCopyToContainer(t *testing.T) {
 				{
 					description:     "DEST_PATH is a directory, relative",
 					destinationSpec: pathIsADirRelative,
-					catFile:         filepath.Join(pathIsADirRelative, filepath.Base(srcDirName), srcFileName),
+					catFile: filepath.Join(
+						pathIsADirRelative,
+						filepath.Base(srcDirName),
+						srcFileName,
+					),
 					expect: icmd.Expected{
 						ExitCode: 0,
 					},
@@ -345,7 +369,11 @@ func TestCopyToContainer(t *testing.T) {
 				{
 					description:     "DEST_PATH is a directory, absolute",
 					destinationSpec: pathIsADirAbsolute,
-					catFile:         filepath.Join(pathIsADirAbsolute, filepath.Base(srcDirName), srcFileName),
+					catFile: filepath.Join(
+						pathIsADirAbsolute,
+						filepath.Base(srcDirName),
+						srcFileName,
+					),
 					expect: icmd.Expected{
 						ExitCode: 0,
 					},
@@ -354,9 +382,15 @@ func TestCopyToContainer(t *testing.T) {
 					},
 				},
 				{
-					description:     "DEST_PATH is a directory, relative, ends with " + string(os.PathSeparator),
+					description: "DEST_PATH is a directory, relative, ends with " + string(
+						os.PathSeparator,
+					),
 					destinationSpec: pathIsADirRelative + string(os.PathSeparator),
-					catFile:         filepath.Join(pathIsADirRelative, filepath.Base(srcDirName), srcFileName),
+					catFile: filepath.Join(
+						pathIsADirRelative,
+						filepath.Base(srcDirName),
+						srcFileName,
+					),
 					expect: icmd.Expected{
 						ExitCode: 0,
 					},
@@ -365,9 +399,15 @@ func TestCopyToContainer(t *testing.T) {
 					},
 				},
 				{
-					description:     "DEST_PATH is a directory, absolute, ends with " + string(os.PathSeparator),
+					description: "DEST_PATH is a directory, absolute, ends with " + string(
+						os.PathSeparator,
+					),
 					destinationSpec: pathIsADirAbsolute + string(os.PathSeparator),
-					catFile:         filepath.Join(pathIsADirAbsolute, filepath.Base(srcDirName), srcFileName),
+					catFile: filepath.Join(
+						pathIsADirAbsolute,
+						filepath.Base(srcDirName),
+						srcFileName,
+					),
 					expect: icmd.Expected{
 						ExitCode: 0,
 					},
@@ -637,7 +677,11 @@ func TestCopyFromContainer(t *testing.T) {
 				{
 					description:     "DEST_PATH is a directory, relative",
 					destinationSpec: pathIsADirRelative,
-					catFile:         filepath.Join(pathIsADirRelative, filepath.Base(srcDirName), srcFileName),
+					catFile: filepath.Join(
+						pathIsADirRelative,
+						filepath.Base(srcDirName),
+						srcFileName,
+					),
 					expect: icmd.Expected{
 						ExitCode: 0,
 					},
@@ -649,7 +693,11 @@ func TestCopyFromContainer(t *testing.T) {
 				{
 					description:     "DEST_PATH is a directory, absolute",
 					destinationSpec: pathIsADirAbsolute,
-					catFile:         filepath.Join(pathIsADirAbsolute, filepath.Base(srcDirName), srcFileName),
+					catFile: filepath.Join(
+						pathIsADirAbsolute,
+						filepath.Base(srcDirName),
+						srcFileName,
+					),
 					expect: icmd.Expected{
 						ExitCode: 0,
 					},
@@ -661,7 +709,11 @@ func TestCopyFromContainer(t *testing.T) {
 				{
 					description:     "DEST_PATH is a directory, relative, ends with path separator",
 					destinationSpec: pathIsADirRelative + string(os.PathSeparator),
-					catFile:         filepath.Join(pathIsADirRelative, filepath.Base(srcDirName), srcFileName),
+					catFile: filepath.Join(
+						pathIsADirRelative,
+						filepath.Base(srcDirName),
+						srcFileName,
+					),
 					expect: icmd.Expected{
 						ExitCode: 0,
 					},
@@ -673,7 +725,11 @@ func TestCopyFromContainer(t *testing.T) {
 				{
 					description:     "DEST_PATH is a directory, absolute, ends with path separator",
 					destinationSpec: pathIsADirAbsolute + string(os.PathSeparator),
-					catFile:         filepath.Join(pathIsADirAbsolute, filepath.Base(srcDirName), srcFileName),
+					catFile: filepath.Join(
+						pathIsADirAbsolute,
+						filepath.Base(srcDirName),
+						srcFileName,
+					),
 					expect: icmd.Expected{
 						ExitCode: 0,
 					},
@@ -722,7 +778,14 @@ func TestCopyFromContainer(t *testing.T) {
 	}
 }
 
-func assertCatHelper(base *testutil.Base, catPath string, fileContent []byte, container string, expectedUID int, containerIsStopped bool) {
+func assertCatHelper(
+	base *testutil.Base,
+	catPath string,
+	fileContent []byte,
+	container string,
+	expectedUID int,
+	containerIsStopped bool,
+) {
 	base.T.Logf("catPath=%q", catPath)
 	if container != "" && containerIsStopped {
 		base.Cmd("start", container).AssertOK()
@@ -853,8 +916,10 @@ func cpTestHelper(t *testing.T, tg *testgroup) {
 						}
 						args = append(args, "-v", volArg)
 					}
-					base.Cmd(append(args, "--name", containerRunning, testutil.CommonImage, "sleep", "Inf")...).AssertOK()
-					base.Cmd(append(args, "--name", containerStopped, testutil.CommonImage, "sleep", "Inf")...).AssertOK()
+					base.Cmd(append(args, "--name", containerRunning, testutil.CommonImage, "sleep", "Inf")...).
+						AssertOK()
+					base.Cmd(append(args, "--name", containerStopped, testutil.CommonImage, "sleep", "Inf")...).
+						AssertOK()
 
 					if copyToContainer {
 						createFileOnHost()
@@ -907,7 +972,8 @@ func cpTestHelper(t *testing.T, tg *testgroup) {
 				container := ""
 				if copyToContainer {
 					container = containerRunning
-					base.Cmd("cp", sourceSpec, containerRunning+":"+destinationSpec).Assert(testCase.expect)
+					base.Cmd("cp", sourceSpec, containerRunning+":"+destinationSpec).
+						Assert(testCase.expect)
 				} else {
 					base.Cmd("cp", containerRunning+":"+sourceSpec, destinationSpec).Assert(testCase.expect)
 				}

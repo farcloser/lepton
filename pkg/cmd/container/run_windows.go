@@ -70,17 +70,17 @@ func setPlatformOptions(
 			if err != nil {
 				return nil, fmt.Errorf("failed to parse memory bytes %q: %w", options.Memory, err)
 			}
-			UVMMemmory := map[string]string{
+			uvmMemory := map[string]string{
 				uvmMemorySizeInMB: strconv.FormatInt(mem64, 10),
 			}
-			opts = append(opts, oci.WithAnnotations(UVMMemmory))
+			opts = append(opts, oci.WithAnnotations(uvmMemory))
 		}
 
 		if options.CPUs > 0.0 {
-			UVMCPU := map[string]string{
+			uvmCPU := map[string]string{
 				uvmCPUCount: fmt.Sprintf("%v", options.CPUs),
 			}
-			opts = append(opts, oci.WithAnnotations(UVMCPU))
+			opts = append(opts, oci.WithAnnotations(uvmCPU))
 		}
 		opts = append(opts, oci.WithWindowsHyperV)
 	case "host":

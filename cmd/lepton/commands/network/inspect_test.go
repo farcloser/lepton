@@ -132,7 +132,15 @@ func TestNetworkInspect(t *testing.T) {
 			Description: "match exact id",
 			// See notes below
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-				id := strings.TrimSpace(helpers.Capture("network", "inspect", data.Get("basenet"), "--format", "{{ .Id }}"))
+				id := strings.TrimSpace(
+					helpers.Capture(
+						"network",
+						"inspect",
+						data.Get("basenet"),
+						"--format",
+						"{{ .Id }}",
+					),
+				)
 				return helpers.Command("network", "inspect", id)
 			},
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
@@ -153,7 +161,15 @@ func TestNetworkInspect(t *testing.T) {
 			// This is bizarre, as it is working in the match exact id test - and there does not seem to be a particular reason for that
 			Require: require.Not(require.Windows),
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-				id := strings.TrimSpace(helpers.Capture("network", "inspect", data.Get("basenet"), "--format", "{{ .Id }}"))
+				id := strings.TrimSpace(
+					helpers.Capture(
+						"network",
+						"inspect",
+						data.Get("basenet"),
+						"--format",
+						"{{ .Id }}",
+					),
+				)
 				return helpers.Command("network", "inspect", id[0:25])
 			},
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
@@ -174,7 +190,15 @@ func TestNetworkInspect(t *testing.T) {
 			// This is bizarre, as it is working in the match exact id test - and there does not seem to be a particular reason for that
 			Require: require.Not(require.Windows),
 			Setup: func(data test.Data, helpers test.Helpers) {
-				id := strings.TrimSpace(helpers.Capture("network", "inspect", data.Get("basenet"), "--format", "{{ .Id }}"))
+				id := strings.TrimSpace(
+					helpers.Capture(
+						"network",
+						"inspect",
+						data.Get("basenet"),
+						"--format",
+						"{{ .Id }}",
+					),
+				)
 				helpers.Ensure("network", "create", id[0:12])
 				data.Set("netname", id[0:12])
 			},
@@ -201,8 +225,19 @@ func TestNetworkInspect(t *testing.T) {
 			// FIXME: IPAMConfig is not implemented on Windows yet
 			Require: require.Not(require.Windows),
 			Setup: func(data test.Data, helpers test.Helpers) {
-				helpers.Ensure("network", "create", "--label", "tag=testNetwork", "--subnet", testSubnet,
-					"--gateway", testGateway, "--ip-range", testIPRange, data.Identifier())
+				helpers.Ensure(
+					"network",
+					"create",
+					"--label",
+					"tag=testNetwork",
+					"--subnet",
+					testSubnet,
+					"--gateway",
+					testGateway,
+					"--ip-range",
+					testIPRange,
+					data.Identifier(),
+				)
 			},
 			Cleanup: func(data test.Data, helpers test.Helpers) {
 				helpers.Anyhow("network", "rm", data.Identifier())

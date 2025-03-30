@@ -38,7 +38,11 @@ func testInfoComparator(stdout string, info string, t *testing.T) {
 	err := json.Unmarshal([]byte(stdout), &dinf)
 	assert.NilError(t, err, "failed to unmarshal stdout"+info)
 	unameM := infoutil.UnameM()
-	assert.Assert(t, dinf.Architecture == unameM, fmt.Sprintf("expected info.Architecture to be %q, got %q", unameM, dinf.Architecture)+info)
+	assert.Assert(
+		t,
+		dinf.Architecture == unameM,
+		fmt.Sprintf("expected info.Architecture to be %q, got %q", unameM, dinf.Architecture)+info,
+	)
 }
 
 func TestInfo(t *testing.T) {
