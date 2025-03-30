@@ -103,7 +103,7 @@ func TestImageHistory(t *testing.T) {
 					assert.Equal(t, len(history), 2, info)
 					assert.Equal(t, history[0].Size, "0B", info)
 					// FIXME: how is this going to age?
-					assert.Equal(t, history[0].CreatedSince, "3 years ago", info)
+					assert.Equal(t, history[0].CreatedSince, "4 years ago", info)
 					assert.Equal(t, history[0].Snapshot, "<missing>", info)
 					assert.Equal(t, history[0].Comment, "", info)
 
@@ -127,7 +127,7 @@ func TestImageHistory(t *testing.T) {
 					)
 
 					assert.Equal(t, history[1].Size, "5.947MB", info)
-					assert.Equal(t, history[1].CreatedSince, "3 years ago", info)
+					assert.Equal(t, history[1].CreatedSince, "4 years ago", info)
 					assert.Equal(
 						t,
 						history[1].Snapshot,
