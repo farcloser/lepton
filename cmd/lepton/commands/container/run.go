@@ -25,6 +25,7 @@ import (
 	"github.com/containerd/console"
 	"github.com/containerd/log"
 	"github.com/spf13/cobra"
+	"golang.org/x/term"
 
 	"go.farcloser.world/containers/security/cgroups"
 
@@ -110,7 +111,7 @@ func setCreateFlags(cmd *cobra.Command) {
 	// #region platform flags
 	cmd.Flags().
 		String("platform", "", "Set platform (e.g. \"amd64\", \"arm64\")")
-		// not a slice, and there is no --all-platforms
+	// not a slice, and there is no --all-platforms
 	cmd.RegisterFlagCompletionFunc("platform", completion.Platforms)
 	// #endregion
 
@@ -341,7 +342,7 @@ func setCreateFlags(cmd *cobra.Command) {
 	cmd.Flags().
 		String("cosign-certificate-oidc-issuer-regexp", "", "A regular expression alternative to --certificate-oidc-issuer for --verify=cosign. Accepts the Go regular expression syntax described at https://golang.org/s/re2syntax. Either --cosign-certificate-oidc-issuer or --cosign-certificate-oidc-issuer-regexp must be set for keyless flows")
 
-		// #endregion
+	// #endregion
 
 	cmd.Flags().
 		String("isolation", "default", "Specify isolation technology for container. On Linux the only valid value is default. Windows options are host, process and hyperv with process isolation as the default")
@@ -472,8 +473,8 @@ func runAction(cmd *cobra.Command, args []string) error {
 			return err
 		}
 		defer con.Reset()
-		if err := con.SetRaw(); err != nil {
-			return err
+		if _, err := term.MakeRaw(int(con.Fd())); err != nil {
+			return fmt.Errorf("failed to set the console to raw mode: %w", err)
 		}
 	}
 

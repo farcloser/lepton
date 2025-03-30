@@ -26,6 +26,7 @@ import (
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/pkg/cio"
 	"github.com/containerd/log"
+	"golang.org/x/term"
 
 	"go.farcloser.world/containers/specs"
 
@@ -117,8 +118,8 @@ func execActionWithContainer(
 			return err
 		}
 		defer con.Reset()
-		if err := con.SetRaw(); err != nil {
-			return err
+		if _, err := term.MakeRaw(int(con.Fd())); err != nil {
+			return fmt.Errorf("failed to set the console to raw mode: %w", err)
 		}
 	}
 	if !options.Detach {

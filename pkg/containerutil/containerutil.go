@@ -40,6 +40,7 @@ import (
 	dockercliopts "github.com/docker/cli/opts"
 	dockeropts "github.com/docker/docker/opts"
 	"github.com/moby/sys/signal"
+	"golang.org/x/term"
 
 	"go.farcloser.world/containers/specs"
 
@@ -263,7 +264,7 @@ func Start(
 			return err
 		}
 		defer con.Reset()
-		if err := con.SetRaw(); err != nil {
+		if _, err := term.MakeRaw(int(con.Fd())); err != nil {
 			return err
 		}
 	}
