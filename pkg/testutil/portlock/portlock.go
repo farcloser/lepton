@@ -44,7 +44,8 @@ func Acquire(port int) (int, error) {
 		port = 5000
 		flexible = true
 	}
-	for {
+
+	for range 30 {
 		mut.Lock()
 		if _, ok := portList[port]; !ok {
 			portList[port] = true
@@ -59,6 +60,8 @@ func Acquire(port int) (int, error) {
 		fmt.Fprintln(os.Stdout, "Waiting for port to become available...", port)
 		time.Sleep(1 * time.Second)
 	}
+
+	return port, fmt.Errorf("port %d not available atfer 30 seconds", port)
 }
 
 func Release(port int) error {
