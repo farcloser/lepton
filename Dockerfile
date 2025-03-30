@@ -27,7 +27,7 @@ ARG         LICENSE_ZLIB="The zlib/libpng License, https://opensource.org/licens
 ARG         BINARY_NAME=lepton
 ARG         BINARY_LICENSE="$LICENSE_APACHE_V2"
 
-ARG         CONTAINERD_VERSION=v2.0.3
+ARG         CONTAINERD_VERSION=v2.0.4
 ARG         CONTAINERD_REVISION=06b99ca80cdbfbc6cc8bd567021738c9af2b36ce
 ARG         CONTAINERD_LICENSE="$LICENSE_APACHE_V2"
 ARG         CONTAINERD_REPO=github.com/containerd/containerd
