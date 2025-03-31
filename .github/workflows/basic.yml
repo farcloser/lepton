@@ -19,7 +19,9 @@ jobs:
 
   lint:
     needs: env
-    timeout-minutes: ${{ fromJSON(needs.env.outputs.TIMEOUT_SHORT) }}
+    # FIXME: windows 2022 is horribly slow restoring cache for mods...
+    # Should disable cache for that
+    timeout-minutes: ${{ fromJSON(needs.env.outputs.TIMEOUT_LONG) }}
     name: lint | go ${{ matrix.go}} | ${{ matrix.runner }}
     runs-on: ${{ matrix.runner }}
     defaults:
