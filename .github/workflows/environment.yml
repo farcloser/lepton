@@ -54,12 +54,15 @@ on:
       GITHUB_TOKEN:
         description: "Github token"
         value: ""
-      CONTAINERD_VERSION:
+      WINDOWS_CONTAINERD_VERSION:
         description: "containerd version for windows"
-        value: "2.0.4"
-      WINCNI_VERSION:
+        value: "v2.0.4"
+      WINDOWS_WINCNI_VERSION:
         description: "wincni version"
         value: "v0.3.1"
+      WINDOWS_BUILDKIT_VERSION:
+        description: "buildkit version"
+        value: "v0.20.2"
 
 jobs:
   blank:
