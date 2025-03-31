@@ -49,8 +49,8 @@ jobs:
           sudo make install
       - name: "QEMU"
         run: |
-          [ "$RUNNER_ARCH" == "amd64" ] || sudo lepton run --net none --privileged --rm tonistiigi/binfmt --install linux/amd64
-          [ "$RUNNER_ARCH" == "arm64" ] || sudo lepton run --net none --privileged --rm tonistiigi/binfmt --install linux/arm64
+          [ "$RUNNER_ARCH" == "amd64" ] || sudo lepton run --net none --privileged --rm ghcr.io/apostasie/binfmt --install linux/amd64
+          [ "$RUNNER_ARCH" == "arm64" ] || sudo lepton run --net none --privileged --rm ghcr.io/apostasie/binfmt --install linux/arm64
       - name: "Ensure that the integration test suite is compatible with Docker"
         run: WITH_SUDO=true ./hack/test-integration.sh -test.target=docker -test.only-flaky=${{matrix.flaky}}
       - name: "Ensure that the IPv6 integration test suite is compatible with Docker"

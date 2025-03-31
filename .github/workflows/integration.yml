@@ -59,7 +59,7 @@ jobs:
 #      - name: "Build base dependencies for all targets"
 #        run: |
 #          # FIXME: rid docker
-#          sudo docker run --net none --privileged --rm tonistiigi/binfmt --install linux/arm64 || true
+#          sudo docker run --net none --privileged --rm ghcr.io/apostasie/binfmt --install linux/arm64 || true
 #          # This is building both arm and amd versions of the base dependencies (assembly-integration)
 #          # IMPORTANT: currently, you cannot run a non-native go with qemu as of 2025-03.
 #          # For that reason, the next stages down there cannot be pinned to the same BUILDPLATFORM, and all builds
@@ -175,8 +175,8 @@ jobs:
           sudo make install
       - name: "QEMU"
         run: |
-          [ "$RUNNER_ARCH" == "amd64" ] || sudo lepton run --net none --privileged --rm tonistiigi/binfmt --install linux/amd64
-          [ "$RUNNER_ARCH" == "arm64" ] || sudo lepton run --net none --privileged --rm tonistiigi/binfmt --install linux/arm64
+          [ "$RUNNER_ARCH" == "amd64" ] || sudo lepton run --net none --privileged --rm ghcr.io/apostasie/binfmt --install linux/amd64
+          [ "$RUNNER_ARCH" == "arm64" ] || sudo lepton run --net none --privileged --rm ghcr.io/apostasie/binfmt --install linux/arm64
       - name: "Run integration tests"
         run: |
           # FIXME: we should delete on container shutdown instead
