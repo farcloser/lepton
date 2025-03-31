@@ -3,7 +3,7 @@ name: "Install: buildkitd"
 description: "A simple action installing buildkitd"
 
 inputs:
-  version:
+  buildkit-version:
     default: "stable"
     description: "buildkitd version"
   namespace:
@@ -20,11 +20,11 @@ runs:
         args=(curl --proto '=https' --tlsv1.2 -fsSL -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28")
         [ "${GITHUB_TOKEN:-}" == "" ] && {
           echo "GITHUB_TOKEN is not set - you might face rate limitations with the Github API"
-        } || args+=(-H "Authorization: Bearer $GITHUB_TOKEN")
-        if [ "${{ inputs.version }}" == stable ]; then
+        } || args+=(-H "Authorization: Bearer ${GITHUB_TOKEN:-}")
+        if [ "${{ inputs.buildkit-version }}" == stable ]; then
           version="$("${args[@]}" https://api.github.com/repos/moby/buildkit/tags | jq -rc .[0].name)"
         else
-          version="$("${args[@]}" https://api.github.com/repos/moby/buildkit/tags | jq -rc 'map(select(.name | startswith("${{ inputs.version }}")).[0].name')"
+          version="$("${args[@]}" https://api.github.com/repos/moby/buildkit/tags | jq -rc 'map(select(.name | startswith("${{ inputs.buildkit-version }}")).[0].name')"
         fi
 
         # Get the arch
@@ -56,7 +56,7 @@ runs:
       continue-on-error: false
       run: |
         cd ~/opt/buildkit
-        curl -fsSL --proto '=https' --tlsv1.2 https://github.com/moby/buildkit/releases/download/"$ACTION_INSTALL_BUILDKITD_FILENAME" | tar xz
+        curl --proto '=https' --tlsv1.2 -fsSL https://github.com/moby/buildkit/releases/download/"$ACTION_INSTALL_BUILDKITD_FILENAME" | tar xz
 
     - name: "Configure GHA"
       uses: crazy-max/ghaction-github-runtime@b3a9207c0e1ef41f4cf215303c976869d0c2c1c4  # v3.0.0

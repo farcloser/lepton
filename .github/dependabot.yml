@@ -26,7 +26,7 @@ updates:
           - "github.com/docker/*"
       containerd:
         patterns:
-          - "github.com/containerd/containerd/*"
+          - "github.com/containerd/*"
 
   # Dependencies listed in `.github/workflows/*.yml`
   - package-ecosystem: "github-actions"

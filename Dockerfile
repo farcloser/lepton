@@ -148,7 +148,7 @@ RUN         apt-get update -qq >/dev/null && \
                jq \
                    >/dev/null; \
             os=linux; \
-            all_versions="$(curl -fsSL --proto '=https' --tlsv1.3 "https://go.dev/dl/?mode=json&include=all")"; \
+            all_versions="$(curl --proto "=https" --tlsv1.3 -fsSL "https://go.dev/dl/?mode=json&include=all")"; \
             candidates="$(case "$GO_VERSION" in \
                     canary) condition=".stable==false" ;; \
                     stable|"") condition=".stable==true" ;; \
@@ -158,7 +158,7 @@ RUN         apt-get update -qq >/dev/null && \
             for arch in $SUPPORTED_ARCHS; do \
                 filename="$(jq -r 'map(select(.arch=="'"$arch"'"))[0].filename' <(printf "$candidates"))"; \
                 mkdir -p /out/usr/local/linux/"$arch"; \
-                curl -fsSL --proto '=https' --tlsv1.3 https://go.dev/dl/"$filename" | tar xzC /out/usr/local/linux/"$arch" || {  \
+                curl --proto "=https" --tlsv1.3 -fsSL https://go.dev/dl/"$filename" | tar xzC /out/usr/local/linux/"$arch" || {  \
                     echo "Failed retrieving go download for $arch: $GO_VERSION"; \
                     exit 1; \
                 }; \

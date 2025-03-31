@@ -1,11 +1,11 @@
-# To install CNI, see https://github.com/containerd/containerd/blob/release/1.7/script/setup/install-cni-windows
+# To install CNI, see cni.sh
 
 $ErrorActionPreference = "Stop"
 
 #install containerd
 $version=$env:ctrdVersion
 echo "Installing containerd $version"
-curl.exe -L https://github.com/containerd/containerd/releases/download/v$version/containerd-$version-windows-amd64.tar.gz -o containerd-windows-amd64.tar.gz
+curl.exe --proto "=https" --tlsv1.2 -fsSL https://github.com/containerd/containerd/releases/download/v$version/containerd-$version-windows-amd64.tar.gz -o containerd-windows-amd64.tar.gz
 tar.exe xvf containerd-windows-amd64.tar.gz
 mkdir -force "$Env:ProgramFiles\containerd"
 cp ./bin/* "$Env:ProgramFiles\containerd"

@@ -24,7 +24,7 @@ runs:
         esac
 
         # Retrieve the files for the requested version
-        files="$(curl -fsSL --proto "=https" --tlsv1.2 "https://go.dev/dl/?mode=json&include=all" | jq -rc 'map(select('"$selector"'))[0].files')"
+        files="$(curl --proto "=https" --tlsv1.2 -fsSL "https://go.dev/dl/?mode=json&include=all" | jq -rc 'map(select('"$selector"'))[0].files')"
 
         # Get the arch
         arch=$(echo "$RUNNER_ARCH" | sed -E "s/(X86|X64)/amd64/" | sed -E "s/(ARM|ARM64)/arm64/")
