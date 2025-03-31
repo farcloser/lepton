@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package completion
+package completion_test
 
 import (
 	"testing"

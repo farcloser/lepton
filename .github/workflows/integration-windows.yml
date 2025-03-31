@@ -74,8 +74,9 @@ jobs:
               echo "GITHUB_TOKEN is not set - you might face rate limitations with the Github API"
             } || args+=(-H "Authorization: Bearer ${{ needs.env.outputs.GITHUB_TOKEN }}")
             ctd_v="$("${args[@]}" https://api.github.com/repos/containerd/containerd/tags | jq -rc .[0].name)"
-            export ctrdVersion="${ctd_v:1}"
+            export ctrdVersion="$ctd_v"
           fi
+          export ctrdVersion="${ctrdVersion:1}"
           powershell ./hack/provisioning/windows/containerd.ps1
       - name: "Build and install cli"
         run: |
