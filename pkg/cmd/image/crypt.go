@@ -37,19 +37,38 @@ import (
 	"go.farcloser.world/lepton/pkg/platformutil"
 )
 
-func layerDescs(ctx context.Context, provider content.Provider, imageTarget specs.Descriptor, platform platforms.MatchComparer) ([]specs.Descriptor, error) {
+func layerDescs(
+	ctx context.Context,
+	provider content.Provider,
+	imageTarget specs.Descriptor,
+	platform platforms.MatchComparer,
+) ([]specs.Descriptor, error) {
 	var descs []specs.Descriptor
-	err := images.Walk(ctx, images.Handlers(images.HandlerFunc(func(ctx context.Context, desc specs.Descriptor) ([]specs.Descriptor, error) {
-		if images.IsLayerType(desc.MediaType) {
-			descs = append(descs, desc)
-		}
-		return nil, nil
-	}), images.FilterPlatforms(images.ChildrenHandler(provider), platform)), imageTarget)
+	err := images.Walk(
+		ctx,
+		images.Handlers(
+			images.HandlerFunc(func(ctx context.Context, desc specs.Descriptor) ([]specs.Descriptor, error) {
+				if images.IsLayerType(desc.MediaType) {
+					descs = append(descs, desc)
+				}
+				return nil, nil
+			}),
+			images.FilterPlatforms(images.ChildrenHandler(provider), platform),
+		),
+		imageTarget,
+	)
 	return descs, err
 }
 
-func Crypt(ctx context.Context, encrypt bool, cli *client.Client, output io.Writer, globalOptions *options.Global, opts options.ImageCrypt) error {
-	var convertOpts = []converter.Opt{}
+func Crypt(
+	ctx context.Context,
+	encrypt bool,
+	cli *client.Client,
+	output io.Writer,
+	globalOptions *options.Global,
+	opts options.ImageCrypt,
+) error {
+	convertOpts := []converter.Opt{}
 	if opts.SourceRef == "" || opts.DestinationRef == "" {
 		return errors.New("src and target image need to be specified")
 	}
@@ -123,7 +142,8 @@ func Crypt(ctx context.Context, encrypt bool, cli *client.Client, output io.Writ
 	return nil
 }
 
-// parseImgcryptFlags corresponds to https://github.com/containerd/imgcrypt/blob/v1.1.2/cmd/ctr/commands/images/crypt_utils.go#L244-L252
+// parseImgcryptFlags corresponds to
+// https://github.com/containerd/imgcrypt/blob/v1.1.2/cmd/ctr/commands/images/crypt_utils.go#L244-L252
 func parseImgcryptFlags(options options.ImageCrypt, encrypt bool) (parsehelpers.EncArgs, error) {
 	var a parsehelpers.EncArgs
 

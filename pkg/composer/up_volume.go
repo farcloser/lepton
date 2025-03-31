@@ -42,7 +42,8 @@ func (c *Composer) upVolume(ctx context.Context, shortName string) error {
 
 	// shortName is like "db_data", fullName is like "compose-wordpress_db_data"
 	fullName := vol.Name
-	// FIXME: this is racy. By the time we get below to creating the volume, there is no guarantee that things are still fine.
+	// FIXME: this is racy. By the time we get below to creating the volume, there is no guarantee that things are still
+	// fine.
 	// Furthermore, by the time we are done creating all the volumes, they may very well have been destroyed.
 	// This cannot be fixed without getting rid of the whole "shell-out" approach entirely.
 	volExists, err := c.VolumeExists(fullName)

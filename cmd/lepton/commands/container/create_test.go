@@ -34,7 +34,15 @@ import (
 func TestCreate(t *testing.T) {
 	testCase := nerdtest.Setup()
 	testCase.Setup = func(data test.Data, helpers test.Helpers) {
-		helpers.Ensure("create", "--quiet", "--name", data.Identifier("container"), testutil.CommonImage, "echo", "foo")
+		helpers.Ensure(
+			"create",
+			"--quiet",
+			"--name",
+			data.Identifier("container"),
+			testutil.CommonImage,
+			"echo",
+			"foo",
+		)
 		data.Set("cID", data.Identifier("container"))
 	}
 	testCase.Cleanup = func(data test.Data, helpers test.Helpers) {
@@ -49,7 +57,7 @@ func TestCreate(t *testing.T) {
 			NoParallel:  true,
 			Command:     test.Command("ps", "-a"),
 			// FIXME: this might get a false positive if other tests have created a container
-			Expected: test.Expects(0, nil, expect.Contains("Created")),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("Created")),
 		},
 		{
 			Description: "start",
@@ -57,7 +65,7 @@ func TestCreate(t *testing.T) {
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("start", data.Get("cID"))
 			},
-			Expected: test.Expects(0, nil, nil),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 		},
 		{
 			Description: "logs",
@@ -65,7 +73,7 @@ func TestCreate(t *testing.T) {
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("logs", data.Get("cID"))
 			},
-			Expected: test.Expects(0, nil, expect.Contains("foo")),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("foo")),
 		},
 	}
 
@@ -78,7 +86,17 @@ func TestCreateHyperVContainer(t *testing.T) {
 	testCase.Require = nerdtest.HyperV
 
 	testCase.Setup = func(data test.Data, helpers test.Helpers) {
-		helpers.Ensure("create", "--quiet", "--isolation", "hyperv", "--name", data.Identifier("container"), testutil.CommonImage, "echo", "foo")
+		helpers.Ensure(
+			"create",
+			"--quiet",
+			"--isolation",
+			"hyperv",
+			"--name",
+			data.Identifier("container"),
+			testutil.CommonImage,
+			"echo",
+			"foo",
+		)
 		data.Set("cID", data.Identifier("container"))
 	}
 
@@ -92,7 +110,7 @@ func TestCreateHyperVContainer(t *testing.T) {
 			NoParallel:  true,
 			Command:     test.Command("ps", "-a"),
 			// FIXME: this might get a false positive if other tests have created a container
-			Expected: test.Expects(0, nil, expect.Contains("Created")),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("Created")),
 		},
 		{
 			Description: "start",
@@ -104,13 +122,18 @@ func TestCreateHyperVContainer(t *testing.T) {
 					helpers.Command("container", "inspect", data.Get("cID")).
 						Run(&test.Expected{
 							ExitCode: expect.ExitCodeNoCheck,
-							Output: func(stdout string, info string, t *testing.T) {
+							Output: func(stdout, info string, t *testing.T) {
 								var dc []dockercompat.Container
 								err := json.Unmarshal([]byte(stdout), &dc)
 								if err != nil || len(dc) == 0 {
 									return
 								}
-								assert.Equal(t, len(dc), 1, "Unexpectedly got multiple results\n"+info)
+								assert.Equal(
+									t,
+									len(dc),
+									1,
+									"Unexpectedly got multiple results\n"+info,
+								)
 								ran = dc[0].State.Status == "exited"
 							},
 						})
@@ -121,7 +144,7 @@ func TestCreateHyperVContainer(t *testing.T) {
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("logs", data.Get("cID"))
 			},
-			Expected: test.Expects(0, nil, expect.Contains("foo")),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("foo")),
 		},
 	}
 

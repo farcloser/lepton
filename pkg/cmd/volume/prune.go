@@ -29,9 +29,16 @@ import (
 	"go.farcloser.world/lepton/pkg/labels"
 )
 
-func Prune(ctx context.Context, client *containerd.Client, output io.Writer, globalOptions *options.Global, opts *options.VolumePrune) error {
+func Prune(
+	ctx context.Context,
+	client *containerd.Client,
+	output io.Writer,
+	globalOptions *options.Global,
+	opts *options.VolumePrune,
+) error {
 	// Get the volume store and lock it until we are done.
-	// This will prevent racing new containers from being created or removed until we are done with the cleanup of volumes
+	// This will prevent racing new containers from being created or removed until we are done with the cleanup of
+	// volumes
 	volStore, err := Store(globalOptions.Namespace, globalOptions.DataRoot, globalOptions.Address)
 	if err != nil {
 		return err
@@ -70,7 +77,6 @@ func Prune(ctx context.Context, client *containerd.Client, output io.Writer, glo
 
 		return toRemove, nil
 	})
-
 	if err != nil {
 		return err
 	}

@@ -33,88 +33,123 @@ func TestParseFluentdConfig(t *testing.T) {
 		want    *fluentd.Config
 		wantErr bool
 	}{
-		{"DefaultLocation", args{
-			config: map[string]string{}},
+		{
+			"DefaultLocation",
+			args{
+				config: map[string]string{},
+			},
 			(func() *fluentd.Config {
 				cfg := fluentd.NewConfig()
 				return cfg
 			})(),
 			false,
 		},
-		{"InputLocation", args{
-			config: map[string]string{
-				fluentAddress: "tcp://127.0.0.1:123",
-			}},
+		{
+			"InputLocation",
+			args{
+				config: map[string]string{
+					fluentAddress: "tcp://127.0.0.1:123",
+				},
+			},
 			(func() *fluentd.Config {
 				cfg := fluentd.NewConfig()
 				cfg.FluentPort = 123
 				cfg.FluentHost = "127.0.0.1"
 				return cfg
-			})(), false},
+			})(), false,
+		},
 		{"InvalidLocation", args{config: map[string]string{fluentAddress: "://asd123"}}, nil, true},
-		{"InputAsyncOption", args{
-			config: map[string]string{
-				fluentdAsync: "true",
-			}},
+		{
+			"InputAsyncOption",
+			args{
+				config: map[string]string{
+					fluentdAsync: "true",
+				},
+			},
 			(func() *fluentd.Config {
 				cfg := fluentd.NewConfig()
 				cfg.Async = true
 				return cfg
-			})(), false},
-		{"InputAsyncReconnectOption", args{
-			config: map[string]string{
-				fluentdAsyncReconnectInterval: "100ms",
-			}},
+			})(), false,
+		},
+		{
+			"InputAsyncReconnectOption",
+			args{
+				config: map[string]string{
+					fluentdAsyncReconnectInterval: "100ms",
+				},
+			},
 			(func() *fluentd.Config {
 				cfg := fluentd.NewConfig()
 				cfg.AsyncReconnectInterval = 100
 				return cfg
-			})(), false},
-		{"InputBufferLimitOption", args{
-			config: map[string]string{
-				fluentdBufferLimit: "1000",
-			}},
+			})(), false,
+		},
+		{
+			"InputBufferLimitOption",
+			args{
+				config: map[string]string{
+					fluentdBufferLimit: "1000",
+				},
+			},
 			(func() *fluentd.Config {
 				cfg := fluentd.NewConfig()
 				cfg.BufferLimit = 1000
 				return cfg
-			})(), false},
-		{"InputRetryWaitOption", args{
-			config: map[string]string{
-				fluentdRetryWait: "10s",
-			}},
+			})(), false,
+		},
+		{
+			"InputRetryWaitOption",
+			args{
+				config: map[string]string{
+					fluentdRetryWait: "10s",
+				},
+			},
 			(func() *fluentd.Config {
 				cfg := fluentd.NewConfig()
 				cfg.RetryWait = 10000
 				return cfg
-			})(), false},
-		{"InputMaxRetriesOption", args{
-			config: map[string]string{
-				fluentdMaxRetries: "100",
-			}},
+			})(), false,
+		},
+		{
+			"InputMaxRetriesOption",
+			args{
+				config: map[string]string{
+					fluentdMaxRetries: "100",
+				},
+			},
 			(func() *fluentd.Config {
 				cfg := fluentd.NewConfig()
 				cfg.MaxRetry = 100
 				return cfg
-			})(), false},
-		{"InputSubSecondPrecision", args{
-			config: map[string]string{
-				fluentdSubSecondPrecision: "true",
-			}},
+			})(), false,
+		},
+		{
+			"InputSubSecondPrecision",
+			args{
+				config: map[string]string{
+					fluentdSubSecondPrecision: "true",
+				},
+			},
 			(func() *fluentd.Config {
 				cfg := fluentd.NewConfig()
 				cfg.SubSecondPrecision = true
 				return cfg
-			})(), false},
-		{"InputRequestAck", args{
-			config: map[string]string{
-				fluentRequestAck: "true",
-			}},
+			})(), false,
+		},
+		{
+			"InputRequestAck",
+			args{
+				config: map[string]string{
+					fluentRequestAck: "true",
+				},
+			},
 			(func() *fluentd.Config {
 				cfg := fluentd.NewConfig()
 				cfg.RequestAck = true
 				return cfg
-			})(), false},
+			})(), false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

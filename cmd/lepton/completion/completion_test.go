@@ -55,57 +55,57 @@ func TestCompletion(t *testing.T) {
 				Description: "namespace",
 				Require:     require.Not(require.Windows),
 				Command:     test.Command("__complete", "namespace", ""),
-				Expected:    test.Expects(0, nil, expect.Contains("inspect")),
+				Expected:    test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("inspect")),
 			},
 			{
 				Description: "namespace",
 				Require:     require.Not(require.Windows),
 				Command:     test.Command("__complete", "namespace", "inspect", "--format"),
-				Expected:    test.Expects(0, nil, expect.Contains(formatter.FormatJSON)),
+				Expected:    test.Expects(expect.ExitCodeSuccess, nil, expect.Contains(formatter.FormatJSON)),
 			},
 			{
 				Description: "namespace",
 				Require:     require.Not(require.Windows),
 				Command:     test.Command("__complete", "namespace", "inspect", ""),
-				Expected:    test.Expects(0, nil, expect.Contains("cli-test")),
+				Expected:    test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("cli-test")),
 			},
 			// Others
 			{
 				Description: "--cgroup-manager",
 				Require:     require.Not(require.Windows),
 				Command:     test.Command("__complete", "--cgroup-manager", ""),
-				Expected:    test.Expects(0, nil, expect.Contains("systemd\n")),
+				Expected:    test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("systemd\n")),
 			},
 			{
 				Description: "--snapshotter",
 				Require:     require.Not(require.Windows),
 				Command:     test.Command("__complete", "--snapshotter", ""),
-				Expected:    test.Expects(0, nil, expect.Contains("native\n")),
+				Expected:    test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("native\n")),
 			},
 			{
 				Description: "empty",
 				Command:     test.Command("__complete", ""),
-				Expected:    test.Expects(0, nil, expect.Contains("run\t")),
+				Expected:    test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("run\t")),
 			},
 			{
 				Description: "build --network",
 				Command:     test.Command("__complete", "build", "--network", ""),
-				Expected:    test.Expects(0, nil, expect.Contains("default\n")),
+				Expected:    test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("default\n")),
 			},
 			{
 				Description: "run -",
 				Command:     test.Command("__complete", "run", "-"),
-				Expected:    test.Expects(0, nil, expect.Contains("--network\t")),
+				Expected:    test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("--network\t")),
 			},
 			{
 				Description: "run --n",
 				Command:     test.Command("__complete", "run", "--n"),
-				Expected:    test.Expects(0, nil, expect.Contains("--network\t")),
+				Expected:    test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("--network\t")),
 			},
 			{
 				Description: "run --ne",
 				Command:     test.Command("__complete", "run", "--ne"),
-				Expected:    test.Expects(0, nil, expect.Contains("--network\t")),
+				Expected:    test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("--network\t")),
 			},
 			{
 				Description: "run --net",
@@ -146,7 +146,7 @@ func TestCompletion(t *testing.T) {
 			{
 				Description: "run --restart",
 				Command:     test.Command("__complete", "run", "--restart", ""),
-				Expected:    test.Expects(0, nil, expect.Contains("always\n")),
+				Expected:    test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("always\n")),
 			},
 			{
 				Description: "network --rm",
@@ -164,7 +164,7 @@ func TestCompletion(t *testing.T) {
 				Description: "run --cap-add",
 				Require:     require.Not(require.Windows),
 				Command:     test.Command("__complete", "run", "--cap-add", ""),
-				Expected: test.Expects(0, nil, expect.All(
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.All(
 					expect.Contains("sys_admin\n"),
 					expect.DoesNotContain("CAP_SYS_ADMIN\n"),
 				)),
@@ -193,45 +193,59 @@ func TestCompletion(t *testing.T) {
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 					return helpers.Custom(nerdtest.Binary(), "__complete", "--cgroup-manager", "")
 				},
-				Expected: test.Expects(0, nil, expect.Contains("systemd\n")),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("systemd\n")),
 			},
 			{
 				Description: "no namespace empty",
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 					return helpers.Custom(nerdtest.Binary(), "__complete", "")
 				},
-				Expected: test.Expects(0, nil, expect.Contains("run\t")),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("run\t")),
 			},
 			{
 				Description: "namespace space empty",
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 					// mind {"--namespace=test"} vs {"--namespace", "test"}
-					return helpers.Custom(nerdtest.Binary(), "__complete", "--namespace", string(helpers.Read(nerdtest.Namespace)), "")
+					return helpers.Custom(
+						nerdtest.Binary(),
+						"__complete",
+						"--namespace",
+						string(helpers.Read(nerdtest.Namespace)),
+						"",
+					)
 				},
-				Expected: test.Expects(0, nil, expect.Contains("run\t")),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("run\t")),
 			},
 			{
 				Description: "run -i",
 				Command:     test.Command("__complete", "run", "-i", ""),
-				Expected:    test.Expects(0, nil, expect.Contains(testutil.CommonImage)),
+				Expected:    test.Expects(expect.ExitCodeSuccess, nil, expect.Contains(testutil.CommonImage)),
 			},
 			{
 				Description: "run -it",
 				Command:     test.Command("__complete", "run", "-it", ""),
-				Expected:    test.Expects(0, nil, expect.Contains(testutil.CommonImage)),
+				Expected:    test.Expects(expect.ExitCodeSuccess, nil, expect.Contains(testutil.CommonImage)),
 			},
 			{
 				Description: "run -it --rm",
 				Command:     test.Command("__complete", "run", "-it", "--rm", ""),
-				Expected:    test.Expects(0, nil, expect.Contains(testutil.CommonImage)),
+				Expected:    test.Expects(expect.ExitCodeSuccess, nil, expect.Contains(testutil.CommonImage)),
 			},
 			{
 				Description: "namespace run -i",
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 					// mind {"--namespace=test"} vs {"--namespace", "test"}
-					return helpers.Custom(nerdtest.Binary(), "__complete", "--namespace", string(helpers.Read(nerdtest.Namespace)), "run", "-i", "")
+					return helpers.Custom(
+						nerdtest.Binary(),
+						"__complete",
+						"--namespace",
+						string(helpers.Read(nerdtest.Namespace)),
+						"run",
+						"-i",
+						"",
+					)
 				},
-				Expected: test.Expects(0, nil, expect.Contains(testutil.CommonImage+"\n")),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains(testutil.CommonImage+"\n")),
 			},
 		},
 	}

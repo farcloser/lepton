@@ -51,21 +51,24 @@ func TestRunHostProcessContainerAsUser(t *testing.T) {
 	base := testutil.NewBase(t)
 
 	hostuser := "nt authority\\system"
-	base.Cmd("run", "--rm", "--isolation=host", "-u", "NT AUTHORITY\\SYSTEM", testutil.WindowsNano, "whoami").AssertOutContains(hostuser)
+	base.Cmd("run", "--rm", "--isolation=host", "-u", "NT AUTHORITY\\SYSTEM", testutil.WindowsNano, "whoami").
+		AssertOutContains(hostuser)
 }
 
 func TestRunHostProcessContainerAsService(t *testing.T) {
 	testutil.DockerIncompatible(t)
 	base := testutil.NewBase(t)
 	hostuser := "nt authority\\local service"
-	base.Cmd("run", "--rm", "--isolation=host", "-u", "NT AUTHORITY\\Local Service", testutil.WindowsNano, "whoami").AssertOutContains(hostuser)
+	base.Cmd("run", "--rm", "--isolation=host", "-u", "NT AUTHORITY\\Local Service", testutil.WindowsNano, "whoami").
+		AssertOutContains(hostuser)
 }
 
 func TestRunHostProcessContainerAslocalService(t *testing.T) {
 	testutil.DockerIncompatible(t)
 	base := testutil.NewBase(t)
 	hostuser := "nt authority\\network service"
-	base.Cmd("run", "--rm", "--isolation=host", "-u", "NT AUTHORITY\\Network Service", testutil.WindowsNano, "whoami").AssertOutContains(hostuser)
+	base.Cmd("run", "--rm", "--isolation=host", "-u", "NT AUTHORITY\\Network Service", testutil.WindowsNano, "whoami").
+		AssertOutContains(hostuser)
 }
 
 func TestRunProcessIsolated(t *testing.T) {
@@ -73,7 +76,8 @@ func TestRunProcessIsolated(t *testing.T) {
 	base := testutil.NewBase(t)
 
 	containerUser := "ContainerUser"
-	base.Cmd("run", "--rm", "--isolation=process", "-u", containerUser, testutil.WindowsNano, "whoami").AssertOutContains(containerUser)
+	base.Cmd("run", "--rm", "--isolation=process", "-u", containerUser, testutil.WindowsNano, "whoami").
+		AssertOutContains(containerUser)
 }
 
 func TestRunHyperVContainer(t *testing.T) {
@@ -131,7 +135,19 @@ func TestRunWithTtyAndDetached(t *testing.T) {
 
 	testCase.Setup = func(data test.Data, helpers test.Helpers) {
 		// with -t, success, the container should run with tty support.
-		helpers.Ensure("run", "--quiet", "-d", "-t", "--name", data.Identifier("with-terminal"), testutil.CommonImage, "cmd", "/c", "echo", "Hello, World with TTY!")
+		helpers.Ensure(
+			"run",
+			"--quiet",
+			"-d",
+			"-t",
+			"--name",
+			data.Identifier("with-terminal"),
+			testutil.CommonImage,
+			"cmd",
+			"/c",
+			"echo",
+			"Hello, World with TTY!",
+		)
 	}
 
 	testCase.Cleanup = func(data test.Data, helpers test.Helpers) {
@@ -144,7 +160,7 @@ func TestRunWithTtyAndDetached(t *testing.T) {
 		return helpers.Command("logs", data.Identifier("with-terminal"))
 	}
 
-	testCase.Expected = test.Expects(0, nil, expect.Contains("Hello, World with TTY!"))
+	testCase.Expected = test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("Hello, World with TTY!"))
 
 	testCase.Run(t)
 }

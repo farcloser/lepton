@@ -54,7 +54,7 @@ const (
 // ErrHostsStore will wrap all errors here
 var ErrHostsStore = errors.New("hosts-store error")
 
-func New(dataStore string, namespace string) (retStore Store, err error) {
+func New(dataStore, namespace string) (retStore Store, err error) {
 	defer func() {
 		if err != nil {
 			err = errors.Join(ErrHostsStore, err)
@@ -119,7 +119,8 @@ func (x *hostsStore) Acquire(meta Meta) (err error) {
 				return errors.Join(errs.ErrSystemFailure, err)
 			}
 
-			// os.WriteFile relies on syscall.Open. Unless there are ACLs, the effective mode of the file will be matched
+			// os.WriteFile relies on syscall.Open. Unless there are ACLs, the effective mode of the file will be
+			// matched
 			// against the current process umask.
 			// See https://www.man7.org/linux/man-pages/man2/open.2.html for details.
 			// Since we must make sure that these files are world readable, explicitly chmod them here.

@@ -19,7 +19,9 @@ package rootlesskit
 import "errors"
 
 var (
-	ErrEnvXDGRuntimeDirNotSet = errors.New("environment variable XDG_RUNTIME_DIR is not set, see https://rootlesscontaine.rs/getting-started/common/login/")
-	ErrEnvHomeNotSet          = errors.New("environment variable HOME is not set")
-	ErrXDGNotAvailable        = errors.New("can only query XDG env vars on Linux")
+	ErrEnvXDGRuntimeDirNotSet = errors.New(
+		"environment variable XDG_RUNTIME_DIR is not set, see https://rootlesscontaine.rs/getting-started/common/login/",
+	)
+	ErrEnvHomeNotSet   = errors.New("environment variable HOME is not set")
+	ErrXDGNotAvailable = errors.New("can only query XDG env vars on Linux")
 )

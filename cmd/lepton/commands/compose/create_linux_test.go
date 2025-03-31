@@ -27,7 +27,7 @@ func TestComposeCreate(t *testing.T) {
 	t.Parallel()
 
 	base := testutil.NewBase(t)
-	var dockerComposeYAML = fmt.Sprintf(`
+	dockerComposeYAML := fmt.Sprintf(`
 version: '3.1'
 
 services:
@@ -44,7 +44,8 @@ services:
 
 	// 1.1 `compose create` should create service container (in `created` status)
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "create").AssertOK()
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "svc0", "-a").AssertOutContainsAny("Created", "created")
+	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "svc0", "-a").
+		AssertOutContainsAny("Created", "created")
 	// 1.2 created container can be started by `compose start`
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "start").AssertOK()
 }
@@ -53,7 +54,7 @@ func TestComposeCreateDependency(t *testing.T) {
 	t.Parallel()
 
 	base := testutil.NewBase(t)
-	var dockerComposeYAML = fmt.Sprintf(`
+	dockerComposeYAML := fmt.Sprintf(`
 version: '3.1'
 
 services:
@@ -74,8 +75,10 @@ services:
 
 	// `compose create` should create containers for both services and their dependencies
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "create", "svc0").AssertOK()
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "svc0", "-a").AssertOutContainsAny("Created", "created")
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "svc1", "-a").AssertOutContainsAny("Created", "created")
+	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "svc0", "-a").
+		AssertOutContainsAny("Created", "created")
+	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "svc1", "-a").
+		AssertOutContainsAny("Created", "created")
 }
 
 func TestComposeCreatePull(t *testing.T) {
@@ -83,7 +86,7 @@ func TestComposeCreatePull(t *testing.T) {
 	// t.Parallel()
 
 	base := testutil.NewBase(t)
-	var dockerComposeYAML = fmt.Sprintf(`
+	dockerComposeYAML := fmt.Sprintf(`
 version: '3.1'
 
 services:
@@ -106,7 +109,8 @@ services:
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "create").AssertOK()
 	base.Cmd("rmi", "-f", testutil.AlpineImage).Run()
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "create", "--pull", "always").AssertOK()
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "svc0", "-a").AssertOutContainsAny("Created", "created")
+	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "svc0", "-a").
+		AssertOutContainsAny("Created", "created")
 }
 
 func TestComposeCreateBuild(t *testing.T) {
@@ -141,5 +145,6 @@ services:
 	// `compose create --build` should succeed: image is built and container is created
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "create", "--build").AssertOK()
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "images", "svc0").AssertOutContains(imageSvc0)
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "svc0", "-a").AssertOutContainsAny("Created", "created")
+	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "svc0", "-a").
+		AssertOutContainsAny("Created", "created")
 }

@@ -52,7 +52,7 @@ func TestImages(t *testing.T) {
 				Command:     test.Command("images"),
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
-						Output: func(stdout string, info string, t *testing.T) {
+						Output: func(stdout, info string, t *testing.T) {
 							lines := strings.Split(strings.TrimSpace(stdout), "\n")
 							assert.Assert(t, len(lines) >= 2, info)
 							header := "REPOSITORY\tTAG\tIMAGE ID\tCREATED\tPLATFORM\tSIZE\tBLOB SIZE"
@@ -83,10 +83,12 @@ func TestImages(t *testing.T) {
 					return &test.Expected{
 						Output: expect.All(
 							expect.Contains(testutil.CommonImage),
-							func(stdout string, info string, t *testing.T) {
+							func(stdout, info string, t *testing.T) {
 								lines := strings.Split(strings.TrimSpace(stdout), "\n")
 								assert.Assert(t, len(lines) >= 2, info)
-								tab := tabutil.NewReader("NAME\tIMAGE ID\tCREATED\tPLATFORM\tSIZE\tBLOB SIZE")
+								tab := tabutil.NewReader(
+									"NAME\tIMAGE ID\tCREATED\tPLATFORM\tSIZE\tBLOB SIZE",
+								)
 								err := tab.ParseHeader(lines[0])
 								assert.NilError(t, err, info)
 								found := false
@@ -109,7 +111,7 @@ func TestImages(t *testing.T) {
 				Command:     test.Command("images", "--format", "'{{json .CreatedAt}}'"),
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
-						Output: func(stdout string, info string, t *testing.T) {
+						Output: func(stdout, info string, t *testing.T) {
 							lines := strings.Split(strings.TrimSpace(stdout), "\n")
 							assert.Assert(t, len(lines) >= 2, info)
 							createdTimes := lines
@@ -162,7 +164,7 @@ RUN echo "actually creating a layer so that docker sets the createdAt time"
 			data.Set("builtImageID", data.Identifier())
 			return helpers.Command("build", "-t", data.Identifier(), data.Get("buildCtx"))
 		},
-		Expected: test.Expects(0, nil, nil),
+		Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 		SubTests: []*test.Case{
 			{
 				Description: "label=foo=bar",
@@ -184,7 +186,13 @@ RUN echo "actually creating a layer so that docker sets the createdAt time"
 			},
 			{
 				Description: "label=foo=bar label=version=0.1",
-				Command:     test.Command("images", "--filter", "label=foo=bar", "--filter", "label=version=0.1"),
+				Command: test.Command(
+					"images",
+					"--filter",
+					"label=foo=bar",
+					"--filter",
+					"label=version=0.1",
+				),
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
 						Output: expect.Contains(data.Get("builtImageID")),
@@ -193,7 +201,13 @@ RUN echo "actually creating a layer so that docker sets the createdAt time"
 			},
 			{
 				Description: "label=foo=bar label=version=0.2",
-				Command:     test.Command("images", "--filter", "label=foo=bar", "--filter", "label=version=0.2"),
+				Command: test.Command(
+					"images",
+					"--filter",
+					"label=foo=bar",
+					"--filter",
+					"label=version=0.2",
+				),
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
 						Output: expect.DoesNotContain(data.Get("builtImageID")),
@@ -212,7 +226,11 @@ RUN echo "actually creating a layer so that docker sets the createdAt time"
 			{
 				Description: "reference=ID*",
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-					return helpers.Command("images", "--filter", fmt.Sprintf("reference=%s*", data.Get("builtImageID")))
+					return helpers.Command(
+						"images",
+						"--filter",
+						fmt.Sprintf("reference=%s*", data.Get("builtImageID")),
+					)
 				},
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
@@ -223,7 +241,7 @@ RUN echo "actually creating a layer so that docker sets the createdAt time"
 			{
 				Description: "reference=tagged*:*fragment*",
 				Command:     test.Command("images", "--filter", "reference=tagged*:*fragment*"),
-				Expected: test.Expects(0, nil, expect.All(
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.All(
 					expect.Contains("one-"),
 					expect.Contains("two-"),
 				)),
@@ -231,7 +249,11 @@ RUN echo "actually creating a layer so that docker sets the createdAt time"
 			{
 				Description: "before=ID:latest",
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-					return helpers.Command("images", "--filter", fmt.Sprintf("before=%s:latest", data.Get("builtImageID")))
+					return helpers.Command(
+						"images",
+						"--filter",
+						fmt.Sprintf("before=%s:latest", data.Get("builtImageID")),
+					)
 				},
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
@@ -256,7 +278,12 @@ RUN echo "actually creating a layer so that docker sets the createdAt time"
 			},
 			{
 				Description: "since=" + testutil.CommonImage + " " + testutil.CommonImage,
-				Command:     test.Command("images", "--filter", "since="+testutil.CommonImage, testutil.CommonImage),
+				Command: test.Command(
+					"images",
+					"--filter",
+					"since="+testutil.CommonImage,
+					testutil.CommonImage,
+				),
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
 						Output: expect.All(
@@ -269,16 +296,20 @@ RUN echo "actually creating a layer so that docker sets the createdAt time"
 			{
 				Description: "since=non-exists-image",
 				// FIXME still broken
-				Require:  nerdtest.NerdishctlNeedsFixing("https://github.com/containerd/nerdctl/issues/3511"),
+				Require: nerdtest.NerdishctlNeedsFixing(
+					"https://github.com/containerd/nerdctl/issues/3511",
+				),
 				Command:  test.Command("images", "--filter", "since=non-exists-image"),
-				Expected: test.Expects(-1, []error{errors.New("No such image: ")}, nil),
+				Expected: test.Expects(expect.ExitCodeGenericFail, []error{errors.New("No such image: ")}, nil),
 			},
 			{
 				Description: "before=non-exists-image",
 				// FIXME still broken
-				Require:  nerdtest.NerdishctlNeedsFixing("https://github.com/containerd/nerdctl/issues/3511"),
+				Require: nerdtest.NerdishctlNeedsFixing(
+					"https://github.com/containerd/nerdctl/issues/3511",
+				),
 				Command:  test.Command("images", "--filter", "before=non-exists-image"),
-				Expected: test.Expects(-1, []error{errors.New("No such image: ")}, nil),
+				Expected: test.Expects(expect.ExitCodeGenericFail, []error{errors.New("No such image: ")}, nil),
 			},
 		},
 	}
@@ -310,17 +341,17 @@ CMD ["echo", "build-notag-string"]
 		Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 			return helpers.Command("build", data.Get("buildCtx"))
 		},
-		Expected: test.Expects(0, nil, nil),
+		Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 		SubTests: []*test.Case{
 			{
 				Description: "dangling",
 				Command:     test.Command("images", "--filter", "dangling=true"),
-				Expected:    test.Expects(0, nil, expect.Contains("<none>")),
+				Expected:    test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("<none>")),
 			},
 			{
 				Description: "not dangling",
 				Command:     test.Command("images", "--filter", "dangling=false"),
-				Expected:    test.Expects(0, nil, expect.DoesNotContain("<none>")),
+				Expected:    test.Expects(expect.ExitCodeSuccess, nil, expect.DoesNotContain("<none>")),
 			},
 		},
 	}
@@ -344,7 +375,7 @@ func TestImagesKubeWithKubeHideDupe(t *testing.T) {
 				Command:     test.Command("--kube-hide-dupe", "images"),
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
-						Output: func(stdout string, info string, t *testing.T) {
+						Output: func(stdout, info string, t *testing.T) {
 							var imageID string
 							var skipLine int
 							lines := strings.Split(strings.TrimSpace(stdout), "\n")

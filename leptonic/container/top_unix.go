@@ -50,7 +50,7 @@ import (
 // is not found, or is not running, or if there are any problems
 // running ps, or parsing the output.
 // procList *ContainerTopOKBody
-func containerTop(ctx context.Context, stdio io.Writer, client *containerd.Client, id string, psArgs string) error {
+func containerTop(ctx context.Context, stdio io.Writer, client *containerd.Client, id, psArgs string) error {
 	if psArgs == "" {
 		psArgs = "-ef"
 	}

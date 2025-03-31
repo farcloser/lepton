@@ -40,9 +40,12 @@ func inspectCommand() *cobra.Command {
 	cmd.Flags().StringP("format", "f", "", "Format the output using the given Go template, e.g, '{{json .}}'")
 	cmd.Flags().BoolP("size", "s", false, "Display the disk usage of the volume")
 
-	_ = cmd.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{formatter.FormatJSON}, cobra.ShellCompDirectiveNoFileComp
-	})
+	_ = cmd.RegisterFlagCompletionFunc(
+		"format",
+		func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			return []string{formatter.FormatJSON}, cobra.ShellCompDirectiveNoFileComp
+		},
+	)
 
 	return cmd
 }

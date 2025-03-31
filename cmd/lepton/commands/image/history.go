@@ -44,7 +44,7 @@ import (
 )
 
 func HistoryCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:               "history [flags] IMAGE",
 		Short:             "Show the history of an image",
 		Args:              helpers.IsExactArgs(1),
@@ -59,9 +59,12 @@ func HistoryCommand() *cobra.Command {
 	cmd.Flags().BoolP("human", "H", true, "Print sizes and dates in human readable format (default true)")
 	cmd.Flags().Bool("no-trunc", false, "Don't truncate output")
 
-	_ = cmd.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{formatter.FormatJSON}, cobra.ShellCompDirectiveNoFileComp
-	})
+	_ = cmd.RegisterFlagCompletionFunc(
+		"format",
+		func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			return []string{formatter.FormatJSON}, cobra.ShellCompDirectiveNoFileComp
+		},
+	)
 
 	return cmd
 }

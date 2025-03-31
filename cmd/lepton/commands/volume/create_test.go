@@ -35,7 +35,11 @@ func TestVolumeCreate(t *testing.T) {
 		{
 			Description: "arg missing should create anonymous volume",
 			Command:     test.Command("volume", "create"),
-			Expected:    test.Expects(0, nil, expect.Match(regexp.MustCompile("^[a-f0-9]{64}\n$"))),
+			Expected: test.Expects(
+				expect.ExitCodeSuccess,
+				nil,
+				expect.Match(regexp.MustCompile("^[a-f0-9]{64}\n$")),
+			),
 		},
 		{
 			Description: "invalid identifier should fail",
@@ -64,7 +68,15 @@ func TestVolumeCreate(t *testing.T) {
 		{
 			Description: "success with labels",
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-				return helpers.Command("volume", "create", "--label", "foo1=baz1", "--label", "foo2=baz2", data.Identifier())
+				return helpers.Command(
+					"volume",
+					"create",
+					"--label",
+					"foo1=baz1",
+					"--label",
+					"foo2=baz2",
+					data.Identifier(),
+				)
 			},
 			Cleanup: func(data test.Data, helpers test.Helpers) {
 				helpers.Anyhow("volume", "rm", "-f", data.Identifier())
@@ -79,13 +91,25 @@ func TestVolumeCreate(t *testing.T) {
 			Description: "invalid labels should fail",
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				// See https://github.com/containerd/nerdctl/issues/3126
-				return helpers.Command("volume", "create", "--label", "a", "--label", "", data.Identifier())
+				return helpers.Command(
+					"volume",
+					"create",
+					"--label",
+					"a",
+					"--label",
+					"",
+					data.Identifier(),
+				)
 			},
 			Cleanup: func(data test.Data, helpers test.Helpers) {
 				helpers.Anyhow("volume", "rm", "-f", data.Identifier())
 			},
 			// NOTE: docker returns 125 on this
-			Expected: test.Expects(-1, []error{errs.ErrInvalidArgument}, nil),
+			Expected: test.Expects(
+				expect.ExitCodeGenericFail,
+				[]error{errs.ErrInvalidArgument},
+				nil,
+			),
 		},
 		{
 			Description: "creating already existing volume should succeed",

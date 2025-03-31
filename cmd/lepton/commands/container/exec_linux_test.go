@@ -32,7 +32,8 @@ func TestExecWithUser(t *testing.T) {
 	testContainer := testutil.Identifier(t)
 
 	defer base.Cmd("rm", "-f", testContainer).Run()
-	base.Cmd("run", "-d", "--name", testContainer, testutil.CommonImage, "sleep", nerdtest.Infinity).AssertOK()
+	base.Cmd("run", "-d", "--name", testContainer, testutil.CommonImage, "sleep", nerdtest.Infinity).
+		AssertOK()
 	base.EnsureContainerStarted(testContainer)
 
 	testCases := map[string]string{
@@ -64,7 +65,15 @@ func TestExecTTY(t *testing.T) {
 	}
 
 	testCase.Setup = func(data test.Data, helpers test.Helpers) {
-		helpers.Ensure("run", "-d", "--name", data.Identifier(), testutil.CommonImage, "sleep", nerdtest.Infinity)
+		helpers.Ensure(
+			"run",
+			"-d",
+			"--name",
+			data.Identifier(),
+			testutil.CommonImage,
+			"sleep",
+			nerdtest.Infinity,
+		)
 		data.Set("container_name", data.Identifier())
 	}
 
@@ -76,7 +85,7 @@ func TestExecTTY(t *testing.T) {
 				cmd.WithPseudoTTY()
 				return cmd
 			},
-			Expected: test.Expects(0, nil, expect.Contains(sttyPartialOutput)),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains(sttyPartialOutput)),
 		},
 		{
 			Description: "stty with -t",
@@ -85,7 +94,7 @@ func TestExecTTY(t *testing.T) {
 				cmd.WithPseudoTTY()
 				return cmd
 			},
-			Expected: test.Expects(0, nil, expect.Contains(sttyPartialOutput)),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains(sttyPartialOutput)),
 		},
 		{
 			Description: "stty with -i",

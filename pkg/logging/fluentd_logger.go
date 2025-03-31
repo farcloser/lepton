@@ -80,7 +80,7 @@ func (f *FluentdLogger) PreProcess(ctx context.Context, _ string, config *loggin
 	return nil
 }
 
-func (f *FluentdLogger) Process(stdout <-chan string, stderr <-chan string) error {
+func (f *FluentdLogger) Process(stdout, stderr <-chan string) error {
 	metadata := map[string]string{
 		"container_id": f.id,
 		"namespace":    f.namespace,
@@ -147,7 +147,11 @@ func parseFluentdConfig(config map[string]string) (*fluentd.Config, error) {
 	if config[fluentdAsyncReconnectInterval] != "" {
 		tempDuration, err := time.ParseDuration(config[fluentdAsyncReconnectInterval])
 		if err != nil {
-			return nil, fmt.Errorf("error occurs %w, invalid async connect interval (%s)", err, config[fluentdAsyncReconnectInterval])
+			return nil, fmt.Errorf(
+				"error occurs %w, invalid async connect interval (%s)",
+				err,
+				config[fluentdAsyncReconnectInterval],
+			)
 		}
 		if err = result.SetAsyncReconnectInterval(int(tempDuration.Milliseconds())); err != nil {
 			return nil, err
@@ -157,7 +161,11 @@ func parseFluentdConfig(config map[string]string) (*fluentd.Config, error) {
 	if config[fluentdSubSecondPrecision] != "" {
 		result.SubSecondPrecision, err = strconv.ParseBool(config[fluentdSubSecondPrecision])
 		if err != nil {
-			return nil, fmt.Errorf("error occurs %w, invalid sub second precision (%s)", err, config[fluentdSubSecondPrecision])
+			return nil, fmt.Errorf(
+				"error occurs %w, invalid sub second precision (%s)",
+				err,
+				config[fluentdSubSecondPrecision],
+			)
 		}
 	}
 

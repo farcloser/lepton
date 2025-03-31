@@ -33,12 +33,16 @@ import (
 	"go.farcloser.world/lepton/pkg/testutil/nerdtest"
 )
 
-func testInfoComparator(stdout string, info string, t *testing.T) {
+func testInfoComparator(stdout, info string, t *testing.T) {
 	var dinf dockercompat.Info
 	err := json.Unmarshal([]byte(stdout), &dinf)
 	assert.NilError(t, err, "failed to unmarshal stdout"+info)
 	unameM := infoutil.UnameM()
-	assert.Assert(t, dinf.Architecture == unameM, fmt.Sprintf("expected info.Architecture to be %q, got %q", unameM, dinf.Architecture)+info)
+	assert.Assert(
+		t,
+		dinf.Architecture == unameM,
+		fmt.Sprintf("expected info.Architecture to be %q, got %q", unameM, dinf.Architecture)+info,
+	)
 }
 
 func TestInfo(t *testing.T) {
@@ -48,12 +52,12 @@ func TestInfo(t *testing.T) {
 		{
 			Description: "info",
 			Command:     test.Command("info", "--format", "{{json .}}"),
-			Expected:    test.Expects(0, nil, testInfoComparator),
+			Expected:    test.Expects(expect.ExitCodeSuccess, nil, testInfoComparator),
 		},
 		{
 			Description: "info convenience form",
 			Command:     test.Command("info", "--format", formatter.FormatJSON),
-			Expected:    test.Expects(0, nil, testInfoComparator),
+			Expected:    test.Expects(expect.ExitCodeSuccess, nil, testInfoComparator),
 		},
 		{
 			Description: "info with namespace",
@@ -61,7 +65,7 @@ func TestInfo(t *testing.T) {
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Custom(nerdtest.Binary(), "info")
 			},
-			Expected: test.Expects(0, nil, expect.Contains("Namespace:	default")),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("Namespace:	default")),
 		},
 		{
 			Description: "info with namespace env var",
@@ -72,7 +76,7 @@ func TestInfo(t *testing.T) {
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Custom(nerdtest.Binary(), "info")
 			},
-			Expected: test.Expects(0, nil, expect.Contains("Namespace:	test")),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("Namespace:	test")),
 		},
 	}
 

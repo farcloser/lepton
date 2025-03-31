@@ -67,7 +67,8 @@ func InspectNetNS(ctx context.Context, pid int) (*native.NetNS, error) {
 // Zero means no primary interface was detected.
 func determinePrimaryInterface(interfaces []native.NetInterface) int {
 	for _, f := range interfaces {
-		if f.Interface.Flags&net.FlagLoopback == 0 && f.Interface.Flags&net.FlagUp != 0 && !strings.HasPrefix(f.Name, "lo") {
+		if f.Interface.Flags&net.FlagLoopback == 0 && f.Interface.Flags&net.FlagUp != 0 &&
+			!strings.HasPrefix(f.Name, "lo") {
 			return f.Index
 		}
 	}

@@ -33,7 +33,7 @@ import (
 )
 
 func TopCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:               "top CONTAINER [ps OPTIONS]",
 		Args:              cobra.MinimumNArgs(1),
 		Short:             "Display the running processes of a container",
@@ -54,7 +54,9 @@ func topAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	if rootlessutil.IsRootless() && cgroups.Version() < 2 {
-		return errors.New("top requires cgroup v2 for rootless containers, see https://rootlesscontaine.rs/getting-started/common/cgroup2/")
+		return errors.New(
+			"top requires cgroup v2 for rootless containers, see https://rootlesscontaine.rs/getting-started/common/cgroup2/",
+		)
 	}
 
 	if globalOptions.CgroupManager == cgroups.NoneManager {
@@ -69,7 +71,6 @@ func topAction(cmd *cobra.Command, args []string) error {
 		Stdout:   cmd.OutOrStdout(),
 		GOptions: globalOptions,
 	})
-
 }
 
 func topShellComplete(cmd *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {

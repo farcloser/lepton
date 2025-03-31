@@ -35,9 +35,16 @@ func getBuildkitHostCandidates(namespace string) ([]string, error) {
 	}
 	var candidates []string
 	if namespace != "default" {
-		candidates = append(candidates, "unix://"+filepath.Join(run, fmt.Sprintf("buildkit-%s/buildkitd.sock", namespace)))
+		candidates = append(
+			candidates,
+			"unix://"+filepath.Join(run, fmt.Sprintf("buildkit-%s/buildkitd.sock", namespace)),
+		)
 	}
-	candidates = append(candidates, "unix://"+filepath.Join(run, "buildkit-default/buildkitd.sock"), "unix://"+filepath.Join(run, "buildkit/buildkitd.sock"))
+	candidates = append(
+		candidates,
+		"unix://"+filepath.Join(run, "buildkit-default/buildkitd.sock"),
+		"unix://"+filepath.Join(run, "buildkit/buildkitd.sock"),
+	)
 
 	return candidates, nil
 }

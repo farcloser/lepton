@@ -94,7 +94,7 @@ type CosignKeyPair struct {
 	Cleanup    func()
 }
 
-func NewCosignKeyPair(t testing.TB, path string, password string) *CosignKeyPair {
+func NewCosignKeyPair(t testing.TB, path, password string) *CosignKeyPair {
 	td := t.TempDir()
 
 	cmd := exec.Command("cosign", "generate-key-pair")
@@ -116,7 +116,13 @@ func NewCosignKeyPair(t testing.TB, path string, password string) *CosignKeyPair
 	}
 }
 
-func ComposeUp(t *testing.T, base *testutil.Base, port string, dockerComposeYAML string, opts ...string) {
+func ComposeUp(
+	t *testing.T,
+	base *testutil.Base,
+	port string,
+	dockerComposeYAML string,
+	opts ...string,
+) {
 	comp := testutil.NewComposeDir(t, dockerComposeYAML)
 	t.Cleanup(func() {
 		comp.CleanUp()
@@ -125,7 +131,8 @@ func ComposeUp(t *testing.T, base *testutil.Base, port string, dockerComposeYAML
 	projectName := comp.ProjectName()
 	t.Logf("projectName=%q", projectName)
 
-	base.ComposeCmd(append(append([]string{"-f", comp.YAMLFullPath()}, opts...), "up", "-d")...).AssertOK()
+	base.ComposeCmd(append(append([]string{"-f", comp.YAMLFullPath()}, opts...), "up", "-d")...).
+		AssertOK()
 	t.Cleanup(func() {
 		base.ComposeCmd("-f", comp.YAMLFullPath(), "down", "-v").Run()
 	})

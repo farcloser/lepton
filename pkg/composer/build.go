@@ -46,7 +46,13 @@ func (c *Composer) Build(ctx context.Context, bo BuildOptions, services []string
 	}, types.IgnoreDependencies)
 }
 
-func (c *Composer) buildServiceImage(ctx context.Context, image string, b *serviceparser.Build, platform string, bo BuildOptions) error {
+func (c *Composer) buildServiceImage(
+	ctx context.Context,
+	image string,
+	b *serviceparser.Build,
+	platform string,
+	bo BuildOptions,
+) error {
 	log.G(ctx).Infof("Building image %s", image)
 
 	var args []string //nolint:prealloc

@@ -46,23 +46,25 @@ const (
 	Tag     = "tag"
 )
 
-var (
-	// MagicArgv1 is the magic argv1 for the containerd runtime v2 logging plugin mode.
-	MagicArgv1 = fmt.Sprintf("_%s_INTERNAL_LOGGING", version.EnvPrefix)
-)
+// MagicArgv1 is the magic argv1 for the containerd runtime v2 logging plugin mode.
+var MagicArgv1 = fmt.Sprintf("_%s_INTERNAL_LOGGING", version.EnvPrefix)
 
 type Driver interface {
 	Init(dataStore, ns, id string) error
 	PreProcess(ctx context.Context, dataStore string, config *logging.Config) error
-	Process(stdout <-chan string, stderr <-chan string) error
+	Process(stdout, stderr <-chan string) error
 	PostProcess() error
 }
 
-type DriverFactory func(map[string]string, string) (Driver, error)
-type LogOptsValidateFunc func(logOptMap map[string]string) error
+type (
+	DriverFactory       func(map[string]string, string) (Driver, error)
+	LogOptsValidateFunc func(logOptMap map[string]string) error
+)
 
-var drivers = make(map[string]DriverFactory)
-var driversLogOptsValidateFunctions = make(map[string]LogOptsValidateFunc)
+var (
+	drivers                         = make(map[string]DriverFactory)
+	driversLogOptsValidateFunctions = make(map[string]LogOptsValidateFunc)
+)
 
 func ValidateLogOpts(logDriver string, logOpts map[string]string) error {
 	if value, ok := driversLogOptsValidateFunctions[logDriver]; ok && value != nil {
@@ -268,7 +270,11 @@ func startTail(ctx context.Context, logName string, w *fsnotify.Watcher) (bool, 
 				log.L.Debugf("Received unexpected fsnotify event: %v, retrying", e)
 			}
 		case err := <-w.Errors:
-			log.L.Debugf("Received fsnotify watch error, retrying unless no more retries left, retries: %d, error: %s", errRetry, err)
+			log.L.Debugf(
+				"Received fsnotify watch error, retrying unless no more retries left, retries: %d, error: %s",
+				errRetry,
+				err,
+			)
 			if errRetry == 0 {
 				return false, err
 			}

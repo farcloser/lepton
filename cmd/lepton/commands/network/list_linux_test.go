@@ -35,7 +35,10 @@ func TestNetworkLsFilter(t *testing.T) {
 		data.Set("label", "mylabel=label-1")
 		data.Set("net1", data.Identifier("1"))
 		data.Set("net2", data.Identifier("2"))
-		data.Set("netID1", helpers.Capture("network", "create", "--label="+data.Get("label"), data.Get("net1")))
+		data.Set(
+			"netID1",
+			helpers.Capture("network", "create", "--label="+data.Get("label"), data.Get("net1")),
+		)
 		data.Set("netID2", helpers.Capture("network", "create", data.Get("net2")))
 	}
 
@@ -48,12 +51,18 @@ func TestNetworkLsFilter(t *testing.T) {
 		{
 			Description: "filter label",
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-				return helpers.Command("network", "ls", "--quiet", "--filter", "label="+data.Get("label"))
+				return helpers.Command(
+					"network",
+					"ls",
+					"--quiet",
+					"--filter",
+					"label="+data.Get("label"),
+				)
 			},
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 				return &test.Expected{
-					Output: func(stdout string, info string, t *testing.T) {
-						var lines = strings.Split(strings.TrimSpace(stdout), "\n")
+					Output: func(stdout, info string, t *testing.T) {
+						lines := strings.Split(strings.TrimSpace(stdout), "\n")
 						assert.Assert(t, len(lines) >= 1, info)
 						netNames := map[string]struct{}{
 							data.Get("netID1")[:12]: {},
@@ -70,12 +79,18 @@ func TestNetworkLsFilter(t *testing.T) {
 		{
 			Description: "filter name",
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-				return helpers.Command("network", "ls", "--quiet", "--filter", "name="+data.Get("net2"))
+				return helpers.Command(
+					"network",
+					"ls",
+					"--quiet",
+					"--filter",
+					"name="+data.Get("net2"),
+				)
 			},
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 				return &test.Expected{
-					Output: func(stdout string, info string, t *testing.T) {
-						var lines = strings.Split(strings.TrimSpace(stdout), "\n")
+					Output: func(stdout, info string, t *testing.T) {
+						lines := strings.Split(strings.TrimSpace(stdout), "\n")
 						assert.Assert(t, len(lines) >= 1, info)
 						netNames := map[string]struct{}{
 							data.Get("netID2")[:12]: {},

@@ -50,12 +50,14 @@ func TestRunCustomRootfs(t *testing.T) {
 	testutil.DockerIncompatible(t)
 	// FIXME: root issue is undiagnosed and this is very likely a containerd bug
 	// It appears that in certain conditions, the proxy content store info method will fail on the layer of the image
-	// Search for func (pcs *proxyContentStore) ReaderAt(ctx context.Context, desc specs.Descriptor) (content.ReaderAt, error) {
+	// Search for func (pcs *proxyContentStore) ReaderAt(ctx context.Context, desc specs.Descriptor) (content.ReaderAt,
+	// error) {
 	// Note that:
 	// - the problem is still here with containerd and nerdctl v2
 	// - it seems to affect images that are tagged multiple times, or that share a layer with another image
 	// - this test is not parallelized - but the fact that namespacing it solves the problem suggest that something
-	// happening in the default namespace BEFORE this test is run is SOMETIMES setting conditions that will make this fail
+	// happening in the default namespace BEFORE this test is run is SOMETIMES setting conditions that will make this
+	// fail
 	// Possible suspects would be concurrent pulls somehow effing things up w. namespaces.
 	base := testutil.NewBaseWithNamespace(t, testutil.Identifier(t))
 	rootfs := prepareCustomRootfs(base, testutil.AlpineImage)
@@ -63,8 +65,10 @@ func TestRunCustomRootfs(t *testing.T) {
 		base.Cmd("namespace", "remove", testutil.Identifier(t)).Run()
 	})
 	defer os.RemoveAll(rootfs)
-	base.Cmd("run", "--rm", "--rootfs", rootfs, "/bin/cat", "/proc/self/environ").AssertOutContains("PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin")
-	base.Cmd("run", "--rm", "--entrypoint", "/bin/echo", "--rootfs", rootfs, "echo", "foo").AssertOutExactly("echo foo\n")
+	base.Cmd("run", "--rm", "--rootfs", rootfs, "/bin/cat", "/proc/self/environ").
+		AssertOutContains("PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin")
+	base.Cmd("run", "--rm", "--entrypoint", "/bin/echo", "--rootfs", rootfs, "echo", "foo").
+		AssertOutExactly("echo foo\n")
 }
 
 func prepareCustomRootfs(base *testutil.Base, imageName string) string {
@@ -84,7 +88,8 @@ func TestRunShmSize(t *testing.T) {
 	base := testutil.NewBase(t)
 	const shmSize = "32m"
 
-	base.Cmd("run", "--rm", "--shm-size", shmSize, testutil.AlpineImage, "/bin/grep", "shm", "/proc/self/mounts").AssertOutContains("size=32768k")
+	base.Cmd("run", "--rm", "--shm-size", shmSize, testutil.AlpineImage, "/bin/grep", "shm", "/proc/self/mounts").
+		AssertOutContains("size=32768k")
 }
 
 func TestRunShmSizeIPCShareable(t *testing.T) {
@@ -94,7 +99,8 @@ func TestRunShmSizeIPCShareable(t *testing.T) {
 	const shmSize = "32m"
 
 	container := testutil.Identifier(t)
-	base.Cmd("run", "--rm", "--name", container, "--ipc", "shareable", "--shm-size", shmSize, testutil.AlpineImage, "/bin/grep", "shm", "/proc/self/mounts").AssertOutContains("size=32768k")
+	base.Cmd("run", "--rm", "--name", container, "--ipc", "shareable", "--shm-size", shmSize, testutil.AlpineImage, "/bin/grep", "shm", "/proc/self/mounts").
+		AssertOutContains("size=32768k")
 	defer base.Cmd("rm", "-f", container)
 }
 
@@ -104,7 +110,8 @@ func TestRunIPCShareableRemoveMount(t *testing.T) {
 	base := testutil.NewBase(t)
 	container := testutil.Identifier(t)
 
-	base.Cmd("run", "--name", container, "--ipc", "shareable", testutil.AlpineImage, "sleep", "0").AssertOK()
+	base.Cmd("run", "--name", container, "--ipc", "shareable", testutil.AlpineImage, "sleep", "0").
+		AssertOK()
 	base.Cmd("rm", container).AssertOK()
 }
 
@@ -114,7 +121,8 @@ func TestRunIPCContainerNotExists(t *testing.T) {
 	base := testutil.NewBase(t)
 
 	container := testutil.Identifier(t)
-	result := base.Cmd("run", "--name", container, "--ipc", "container:abcd1234", testutil.AlpineImage, "sleep", nerdtest.Infinity).Run()
+	result := base.Cmd("run", "--name", container, "--ipc", "container:abcd1234", testutil.AlpineImage, "sleep", nerdtest.Infinity).
+		Run()
 	defer base.Cmd("rm", "-f", container)
 	combined := result.Combined()
 	if !strings.Contains(strings.ToLower(combined), "no such container: abcd1234") {
@@ -128,12 +136,20 @@ func TestRunShmSizeIPCContainer(t *testing.T) {
 	base := testutil.NewBase(t)
 
 	const shmSize = "32m"
-	sharedContainerResult := base.Cmd("run", "-d", "--ipc", "shareable", "--shm-size", shmSize, testutil.AlpineImage, "sleep", nerdtest.Infinity).Run()
+	sharedContainerResult := base.Cmd("run", "-d", "--ipc", "shareable", "--shm-size", shmSize, testutil.AlpineImage, "sleep", nerdtest.Infinity).
+		Run()
 	baseContainerID := strings.TrimSpace(sharedContainerResult.Stdout())
 	defer base.Cmd("rm", "-f", baseContainerID).Run()
 
-	base.Cmd("run", "--rm", "--ipc=container:"+baseContainerID,
-		testutil.AlpineImage, "/bin/grep", "shm", "/proc/self/mounts").AssertOutContains("size=32768k")
+	base.Cmd(
+		"run",
+		"--rm",
+		"--ipc=container:"+baseContainerID,
+		testutil.AlpineImage,
+		"/bin/grep",
+		"shm",
+		"/proc/self/mounts",
+	).AssertOutContains("size=32768k")
 }
 
 func TestRunIPCContainer(t *testing.T) {
@@ -142,12 +158,20 @@ func TestRunIPCContainer(t *testing.T) {
 	base := testutil.NewBase(t)
 
 	const shmSize = "32m"
-	victimContainerResult := base.Cmd("run", "-d", "--ipc", "shareable", "--shm-size", shmSize, testutil.AlpineImage, "sleep", nerdtest.Infinity).Run()
+	victimContainerResult := base.Cmd("run", "-d", "--ipc", "shareable", "--shm-size", shmSize, testutil.AlpineImage, "sleep", nerdtest.Infinity).
+		Run()
 	victimContainerID := strings.TrimSpace(victimContainerResult.Stdout())
 	defer base.Cmd("rm", "-f", victimContainerID).Run()
 
-	base.Cmd("run", "--rm", "--ipc=container:"+victimContainerID,
-		testutil.AlpineImage, "/bin/grep", "shm", "/proc/self/mounts").AssertOutContains("size=32768k")
+	base.Cmd(
+		"run",
+		"--rm",
+		"--ipc=container:"+victimContainerID,
+		testutil.AlpineImage,
+		"/bin/grep",
+		"shm",
+		"/proc/self/mounts",
+	).AssertOutContains("size=32768k")
 }
 
 func TestRunPidHost(t *testing.T) {
@@ -156,7 +180,8 @@ func TestRunPidHost(t *testing.T) {
 	base := testutil.NewBase(t)
 	pid := os.Getpid()
 
-	base.Cmd("run", "--rm", "--pid=host", testutil.AlpineImage, "ps", "auxw").AssertOutContains(strconv.Itoa(pid))
+	base.Cmd("run", "--rm", "--pid=host", testutil.AlpineImage, "ps", "auxw").
+		AssertOutContains(strconv.Itoa(pid))
 }
 
 func TestRunUtsHost(t *testing.T) {
@@ -170,11 +195,14 @@ func TestRunUtsHost(t *testing.T) {
 	hostName, err := os.Hostname()
 	assert.NilError(base.T, err)
 
-	base.Cmd("run", "--rm", "--uts=host", testutil.AlpineImage, "hostname").AssertOutContains(hostName)
+	base.Cmd("run", "--rm", "--uts=host", testutil.AlpineImage, "hostname").
+		AssertOutContains(hostName)
 	// Validate we can't provide a hostname with uts=host
-	base.Cmd("run", "--rm", "--uts=host", "--hostname=foobar", testutil.AlpineImage, "hostname").AssertFail()
+	base.Cmd("run", "--rm", "--uts=host", "--hostname=foobar", testutil.AlpineImage, "hostname").
+		AssertFail()
 	// Validate we can't provide a domainname with uts=host
-	base.Cmd("run", "--rm", "--uts=host", "--domainname=example.com", testutil.AlpineImage, "hostname").AssertFail()
+	base.Cmd("run", "--rm", "--uts=host", "--domainname=example.com", testutil.AlpineImage, "hostname").
+		AssertFail()
 }
 
 func TestRunPidContainer(t *testing.T) {
@@ -182,7 +210,8 @@ func TestRunPidContainer(t *testing.T) {
 
 	base := testutil.NewBase(t)
 
-	sharedContainerResult := base.Cmd("run", "-d", testutil.AlpineImage, "sleep", nerdtest.Infinity).Run()
+	sharedContainerResult := base.Cmd("run", "-d", testutil.AlpineImage, "sleep", nerdtest.Infinity).
+		Run()
 	baseContainerID := strings.TrimSpace(sharedContainerResult.Stdout())
 	defer base.Cmd("rm", "-f", baseContainerID).Run()
 
@@ -208,71 +237,80 @@ func TestRunAddHost(t *testing.T) {
 
 	// Not parallelizable (https://github.com/containerd/nerdctl/issues/1127)
 	base := testutil.NewBase(t)
-	base.Cmd("run", "--rm", "--add-host", "testing.example.com:10.0.0.1", testutil.AlpineImage, "cat", "/etc/hosts").AssertOutWithFunc(func(stdout string) error {
-		var found bool
-		sc := bufio.NewScanner(bytes.NewBufferString(stdout))
-		for sc.Scan() {
-			// removing spaces and tabs separating items
-			line := strings.ReplaceAll(sc.Text(), " ", "")
-			line = strings.ReplaceAll(line, "\t", "")
-			if strings.Contains(line, "10.0.0.1testing.example.com") {
-				found = true
+	base.Cmd("run", "--rm", "--add-host", "testing.example.com:10.0.0.1", testutil.AlpineImage, "cat", "/etc/hosts").
+		AssertOutWithFunc(func(stdout string) error {
+			var found bool
+			sc := bufio.NewScanner(bytes.NewBufferString(stdout))
+			for sc.Scan() {
+				// removing spaces and tabs separating items
+				line := strings.ReplaceAll(sc.Text(), " ", "")
+				line = strings.ReplaceAll(line, "\t", "")
+				if strings.Contains(line, "10.0.0.1testing.example.com") {
+					found = true
+				}
 			}
-		}
-		if !found {
-			return errors.New("host was not added")
-		}
-		return nil
-	})
-	base.Cmd("run", "--rm", "--add-host", "test:10.0.0.1", "--add-host", "test1:10.0.0.1", testutil.AlpineImage, "cat", "/etc/hosts").AssertOutWithFunc(func(stdout string) error {
-		var found int
-		sc := bufio.NewScanner(bytes.NewBufferString(stdout))
-		for sc.Scan() {
-			// removing spaces and tabs separating items
-			line := strings.ReplaceAll(sc.Text(), " ", "")
-			line = strings.ReplaceAll(line, "\t", "")
-			if strutil.InStringSlice([]string{"10.0.0.1test", "10.0.0.1test1"}, line) {
-				found++
+			if !found {
+				return errors.New("host was not added")
 			}
-		}
-		if found != 2 {
-			return fmt.Errorf("host was not added, found %d", found)
-		}
-		return nil
-	})
-	base.Cmd("run", "--rm", "--add-host", "10.0.0.1:testing.example.com", testutil.AlpineImage, "cat", "/etc/hosts").AssertFail()
+			return nil
+		})
+	base.Cmd("run", "--rm", "--add-host", "test:10.0.0.1", "--add-host", "test1:10.0.0.1", testutil.AlpineImage, "cat", "/etc/hosts").
+		AssertOutWithFunc(func(stdout string) error {
+			var found int
+			sc := bufio.NewScanner(bytes.NewBufferString(stdout))
+			for sc.Scan() {
+				// removing spaces and tabs separating items
+				line := strings.ReplaceAll(sc.Text(), " ", "")
+				line = strings.ReplaceAll(line, "\t", "")
+				if strutil.InStringSlice([]string{"10.0.0.1test", "10.0.0.1test1"}, line) {
+					found++
+				}
+			}
+			if found != 2 {
+				return fmt.Errorf("host was not added, found %d", found)
+			}
+			return nil
+		})
+	base.Cmd("run", "--rm", "--add-host", "10.0.0.1:testing.example.com", testutil.AlpineImage, "cat", "/etc/hosts").
+		AssertFail()
 
 	response := "This is the expected response for --add-host special IP test."
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		io.WriteString(w, response)
 	})
 	const hostPort = 8081
-	s := http.Server{Addr: fmt.Sprintf(":%d", hostPort), Handler: nil, ReadTimeout: 30 * time.Second}
+	s := http.Server{
+		Addr:        fmt.Sprintf(":%d", hostPort),
+		Handler:     nil,
+		ReadTimeout: 30 * time.Second,
+	}
 	go s.ListenAndServe()
 	defer s.Shutdown(context.Background())
-	base.Cmd("run", "--rm", "--add-host", "test:host-gateway", testutil.NginxAlpineImage, "curl", fmt.Sprintf("test:%d", hostPort)).AssertOutExactly(response)
+	base.Cmd("run", "--rm", "--add-host", "test:host-gateway", testutil.NginxAlpineImage, "curl", fmt.Sprintf("test:%d", hostPort)).
+		AssertOutExactly(response)
 }
 
 func TestRunAddHostWithCustomHostGatewayIP(t *testing.T) {
 	// Not parallelizable (https://github.com/containerd/nerdctl/issues/1127)
 	base := testutil.NewBase(t)
 	testutil.DockerIncompatible(t)
-	base.Cmd("run", "--rm", "--host-gateway-ip", "192.168.5.2", "--add-host", "test:host-gateway", testutil.AlpineImage, "cat", "/etc/hosts").AssertOutWithFunc(func(stdout string) error {
-		var found bool
-		sc := bufio.NewScanner(bytes.NewBufferString(stdout))
-		for sc.Scan() {
-			// removing spaces and tabs separating items
-			line := strings.ReplaceAll(sc.Text(), " ", "")
-			line = strings.ReplaceAll(line, "\t", "")
-			if strings.Contains(line, "192.168.5.2test") {
-				found = true
+	base.Cmd("run", "--rm", "--host-gateway-ip", "192.168.5.2", "--add-host", "test:host-gateway", testutil.AlpineImage, "cat", "/etc/hosts").
+		AssertOutWithFunc(func(stdout string) error {
+			var found bool
+			sc := bufio.NewScanner(bytes.NewBufferString(stdout))
+			for sc.Scan() {
+				// removing spaces and tabs separating items
+				line := strings.ReplaceAll(sc.Text(), " ", "")
+				line = strings.ReplaceAll(line, "\t", "")
+				if strings.Contains(line, "192.168.5.2test") {
+					found = true
+				}
 			}
-		}
-		if !found {
-			return errors.New("host was not added")
-		}
-		return nil
-	})
+			if !found {
+				return errors.New("host was not added")
+			}
+			return nil
+		})
 }
 
 func TestRunUlimit(t *testing.T) {
@@ -282,11 +320,15 @@ func TestRunUlimit(t *testing.T) {
 	ulimit := "nofile=622:622"
 	ulimit2 := "nofile=622:722"
 
-	base.Cmd("run", "--rm", "--ulimit", ulimit, testutil.AlpineImage, "sh", "-c", "ulimit -Sn").AssertOutExactly("622\n")
-	base.Cmd("run", "--rm", "--ulimit", ulimit, testutil.AlpineImage, "sh", "-c", "ulimit -Hn").AssertOutExactly("622\n")
+	base.Cmd("run", "--rm", "--ulimit", ulimit, testutil.AlpineImage, "sh", "-c", "ulimit -Sn").
+		AssertOutExactly("622\n")
+	base.Cmd("run", "--rm", "--ulimit", ulimit, testutil.AlpineImage, "sh", "-c", "ulimit -Hn").
+		AssertOutExactly("622\n")
 
-	base.Cmd("run", "--rm", "--ulimit", ulimit2, testutil.AlpineImage, "sh", "-c", "ulimit -Sn").AssertOutExactly("622\n")
-	base.Cmd("run", "--rm", "--ulimit", ulimit2, testutil.AlpineImage, "sh", "-c", "ulimit -Hn").AssertOutExactly("722\n")
+	base.Cmd("run", "--rm", "--ulimit", ulimit2, testutil.AlpineImage, "sh", "-c", "ulimit -Sn").
+		AssertOutExactly("622\n")
+	base.Cmd("run", "--rm", "--ulimit", ulimit2, testutil.AlpineImage, "sh", "-c", "ulimit -Hn").
+		AssertOutExactly("722\n")
 }
 
 func TestRunWithInit(t *testing.T) {
@@ -297,7 +339,8 @@ func TestRunWithInit(t *testing.T) {
 	base := testutil.NewBase(t)
 
 	container := testutil.Identifier(t)
-	base.Cmd("run", "-d", "--name", container, testutil.AlpineImage, "sleep", nerdtest.Infinity).AssertOK()
+	base.Cmd("run", "-d", "--name", container, testutil.AlpineImage, "sleep", nerdtest.Infinity).
+		AssertOK()
 	defer base.Cmd("rm", "-f", container).Run()
 
 	base.Cmd("stop", "--time=3", container).AssertOK()
@@ -339,7 +382,7 @@ func TestRunTTY(t *testing.T) {
 				cmd.WithPseudoTTY()
 				return cmd
 			},
-			Expected: test.Expects(0, nil, expect.Contains(sttyPartialOutput)),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains(sttyPartialOutput)),
 		},
 		{
 			Description: "stty with -t",
@@ -351,7 +394,7 @@ func TestRunTTY(t *testing.T) {
 				cmd.WithPseudoTTY()
 				return cmd
 			},
-			Expected: test.Expects(0, nil, expect.Contains(sttyPartialOutput)),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains(sttyPartialOutput)),
 		},
 		{
 			Description: "stty with -i",
@@ -392,13 +435,14 @@ func TestRunSigProxy(t *testing.T) {
 			},
 
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
+				// FIXME: os.Interrupt will likely not work on Windows
 				cmd := nerdtest.RunSigProxyContainer(os.Interrupt, true, nil, data, helpers)
 				err := cmd.Signal(os.Interrupt)
 				assert.NilError(helpers.T(), err)
 				return cmd
 			},
 
-			Expected: test.Expects(0, nil, expect.Contains(nerdtest.SignalCaught)),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains(nerdtest.SignalCaught)),
 		},
 		{
 			Description: "SigProxyTrue",
@@ -408,13 +452,19 @@ func TestRunSigProxy(t *testing.T) {
 			},
 
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-				cmd := nerdtest.RunSigProxyContainer(os.Interrupt, true, []string{"--sig-proxy=true"}, data, helpers)
+				cmd := nerdtest.RunSigProxyContainer(
+					os.Interrupt,
+					true,
+					[]string{"--sig-proxy=true"},
+					data,
+					helpers,
+				)
 				err := cmd.Signal(os.Interrupt)
 				assert.NilError(helpers.T(), err)
 				return cmd
 			},
 
-			Expected: test.Expects(0, nil, expect.Contains(nerdtest.SignalCaught)),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains(nerdtest.SignalCaught)),
 		},
 		{
 			Description: "SigProxyFalse",
@@ -424,13 +474,19 @@ func TestRunSigProxy(t *testing.T) {
 			},
 
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-				cmd := nerdtest.RunSigProxyContainer(os.Interrupt, true, []string{"--sig-proxy=false"}, data, helpers)
+				cmd := nerdtest.RunSigProxyContainer(
+					os.Interrupt,
+					true,
+					[]string{"--sig-proxy=false"},
+					data,
+					helpers,
+				)
 				err := cmd.Signal(os.Interrupt)
 				assert.NilError(helpers.T(), err)
 				return cmd
 			},
 
-			Expected: test.Expects(127, nil, expect.DoesNotContain(nerdtest.SignalCaught)),
+			Expected: test.Expects(expect.ExitCodeSignaled, nil, expect.DoesNotContain(nerdtest.SignalCaught)),
 		},
 	}
 
@@ -453,7 +509,8 @@ func TestRunWithFluentdLogDriver(t *testing.T) {
 
 	testContainerName := containerName + "test"
 	base.Cmd("run", "-d", "--log-driver", "fluentd", "--name", testContainerName, testutil.CommonImage,
-		"sh", "-c", "echo test").AssertOK()
+		"sh", "-c", "echo test").
+		AssertOK()
 	defer base.Cmd("rm", "-f", testContainerName).AssertOK()
 
 	inspectedContainer := base.InspectContainer(testContainerName)
@@ -506,9 +563,10 @@ func TestRunWithOOMScoreAdj(t *testing.T) {
 		t.Skip("test skipped for rootless containers.")
 	}
 	base := testutil.NewBase(t)
-	var score = "-42"
+	score := "-42"
 
-	base.Cmd("run", "--rm", "--oom-score-adj", score, testutil.AlpineImage, "cat", "/proc/self/oom_score_adj").AssertOutContains(score)
+	base.Cmd("run", "--rm", "--oom-score-adj", score, testutil.AlpineImage, "cat", "/proc/self/oom_score_adj").
+		AssertOutContains(score)
 }
 
 func TestRunWithDetachKeys(t *testing.T) {
@@ -520,9 +578,17 @@ func TestRunWithDetachKeys(t *testing.T) {
 
 	testCase.Command = func(data test.Data, helpers test.Helpers) test.TestableCommand {
 		// Run interactively and detach
-		cmd := helpers.Command("run", "-it", "--detach-keys=ctrl-a,ctrl-b", "--name", data.Identifier(), testutil.CommonImage)
-		cmd.WithPseudoTTY(func(f *os.File) error {
-			_, _ = f.WriteString("echo mark${NON}mark\n")
+		cmd := helpers.Command(
+			"run",
+			"-it",
+			"--detach-keys=ctrl-a,ctrl-b",
+			"--name",
+			data.Identifier(),
+			testutil.CommonImage,
+		)
+		cmd.WithPseudoTTY()
+		cmd.Feed(strings.NewReader("echo mark${NON}mark\n"))
+		cmd.WithFeeder(func() io.Reader {
 			// Because of the way we proxy stdin, we have to wait here, otherwise we detach before
 			// the rest of the input ever reaches the container
 			// Note that this only concerns nerdctl, as docker seems to behave ok LOCALLY.
@@ -532,8 +598,7 @@ func TestRunWithDetachKeys(t *testing.T) {
 			nerdtest.EnsureContainerStarted(helpers, data.Identifier())
 			// }
 			// ctrl+a and ctrl+b (see https://en.wikipedia.org/wiki/C0_and_C1_control_codes)
-			_, err := f.Write([]byte{1, 2})
-			return err
+			return bytes.NewReader([]byte{1, 2})
 		})
 
 		return cmd
@@ -545,8 +610,14 @@ func TestRunWithDetachKeys(t *testing.T) {
 			Errors:   []error{errors.New("detach keys")},
 			Output: expect.All(
 				expect.Contains("markmark"),
-				func(stdout string, info string, t *testing.T) {
-					assert.Assert(t, strings.Contains(helpers.Capture("inspect", "--format", "json", data.Identifier()), "\"Running\":true"))
+				func(stdout, info string, t *testing.T) {
+					assert.Assert(
+						t,
+						strings.Contains(
+							helpers.Capture("inspect", "--format", "json", data.Identifier()),
+							"\"Running\":true",
+						),
+					)
 				},
 			),
 		}
@@ -566,7 +637,8 @@ func TestRunWithTtyAndDetached(t *testing.T) {
 	// without -t, fail
 	base.Cmd("run", "-d", "--name", withoutTtyContainerName, imageName, "stty").AssertOK()
 	defer base.Cmd("container", "rm", "-f", withoutTtyContainerName).AssertOK()
-	base.Cmd("logs", withoutTtyContainerName).AssertCombinedOutContains("stty: standard input: Not a tty")
+	base.Cmd("logs", withoutTtyContainerName).
+		AssertCombinedOutContains("stty: standard input: Not a tty")
 	withoutTtyContainer := base.InspectContainer(withoutTtyContainerName)
 	assert.Equal(base.T, 1, withoutTtyContainer.State.ExitCode)
 
@@ -590,9 +662,19 @@ func TestIssue3568(t *testing.T) {
 
 	testCase.Command = func(data test.Data, helpers test.Helpers) test.TestableCommand {
 		// Run interactively and detach
-		cmd := helpers.Command("run", "--rm", "-it", "--detach-keys=ctrl-a,ctrl-b", "--name", data.Identifier(), testutil.CommonImage)
-		cmd.WithPseudoTTY(func(f *os.File) error {
-			_, _ = f.WriteString("echo mark${NON}mark\n")
+		cmd := helpers.Command(
+			"run",
+			"--rm",
+			"-it",
+			"--detach-keys=ctrl-a,ctrl-b",
+			"--name",
+			data.Identifier(),
+			testutil.CommonImage,
+		)
+
+		cmd.WithPseudoTTY()
+		cmd.Feed(strings.NewReader("echo mark${NON}mark\n"))
+		cmd.WithFeeder(func() io.Reader {
 			// Because of the way we proxy stdin, we have to wait here, otherwise we detach before
 			// the rest of the input ever reaches the container
 			// Note that this only concerns nerdctl, as docker seems to behave ok LOCALLY.
@@ -602,8 +684,7 @@ func TestIssue3568(t *testing.T) {
 			nerdtest.EnsureContainerStarted(helpers, data.Identifier())
 			// }
 			// ctrl+a and ctrl+b (see https://en.wikipedia.org/wiki/C0_and_C1_control_codes)
-			_, err := f.Write([]byte{1, 2})
-			return err
+			return bytes.NewReader([]byte{1, 2})
 		})
 
 		return cmd
@@ -615,8 +696,14 @@ func TestIssue3568(t *testing.T) {
 			Errors:   []error{errors.New("detach keys")},
 			Output: expect.All(
 				expect.Contains("markmark"),
-				func(stdout string, info string, t *testing.T) {
-					assert.Assert(t, strings.Contains(helpers.Capture("inspect", "--format", "json", data.Identifier()), "\"Running\":true"))
+				func(stdout, info string, t *testing.T) {
+					assert.Assert(
+						t,
+						strings.Contains(
+							helpers.Capture("inspect", "--format", "json", data.Identifier()),
+							"\"Running\":true",
+						),
+					)
 				},
 			),
 		}
@@ -639,7 +726,15 @@ func TestPortBindingWithCustomHost(t *testing.T) {
 		{
 			Description: "Issue #3539 - Access to a container running when 127.0.0.2 is specified in -p in rootless mode.",
 			Setup: func(data test.Data, helpers test.Helpers) {
-				helpers.Ensure("run", "-d", "--name", data.Identifier(), "-p", address+":80", testutil.NginxAlpineImage)
+				helpers.Ensure(
+					"run",
+					"-d",
+					"--name",
+					data.Identifier(),
+					"-p",
+					address+":80",
+					testutil.NginxAlpineImage,
+				)
 				nerdtest.EnsureContainerStarted(helpers, data.Identifier())
 			},
 			Cleanup: func(data test.Data, helpers test.Helpers) {
@@ -650,14 +745,20 @@ func TestPortBindingWithCustomHost(t *testing.T) {
 					ExitCode: 0,
 					Errors:   []error{},
 					Output: expect.All(
-						func(stdout string, info string, t *testing.T) {
+						func(stdout, info string, t *testing.T) {
 							resp, err := nettestutil.HTTPGet(address, 30, false)
 							assert.NilError(t, err)
 
 							respBody, err := io.ReadAll(resp.Body)
 							_ = resp.Body.Close()
 							assert.NilError(t, err)
-							assert.Assert(t, strings.Contains(string(respBody), testutil.NginxAlpineIndexHTMLSnippet))
+							assert.Assert(
+								t,
+								strings.Contains(
+									string(respBody),
+									testutil.NginxAlpineIndexHTMLSnippet,
+								),
+							)
 						},
 					),
 				}

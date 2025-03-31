@@ -91,7 +91,8 @@ func Login(ctx context.Context, stdout io.Writer, globalOptions *options.Global,
 		return fmt.Errorf("error saving credentials: %w", err)
 	}
 
-	// When the port is the https default (443), other clients cannot be expected to necessarily look up the variants with port
+	// When the port is the https default (443), other clients cannot be expected to necessarily look up the variants
+	// with port
 	// so save it both with and without port.
 	// This is the case for at least buildctl: https://github.com/containerd/nerdctl/issues/3748
 	if registryURL.Port() == dockerconfigresolver.StandardHTTPSPort {
@@ -107,7 +108,12 @@ func Login(ctx context.Context, stdout io.Writer, globalOptions *options.Global,
 	return err
 }
 
-func loginClientSide(ctx context.Context, globalOptions *options.Global, registryURL *dockerconfigresolver.RegistryURL, credentials *dockerconfigresolver.Credentials) (string, error) {
+func loginClientSide(
+	ctx context.Context,
+	globalOptions *options.Global,
+	registryURL *dockerconfigresolver.RegistryURL,
+	credentials *dockerconfigresolver.Credentials,
+) (string, error) {
 	host := registryURL.Host
 	var dOpts []dockerconfigresolver.Opt
 	if globalOptions.InsecureRegistry {
@@ -149,7 +155,8 @@ func loginClientSide(ctx context.Context, globalOptions *options.Global, registr
 	}
 	for i, rh := range regHosts {
 		err = tryLoginWithRegHost(ctx, rh)
-		if err != nil && globalOptions.InsecureRegistry && (errors.Is(err, http.ErrSchemeMismatch) || errutil.IsErrConnectionRefused(err)) {
+		if err != nil && globalOptions.InsecureRegistry &&
+			(errors.Is(err, http.ErrSchemeMismatch) || errutil.IsErrConnectionRefused(err)) {
 			rh.Scheme = "http"
 			err = tryLoginWithRegHost(ctx, rh)
 		}
@@ -169,7 +176,8 @@ func tryLoginWithRegHost(ctx context.Context, rh docker.RegistryHost) error {
 	if rh.Path == "/v2" {
 		// If the path is using /v2 endpoint but lacks trailing slash add it
 		// https://docs.docker.com/registry/spec/api/#detail. Acts as a workaround
-		// for containerd issue https://github.com/containerd/containerd/blob/2986d5b077feb8252d5d2060277a9c98ff8e009b/remotes/docker/config/hosts.go#L110
+		// for containerd issue
+		// https://github.com/containerd/containerd/blob/2986d5b077feb8252d5d2060277a9c98ff8e009b/remotes/docker/config/hosts.go#L110
 		rh.Path = "/v2/"
 	}
 	u := url.URL{

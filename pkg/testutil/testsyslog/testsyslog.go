@@ -30,7 +30,11 @@ import (
 	"go.farcloser.world/lepton/pkg/testutil/testca"
 )
 
-func StartServer(n, la string, done chan<- string, certs ...*testca.Cert) (addr string, sock io.Closer) {
+func StartServer(
+	n, la string,
+	done chan<- string,
+	certs ...*testca.Cert,
+) (addr string, sock io.Closer) {
 	if n == "udp" || n == "tcp" || n == "tcp+tls" {
 		la = "127.0.0.1:0"
 	} else {
@@ -47,7 +51,8 @@ func StartServer(n, la string, done chan<- string, certs ...*testca.Cert) (addr 
 		os.Remove(la)
 	}
 
-	if n == "udp" || n == "unixgram" {
+	switch n {
+	case "udp", "unixgram":
 		l, e := net.ListenPacket(n, la)
 		if e != nil {
 			log.Fatalf("startServer failed: %v", e)
@@ -55,7 +60,7 @@ func StartServer(n, la string, done chan<- string, certs ...*testca.Cert) (addr 
 		addr = l.LocalAddr().String()
 		sock = l
 		go runPacketSyslog(l, done)
-	} else if n == "tcp+tls" {
+	case "tcp+tls":
 		if len(certs) == 0 {
 			log.Fatalf("certificates required.")
 		}
@@ -75,7 +80,7 @@ func StartServer(n, la string, done chan<- string, certs ...*testca.Cert) (addr 
 		addr = l.Addr().String()
 		sock = l
 		go runStreamSyslog(l, done)
-	} else {
+	default:
 		l, e := net.Listen(n, la)
 		if e != nil {
 			log.Fatalf("startServer failed: %v", e)
@@ -84,6 +89,7 @@ func StartServer(n, la string, done chan<- string, certs ...*testca.Cert) (addr 
 		sock = l
 		go runStreamSyslog(l, done)
 	}
+
 	return addr, sock
 }
 

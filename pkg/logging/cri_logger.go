@@ -85,7 +85,7 @@ func viewLogsCRI(lvopts LogViewOptions, stdout, stderr io.Writer, stopChannel ch
 // Note that containerID is only needed when following the log, or else
 // just pass in empty string "".
 func ReadLogs(opts *LogViewOptions, stdout, stderr io.Writer, stopChannel chan os.Signal) error {
-	var logPath = opts.LogPath
+	logPath := opts.LogPath
 	evaluated, err := filepath.EvalSymlinks(logPath)
 	if err != nil {
 		return fmt.Errorf("failed to try resolving symlinks in path %q: %w", logPath, err)
@@ -242,7 +242,7 @@ var errMaximumWrite = errors.New("maximum write")
 // errShortWrite is returned when the message is not fully written.
 var errShortWrite = errors.New("short write")
 
-func newLogWriter(stdout io.Writer, stderr io.Writer, opts *LogViewOptions) *logWriter {
+func newLogWriter(stdout, stderr io.Writer, opts *LogViewOptions) *logWriter {
 	w := &logWriter{
 		stdout: stdout,
 		stderr: stderr,
@@ -257,7 +257,6 @@ func newLogWriter(stdout io.Writer, stderr io.Writer, opts *LogViewOptions) *log
 
 // writeLogs writes logs into stdout, stderr.
 func (w *logWriter) write(msg *logMessage, addPrefix bool) error {
-
 	// if msg.timestamp.Before(ts) {
 	//	// Skip the line because it's older than since
 	//	return nil

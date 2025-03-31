@@ -33,7 +33,7 @@ import (
 )
 
 func BuildCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "build [flags] PATH",
 		Short: "Build an image from a Dockerfile. Needs buildkitd to be running.",
 		Long: `Build an image from a Dockerfile. Needs buildkitd to be running.
@@ -51,17 +51,22 @@ If Dockerfile is not present and -f is not specified, it will look for Container
 	cmd.Flags().StringArray("build-arg", nil, "Set build-time variables")
 	cmd.Flags().Bool("no-cache", false, "Do not use cache when building the image")
 	cmd.Flags().StringP("output", "o", "", "Output destination (format: type=local,dest=path)")
-	cmd.Flags().String("progress", "auto", "Set type of progress output (auto, plain, tty). Use plain to show container output")
+	cmd.Flags().
+		String("progress", "auto", "Set type of progress output (auto, plain, tty). Use plain to show container output")
 	cmd.Flags().String("provenance", "", "Shorthand for \"--attest=type=provenance\"")
-	cmd.Flags().Bool("pull", false, "On true, always attempt to pull latest image version from remote. Default uses buildkit's default.")
+	cmd.Flags().
+		Bool("pull", false, "On true, always attempt to pull latest image version from remote. Default uses buildkit's default.")
 	cmd.Flags().StringArray("secret", nil, "Secret file to expose to the build: id=mysecret,src=/local/secret")
 	cmd.Flags().StringArray("allow", nil, "Allow extra privileged entitlement, e.g. network.host, security.insecure")
 	cmd.Flags().StringArray("attest", nil, "Attestation parameters (format: \"type=sbom,generator=image\")")
-	cmd.Flags().StringArray("ssh", nil, "SSH agent socket or keys to expose to the build (format: default|<id>[=<socket>|<key>[,<key>]])")
+	cmd.Flags().
+		StringArray("ssh", nil, "SSH agent socket or keys to expose to the build (format: default|<id>[=<socket>|<key>[,<key>]])")
 	cmd.Flags().BoolP("quiet", "q", false, "Suppress the build output and print image ID on success")
 	cmd.Flags().String("sbom", "", "Shorthand for \"--attest=type=sbom\"")
-	cmd.Flags().StringArray("cache-from", nil, "External cache sources (eg. user/app:cache, type=local,src=path/to/dir)")
-	cmd.Flags().StringArray("cache-to", nil, "Cache export destinations (eg. user/app:cache, type=local,dest=path/to/dir)")
+	cmd.Flags().
+		StringArray("cache-from", nil, "External cache sources (eg. user/app:cache, type=local,src=path/to/dir)")
+	cmd.Flags().
+		StringArray("cache-to", nil, "Cache export destinations (eg. user/app:cache, type=local,dest=path/to/dir)")
 	cmd.Flags().Bool("rm", true, "Remove intermediate containers after a successful build")
 	cmd.Flags().String("network", "default", "Set type of network for build (format:network=default|none|host)")
 	cmd.Flags().StringSlice("platform", []string{}, "Set target platform for build (e.g., \"amd64\", \"arm64\")")
@@ -69,12 +74,18 @@ If Dockerfile is not present and -f is not specified, it will look for Container
 	cmd.Flags().String("iidfile", "", "Write the image ID to the file")
 	cmd.Flags().StringArray("label", nil, "Set metadata for an image")
 
-	_ = cmd.RegisterFlagCompletionFunc("allow", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{"network.host", "security.insecure"}, cobra.ShellCompDirectiveNoFileComp
-	})
-	_ = cmd.RegisterFlagCompletionFunc("network", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{"default", "host", "none"}, cobra.ShellCompDirectiveNoFileComp
-	})
+	_ = cmd.RegisterFlagCompletionFunc(
+		"allow",
+		func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			return []string{"network.host", "security.insecure"}, cobra.ShellCompDirectiveNoFileComp
+		},
+	)
+	_ = cmd.RegisterFlagCompletionFunc(
+		"network",
+		func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			return []string{"default", "host", "none"}, cobra.ShellCompDirectiveNoFileComp
+		},
+	)
 	_ = cmd.RegisterFlagCompletionFunc("platform", completion.Platforms)
 
 	return cmd
@@ -281,7 +292,7 @@ func buildAction(cmd *cobra.Command, args []string) error {
 }
 
 // canonicalizeAttest is from https://github.com/docker/buildx/blob/v0.12/util/buildflags/attests.go#L13-L21
-func canonicalizeAttest(attestType string, in string) string {
+func canonicalizeAttest(attestType, in string) string {
 	if in == "" {
 		return ""
 	}

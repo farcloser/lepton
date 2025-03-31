@@ -25,6 +25,7 @@ import (
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/pkg/cio"
 	"github.com/containerd/log"
+	"golang.org/x/term"
 
 	"go.farcloser.world/lepton/pkg/api/options"
 	"go.farcloser.world/lepton/pkg/consoleutil"
@@ -93,7 +94,7 @@ func Attach(ctx context.Context, client *containerd.Client, req string, options 
 			return err
 		}
 		defer con.Reset()
-		if err := con.SetRaw(); err != nil {
+		if _, err := term.MakeRaw(int(con.Fd())); err != nil {
 			return fmt.Errorf("failed to set the console to raw mode: %w", err)
 		}
 		closer := func() {
@@ -103,7 +104,8 @@ func Attach(ctx context.Context, client *containerd.Client, req string, options 
 			// We cannot use container.Task(ctx, cio.Load) to get the IO here
 			// because the `cancel` field of the returned `*cio` is nil. [1]
 			//
-			// [1] https://github.com/containerd/containerd/blob/8f756bc8c26465bd93e78d9cd42082b66f276e10/cio/io.go#L358-L359
+			// [1]
+			// https://github.com/containerd/containerd/blob/8f756bc8c26465bd93e78d9cd42082b66f276e10/cio/io.go#L358-L359
 			io := task.IO()
 			if io == nil {
 				log.G(ctx).Errorf("got a nil io")

@@ -32,7 +32,9 @@ import (
 func TestReadRotatedJSONLog(t *testing.T) {
 	tmpDir := t.TempDir()
 	if runtime.GOOS == "windows" {
-		t.Skip("windows implementation does not seem to work right now and should be fixed: https://github.com/containerd/nerdctl/issues/3554")
+		t.Skip(
+			"windows implementation does not seem to work right now and should be fixed: https://github.com/containerd/nerdctl/issues/3554",
+		)
 	}
 	file, err := os.CreateTemp(tmpDir, "logfile")
 	if err != nil {
@@ -166,7 +168,6 @@ func TestReadJSONLogs(t *testing.T) {
 			stdoutBuf := bytes.NewBuffer(nil)
 			stderrBuf := bytes.NewBuffer(nil)
 			err = viewLogsJSONFileDirect(tc.logViewOptions, file.Name(), stdoutBuf, stderrBuf, stopChan)
-
 			if err != nil {
 				t.Fatal(err.Error())
 			}

@@ -147,7 +147,7 @@ func FormatLabels(labelMap map[string]string) string {
 
 // ToJSON return a string with the JSON representation of the interface{}
 // https://github.com/docker/compose/blob/v2/cmd/formatter/json.go#L31C4-L39
-func ToJSON(i interface{}, prefix string, indentation string) (string, error) {
+func ToJSON(i interface{}, prefix, indentation string) (string, error) {
 	buffer := &bytes.Buffer{}
 	encoder := json.NewEncoder(buffer)
 	encoder.SetEscapeHTML(false)

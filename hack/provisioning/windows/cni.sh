@@ -82,7 +82,7 @@ subnet="$(calculate_subnet "$GATEWAY" "$PREFIX_LEN")"
 # https://docs.microsoft.com/en-us/windows-server/networking/technologies/hcn/hcn-json-document-schemas
 bash -c 'cat >"'"${CNI_CONFIG_DIR}"'"/0-containerd-nat.conf <<EOF
 {
-    "cniVersion": "0.2.0",
+    "cniVersion": "1.0.0",
     "name": "nat",
     "type": "nat",
     "master": "Ethernet",

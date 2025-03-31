@@ -34,7 +34,13 @@ import (
 )
 
 // Commit will commit a container’s file changes or settings into a new image.
-func Commit(ctx context.Context, client *containerd.Client, rawRef string, req string, options options.ContainerCommit) error {
+func Commit(
+	ctx context.Context,
+	client *containerd.Client,
+	rawRef string,
+	req string,
+	options options.ContainerCommit,
+) error {
 	parsedReference, err := reference.Parse(rawRef)
 	if err != nil {
 		return err
@@ -108,7 +114,9 @@ func parseChanges(userChanges []string) (commit.Changes, error) {
 				return commit.Changes{}, fmt.Errorf("malformed json in change flag value %q", change)
 			}
 			if changes.Entrypoint != nil {
-				log.L.Warnf("multiple change flags supplied for the Entrypoint directive, overriding with last supplied")
+				log.L.Warnf(
+					"multiple change flags supplied for the Entrypoint directive, overriding with last supplied",
+				)
 			}
 			changes.Entrypoint = overrideEntrypoint
 		default: // TODO: Support the rest of the change directives

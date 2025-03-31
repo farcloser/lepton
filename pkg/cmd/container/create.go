@@ -66,7 +66,13 @@ import (
 )
 
 // Create will create a container.
-func Create(ctx context.Context, client *containerd.Client, args []string, netManager containerutil.NetworkOptionsManager, opts *options.ContainerCreate) (containerd.Container, func(), error) {
+func Create(
+	ctx context.Context,
+	client *containerd.Client,
+	args []string,
+	netManager containerutil.NetworkOptionsManager,
+	opts *options.ContainerCreate,
+) (containerd.Container, func(), error) {
 	// Acquire an exclusive lock on the volume store until we are done to avoid being raced by any other
 	// volume operations (or any other operation involving volume manipulation)
 	volStore, err := volume.Store(opts.GOptions.Namespace, opts.GOptions.DataRoot, opts.GOptions.Address)
@@ -119,7 +125,14 @@ func Create(ctx context.Context, client *containerd.Client, args []string, netMa
 		oci.WithDefaultSpec(),
 	)
 
-	platformOpts, err := setPlatformOptions(ctx, client, id, netManager.NetworkOptions().UTSNamespace, &internalLabels, opts)
+	platformOpts, err := setPlatformOptions(
+		ctx,
+		client,
+		id,
+		netManager.NetworkOptions().UTSNamespace,
+		&internalLabels,
+		opts,
+	)
 	if err != nil {
 		return nil, generateRemoveStateDirFunc(ctx, id, internalLabels), err
 	}
@@ -198,7 +211,13 @@ func Create(ctx context.Context, client *containerd.Client, args []string, netMa
 
 	if opts.Interactive {
 		if opts.Detach {
-			return nil, generateRemoveStateDirFunc(ctx, id, internalLabels), errors.New("currently flag -i and -d cannot be specified together (FIXME)")
+			return nil, generateRemoveStateDirFunc(
+					ctx,
+					id,
+					internalLabels,
+				), errors.New(
+					"currently flag -i and -d cannot be specified together (FIXME)",
+				)
 		}
 	}
 
@@ -207,7 +226,13 @@ func Create(ctx context.Context, client *containerd.Client, args []string, netMa
 	}
 
 	var mountOpts []oci.SpecOpts
-	mountOpts, internalLabels.anonVolumes, internalLabels.mountPoints, err = generateMountOpts(ctx, client, ensuredImage, volStore, opts)
+	mountOpts, internalLabels.anonVolumes, internalLabels.mountPoints, err = generateMountOpts(
+		ctx,
+		client,
+		ensuredImage,
+		volStore,
+		opts,
+	)
 	if err != nil {
 		return nil, generateRemoveStateDirFunc(ctx, id, internalLabels), err
 	}
@@ -219,7 +244,14 @@ func Create(ctx context.Context, client *containerd.Client, args []string, netMa
 	// 1, run --name demo -it imagename
 	// 2, ctrl + c to stop demo container
 	// 3, start/restart demo
-	logConfig, err := generateLogConfig(dataStore, id, opts.LogDriver, opts.LogOpt, opts.GOptions.Namespace, opts.GOptions.Address)
+	logConfig, err := generateLogConfig(
+		dataStore,
+		id,
+		opts.LogDriver,
+		opts.LogOpt,
+		opts.GOptions.Namespace,
+		opts.GOptions.Address,
+	)
 	if err != nil {
 		return nil, generateRemoveStateDirFunc(ctx, id, internalLabels), err
 	}
@@ -236,19 +268,42 @@ func Create(ctx context.Context, client *containerd.Client, args []string, netMa
 	cOpts = append(cOpts, restartOpts...)
 
 	if err = netManager.VerifyNetworkOptions(ctx); err != nil {
-		return nil, generateRemoveStateDirFunc(ctx, id, internalLabels), fmt.Errorf("failed to verify networking settings: %w", err)
+		return nil, generateRemoveStateDirFunc(
+				ctx,
+				id,
+				internalLabels,
+			), fmt.Errorf(
+				"failed to verify networking settings: %w",
+				err,
+			)
 	}
 
 	netOpts, netNewContainerOpts, err := netManager.ContainerNetworkingOpts(ctx, id)
 	if err != nil {
-		return nil, generateRemoveOrphanedDirsFunc(ctx, id, dataStore, internalLabels), fmt.Errorf("failed to generate networking spec options: %w", err)
+		return nil, generateRemoveOrphanedDirsFunc(
+				ctx,
+				id,
+				dataStore,
+				internalLabels,
+			), fmt.Errorf(
+				"failed to generate networking spec options: %w",
+				err,
+			)
 	}
 	specOpts = append(specOpts, netOpts...)
 	cOpts = append(cOpts, netNewContainerOpts...)
 
 	netLabelOpts, err := netManager.InternalNetworkingOptionLabels(ctx)
 	if err != nil {
-		return nil, generateRemoveOrphanedDirsFunc(ctx, id, dataStore, internalLabels), fmt.Errorf("failed to generate internal networking labels: %w", err)
+		return nil, generateRemoveOrphanedDirsFunc(
+				ctx,
+				id,
+				dataStore,
+				internalLabels,
+			), fmt.Errorf(
+				"failed to generate internal networking labels: %w",
+				err,
+			)
 	}
 
 	envs = append(envs, "HOSTNAME="+netLabelOpts.Hostname)
@@ -315,7 +370,11 @@ func Create(ctx context.Context, client *containerd.Client, args []string, netMa
 	internalLabels.name = opts.Name
 	internalLabels.pidFile = opts.PidFile
 
-	extraHosts, err := containerutil.ParseExtraHosts(netManager.NetworkOptions().AddHost, opts.GOptions.HostGatewayIP, ":")
+	extraHosts, err := containerutil.ParseExtraHosts(
+		netManager.NetworkOptions().AddHost,
+		opts.GOptions.HostGatewayIP,
+		":",
+	)
 	if err != nil {
 		return nil, generateRemoveOrphanedDirsFunc(ctx, id, dataStore, internalLabels), err
 	}
@@ -354,13 +413,29 @@ func Create(ctx context.Context, client *containerd.Client, args []string, netMa
 		if netSetupErr != nil {
 			returnedError = netSetupErr // mutually exclusive
 		}
-		return nil, generateGcFunc(ctx, c, opts.GOptions.Namespace, id, opts.Name, dataStore, containerErr, containerNameStore, netManager, internalLabels), returnedError
+		return nil, generateGcFunc(
+			ctx,
+			c,
+			opts.GOptions.Namespace,
+			id,
+			opts.Name,
+			dataStore,
+			containerErr,
+			containerNameStore,
+			netManager,
+			internalLabels,
+		), returnedError
 	}
 
 	return c, nil, nil
 }
 
-func generateRootfsOpts(args []string, id string, ensured *imgutil.EnsuredImage, options *options.ContainerCreate) (opts []oci.SpecOpts, cOpts []containerd.NewContainerOpts, err error) {
+func generateRootfsOpts(
+	args []string,
+	id string,
+	ensured *imgutil.EnsuredImage,
+	options *options.ContainerCreate,
+) (opts []oci.SpecOpts, cOpts []containerd.NewContainerOpts, err error) {
 	if !options.Rootfs {
 		cOpts = append(cOpts,
 			containerd.WithImage(ensured.Image),
@@ -429,14 +504,19 @@ func generateRootfsOpts(args []string, id string, ensured *imgutil.EnsuredImage,
 	if options.Systemd == "always" || (options.Systemd == "true" && isEntryPointSystemd) {
 		if options.Privileged {
 			securityOptsMap := utils.KeyValueStringsToMap(strutil.DedupeStrSlice(options.SecurityOpt))
-			privilegedWithoutHostDevices, err := maputil.MapBoolValueAsOpt(securityOptsMap, "privileged-without-host-devices")
+			privilegedWithoutHostDevices, err := maputil.MapBoolValueAsOpt(
+				securityOptsMap,
+				"privileged-without-host-devices",
+			)
 			if err != nil {
 				return nil, nil, err
 			}
 
 			// See: https://github.com/containers/podman/issues/15878
 			if !privilegedWithoutHostDevices {
-				return nil, nil, errors.New("if --privileged is used with systemd `--security-opt privileged-without-host-devices` must also be used")
+				return nil, nil, errors.New(
+					"if --privileged is used with systemd `--security-opt privileged-without-host-devices` must also be used",
+				)
 			}
 		}
 
@@ -511,7 +591,8 @@ func withOCIHook(cmd string, args []string) (oci.SpecOpts, error) {
 			//     - args: {"--data-root=/foo", "internal", "oci-hook"}
 			//   - New:
 			//     - cmd:  "/usr/bin/nsenter"
-			//     - args: {"-n/run/user/1000/containerd-rootless/netns", "-F", "--", "/usr/local/bin/<ROOT_NAME>", "--data-root=/foo", "internal", "oci-hook"}
+			// - args: {"-n/run/user/1000/containerd-rootless/netns", "-F", "--", "/usr/local/bin/<ROOT_NAME>",
+			// "--data-root=/foo", "internal", "oci-hook"}
 			oldCmd, oldArgs := cmd, args
 			cmd, err = exec.LookPath("nsenter")
 			if err != nil {
@@ -543,7 +624,10 @@ func withOCIHook(cmd string, args []string) (oci.SpecOpts, error) {
 	}, nil
 }
 
-func withContainerLabels(label, labelFile []string, ensuredImage *imgutil.EnsuredImage) ([]containerd.NewContainerOpts, error) {
+func withContainerLabels(
+	label, labelFile []string,
+	ensuredImage *imgutil.EnsuredImage,
+) ([]containerd.NewContainerOpts, error) {
 	var opts []containerd.NewContainerOpts
 
 	// add labels defined by image
@@ -875,7 +959,13 @@ func writeCIDFile(path, id string) error {
 }
 
 // generateLogConfig creates a LogConfig for the current container store
-func generateLogConfig(dataStore string, id string, logDriver string, logOpt []string, ns, address string) (logConfig logging.LogConfig, err error) {
+func generateLogConfig(
+	dataStore string,
+	id string,
+	logDriver string,
+	logOpt []string,
+	ns, address string,
+) (logConfig logging.LogConfig, err error) {
 	var u *url.URL
 	if u, err = url.Parse(logDriver); err == nil && u.Scheme != "" {
 		logConfig.LogURI = logDriver
@@ -944,7 +1034,15 @@ func generateRemoveOrphanedDirsFunc(ctx context.Context, id, dataStore string, i
 	}
 }
 
-func generateGcFunc(ctx context.Context, container containerd.Container, ns, id, name, dataStore string, containerErr error, containerNameStore namestore.NameStore, netManager containerutil.NetworkOptionsManager, internalLabels internalLabels) func() {
+func generateGcFunc(
+	ctx context.Context,
+	container containerd.Container,
+	ns, id, name, dataStore string,
+	containerErr error,
+	containerNameStore namestore.NameStore,
+	netManager containerutil.NetworkOptionsManager,
+	internalLabels internalLabels,
+) func() {
 	return func() {
 		if containerErr == nil {
 			netGcErr := netManager.CleanupNetworking(ctx, container)
@@ -978,11 +1076,15 @@ func generateGcFunc(ctx context.Context, container containerd.Container, ns, id,
 		if name != "" {
 			var errE error
 			if containerNameStore, errE = namestore.New(dataStore, ns); errE != nil {
-				log.G(ctx).WithError(errE).Warnf("failed to instantiate container name store during cleanup for container %q", id)
+				log.G(ctx).
+					WithError(errE).
+					Warnf("failed to instantiate container name store during cleanup for container %q", id)
 			}
 			// Double-releasing may happen with containers started with --rm, so, ignore NotFound errors
 			if errE := containerNameStore.Release(name, id); errE != nil && !errors.Is(errE, errs.ErrNotFound) {
-				log.G(ctx).WithError(errE).Warnf("failed to release container name store for container %q (%s)", name, id)
+				log.G(ctx).
+					WithError(errE).
+					Warnf("failed to release container name store for container %q (%s)", name, id)
 			}
 		}
 	}

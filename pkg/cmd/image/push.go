@@ -57,17 +57,24 @@ func Push(ctx context.Context, client *containerd.Client, rawRef string, options
 	pushRef := ref
 	if !options.AllPlatforms {
 		pushRef = ref + "-tmp-reduced-platform"
-		// Push fails with "400 Bad Request" when the manifest is multi-platform, but we do not locally have multi-platform blobs.
+		// Push fails with "400 Bad Request" when the manifest is multi-platform, but we do not locally have
+		// multi-platform blobs.
 		// So we create a tmp reduced-platform image to avoid the error.
 		platImg, err := converter.Convert(ctx, client, pushRef, ref, converter.WithPlatform(platMC))
 		if err != nil {
 			if len(options.Platforms) == 0 {
 				return fmt.Errorf("failed to create a tmp single-platform image %q: %w", pushRef, err)
 			}
-			return fmt.Errorf("failed to create a tmp reduced-platform image %q (platform=%v): %w", pushRef, options.Platforms, err)
+			return fmt.Errorf(
+				"failed to create a tmp reduced-platform image %q (platform=%v): %w",
+				pushRef,
+				options.Platforms,
+				err,
+			)
 		}
 		defer client.ImageService().Delete(ctx, platImg.Name, images.SynchronousDelete())
-		log.G(ctx).Infof("pushing as a reduced-platform image (%s, %s)", platImg.Target.MediaType, platImg.Target.Digest)
+		log.G(ctx).
+			Infof("pushing as a reduced-platform image (%s, %s)", platImg.Target.MediaType, platImg.Target.Digest)
 	}
 
 	// In order to push images where most layers are the same but the
@@ -78,7 +85,18 @@ func Push(ctx context.Context, client *containerd.Client, rawRef string, options
 	pushTracker := docker.NewInMemoryTracker()
 
 	pushFunc := func(r remotes.Resolver) error {
-		return push.Push(ctx, client, r, pushTracker, options.Stdout, pushRef, ref, platMC, options.AllowNondistributableArtifacts, options.Quiet)
+		return push.Push(
+			ctx,
+			client,
+			r,
+			pushTracker,
+			options.Stdout,
+			pushRef,
+			ref,
+			platMC,
+			options.AllowNondistributableArtifacts,
+			options.Quiet,
+		)
 	}
 
 	var dOpts []dockerconfigresolver.Opt
@@ -100,12 +118,15 @@ func Push(ctx context.Context, client *containerd.Client, rawRef string, options
 
 	resolver := docker.NewResolver(resolverOpts)
 	if err = pushFunc(resolver); err != nil {
-		// In some circumstance (e.g. people just use 80 port to support pure http), the error will contain message like "dial tcp <port>: connection refused"
+		// In some circumstance (e.g. people just use 80 port to support pure http), the error will contain message like
+		// "dial tcp <port>: connection refused"
 		if !errors.Is(err, http.ErrSchemeMismatch) && !errutil.IsErrConnectionRefused(err) {
 			return err
 		}
 		if options.GOptions.InsecureRegistry {
-			log.G(ctx).WithError(err).Warnf("server %q does not seem to support HTTPS, falling back to plain HTTP", refDomain)
+			log.G(ctx).
+				WithError(err).
+				Warnf("server %q does not seem to support HTTPS, falling back to plain HTTP", refDomain)
 			dOpts = append(dOpts, dockerconfigresolver.WithPlainHTTP(true))
 			resolver, err = dockerconfigresolver.New(ctx, refDomain, dOpts...)
 			if err != nil {
@@ -114,7 +135,8 @@ func Push(ctx context.Context, client *containerd.Client, rawRef string, options
 			return pushFunc(resolver)
 		}
 		log.G(ctx).WithError(err).Errorf("server %q does not seem to support HTTPS", refDomain)
-		log.G(ctx).Info("Hint: you may want to try --insecure-registry to allow plain HTTP (if you are in a trusted network)")
+		log.G(ctx).
+			Info("Hint: you may want to try --insecure-registry to allow plain HTTP (if you are in a trusted network)")
 		return err
 	}
 

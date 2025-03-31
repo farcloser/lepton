@@ -62,7 +62,12 @@ func NewStatusError(id string, status containerd.ProcessStatus) error {
 }
 
 // Remove removes a list of `containers`.
-func Remove(ctx context.Context, client *containerd.Client, containers []string, options options.ContainerRemove) error {
+func Remove(
+	ctx context.Context,
+	client *containerd.Client,
+	containers []string,
+	options options.ContainerRemove,
+) error {
 	walker := &containerwalker.ContainerWalker{
 		Client: client,
 		OnFound: func(ctx context.Context, found containerwalker.Found) error {
@@ -89,7 +94,8 @@ func Remove(ctx context.Context, client *containerd.Client, containers []string,
 }
 
 // RemoveContainer removes a container from containerd store.
-// It will first retrieve system objects (namestore, etcetera), then assess whether we should remove the container or not
+// It will first retrieve system objects (namestore, etcetera), then assess whether we should remove the container or
+// not
 // based of "force" and the status of the task.
 // If we are to delete, it then kills and delete the task.
 // If task removal fails, we stop (except if it was just "NotFound").
@@ -98,7 +104,14 @@ func Remove(ctx context.Context, client *containerd.Client, containers []string,
 // - delete the container
 // - then and ONLY then, on a successful container remove, clean things-up on our side (volume store, etcetera)
 // If you do need to add more cleanup, please do so at the bottom of the defer function
-func RemoveContainer(ctx context.Context, c containerd.Container, globalOptions *options.Global, force bool, removeAnonVolumes bool, client *containerd.Client) (retErr error) {
+func RemoveContainer(
+	ctx context.Context,
+	c containerd.Container,
+	globalOptions *options.Global,
+	force bool,
+	removeAnonVolumes bool,
+	client *containerd.Client,
+) (retErr error) {
 	// Get labels
 	containerLabels, err := c.Labels(ctx)
 	if err != nil {

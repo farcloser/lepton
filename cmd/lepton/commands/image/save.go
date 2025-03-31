@@ -32,7 +32,7 @@ import (
 )
 
 func SaveCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:               "save",
 		Args:              cobra.MinimumNArgs(1),
 		Short:             "Save one or more images to a tar archive (streamed to STDOUT by default)",

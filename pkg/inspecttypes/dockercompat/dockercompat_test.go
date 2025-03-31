@@ -359,7 +359,8 @@ func TestNetworkSettingsFromNative(t *testing.T) {
 				},
 			},
 		},
-		// Given native.NetNS with single Interface without Port Annotations, Return valid NetworkSettings w/ empty Ports
+		// Given native.NetNS with single Interface without Port Annotations, Return valid NetworkSettings w/ empty
+		// Ports
 		//   UseCase: Inspect a Running Container without published ports
 		{
 			name: "Given NetNS with single Interface without Port Annotations, Return valid NetworkSettings w/ empty Ports",

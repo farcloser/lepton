@@ -57,7 +57,11 @@ func generateSecurityOpt(listenerPath string) oci.SpecOpts {
 	}
 }
 
-func GenerateBypass4netnsOpts(securityOptsMaps map[string]string, annotationsMap map[string]string, id string) ([]oci.SpecOpts, error) {
+func GenerateBypass4netnsOpts(
+	securityOptsMaps map[string]string,
+	annotationsMap map[string]string,
+	id string,
+) ([]oci.SpecOpts, error) {
 	b4nn, ok := annotationsMap[annotations.Bypass4netns]
 	if !ok {
 		return nil, nil

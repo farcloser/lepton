@@ -84,40 +84,60 @@ func TestIsMatchingRuntimePlatform(t *testing.T) {
 		{
 			name: "Image is shareable when Runtime and build platform match for os, arch and variant",
 			mock: func(mockParser *MockParse) {
-				mockParser.EXPECT().Parse("test").Return(specs.Platform{OS: "mockOS", Architecture: "mockArch", Variant: "mockVariant"}, nil)
-				mockParser.EXPECT().DefaultSpec().Return(specs.Platform{OS: "mockOS", Architecture: "mockArch", Variant: "mockVariant"})
+				mockParser.EXPECT().
+					Parse("test").
+					Return(specs.Platform{OS: "mockOS", Architecture: "mockArch", Variant: "mockVariant"}, nil)
+				mockParser.EXPECT().
+					DefaultSpec().
+					Return(specs.Platform{OS: "mockOS", Architecture: "mockArch", Variant: "mockVariant"})
 			},
 			want: true,
 		},
 		{
 			name: "Image is shareable when Runtime and build platform match for os, arch. Variant is not defined",
 			mock: func(mockParser *MockParse) {
-				mockParser.EXPECT().Parse("test").Return(specs.Platform{OS: "mockOS", Architecture: "mockArch", Variant: ""}, nil)
-				mockParser.EXPECT().DefaultSpec().Return(specs.Platform{OS: "mockOS", Architecture: "mockArch", Variant: "mockVariant"})
+				mockParser.EXPECT().
+					Parse("test").
+					Return(specs.Platform{OS: "mockOS", Architecture: "mockArch", Variant: ""}, nil)
+				mockParser.EXPECT().
+					DefaultSpec().
+					Return(specs.Platform{OS: "mockOS", Architecture: "mockArch", Variant: "mockVariant"})
 			},
 			want: true,
 		},
 		{
 			name: "Image is not shareable when Runtime and build platform donot math OS",
 			mock: func(mockParser *MockParse) {
-				mockParser.EXPECT().Parse("test").Return(specs.Platform{OS: "OS", Architecture: "mockArch", Variant: ""}, nil)
-				mockParser.EXPECT().DefaultSpec().Return(specs.Platform{OS: "mockOS", Architecture: "mockArch", Variant: "mockVariant"})
+				mockParser.EXPECT().
+					Parse("test").
+					Return(specs.Platform{OS: "OS", Architecture: "mockArch", Variant: ""}, nil)
+				mockParser.EXPECT().
+					DefaultSpec().
+					Return(specs.Platform{OS: "mockOS", Architecture: "mockArch", Variant: "mockVariant"})
 			},
 			want: false,
 		},
 		{
 			name: "Image is not shareable when Runtime and build platform donot math Arch",
 			mock: func(mockParser *MockParse) {
-				mockParser.EXPECT().Parse("test").Return(specs.Platform{OS: "mockOS", Architecture: "Arch", Variant: ""}, nil)
-				mockParser.EXPECT().DefaultSpec().Return(specs.Platform{OS: "mockOS", Architecture: "mockArch", Variant: "mockVariant"})
+				mockParser.EXPECT().
+					Parse("test").
+					Return(specs.Platform{OS: "mockOS", Architecture: "Arch", Variant: ""}, nil)
+				mockParser.EXPECT().
+					DefaultSpec().
+					Return(specs.Platform{OS: "mockOS", Architecture: "mockArch", Variant: "mockVariant"})
 			},
 			want: false,
 		},
 		{
 			name: "Image is not shareable when Runtime and build platform donot math Variant",
 			mock: func(mockParser *MockParse) {
-				mockParser.EXPECT().Parse("test").Return(specs.Platform{OS: "mockOS", Architecture: "mockArch", Variant: "Variant"}, nil)
-				mockParser.EXPECT().DefaultSpec().Return(specs.Platform{OS: "mockOS", Architecture: "mockArch", Variant: "mockVariant"})
+				mockParser.EXPECT().
+					Parse("test").
+					Return(specs.Platform{OS: "mockOS", Architecture: "mockArch", Variant: "Variant"}, nil)
+				mockParser.EXPECT().
+					DefaultSpec().
+					Return(specs.Platform{OS: "mockOS", Architecture: "mockArch", Variant: "mockVariant"})
 			},
 			want: false,
 		},
@@ -154,8 +174,12 @@ func TestIsBuildPlatformDefault(t *testing.T) {
 			name:     "Image is shareable when Runtime and build platform match for os, arch and variant",
 			platform: []string{"test"},
 			mock: func(mockParser *MockParse) {
-				mockParser.EXPECT().Parse("test").Return(specs.Platform{OS: "mockOS", Architecture: "mockArch", Variant: "mockVariant"}, nil)
-				mockParser.EXPECT().DefaultSpec().Return(specs.Platform{OS: "mockOS", Architecture: "mockArch", Variant: "mockVariant"})
+				mockParser.EXPECT().
+					Parse("test").
+					Return(specs.Platform{OS: "mockOS", Architecture: "mockArch", Variant: "mockVariant"}, nil)
+				mockParser.EXPECT().
+					DefaultSpec().
+					Return(specs.Platform{OS: "mockOS", Architecture: "mockArch", Variant: "mockVariant"})
 			},
 			want: true,
 		},
@@ -163,8 +187,12 @@ func TestIsBuildPlatformDefault(t *testing.T) {
 			name:     "Image is not shareable when Runtime build platform dont match",
 			platform: []string{"test"},
 			mock: func(mockParser *MockParse) {
-				mockParser.EXPECT().Parse("test").Return(specs.Platform{OS: "OS", Architecture: "mockArch", Variant: "mockVariant"}, nil)
-				mockParser.EXPECT().DefaultSpec().Return(specs.Platform{OS: "mockOS", Architecture: "mockArch", Variant: "mockVariant"})
+				mockParser.EXPECT().
+					Parse("test").
+					Return(specs.Platform{OS: "OS", Architecture: "mockArch", Variant: "mockVariant"}, nil)
+				mockParser.EXPECT().
+					DefaultSpec().
+					Return(specs.Platform{OS: "mockOS", Architecture: "mockArch", Variant: "mockVariant"})
 			},
 			want: false,
 		},

@@ -33,7 +33,8 @@ func TestInspectProcessContainerContainsLabel(t *testing.T) {
 	base := testutil.NewBase(t)
 	defer base.Cmd("rm", "-f", testContainer).Run()
 
-	base.Cmd("run", "-d", "--name", testContainer, "--label", "foo=foo", "--label", "bar=bar", testutil.NginxAlpineImage).AssertOK()
+	base.Cmd("run", "-d", "--name", testContainer, "--label", "foo=foo", "--label", "bar=bar", testutil.NginxAlpineImage).
+		AssertOK()
 	base.EnsureContainerStarted(testContainer)
 	inspect := base.InspectContainer(testContainer)
 	lbs := inspect.Config.Labels
@@ -54,7 +55,8 @@ func TestInspectHyperVContainerContainsLabel(t *testing.T) {
 	base := testutil.NewBase(t)
 	defer base.Cmd("rm", "-f", testContainer).Run()
 
-	base.Cmd("run", "-d", "--name", testContainer, "--isolation", "hyperv", "--label", "foo=foo", "--label", "bar=bar", testutil.NginxAlpineImage).AssertOK()
+	base.Cmd("run", "-d", "--name", testContainer, "--isolation", "hyperv", "--label", "foo=foo", "--label", "bar=bar", testutil.NginxAlpineImage).
+		AssertOK()
 	base.EnsureContainerStarted(testContainer)
 	inspect := base.InspectContainer(testContainer)
 	lbs := inspect.Config.Labels

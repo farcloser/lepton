@@ -41,7 +41,16 @@ func TestCommit(t *testing.T) {
 			},
 			Setup: func(data test.Data, helpers test.Helpers) {
 				identifier := data.Identifier()
-				helpers.Ensure("run", "--quiet", "-d", "--name", identifier, testutil.CommonImage, "sleep", nerdtest.Infinity)
+				helpers.Ensure(
+					"run",
+					"--quiet",
+					"-d",
+					"--name",
+					identifier,
+					testutil.CommonImage,
+					"sleep",
+					nerdtest.Infinity,
+				)
 				helpers.Ensure("exec", identifier, "sh", "-euxc", `echo hello-test-commit > /foo`)
 			},
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
@@ -54,7 +63,7 @@ func TestCommit(t *testing.T) {
 					identifier, identifier)
 				return helpers.Command("run", "--rm", identifier)
 			},
-			Expected: test.Expects(0, nil, expect.Equals("hello-test-commit\n")),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Equals("hello-test-commit\n")),
 		},
 		{
 			Description: "no pause",
@@ -66,7 +75,16 @@ func TestCommit(t *testing.T) {
 			},
 			Setup: func(data test.Data, helpers test.Helpers) {
 				identifier := data.Identifier()
-				helpers.Ensure("run", "--quiet", "-d", "--name", identifier, testutil.CommonImage, "sleep", nerdtest.Infinity)
+				helpers.Ensure(
+					"run",
+					"--quiet",
+					"-d",
+					"--name",
+					identifier,
+					testutil.CommonImage,
+					"sleep",
+					nerdtest.Infinity,
+				)
 				nerdtest.EnsureContainerStarted(helpers, identifier)
 				helpers.Ensure("exec", identifier, "sh", "-euxc", `echo hello-test-commit > /foo`)
 			},
@@ -80,7 +98,7 @@ func TestCommit(t *testing.T) {
 					identifier, identifier)
 				return helpers.Command("run", "--rm", identifier)
 			},
-			Expected: test.Expects(0, nil, expect.Equals("hello-test-commit\n")),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Equals("hello-test-commit\n")),
 		},
 	}
 

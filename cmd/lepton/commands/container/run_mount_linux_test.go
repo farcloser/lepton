@@ -244,7 +244,8 @@ RUN echo -n "rev0" > /mnt/file
 
 	base.Cmd("volume", "create", volumeName)
 	runContainer := func() {
-		base.Cmd("run", "-d", "--name", containerName, "-v", volumeName+":/mnt", imageName, "sleep", nerdtest.Infinity).AssertOK()
+		base.Cmd("run", "-d", "--name", containerName, "-v", volumeName+":/mnt", imageName, "sleep", nerdtest.Infinity).
+			AssertOK()
 	}
 	runContainer()
 	base.EnsureContainerStarted(containerName)
@@ -279,10 +280,13 @@ func TestRunTmpfs(t *testing.T) {
 			return nil
 		}
 	}
-	base.Cmd("run", "--rm", "--tmpfs", "/tmp", testutil.AlpineImage, "grep", "/tmp", "/proc/mounts").AssertOutWithFunc(f([]string{"rw", "nosuid", "nodev", "noexec"}, nil))
-	base.Cmd("run", "--rm", "--tmpfs", "/tmp:size=64m,exec", testutil.AlpineImage, "grep", "/tmp", "/proc/mounts").AssertOutWithFunc(f([]string{"rw", "nosuid", "nodev", "size=65536k"}, []string{"noexec"}))
+	base.Cmd("run", "--rm", "--tmpfs", "/tmp", testutil.AlpineImage, "grep", "/tmp", "/proc/mounts").
+		AssertOutWithFunc(f([]string{"rw", "nosuid", "nodev", "noexec"}, nil))
+	base.Cmd("run", "--rm", "--tmpfs", "/tmp:size=64m,exec", testutil.AlpineImage, "grep", "/tmp", "/proc/mounts").
+		AssertOutWithFunc(f([]string{"rw", "nosuid", "nodev", "size=65536k"}, []string{"noexec"}))
 	// for https://github.com/containerd/nerdctl/issues/594
-	base.Cmd("run", "--rm", "--tmpfs", "/dev/shm:rw,exec,size=1g", testutil.AlpineImage, "grep", "/dev/shm", "/proc/mounts").AssertOutWithFunc(f([]string{"rw", "nosuid", "nodev", "size=1048576k"}, []string{"noexec"}))
+	base.Cmd("run", "--rm", "--tmpfs", "/dev/shm:rw,exec,size=1g", testutil.AlpineImage, "grep", "/dev/shm", "/proc/mounts").
+		AssertOutWithFunc(f([]string{"rw", "nosuid", "nodev", "size=1048576k"}, []string{"noexec"}))
 }
 
 func TestRunBindMountTmpfs(t *testing.T) {
@@ -303,8 +307,10 @@ func TestRunBindMountTmpfs(t *testing.T) {
 			return nil
 		}
 	}
-	base.Cmd("run", "--rm", "--mount", "type=tmpfs,target=/tmp", testutil.AlpineImage, "grep", "/tmp", "/proc/mounts").AssertOutWithFunc(f([]string{"rw", "nosuid", "nodev", "noexec"}))
-	base.Cmd("run", "--rm", "--mount", "type=tmpfs,target=/tmp,tmpfs-size=64m", testutil.AlpineImage, "grep", "/tmp", "/proc/mounts").AssertOutWithFunc(f([]string{"rw", "nosuid", "nodev", "size=65536k"}))
+	base.Cmd("run", "--rm", "--mount", "type=tmpfs,target=/tmp", testutil.AlpineImage, "grep", "/tmp", "/proc/mounts").
+		AssertOutWithFunc(f([]string{"rw", "nosuid", "nodev", "noexec"}))
+	base.Cmd("run", "--rm", "--mount", "type=tmpfs,target=/tmp,tmpfs-size=64m", testutil.AlpineImage, "grep", "/tmp", "/proc/mounts").
+		AssertOutWithFunc(f([]string{"rw", "nosuid", "nodev", "size=65536k"}))
 }
 
 func TestRunBindMountBind(t *testing.T) {
@@ -503,17 +509,20 @@ func TestRunBindMountPropagation(t *testing.T) {
 			propagation: "rshared",
 			assertFunc: func(containerName, containerNameReplica string) {
 				// replica can get sub-mounts from original
-				base.Cmd("exec", containerNameReplica, "cat", "/mnt1/replica/foo.txt").AssertOutExactly("toreplica")
+				base.Cmd("exec", containerNameReplica, "cat", "/mnt1/replica/foo.txt").
+					AssertOutExactly("toreplica")
 
 				// and sub-mounts from replica will be propagated to the original too
-				base.Cmd("exec", containerName, "cat", "/mnt1/bar/bar.txt").AssertOutExactly("fromreplica")
+				base.Cmd("exec", containerName, "cat", "/mnt1/bar/bar.txt").
+					AssertOutExactly("fromreplica")
 			},
 		},
 		{
 			propagation: "rslave",
 			assertFunc: func(containerName, containerNameReplica string) {
 				// replica can get sub-mounts from original
-				base.Cmd("exec", containerNameReplica, "cat", "/mnt1/replica/foo.txt").AssertOutExactly("toreplica")
+				base.Cmd("exec", containerNameReplica, "cat", "/mnt1/replica/foo.txt").
+					AssertOutExactly("toreplica")
 
 				// but sub-mounts from replica will not be propagated to the original
 				base.Cmd("exec", containerName, "cat", "/mnt1/bar/bar.txt").AssertFail()
@@ -552,7 +561,11 @@ func TestRunBindMountPropagation(t *testing.T) {
 		containerName := tID + "-" + propagationName
 		containerNameReplica := containerName + "-replica"
 
-		mountOption := fmt.Sprintf("type=bind,src=%s,target=/mnt1,bind-propagation=%s", rwDir, tc.propagation)
+		mountOption := fmt.Sprintf(
+			"type=bind,src=%s,target=/mnt1,bind-propagation=%s",
+			rwDir,
+			tc.propagation,
+		)
 		if tc.propagation == "" {
 			mountOption = fmt.Sprintf("type=bind,src=%s,target=/mnt1", rwDir)
 		}
@@ -562,8 +575,11 @@ func TestRunBindMountPropagation(t *testing.T) {
 			mountOption string
 		}{
 			{
-				name:        containerName,
-				mountOption: fmt.Sprintf("type=bind,src=%s,target=/mnt1,bind-propagation=rshared", rwDir),
+				name: containerName,
+				mountOption: fmt.Sprintf(
+					"type=bind,src=%s,target=/mnt1,bind-propagation=rshared",
+					rwDir,
+				),
 			},
 			{
 				name:        containerNameReplica,
@@ -581,15 +597,21 @@ func TestRunBindMountPropagation(t *testing.T) {
 		}
 
 		// mount in the first container
-		base.Cmd("exec", containerName, "sh", "-exc", "mkdir /app && mkdir /mnt1/replica && mount --bind /app /mnt1/replica && echo -n toreplica > /app/foo.txt").AssertOK()
-		base.Cmd("exec", containerName, "cat", "/mnt1/replica/foo.txt").AssertOutExactly("toreplica")
+		base.Cmd("exec", containerName, "sh", "-exc", "mkdir /app && mkdir /mnt1/replica && mount --bind /app /mnt1/replica && echo -n toreplica > /app/foo.txt").
+			AssertOK()
+		base.Cmd("exec", containerName, "cat", "/mnt1/replica/foo.txt").
+			AssertOutExactly("toreplica")
 
 		// mount in the second container
-		base.Cmd("exec", containerNameReplica, "sh", "-exc", "mkdir /bar && mkdir /mnt1/bar").AssertOK()
-		base.Cmd("exec", containerNameReplica, "sh", "-exc", "mount --bind /bar /mnt1/bar").AssertOK()
+		base.Cmd("exec", containerNameReplica, "sh", "-exc", "mkdir /bar && mkdir /mnt1/bar").
+			AssertOK()
+		base.Cmd("exec", containerNameReplica, "sh", "-exc", "mount --bind /bar /mnt1/bar").
+			AssertOK()
 
-		base.Cmd("exec", containerNameReplica, "sh", "-exc", "echo -n fromreplica > /bar/bar.txt").AssertOK()
-		base.Cmd("exec", containerNameReplica, "cat", "/mnt1/bar/bar.txt").AssertOutExactly("fromreplica")
+		base.Cmd("exec", containerNameReplica, "sh", "-exc", "echo -n fromreplica > /bar/bar.txt").
+			AssertOK()
+		base.Cmd("exec", containerNameReplica, "cat", "/mnt1/bar/bar.txt").
+			AssertOutExactly("fromreplica")
 
 		// call case specific assert function
 		tc.assertFunc(containerName, containerNameReplica)
@@ -680,7 +702,8 @@ func TestBindMountWhenHostFolderDoesNotExist(t *testing.T) {
 	hostDir := t.TempDir()
 	defer os.RemoveAll(hostDir)
 	hp := filepath.Join(hostDir, "does-not-exist")
-	base.Cmd("run", "--name", containerName, "-d", "-v", hp+":/tmp", testutil.AlpineImage).AssertOK()
+	base.Cmd("run", "--name", containerName, "-d", "-v", hp+":/tmp", testutil.AlpineImage).
+		AssertOK()
 	base.Cmd("rm", "-f", containerName).AssertOK()
 
 	// Host directory should get created
@@ -690,7 +713,8 @@ func TestBindMountWhenHostFolderDoesNotExist(t *testing.T) {
 	// Test for --mount
 	os.RemoveAll(hp)
 	base.Cmd("run", "--name", containerName, "-d", "--mount", fmt.Sprintf("type=bind, source=%s, target=/tmp",
-		hp), testutil.AlpineImage).AssertFail()
+		hp), testutil.AlpineImage).
+		AssertFail()
 	_, err = os.Stat(hp)
 	assert.ErrorIs(t, err, os.ErrNotExist)
 }

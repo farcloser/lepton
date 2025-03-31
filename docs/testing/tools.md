@@ -33,7 +33,7 @@ func TestMyThing(t *testing.T) {
 	// This is going to run `nerdctl info` (or `docker info`)
 	myTest.Command = test.Command("info")
     // Verify the command exits with 0, and stdout contains the word `Kernel`
-    myTest.Expected = test.Expects(0, nil, expect.Contains("Kernel"))
+    myTest.Expected = test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("Kernel"))
 	// Run it
 	myTest.Run(t)
 }
@@ -259,9 +259,11 @@ func TestMyThing(t *testing.T) {
 
 Note that inside your `Executor` you do have access to the full palette of command options,
 including:
-- `Background(timeout time.Duration)` which allows you to background a command execution
+- `Background()` which allows you to background a command execution
 - `WithWrapper(binary string, args ...string)` which allows you to "wrap" your command with another binary
-- `WithStdin(io.Reader)` which allows you to pass a reader to the command stdin
+- `WithTimeout(time.Duration)`
+- `Feed(io.Reader)` which allows you to pass a reader to the command stdin
+- `WithFeeder(fun()io.Reader)`
 - `WithCwd(string)` which allows you to specify the working directory (default to the test temp directory)
 - `Clone()` which returns a copy of the command, with env, cwd, etc
 

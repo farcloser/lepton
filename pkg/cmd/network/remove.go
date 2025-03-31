@@ -29,7 +29,11 @@ import (
 )
 
 func Remove(ctx context.Context, cli *client.Client, globalOptions *options.Global, opts *options.NetworkRemove) error {
-	cniEnv, err := netutil.NewCNIEnv(globalOptions.CNIPath, globalOptions.CNINetConfPath, netutil.WithNamespace(globalOptions.Namespace))
+	cniEnv, err := netutil.NewCNIEnv(
+		globalOptions.CNIPath,
+		globalOptions.CNINetConfPath,
+		netutil.WithNamespace(globalOptions.Namespace),
+	)
 	if err != nil {
 		return err
 	}

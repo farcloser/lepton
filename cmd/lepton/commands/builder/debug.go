@@ -30,7 +30,7 @@ import (
 )
 
 func debugCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:           "debug",
 		Short:         "Debug Dockerfile",
 		PreRunE:       helpers.RequireExperimental("`builder debug`"),
@@ -44,7 +44,8 @@ func debugCommand() *cobra.Command {
 	cmd.Flags().String("target", "", "Set the target build stage to build")
 	cmd.Flags().StringArray("build-arg", nil, "Set build-time variables")
 	cmd.Flags().String("image", "", "Image to use for debugging stage")
-	cmd.Flags().StringArray("ssh", nil, "Allow forwarding SSH agent to the build. Format: default|<id>[=<socket>|<key>[,<key>]]")
+	cmd.Flags().
+		StringArray("ssh", nil, "Allow forwarding SSH agent to the build. Format: default|<id>[=<socket>|<key>[,<key>]]")
 	cmd.Flags().StringArray("secret", nil, "Expose secret value to the build. Format: id=secretname,src=filepath")
 
 	return cmd

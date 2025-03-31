@@ -74,8 +74,15 @@ func NewConfig() *Config {
 
 func (cfg *Config) SetAsyncReconnectInterval(asyncReconnectInterval int) error {
 	// Enforce limits on reconnect interval
-	if asyncReconnectInterval != 0 && (asyncReconnectInterval < minReconnectInterval || asyncReconnectInterval > maxReconnectInterval) {
-		return fmt.Errorf("%w: asyncReconnectInterval (%d) must be between %d and %d milliseconds", errs.ErrInvalidArgument, asyncReconnectInterval, minReconnectInterval, maxReconnectInterval)
+	if asyncReconnectInterval != 0 &&
+		(asyncReconnectInterval < minReconnectInterval || asyncReconnectInterval > maxReconnectInterval) {
+		return fmt.Errorf(
+			"%w: asyncReconnectInterval (%d) must be between %d and %d milliseconds",
+			errs.ErrInvalidArgument,
+			asyncReconnectInterval,
+			minReconnectInterval,
+			maxReconnectInterval,
+		)
 	}
 
 	cfg.AsyncReconnectInterval = asyncReconnectInterval

@@ -42,8 +42,8 @@ const (
 
 type windowsInfoUtil interface {
 	RtlGetVersion() *windows.OsVersionInfoEx
-	GetRegistryStringValue(key registry.Key, path string, name string) (string, error)
-	GetRegistryIntValue(key registry.Key, path string, name string) (int, error)
+	GetRegistryStringValue(key registry.Key, path, name string) (string, error)
+	GetRegistryIntValue(key registry.Key, path, name string) (int, error)
 }
 
 type winInfoUtil struct{}
@@ -139,7 +139,11 @@ func getKernelVersion(sw windowsInfoUtil) (string, error) {
 	// Get BuildLabEx value from the Windows registry
 	// [buiild number].[revision number].[architecture].[branch].[date]-[time]
 	// Eg. "BuildLabEx: 10240.16412.amd64fre.th1.150729-1800"
-	buildLab, err := sw.GetRegistryStringValue(registry.LOCAL_MACHINE, `SOFTWARE\Microsoft\Windows NT\CurrentVersion`, "BuildLabEx")
+	buildLab, err := sw.GetRegistryStringValue(
+		registry.LOCAL_MACHINE,
+		`SOFTWARE\Microsoft\Windows NT\CurrentVersion`,
+		"BuildLabEx",
+	)
 	if err != nil {
 		return "", err
 	}
@@ -155,7 +159,7 @@ func getKernelVersion(sw windowsInfoUtil) (string, error) {
 }
 
 // GetRegistryStringValue retrieves a string value from the Windows registry
-func (sw *winInfoUtil) GetRegistryStringValue(key registry.Key, path string, name string) (string, error) {
+func (sw *winInfoUtil) GetRegistryStringValue(key registry.Key, path, name string) (string, error) {
 	k, err := registry.OpenKey(key, path, registry.QUERY_VALUE)
 	if err != nil {
 		return "", err
@@ -170,7 +174,7 @@ func (sw *winInfoUtil) GetRegistryStringValue(key registry.Key, path string, nam
 }
 
 // GetRegistryIntValue retrieves an integer value from the Windows registry
-func (sw *winInfoUtil) GetRegistryIntValue(key registry.Key, path string, name string) (int, error) {
+func (sw *winInfoUtil) GetRegistryIntValue(key registry.Key, path, name string) (int, error) {
 	k, err := registry.OpenKey(key, path, registry.QUERY_VALUE)
 	if err != nil {
 		return 0, err

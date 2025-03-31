@@ -119,7 +119,7 @@ func (jsonLogger *JSONLogger) PreProcess(ctx context.Context, dataStore string, 
 	return nil
 }
 
-func (jsonLogger *JSONLogger) Process(stdout <-chan string, stderr <-chan string) error {
+func (jsonLogger *JSONLogger) Process(stdout, stderr <-chan string) error {
 	return jsonfile.Encode(stdout, stderr, jsonLogger.logger)
 }
 
@@ -150,7 +150,12 @@ func viewLogsJSONFile(lvopts LogViewOptions, stdout, stderr io.Writer, stopChann
 // Loads JSON log entries directly from the provided JSON log file.
 // If `LogViewOptions.Follow` is provided, it will refresh and re-read the file until
 // it receives something through the stopChannel.
-func viewLogsJSONFileDirect(lvopts LogViewOptions, jsonLogFilePath string, stdout, stderr io.Writer, stopChannel chan os.Signal) error {
+func viewLogsJSONFileDirect(
+	lvopts LogViewOptions,
+	jsonLogFilePath string,
+	stdout, stderr io.Writer,
+	stopChannel chan os.Signal,
+) error {
 	fin, err := os.OpenFile(jsonLogFilePath, os.O_RDONLY, 0o400)
 	if err != nil {
 		return err
@@ -192,8 +197,17 @@ func viewLogsJSONFileDirect(lvopts LogViewOptions, jsonLogFilePath string, stdou
 				if len(line) > 0 {
 					time.Sleep(5 * time.Millisecond)
 					if retryTimes == 0 {
-						log.L.Infof("finished parsing log JSON filefile, path: %s, line: %s", jsonLogFilePath, string(line))
-						return fmt.Errorf("error occurred while doing read of JSON logfile %q: %w, retryTimes: %d", jsonLogFilePath, err, retryTimes)
+						log.L.Infof(
+							"finished parsing log JSON filefile, path: %s, line: %s",
+							jsonLogFilePath,
+							string(line),
+						)
+						return fmt.Errorf(
+							"error occurred while doing read of JSON logfile %q: %w, retryTimes: %d",
+							jsonLogFilePath,
+							err,
+							retryTimes,
+						)
 					}
 					retryTimes--
 					backBytes = len(line)
@@ -209,7 +223,12 @@ func viewLogsJSONFileDirect(lvopts LogViewOptions, jsonLogFilePath string, stdou
 				// Get the current file handler's seek.
 				lastPos, err := fin.Seek(int64(-backBytes), io.SeekCurrent)
 				if err != nil {
-					return fmt.Errorf("error occurred while trying to seek JSON logfile %q at position %d: %w", jsonLogFilePath, lastPos, err)
+					return fmt.Errorf(
+						"error occurred while trying to seek JSON logfile %q at position %d: %w",
+						jsonLogFilePath,
+						lastPos,
+						err,
+					)
 				}
 
 				if watcher == nil {

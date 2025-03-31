@@ -35,7 +35,8 @@ import (
 // Rename change container name to a new name
 // containerID is container name, short ID, or long ID
 func Rename(ctx context.Context, client *containerd.Client, containerID, newContainerName string,
-	options options.ContainerRename) error {
+	options options.ContainerRename,
+) error {
 	dataStore, err := clientutil.DataStore(options.GOptions.DataRoot, options.GOptions.Address)
 	if err != nil {
 		return err
@@ -67,7 +68,8 @@ func Rename(ctx context.Context, client *containerd.Client, containerID, newCont
 }
 
 func renameContainer(ctx context.Context, container containerd.Container, newName string,
-	namst namestore.NameStore, hostst hostsstore.Store) (err error) {
+	namst namestore.NameStore, hostst hostsstore.Store,
+) (err error) {
 	l, err := container.Labels(ctx)
 	if err != nil {
 		return err

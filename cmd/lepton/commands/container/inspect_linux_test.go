@@ -37,7 +37,8 @@ func TestContainerInspectContainsPortConfig(t *testing.T) {
 	base := testutil.NewBase(t)
 	defer base.Cmd("rm", "-f", testContainer).Run()
 
-	base.Cmd("run", "-d", "--name", testContainer, "-p", "8080:80", testutil.NginxAlpineImage).AssertOK()
+	base.Cmd("run", "-d", "--name", testContainer, "-p", "8080:80", testutil.NginxAlpineImage).
+		AssertOK()
 	inspect := base.InspectContainer(testContainer)
 	inspect80TCP := (*inspect.NetworkSettings.Ports)["80/tcp"]
 	expected := nat.PortBinding{
@@ -150,7 +151,8 @@ func TestContainerInspectContainsLabel(t *testing.T) {
 	base := testutil.NewBase(t)
 	defer base.Cmd("rm", "-f", testContainer).Run()
 
-	base.Cmd("run", "-d", "--name", testContainer, "--label", "foo=foo", "--label", "bar=bar", testutil.NginxAlpineImage).AssertOK()
+	base.Cmd("run", "-d", "--name", testContainer, "--label", "foo=foo", "--label", "bar=bar", testutil.NginxAlpineImage).
+		AssertOK()
 	base.EnsureContainerStarted(testContainer)
 	inspect := base.InspectContainer(testContainer)
 	lbs := inspect.Config.Labels
@@ -167,7 +169,8 @@ func TestContainerInspectContainsInternalLabel(t *testing.T) {
 	base := testutil.NewBase(t)
 	defer base.Cmd("rm", "-f", testContainer).Run()
 
-	base.Cmd("run", "-d", "--name", testContainer, "--mount", "type=bind,src=/tmp,dst=/app,readonly=false,bind-propagation=rprivate", testutil.NginxAlpineImage).AssertOK()
+	base.Cmd("run", "-d", "--name", testContainer, "--mount", "type=bind,src=/tmp,dst=/app,readonly=false,bind-propagation=rprivate", testutil.NginxAlpineImage).
+		AssertOK()
 	base.EnsureContainerStarted(testContainer)
 	inspect := base.InspectContainer(testContainer)
 	lbs := inspect.Config.Labels
@@ -218,16 +221,20 @@ func TestContainerInspectState(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			defer base.Cmd("rm", "-f", tc.containerName).Run()
 			if tc.want.Error != "" {
-				base.Cmd("run", "--name", tc.containerName, testutil.AlpineImage, tc.cmd).AssertFail()
+				base.Cmd("run", "--name", tc.containerName, testutil.AlpineImage, tc.cmd).
+					AssertFail()
 			} else {
 				base.Cmd("run", "--name", tc.containerName, testutil.AlpineImage, tc.cmd).AssertOK()
 			}
 			inspect := base.InspectContainer(tc.containerName)
-			assert.Assert(t, strings.Contains(inspect.State.Error, tc.want.Error), fmt.Sprintf("expected: %s, actual: %s", tc.want.Error, inspect.State.Error))
+			assert.Assert(
+				t,
+				strings.Contains(inspect.State.Error, tc.want.Error),
+				fmt.Sprintf("expected: %s, actual: %s", tc.want.Error, inspect.State.Error),
+			)
 			assert.Equal(base.T, inspect.State.Status, tc.want.Status)
 		})
 	}
-
 }
 
 func TestContainerInspectHostConfig(t *testing.T) {
@@ -263,8 +270,16 @@ func TestContainerInspectHostConfig(t *testing.T) {
 	assert.Equal(t, uint16(500), inspect.HostConfig.BlkioWeight)
 	assert.Equal(t, uint64(1024), inspect.HostConfig.CPUShares)
 	assert.Equal(t, int64(100000), inspect.HostConfig.CPUQuota)
-	assert.Assert(t, slices.Contains(inspect.HostConfig.GroupAdd, "1000"), "Expected '1000' to be in GroupAdd")
-	assert.Assert(t, slices.Contains(inspect.HostConfig.GroupAdd, "2000"), "Expected '2000' to be in GroupAdd")
+	assert.Assert(
+		t,
+		slices.Contains(inspect.HostConfig.GroupAdd, "1000"),
+		"Expected '1000' to be in GroupAdd",
+	)
+	assert.Assert(
+		t,
+		slices.Contains(inspect.HostConfig.GroupAdd, "2000"),
+		"Expected '2000' to be in GroupAdd",
+	)
 	expectedExtraHosts := []string{"host1:10.0.0.1", "host2:10.0.0.2"}
 	assert.DeepEqual(t, expectedExtraHosts, inspect.HostConfig.ExtraHosts)
 	assert.Equal(t, "host", inspect.HostConfig.IpcMode)
@@ -298,7 +313,8 @@ func TestContainerInspectHostConfigDefaults(t *testing.T) {
 	}
 
 	// Run a container without specifying HostConfig options
-	base.Cmd("run", "-d", "--name", testContainer, testutil.AlpineImage, "sleep", "infinity").AssertOK()
+	base.Cmd("run", "-d", "--name", testContainer, testutil.AlpineImage, "sleep", "infinity").
+		AssertOK()
 
 	inspect := base.InspectContainer(testContainer)
 	t.Logf("HostConfig in TestContainerInspectHostConfigDefaults: %+v", inspect.HostConfig)
@@ -360,7 +376,8 @@ func TestContainerInspectHostConfigDNSDefaults(t *testing.T) {
 	defer base.Cmd("rm", "-f", testContainer).Run()
 
 	// Run a container without specifying DNS options
-	base.Cmd("run", "-d", "--name", testContainer, testutil.AlpineImage, "sleep", "infinity").AssertOK()
+	base.Cmd("run", "-d", "--name", testContainer, testutil.AlpineImage, "sleep", "infinity").
+		AssertOK()
 
 	inspect := base.InspectContainer(testContainer)
 
@@ -378,7 +395,8 @@ func TestContainerInspectHostConfigPID(t *testing.T) {
 	defer base.Cmd("rm", "-f", testContainer1, testContainer2).Run()
 
 	// Run the first container
-	base.Cmd("run", "-d", "--name", testContainer1, testutil.AlpineImage, "sleep", "infinity").AssertOK()
+	base.Cmd("run", "-d", "--name", testContainer1, testutil.AlpineImage, "sleep", "infinity").
+		AssertOK()
 
 	containerID1 := strings.TrimSpace(base.Cmd("inspect", "-f", "{{.Id}}", testContainer1).Out())
 
@@ -397,7 +415,6 @@ func TestContainerInspectHostConfigPID(t *testing.T) {
 	inspect := base.InspectContainer(testContainer2)
 
 	assert.Equal(t, hc.PidMode, inspect.HostConfig.PidMode)
-
 }
 
 func TestContainerInspectHostConfigPIDDefaults(t *testing.T) {
@@ -406,7 +423,8 @@ func TestContainerInspectHostConfigPIDDefaults(t *testing.T) {
 	base := testutil.NewBase(t)
 	defer base.Cmd("rm", "-f", testContainer).Run()
 
-	base.Cmd("run", "-d", "--name", testContainer, testutil.AlpineImage, "sleep", "infinity").AssertOK()
+	base.Cmd("run", "-d", "--name", testContainer, testutil.AlpineImage, "sleep", "infinity").
+		AssertOK()
 
 	inspect := base.InspectContainer(testContainer)
 

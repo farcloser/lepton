@@ -31,7 +31,7 @@ import (
 )
 
 func execCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:           "exec [flags] SERVICE COMMAND [ARGS...]",
 		Short:         "Execute a command in a running container of the service",
 		Args:          cobra.MinimumNArgs(2),
@@ -41,7 +41,8 @@ func execCommand() *cobra.Command {
 	}
 
 	cmd.Flags().SetInterspersed(false)
-	cmd.Flags().BoolP("no-TTY", "T", !term.IsTerminal(os.Stdout.Fd()), "Disable pseudo-TTY allocation. By default compose exec allocates a TTY.")
+	cmd.Flags().
+		BoolP("no-TTY", "T", !term.IsTerminal(os.Stdout.Fd()), "Disable pseudo-TTY allocation. By default compose exec allocates a TTY.")
 	cmd.Flags().BoolP("detach", "d", false, "Detached mode: Run containers in the background")
 	cmd.Flags().StringP("workdir", "w", "", "Working directory inside the container")
 	// env needs to be StringArray, not StringSlice, to prevent "FOO=foo1,foo2" from being split to {"FOO=foo1", "foo2"}

@@ -32,7 +32,11 @@ import (
 	"go.farcloser.world/lepton/pkg/annotations"
 )
 
-func NewBypass4netnsCNIBypassManager(client client.Client, rlkClient rlkclient.Client, annotationsMap map[string]string) (*Bypass4netnsCNIBypassManager, error) {
+func NewBypass4netnsCNIBypassManager(
+	client client.Client,
+	rlkClient rlkclient.Client,
+	annotationsMap map[string]string,
+) (*Bypass4netnsCNIBypassManager, error) {
 	if client == nil || rlkClient == nil {
 		return nil, errs.ErrInvalidArgument
 	}
@@ -46,7 +50,12 @@ func NewBypass4netnsCNIBypassManager(client client.Client, rlkClient rlkclient.C
 	var ignoreSubnets []string
 	if v := annotationsMap[annotations.Bypass4netnsIgnoreSubnets]; v != "" {
 		if err := json.Unmarshal([]byte(v), &ignoreSubnets); err != nil {
-			return nil, fmt.Errorf("failed to unmarshal annotation %q: %q: %w", annotations.Bypass4netnsIgnoreSubnets, v, err)
+			return nil, fmt.Errorf(
+				"failed to unmarshal annotation %q: %q: %w",
+				annotations.Bypass4netnsIgnoreSubnets,
+				v,
+				err,
+			)
 		}
 	}
 	pm := &Bypass4netnsCNIBypassManager{
@@ -65,7 +74,11 @@ type Bypass4netnsCNIBypassManager struct {
 	ignoreBind    bool
 }
 
-func (b4nnm *Bypass4netnsCNIBypassManager) StartBypass(ctx context.Context, ports []cni.PortMapping, id, stateDir string) error {
+func (b4nnm *Bypass4netnsCNIBypassManager) StartBypass(
+	ctx context.Context,
+	ports []cni.PortMapping,
+	id, stateDir string,
+) error {
 	socketPath, err := getSocketPathByID(id)
 	if err != nil {
 		return err

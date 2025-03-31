@@ -22,8 +22,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	containerCmd "go.farcloser.world/lepton/cmd/lepton/commands/container"
-	imageCmd "go.farcloser.world/lepton/cmd/lepton/commands/image"
+	containercmd "go.farcloser.world/lepton/cmd/lepton/commands/container"
+	imagecmd "go.farcloser.world/lepton/cmd/lepton/commands/image"
 	"go.farcloser.world/lepton/cmd/lepton/completion"
 	"go.farcloser.world/lepton/cmd/lepton/helpers"
 	"go.farcloser.world/lepton/leptonic/services/containerd"
@@ -36,7 +36,7 @@ import (
 )
 
 func Command() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:               "inspect",
 		Short:             "Return low-level information on objects.",
 		Args:              cobra.MinimumNArgs(1),
@@ -49,17 +49,27 @@ func Command() *cobra.Command {
 	cmd.Flags().BoolP("size", "s", false, "Display total file sizes (for containers)")
 	cmd.Flags().StringP("format", "f", "", "Format the output using the given Go template, e.g, '{{json .}}'")
 	cmd.Flags().String("type", "", "Return JSON for specified type")
-	cmd.Flags().String("mode", "dockercompat", `Inspect mode, "dockercompat" for Docker-compatible output, "native" for containerd-native output`)
+	cmd.Flags().
+		String("mode", "dockercompat", `Inspect mode, "dockercompat" for Docker-compatible output, "native" for containerd-native output`)
 
-	_ = cmd.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{formatter.FormatJSON}, cobra.ShellCompDirectiveNoFileComp
-	})
-	_ = cmd.RegisterFlagCompletionFunc("type", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{"image", "container", ""}, cobra.ShellCompDirectiveNoFileComp
-	})
-	_ = cmd.RegisterFlagCompletionFunc("mode", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{"dockercompat", "native"}, cobra.ShellCompDirectiveNoFileComp
-	})
+	_ = cmd.RegisterFlagCompletionFunc(
+		"format",
+		func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			return []string{formatter.FormatJSON}, cobra.ShellCompDirectiveNoFileComp
+		},
+	)
+	_ = cmd.RegisterFlagCompletionFunc(
+		"type",
+		func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			return []string{"image", "container", ""}, cobra.ShellCompDirectiveNoFileComp
+		},
+	)
+	_ = cmd.RegisterFlagCompletionFunc(
+		"mode",
+		func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			return []string{"dockercompat", "native"}, cobra.ShellCompDirectiveNoFileComp
+		},
+	)
 
 	return cmd
 }
@@ -114,13 +124,13 @@ func inspectAction(cmd *cobra.Command, args []string) error {
 	var containerInspectOptions options.ContainerInspect
 	if inspectImage {
 		platform := ""
-		imageInspectOptions, err = imageCmd.ProcessImageInspectOptions(cmd, &platform)
+		imageInspectOptions, err = imagecmd.ProcessImageInspectOptions(cmd, &platform)
 		if err != nil {
 			return err
 		}
 	}
 	if inspectContainer {
-		containerInspectOptions, err = containerCmd.ProcessContainerInspectOptions(cmd, args)
+		containerInspectOptions, err = containercmd.ProcessContainerInspectOptions(cmd, args)
 		if err != nil {
 			return err
 		}

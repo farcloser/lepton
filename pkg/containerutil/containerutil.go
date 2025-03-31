@@ -40,6 +40,7 @@ import (
 	dockercliopts "github.com/docker/cli/opts"
 	dockeropts "github.com/docker/docker/opts"
 	"github.com/moby/sys/signal"
+	"golang.org/x/term"
 
 	"go.farcloser.world/containers/specs"
 
@@ -58,7 +59,13 @@ import (
 
 // PrintHostPort writes to `writer` the public (HostIP:HostPort) of a given `containerPort/protocol` in a container.
 // if `containerPort < 0`, it writes all public ports of the container.
-func PrintHostPort(ctx context.Context, writer io.Writer, container containerd.Container, containerPort int, proto string) error {
+func PrintHostPort(
+	ctx context.Context,
+	writer io.Writer,
+	container containerd.Container,
+	containerPort int,
+	proto string,
+) error {
 	l, err := container.Labels(ctx)
 	if err != nil {
 		return err
@@ -215,7 +222,13 @@ func GenerateSharingPIDOpts(ctx context.Context, targetCon containerd.Container)
 }
 
 // Start starts `container` with `attach` flag. If `attach` is true, it will attach to the container's stdio.
-func Start(ctx context.Context, container containerd.Container, flagA bool, client *containerd.Client, detachKeys string) (err error) {
+func Start(
+	ctx context.Context,
+	container containerd.Container,
+	flagA bool,
+	client *containerd.Client,
+	detachKeys string,
+) (err error) {
 	// defer the storage of start error in the dedicated label
 	defer func() {
 		if err != nil {
@@ -251,7 +264,7 @@ func Start(ctx context.Context, container containerd.Container, flagA bool, clie
 			return err
 		}
 		defer con.Reset()
-		if err := con.SetRaw(); err != nil {
+		if _, err := term.MakeRaw(int(con.Fd())); err != nil {
 			return err
 		}
 	}
@@ -286,7 +299,20 @@ func Start(ctx context.Context, container containerd.Container, flagA bool, clie
 		// source: https://github.com/farcloser/lepton/blob/main/docs/command-reference.md#whale-nerdctl-start
 		attachStreamOpt = []string{"STDOUT", "STDERR"}
 	}
-	task, err := taskutil.NewTask(ctx, client, container, attachStreamOpt, false, flagT, true, con, logURI, detachKeys, namespace, detachC)
+	task, err := taskutil.NewTask(
+		ctx,
+		client,
+		container,
+		attachStreamOpt,
+		false,
+		flagT,
+		true,
+		con,
+		logURI,
+		detachKeys,
+		namespace,
+		detachC,
+	)
 	if err != nil {
 		return err
 	}

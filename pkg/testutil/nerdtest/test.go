@@ -38,10 +38,12 @@ func Setup() *test.Case {
 	}
 }
 
-type nerdishctlSetup struct {
-}
+type nerdishctlSetup struct{}
 
-func (ns *nerdishctlSetup) CustomCommand(testCase *test.Case, t *testing.T) test.CustomizableCommand {
+func (ns *nerdishctlSetup) CustomCommand(
+	testCase *test.Case,
+	t *testing.T,
+) test.CustomizableCommand {
 	return newNerdCommand(testCase.Config, t)
 }
 

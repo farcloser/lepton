@@ -20,6 +20,7 @@ import (
 	"runtime"
 	"testing"
 
+	"go.farcloser.world/tigron/expect"
 	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
@@ -37,7 +38,16 @@ func TestTop(t *testing.T) {
 
 	testCase.Setup = func(data test.Data, helpers test.Helpers) {
 		// FIXME: busybox 1.36 on windows still appears to not support sleep inf. Unclear why.
-		helpers.Ensure("run", "--quiet", "-d", "--name", data.Identifier(), testutil.CommonImage, "sleep", nerdtest.Infinity)
+		helpers.Ensure(
+			"run",
+			"--quiet",
+			"-d",
+			"--name",
+			data.Identifier(),
+			testutil.CommonImage,
+			"sleep",
+			nerdtest.Infinity,
+		)
 		data.Set("cID", data.Identifier())
 	}
 
@@ -54,7 +64,7 @@ func TestTop(t *testing.T) {
 				return helpers.Command("top", data.Get("cID"), "-o", "pid,user,cmd")
 			},
 
-			Expected: test.Expects(0, nil, nil),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 		},
 		{
 			Description: "simple",
@@ -62,7 +72,7 @@ func TestTop(t *testing.T) {
 				return helpers.Command("top", data.Get("cID"))
 			},
 
-			Expected: test.Expects(0, nil, nil),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 		},
 	}
 
@@ -76,7 +86,18 @@ func TestTopHyperVContainer(t *testing.T) {
 
 	testCase.Setup = func(data test.Data, helpers test.Helpers) {
 		// FIXME: busybox 1.36 on windows still appears to not support sleep inf. Unclear why.
-		helpers.Ensure("run", "--quiet", "--isolation", "hyperv", "-d", "--name", data.Identifier("container"), testutil.CommonImage, "sleep", nerdtest.Infinity)
+		helpers.Ensure(
+			"run",
+			"--quiet",
+			"--isolation",
+			"hyperv",
+			"-d",
+			"--name",
+			data.Identifier("container"),
+			testutil.CommonImage,
+			"sleep",
+			nerdtest.Infinity,
+		)
 	}
 
 	testCase.Cleanup = func(data test.Data, helpers test.Helpers) {
@@ -87,7 +108,7 @@ func TestTopHyperVContainer(t *testing.T) {
 		return helpers.Command("top", data.Identifier("container"))
 	}
 
-	testCase.Expected = test.Expects(0, nil, nil)
+	testCase.Expected = test.Expects(expect.ExitCodeSuccess, nil, nil)
 
 	testCase.Run(t)
 }

@@ -35,15 +35,21 @@ var (
 	ErrPasswordIsRequired = errors.New("password is required")
 
 	// System errors - not a terminal, failure to read, etc
-	ErrReadingUsername        = errors.New("unable to read username")
-	ErrReadingPassword        = errors.New("unable to read password")
-	ErrNotATerminal           = errors.New("stdin is not a terminal (Hint: use `login --username=USERNAME --password-stdin`)")
+	ErrReadingUsername = errors.New("unable to read username")
+	ErrReadingPassword = errors.New("unable to read password")
+	ErrNotATerminal    = errors.New(
+		"stdin is not a terminal (Hint: use `login --username=USERNAME --password-stdin`)",
+	)
 	ErrCannotAllocateTerminal = errors.New("error allocating terminal")
 )
 
 // promptUserForAuthentication will prompt the user for credentials if needed
 // It might error with any of the errors defined above.
-func promptUserForAuthentication(credentials *dockerconfigresolver.Credentials, username, password string, stdout io.Writer) error {
+func promptUserForAuthentication(
+	credentials *dockerconfigresolver.Credentials,
+	username, password string,
+	stdout io.Writer,
+) error {
 	var err error
 
 	// If the provided username is empty...

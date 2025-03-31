@@ -30,7 +30,7 @@ import (
 )
 
 func LoginCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:           "login [flags] [SERVER]",
 		Args:          cobra.MaximumNArgs(1),
 		Short:         "Log in to a container registry",

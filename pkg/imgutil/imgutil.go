@@ -58,7 +58,12 @@ type EnsuredImage struct {
 type PullMode = string
 
 // GetExistingImage returns the specified image if exists in containerd. Return errdefs.NotFound() if not exists.
-func GetExistingImage(ctx context.Context, client *containerd.Client, snapshotter, rawRef string, platform specs.Platform) (*EnsuredImage, error) {
+func GetExistingImage(
+	ctx context.Context,
+	client *containerd.Client,
+	snapshotter, rawRef string,
+	platform specs.Platform,
+) (*EnsuredImage, error) {
 	var res *EnsuredImage
 	imgwalker := &imagewalker.ImageWalker{
 		Client: client,
@@ -104,7 +109,12 @@ func GetExistingImage(ctx context.Context, client *containerd.Client, snapshotte
 // EnsureImage ensures the image.
 //
 // # When insecure is set, skips verifying certs, and also falls back to HTTP when the registry does not speak HTTPS
-func EnsureImage(ctx context.Context, client *containerd.Client, rawRef string, options options.ImagePull) (*EnsuredImage, error) {
+func EnsureImage(
+	ctx context.Context,
+	client *containerd.Client,
+	rawRef string,
+	options options.ImagePull,
+) (*EnsuredImage, error) {
 	switch options.Mode {
 	case "always", "missing", "never":
 		// NOP
@@ -143,12 +153,15 @@ func EnsureImage(ctx context.Context, client *containerd.Client, rawRef string, 
 
 	img, err := PullImage(ctx, client, resolver, parsedReference.String(), options)
 	if err != nil {
-		// In some circumstance (e.g. people just use 80 port to support pure http), the error will contain message like "dial tcp <port>: connection refused".
+		// In some circumstance (e.g. people just use 80 port to support pure http), the error will contain message like
+		// "dial tcp <port>: connection refused".
 		if !errors.Is(err, http.ErrSchemeMismatch) && !errutil.IsErrConnectionRefused(err) {
 			return nil, err
 		}
 		if options.GOptions.InsecureRegistry {
-			log.G(ctx).WithError(err).Warnf("server %q does not seem to support HTTPS, falling back to plain HTTP", parsedReference.Domain)
+			log.G(ctx).
+				WithError(err).
+				Warnf("server %q does not seem to support HTTPS, falling back to plain HTTP", parsedReference.Domain)
 			dOpts = append(dOpts, dockerconfigresolver.WithPlainHTTP(true))
 			resolver, err = dockerconfigresolver.New(ctx, parsedReference.Domain, dOpts...)
 			if err != nil {
@@ -157,7 +170,8 @@ func EnsureImage(ctx context.Context, client *containerd.Client, rawRef string, 
 			return PullImage(ctx, client, resolver, parsedReference.String(), options)
 		}
 		log.G(ctx).WithError(err).Errorf("server %q does not seem to support HTTPS", parsedReference.Domain)
-		log.G(ctx).Info("Hint: you may want to try --insecure-registry to allow plain HTTP (if you are in a trusted network)")
+		log.G(ctx).
+			Info("Hint: you may want to try --insecure-registry to allow plain HTTP (if you are in a trusted network)")
 		return nil, err
 
 	}
@@ -191,7 +205,13 @@ func ResolveDigest(ctx context.Context, rawRef string, insecure bool, hostsDirs 
 }
 
 // PullImage pulls an image using the specified resolver.
-func PullImage(ctx context.Context, client *containerd.Client, resolver remotes.Resolver, ref string, options options.ImagePull) (*EnsuredImage, error) {
+func PullImage(
+	ctx context.Context,
+	client *containerd.Client,
+	resolver remotes.Resolver,
+	ref string,
+	options options.ImagePull,
+) (*EnsuredImage, error) {
 	ctx, done, err := client.WithLease(ctx)
 	if err != nil {
 		return nil, err
@@ -222,7 +242,8 @@ func PullImage(ctx context.Context, client *containerd.Client, resolver remotes.
 
 	snOpt := getSnapshotterOpts(options.GOptions.Snapshotter)
 	if unpackB {
-		log.G(ctx).Debugf("The image will be unpacked for platform %q, snapshotter %q.", options.OCISpecPlatform[0], options.GOptions.Snapshotter)
+		log.G(ctx).
+			Debugf("The image will be unpacked for platform %q, snapshotter %q.", options.OCISpecPlatform[0], options.GOptions.Snapshotter)
 		imgcryptPayload := imgcrypt.Payload{}
 		imgcryptUnpackOpt := encryption.WithUnpackConfigApplyOpts(encryption.WithDecryptedUnpack(&imgcryptPayload))
 		config.RemoteOpts = append(config.RemoteOpts,
@@ -251,7 +272,6 @@ func PullImage(ctx context.Context, client *containerd.Client, resolver remotes.
 		Remote:      snOpt.isRemote(),
 	}
 	return res, nil
-
 }
 
 func getImageConfig(ctx context.Context, image containerd.Image) (*specs.ImageConfig, error) {
@@ -337,7 +357,8 @@ func ReadManifest(ctx context.Context, img containerd.Image) (*specs.Manifest, *
 	return nil, nil, nil
 }
 
-// ReadImageConfig reads the config spec (`application/vnd.oci.image.config.v1+json`) for img.platform from content store.
+// ReadImageConfig reads the config spec (`application/vnd.oci.image.config.v1+json`) for img.platform from content
+// store.
 func ReadImageConfig(ctx context.Context, img containerd.Image) (specs.Image, specs.Descriptor, error) {
 	var config specs.Image
 
@@ -371,8 +392,13 @@ func ParseRepoTag(imgName string) (string, string) {
 // ResourceUsage will return:
 // - the Usage value of the resource referenced by ID
 // - the cumulative Usage value of the resource, and all parents, recursively
-// Typically, for a running container, this will equal the size of the read-write layer, plus the sum of the size of all layers in the base image
-func ResourceUsage(ctx context.Context, snapshotter snapshots.Snapshotter, resourceID string) (snapshots.Usage, snapshots.Usage, error) {
+// Typically, for a running container, this will equal the size of the read-write layer, plus the sum of the size of all
+// layers in the base image
+func ResourceUsage(
+	ctx context.Context,
+	snapshotter snapshots.Snapshotter,
+	resourceID string,
+) (snapshots.Usage, snapshots.Usage, error) {
 	first := snapshots.Usage{}
 	total := snapshots.Usage{}
 	var info snapshots.Info
@@ -449,9 +475,7 @@ func GetUnusedImages(ctx context.Context, client *containerd.Client, filters ...
 
 // GetDanglingImages returns the list of all images which are not tagged.
 func GetDanglingImages(ctx context.Context, client *containerd.Client, filters ...Filter) ([]images.Image, error) {
-	var (
-		imageStore = client.ImageService()
-	)
+	imageStore := client.ImageService()
 
 	allImages, err := imageStore.List(ctx)
 	if err != nil {

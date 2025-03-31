@@ -136,7 +136,7 @@ func ApplyFilters(imageList []images.Image, filters ...Filter) ([]images.Image, 
 
 // FilterByCreatedAt filters an image list to images created before MAX(before.<Image>.CreatedAt)
 // and after MIN(since.<Image>.CreatedAt).
-func FilterByCreatedAt(ctx context.Context, client *containerd.Client, before []string, since []string) Filter {
+func FilterByCreatedAt(ctx context.Context, client *containerd.Client, before, since []string) Filter {
 	return func(imageList []images.Image) ([]images.Image, error) {
 		var (
 			minTime = time.Date(1970, time.Month(1), 1, 0, 0, 0, 0, time.UTC)
@@ -251,7 +251,9 @@ func FilterByLabel(ctx context.Context, client *containerd.Client, labels map[st
 			if err != nil {
 				// Stop-gap measure. Do not hard error if some images config cannot be read.
 				// See https://github.com/containerd/nerdctl/issues/3516
-				log.G(ctx).WithError(err).Errorf("failed reading image config for %s (%s)", clientImage.Name(), clientImage.Platform())
+				log.G(ctx).
+					WithError(err).
+					Errorf("failed reading image config for %s (%s)", clientImage.Name(), clientImage.Platform())
 				return false, nil
 			}
 			return matchesAllLabels(imageCfg.Config.Labels, labels), nil
@@ -300,7 +302,7 @@ func filter[T any](items []T, f func(item T) (bool, error)) ([]T, error) {
 	return filteredItems, nil
 }
 
-func imageCreatedBetween(image images.Image, minTime time.Time, maxTime time.Time) bool {
+func imageCreatedBetween(image images.Image, minTime, maxTime time.Time) bool {
 	return image.CreatedAt.After(minTime) && image.CreatedAt.Before(maxTime)
 }
 
@@ -308,7 +310,7 @@ func imageCreatedBefore(image images.Image, maxTime time.Time) bool {
 	return image.CreatedAt.Before(maxTime)
 }
 
-func matchesAllLabels(imageCfgLabels map[string]string, filterLabels map[string]string) bool {
+func matchesAllLabels(imageCfgLabels, filterLabels map[string]string) bool {
 	var matches int
 	for lk, lv := range filterLabels {
 		if val, ok := imageCfgLabels[lk]; ok {

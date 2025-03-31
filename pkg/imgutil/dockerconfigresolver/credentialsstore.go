@@ -77,7 +77,8 @@ func (cs *CredentialsStore) Erase(registryURL *RegistryURL) (map[string]error, e
 // On error, ErrUnableToStore
 func (cs *CredentialsStore) Store(registryURL *RegistryURL, credentials *Credentials) error {
 	// We just overwrite the server property here with the host
-	// Whether it was one of the variants, or was not set at all (see for example Amazon ECR, https://github.com/containerd/nerdctl/issues/733
+	// Whether it was one of the variants, or was not set at all (see for example Amazon ECR,
+	// https://github.com/containerd/nerdctl/issues/733
 	// - which is likely a bug in docker) it doesn't matter.
 	// This is the credentials that were returned for that host, by the docker credentials store.
 	if registryURL.Namespace != nil {
@@ -127,7 +128,12 @@ func (cs *CredentialsStore) Retrieve(registryURL *RegistryURL, checkCredStore bo
 	// and that is what ServerAddress should point to
 	defer func() {
 		if registryURL.Namespace != nil {
-			returnedCredentials.ServerAddress = fmt.Sprintf("%s%s?%s", registryURL.Host, registryURL.Path, registryURL.RawQuery)
+			returnedCredentials.ServerAddress = fmt.Sprintf(
+				"%s%s?%s",
+				registryURL.Host,
+				registryURL.Path,
+				registryURL.RawQuery,
+			)
 		} else {
 			returnedCredentials.ServerAddress = registryURL.Host
 		}
@@ -167,7 +173,8 @@ func (cs *CredentialsStore) Retrieve(registryURL *RegistryURL, checkCredStore bo
 	return returnedCredentials, err
 }
 
-// isFileStore is an internal mock interface purely meant to help identify that the docker credential backend is a filesystem one
+// isFileStore is an internal mock interface purely meant to help identify that the docker credential backend is a
+// filesystem one
 type isFileStore interface {
 	IsFileStore() bool
 	GetFilename() string

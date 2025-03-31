@@ -22,7 +22,8 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-// canIgnoreSignal is from https://github.com/containerd/containerd/blob/v1.7.0-rc.2/cmd/ctr/commands/signals_linux.go#L25-L27
+// canIgnoreSignal is from
+// https://github.com/containerd/containerd/blob/v1.7.0-rc.2/cmd/ctr/commands/signals_linux.go#L25-L27
 func canIgnoreSignal(s os.Signal) bool {
 	return s == unix.SIGURG
 }

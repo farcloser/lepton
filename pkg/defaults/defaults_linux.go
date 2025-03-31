@@ -35,9 +35,7 @@ const (
 	Runtime            = plugins.RuntimeRuncV2
 )
 
-var (
-	AppArmorProfileName = version.RootName + "-default"
-)
+var AppArmorProfileName = version.RootName + "-default"
 
 func DataRoot() string {
 	if !rootlessutil.IsRootless() {

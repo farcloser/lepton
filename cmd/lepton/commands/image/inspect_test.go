@@ -26,6 +26,7 @@ import (
 
 	"gotest.tools/v3/assert"
 
+	"go.farcloser.world/tigron/expect"
 	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
@@ -45,7 +46,7 @@ func TestImageInspectSimpleCases(t *testing.T) {
 			{
 				Description: "Contains some stuff",
 				Command:     test.Command("image", "inspect", testutil.CommonImage),
-				Expected: test.Expects(0, nil, func(stdout string, info string, t *testing.T) {
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, func(stdout, info string, t *testing.T) {
 					var dc []dockercompat.Image
 					err := json.Unmarshal([]byte(stdout), &dc)
 					assert.NilError(t, err, "Unable to unmarshal output\n"+info)
@@ -57,13 +58,25 @@ func TestImageInspectSimpleCases(t *testing.T) {
 			},
 			{
 				Description: "RawFormat support (.Id)",
-				Command:     test.Command("image", "inspect", testutil.CommonImage, "--format", "{{.Id}}"),
-				Expected:    test.Expects(0, nil, nil),
+				Command: test.Command(
+					"image",
+					"inspect",
+					testutil.CommonImage,
+					"--format",
+					"{{.Id}}",
+				),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 			},
 			{
 				Description: "typedFormat support (.ID)",
-				Command:     test.Command("image", "inspect", testutil.CommonImage, "--format", "{{.ID}}"),
-				Expected:    test.Expects(0, nil, nil),
+				Command: test.Command(
+					"image",
+					"inspect",
+					testutil.CommonImage,
+					"--format",
+					"{{.ID}}",
+				),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 			},
 			{
 				Description: "Error for image not found",
@@ -115,7 +128,7 @@ func TestImageInspectDifferentValidReferencesForTheSameImage(t *testing.T) {
 				Command:     test.Command("image", "inspect", "busybox"),
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
-						Output: func(stdout string, info string, t *testing.T) {
+						Output: func(stdout, info string, t *testing.T) {
 							var dc []dockercompat.Image
 							err := json.Unmarshal([]byte(stdout), &dc)
 							assert.NilError(t, err, "Unable to unmarshal output\n"+info)
@@ -140,7 +153,7 @@ func TestImageInspectDifferentValidReferencesForTheSameImage(t *testing.T) {
 				Command:     test.Command("image", "inspect", "busybox"),
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
-						Output: func(stdout string, info string, t *testing.T) {
+						Output: func(stdout, info string, t *testing.T) {
 							var dc []dockercompat.Image
 							err := json.Unmarshal([]byte(stdout), &dc)
 							assert.NilError(t, err, "Unable to unmarshal output\n"+info)
@@ -173,7 +186,7 @@ func TestImageInspectDifferentValidReferencesForTheSameImage(t *testing.T) {
 				Command:     test.Command("image", "inspect", "busybox"),
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
-						Output: func(stdout string, info string, t *testing.T) {
+						Output: func(stdout, info string, t *testing.T) {
 							var dc []dockercompat.Image
 							err := json.Unmarshal([]byte(stdout), &dc)
 							assert.NilError(t, err, "Unable to unmarshal output\n"+info)
@@ -184,7 +197,9 @@ func TestImageInspectDifferentValidReferencesForTheSameImage(t *testing.T) {
 								cmd := helpers.Command("image", "inspect", id+"@sha256:"+sha)
 								cmd.Run(&test.Expected{
 									ExitCode: 1,
-									Errors:   []error{fmt.Errorf("no such image: %s@sha256:%s", id, sha)},
+									Errors: []error{
+										fmt.Errorf("no such image: %s@sha256:%s", id, sha),
+									},
 								})
 							}
 						},
@@ -196,7 +211,7 @@ func TestImageInspectDifferentValidReferencesForTheSameImage(t *testing.T) {
 				Command:     test.Command("image", "inspect", "busybox"),
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
-						Output: func(stdout string, info string, t *testing.T) {
+						Output: func(stdout, info string, t *testing.T) {
 							var dc []dockercompat.Image
 							err := json.Unmarshal([]byte(stdout), &dc)
 							assert.NilError(t, err, "Unable to unmarshal output\n"+info)
@@ -206,7 +221,9 @@ func TestImageInspectDifferentValidReferencesForTheSameImage(t *testing.T) {
 								cmd := helpers.Command("image", "inspect", id)
 								cmd.Run(&test.Expected{
 									ExitCode: 1,
-									Errors:   []error{fmt.Errorf("invalid reference format: %s", id)},
+									Errors: []error{
+										fmt.Errorf("invalid reference format: %s", id),
+									},
 								})
 							}
 						},
@@ -218,7 +235,7 @@ func TestImageInspectDifferentValidReferencesForTheSameImage(t *testing.T) {
 				Command:     test.Command("image", "inspect", "busybox", "busybox"),
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
-						Output: func(stdout string, info string, t *testing.T) {
+						Output: func(stdout, info string, t *testing.T) {
 							var dc []dockercompat.Image
 							err := json.Unmarshal([]byte(stdout), &dc)
 							assert.NilError(t, err, "Unable to unmarshal output\n"+info)

@@ -85,7 +85,11 @@ func Unload(profileName string) error {
 func GetSpecOptions(securityOpt string) (oci.SpecOpts, error) {
 	// If opt is the empty string, that is an error
 	if securityOpt == Empty {
-		return nil, errWrap(errors.New("security-opt \"apparmor\" can't be set to the empty string"), ErrServiceAppArmor, errs.ErrInvalidArgument)
+		return nil, errWrap(
+			errors.New("security-opt \"apparmor\" can't be set to the empty string"),
+			ErrServiceAppArmor,
+			errs.ErrInvalidArgument,
+		)
 	}
 
 	// If unconfined, just return

@@ -50,9 +50,37 @@ func TestStats(t *testing.T) {
 	}
 
 	testCase.Setup = func(data test.Data, helpers test.Helpers) {
-		helpers.Ensure("run", "--quiet", "-d", "--name", data.Identifier("container"), testutil.CommonImage, "sleep", nerdtest.Infinity)
-		helpers.Ensure("run", "--quiet", "-d", "--name", data.Identifier("memlimited"), "--memory", "1g", testutil.CommonImage, "sleep", nerdtest.Infinity)
-		helpers.Ensure("run", "--quiet", "--name", data.Identifier("exited"), testutil.CommonImage, "echo", "'exited'")
+		helpers.Ensure(
+			"run",
+			"--quiet",
+			"-d",
+			"--name",
+			data.Identifier("container"),
+			testutil.CommonImage,
+			"sleep",
+			nerdtest.Infinity,
+		)
+		helpers.Ensure(
+			"run",
+			"--quiet",
+			"-d",
+			"--name",
+			data.Identifier("memlimited"),
+			"--memory",
+			"1g",
+			testutil.CommonImage,
+			"sleep",
+			nerdtest.Infinity,
+		)
+		helpers.Ensure(
+			"run",
+			"--quiet",
+			"--name",
+			data.Identifier("exited"),
+			testutil.CommonImage,
+			"echo",
+			"'exited'",
+		)
 		data.Set("id", data.Identifier("container"))
 	}
 
@@ -80,14 +108,14 @@ func TestStats(t *testing.T) {
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("stats", "--no-stream", data.Get("id"))
 			},
-			Expected: test.Expects(0, nil, nil),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 		},
 		{
 			Description: "container stats ID",
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("container", "stats", "--no-stream", data.Get("id"))
 			},
-			Expected: test.Expects(0, nil, nil),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 		},
 		{
 			Description: "no mem limit set",
@@ -96,14 +124,14 @@ func TestStats(t *testing.T) {
 			},
 			// https://github.com/containerd/nerdctl/issues/1240
 			// used to print UINT64_MAX as the memory limit, so, ensure it does no more
-			Expected: test.Expects(0, nil, expect.DoesNotContain("16EiB")),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.DoesNotContain("16EiB")),
 		},
 		{
 			Description: "mem limit set",
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("stats", "--no-stream")
 			},
-			Expected: test.Expects(0, nil, expect.Contains("1GiB")),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("1GiB")),
 		},
 	}
 

@@ -89,14 +89,22 @@ func (s *FormattedStatsEntry) NetIO() string {
 	if s.Entry.IsInvalid {
 		return "--"
 	}
-	return fmt.Sprintf("%s / %s", units.HumanSizeWithPrecision(s.Entry.NetworkRx, 3), units.HumanSizeWithPrecision(s.Entry.NetworkTx, 3))
+	return fmt.Sprintf(
+		"%s / %s",
+		units.HumanSizeWithPrecision(s.Entry.NetworkRx, 3),
+		units.HumanSizeWithPrecision(s.Entry.NetworkTx, 3),
+	)
 }
 
 func (s *FormattedStatsEntry) BlockIO() string {
 	if s.Entry.IsInvalid {
 		return "--"
 	}
-	return fmt.Sprintf("%s / %s", units.HumanSizeWithPrecision(s.BlockRead, 3), units.HumanSizeWithPrecision(s.Entry.BlockWrite, 3))
+	return fmt.Sprintf(
+		"%s / %s",
+		units.HumanSizeWithPrecision(s.BlockRead, 3),
+		units.HumanSizeWithPrecision(s.Entry.BlockWrite, 3),
+	)
 }
 
 func (s *FormattedStatsEntry) PIDs() string {

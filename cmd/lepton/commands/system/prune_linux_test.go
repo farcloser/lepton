@@ -59,14 +59,22 @@ func TestSystemPrune(t *testing.T) {
 			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 				return &test.Expected{
 					ExitCode: 0,
-					Output: func(stdout string, info string, t *testing.T) {
+					Output: func(stdout, info string, t *testing.T) {
 						volumes := helpers.Capture("volume", "ls")
 						networks := helpers.Capture("network", "ls")
 						images := helpers.Capture("images")
 						containers := helpers.Capture("ps", "-a")
 						assert.Assert(t, strings.Contains(volumes, data.Identifier()), volumes)
-						assert.Assert(t, !strings.Contains(volumes, data.Get("anonIdentifier")), volumes)
-						assert.Assert(t, !strings.Contains(containers, data.Identifier()), containers)
+						assert.Assert(
+							t,
+							!strings.Contains(volumes, data.Get("anonIdentifier")),
+							volumes,
+						)
+						assert.Assert(
+							t,
+							!strings.Contains(containers, data.Identifier()),
+							containers,
+						)
 						assert.Assert(t, !strings.Contains(networks, data.Identifier()), networks)
 						assert.Assert(t, !strings.Contains(images, testutil.CommonImage), images)
 					},
@@ -88,7 +96,7 @@ func TestSystemPrune(t *testing.T) {
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return nerdtest.BuildCtlCommand(helpers, "du")
 			},
-			Expected: test.Expects(0, nil, expect.Contains("Total:\t\t0B")),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("Total:\t\t0B")),
 		},
 	}
 

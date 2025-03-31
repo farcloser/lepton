@@ -37,10 +37,21 @@ func Pull(ctx context.Context, client *containerd.Client, rawRef string, options
 }
 
 // EnsureImage pulls an image from registry.
-func EnsureImage(ctx context.Context, client *containerd.Client, rawRef string, options options.ImagePull) (*imgutil.EnsuredImage, error) {
+func EnsureImage(
+	ctx context.Context,
+	client *containerd.Client,
+	rawRef string,
+	options options.ImagePull,
+) (*imgutil.EnsuredImage, error) {
 	var ensured *imgutil.EnsuredImage
 
-	ref, err := signutil.Verify(ctx, rawRef, options.GOptions.HostsDir, options.GOptions.Experimental, options.VerifyOptions)
+	ref, err := signutil.Verify(
+		ctx,
+		rawRef,
+		options.GOptions.HostsDir,
+		options.GOptions.Experimental,
+		options.VerifyOptions,
+	)
 	if err != nil {
 		return nil, err
 	}

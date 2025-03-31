@@ -58,7 +58,13 @@ func (n *NetworkConfig) clean() error {
 	return nil
 }
 
-func (e *CNIEnv) generateCNIPlugins(driver string, name string, ipam map[string]interface{}, opts map[string]string, ipv6 bool) ([]CNIPlugin, error) {
+func (e *CNIEnv) generateCNIPlugins(
+	driver string,
+	name string,
+	ipam map[string]interface{},
+	opts map[string]string,
+	ipv6 bool,
+) ([]CNIPlugin, error) {
 	var plugins []CNIPlugin
 	switch driver {
 	case "nat":
@@ -71,7 +77,13 @@ func (e *CNIEnv) generateCNIPlugins(driver string, name string, ipam map[string]
 	return plugins, nil
 }
 
-func (e *CNIEnv) generateIPAM(driver string, subnets []string, gatewayStr, ipRangeStr string, opts map[string]string, ipv6 bool) (map[string]interface{}, error) {
+func (e *CNIEnv) generateIPAM(
+	driver string,
+	subnets []string,
+	gatewayStr, ipRangeStr string,
+	opts map[string]string,
+	ipv6 bool,
+) (map[string]interface{}, error) {
 	switch driver {
 	case "default":
 	default:

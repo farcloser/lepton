@@ -43,7 +43,7 @@ func Path(dataStore, ns, id string) string {
 	return filepath.Join(dataStore, "containers", ns, id, id+"-json.log")
 }
 
-func Encode(stdout <-chan string, stderr <-chan string, writer io.Writer) error {
+func Encode(stdout, stderr <-chan string, writer io.Writer) error {
 	enc := json.NewEncoder(writer)
 	var encMu sync.Mutex
 	var wg sync.WaitGroup
@@ -71,7 +71,14 @@ func Encode(stdout <-chan string, stderr <-chan string, writer io.Writer) error 
 	return nil
 }
 
-func writeEntry(e *Entry, stdout, stderr io.Writer, refTime time.Time, timestamps bool, since string, until string) error {
+func writeEntry(
+	e *Entry,
+	stdout, stderr io.Writer,
+	refTime time.Time,
+	timestamps bool,
+	since string,
+	until string,
+) error {
 	output := []byte{}
 
 	if since != "" {
@@ -128,7 +135,7 @@ func writeEntry(e *Entry, stdout, stderr io.Writer, refTime time.Time, timestamp
 	return nil
 }
 
-func Decode(stdout, stderr io.Writer, r io.Reader, timestamps bool, since string, until string) ([]byte, error) {
+func Decode(stdout, stderr io.Writer, r io.Reader, timestamps bool, since, until string) ([]byte, error) {
 	dec := json.NewDecoder(r)
 	now := time.Now()
 	for {

@@ -3,7 +3,7 @@ name: "Node"
 description: "A compounded action preparing the environment"
 
 inputs:
-  go:
+  go-version:
     required: false
     default: "stable"
     description: ""
@@ -14,7 +14,7 @@ runs:
     - name: "Install: go"
       uses: ./.github/actions/install-go
       with:
-        version: ${{ inputs.go }}
+        version: ${{ inputs.go-version }}
     - name: "Install: dev-tools"
       uses: ./.github/actions/install-dev-tools
     - name: "Cache: go mod"

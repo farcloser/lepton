@@ -29,7 +29,7 @@ import (
 )
 
 func portCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:           "port [flags] SERVICE PRIVATE_PORT",
 		Short:         "Print the public port for a port binding",
 		Args:          cobra.ExactArgs(2),

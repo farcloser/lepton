@@ -38,9 +38,24 @@ func TestParseAddress(t *testing.T) {
 		want    *loc
 		wantErr bool
 	}{
-		{name: "empty", args: args{address: ""}, want: &loc{scheme: "tcp", host: "127.0.0.1", port: 24224}, wantErr: false},
-		{name: "unix", args: args{address: "unix:///var/run/fluentd/fluentd.sock"}, want: &loc{scheme: "unix", path: "/var/run/fluentd/fluentd.sock"}, wantErr: false},
-		{name: "tcp", args: args{address: "tcp://127.0.0.1:24224"}, want: &loc{scheme: "tcp", host: "127.0.0.1", port: 24224}, wantErr: false},
+		{
+			name:    "empty",
+			args:    args{address: ""},
+			want:    &loc{scheme: "tcp", host: "127.0.0.1", port: 24224},
+			wantErr: false,
+		},
+		{
+			name:    "unix",
+			args:    args{address: "unix:///var/run/fluentd/fluentd.sock"},
+			want:    &loc{scheme: "unix", path: "/var/run/fluentd/fluentd.sock"},
+			wantErr: false,
+		},
+		{
+			name:    "tcp",
+			args:    args{address: "tcp://127.0.0.1:24224"},
+			want:    &loc{scheme: "tcp", host: "127.0.0.1", port: 24224},
+			wantErr: false,
+		},
 		{name: "tcpWithPath", args: args{address: "tcp://127.0.0.1:24224/1234"}, want: nil, wantErr: true},
 		{name: "unixWithEmpty", args: args{address: "unix://"}, want: nil, wantErr: true},
 		{name: "invalidPath", args: args{address: "://asd123"}, want: nil, wantErr: true},

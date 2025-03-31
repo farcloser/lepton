@@ -53,7 +53,7 @@ func TestLoadStdinFromPipe(t *testing.T) {
 			cmd := helpers.Command("load")
 			reader, err := os.Open(filepath.Join(data.TempDir(), "common.tar"))
 			assert.NilError(t, err, "failed to open common.tar")
-			cmd.WithStdin(reader)
+			cmd.Feed(reader)
 			return cmd
 		},
 		Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
@@ -61,7 +61,7 @@ func TestLoadStdinFromPipe(t *testing.T) {
 			return &test.Expected{
 				Output: expect.All(
 					expect.Contains(fmt.Sprintf("Loaded image: %s:latest", identifier)),
-					func(stdout string, info string, t *testing.T) {
+					func(stdout, info string, t *testing.T) {
 						assert.Assert(t, strings.Contains(helpers.Capture("images"), identifier))
 					},
 				),
@@ -101,7 +101,12 @@ func TestLoadQuiet(t *testing.T) {
 			helpers.Anyhow("rmi", "-f", data.Identifier())
 		},
 		Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-			return helpers.Command("load", "--quiet", "--input", filepath.Join(data.TempDir(), "common.tar"))
+			return helpers.Command(
+				"load",
+				"--quiet",
+				"--input",
+				filepath.Join(data.TempDir(), "common.tar"),
+			)
 		},
 		Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 			return &test.Expected{

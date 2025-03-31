@@ -66,7 +66,10 @@ func fulfillPlatformInfo(info *dockercompat.Info) {
 
 	if info.CgroupDriver == cgroups.NoneManager {
 		if info.CgroupVersion == strconv.Itoa(int(cgroups.Version2)) {
-			info.Warnings = append(info.Warnings, "WARNING: Running in rootless-mode without cgroups. Systemd is required to enable cgroups in rootless-mode.")
+			info.Warnings = append(
+				info.Warnings,
+				"WARNING: Running in rootless-mode without cgroups. Systemd is required to enable cgroups in rootless-mode.",
+			)
 		} else {
 			info.Warnings = append(info.Warnings, "WARNING: Running in rootless-mode without cgroups. To enable cgroups in rootless-mode, you need to boot the system in cgroup v2 mode.")
 		}
@@ -120,7 +123,8 @@ func fulfillPlatformInfo(info *dockercompat.Info) {
 
 func mobySysInfo(info *dockercompat.Info) *sysinfo.SysInfo {
 	g := "/"
-	if info.CgroupDriver == cgroups.SystemdManager && info.CgroupVersion == strconv.Itoa(int(cgroups.Version2)) && rootlessutil.IsRootless() {
+	if info.CgroupDriver == cgroups.SystemdManager && info.CgroupVersion == strconv.Itoa(int(cgroups.Version2)) &&
+		rootlessutil.IsRootless() {
 		g = fmt.Sprintf("/user.slice/user-%d.slice", rootlessutil.ParentEUID())
 	}
 	inf, _, _ := sysinfo.New(g)

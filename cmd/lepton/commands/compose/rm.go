@@ -29,7 +29,7 @@ import (
 )
 
 func removeCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:           "rm [flags] [SERVICE...]",
 		Short:         "Remove stopped service containers",
 		RunE:          removeAction,

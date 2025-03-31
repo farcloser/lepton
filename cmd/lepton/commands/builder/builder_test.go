@@ -26,6 +26,7 @@ import (
 
 	"gotest.tools/v3/assert"
 
+	"go.farcloser.world/tigron/expect"
 	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
@@ -50,12 +51,16 @@ func TestBuilder(t *testing.T) {
 					dockerfile := fmt.Sprintf(`FROM %s
 CMD ["echo", "test-builder-prune"]`, testutil.CommonImage)
 					buildCtx := data.TempDir()
-					err := os.WriteFile(filepath.Join(buildCtx, "Dockerfile"), []byte(dockerfile), 0o600)
+					err := os.WriteFile(
+						filepath.Join(buildCtx, "Dockerfile"),
+						[]byte(dockerfile),
+						0o600,
+					)
 					assert.NilError(helpers.T(), err)
 					helpers.Ensure("build", buildCtx)
 				},
 				Command:  test.Command("builder", "prune", "--force"),
-				Expected: test.Expects(0, nil, nil),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 			},
 			{
 				Description: "PruneForceAll",
@@ -64,12 +69,16 @@ CMD ["echo", "test-builder-prune"]`, testutil.CommonImage)
 					dockerfile := fmt.Sprintf(`FROM %s
 CMD ["echo", "test-builder-prune"]`, testutil.CommonImage)
 					buildCtx := data.TempDir()
-					err := os.WriteFile(filepath.Join(buildCtx, "Dockerfile"), []byte(dockerfile), 0o600)
+					err := os.WriteFile(
+						filepath.Join(buildCtx, "Dockerfile"),
+						[]byte(dockerfile),
+						0o600,
+					)
 					assert.NilError(helpers.T(), err)
 					helpers.Ensure("build", buildCtx)
 				},
 				Command:  test.Command("builder", "prune", "--force", "--all"),
-				Expected: test.Expects(0, nil, nil),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 			},
 			{
 				Description: "Debug",
@@ -80,13 +89,17 @@ CMD ["echo", "test-builder-prune"]`, testutil.CommonImage)
 					dockerfile := fmt.Sprintf(`FROM %s
 CMD ["echo", "builder-debug-test-string"]`, testutil.CommonImage)
 					buildCtx := data.TempDir()
-					err := os.WriteFile(filepath.Join(buildCtx, "Dockerfile"), []byte(dockerfile), 0o600)
+					err := os.WriteFile(
+						filepath.Join(buildCtx, "Dockerfile"),
+						[]byte(dockerfile),
+						0o600,
+					)
 					assert.NilError(helpers.T(), err)
 					cmd := helpers.Command("builder", "debug", buildCtx)
-					cmd.WithStdin(bytes.NewReader([]byte("c\n")))
+					cmd.Feed(bytes.NewReader([]byte("c\n")))
 					return cmd
 				},
-				Expected: test.Expects(0, nil, nil),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 			},
 			{
 				Description: "WithPull",
@@ -104,7 +117,11 @@ CMD ["echo", "builder-debug-test-string"]`, testutil.CommonImage)
 
 					dockerfile := "FROM " + newImage
 					buildCtx := data.TempDir()
-					err := os.WriteFile(filepath.Join(buildCtx, "Dockerfile"), []byte(dockerfile), 0o600)
+					err := os.WriteFile(
+						filepath.Join(buildCtx, "Dockerfile"),
+						[]byte(dockerfile),
+						0o600,
+					)
 					assert.NilError(helpers.T(), err)
 
 					data.Set("buildCtx", buildCtx)

@@ -40,7 +40,11 @@ services:
 	testCase := nerdtest.Setup()
 
 	testCase.Setup = func(data test.Data, helpers test.Helpers) {
-		err := os.WriteFile(filepath.Join(data.TempDir(), "compose.yaml"), []byte(dockerComposeYAML), 0o600)
+		err := os.WriteFile(
+			filepath.Join(data.TempDir(), "compose.yaml"),
+			[]byte(dockerComposeYAML),
+			0o600,
+		)
 		assert.NilError(t, err)
 		data.Set("compyaml", filepath.Join(data.TempDir(), "compose.yaml"))
 	}
@@ -51,21 +55,27 @@ services:
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("compose", "-f", data.Get("compyaml"), "config")
 			},
-			Expected: test.Expects(0, nil, expect.Contains("hello:")),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("hello:")),
 		},
 		{
 			Description: "config --services is exactly service name",
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-				return helpers.Command("compose", "-f", data.Get("compyaml"), "config", "--services")
+				return helpers.Command(
+					"compose",
+					"-f",
+					data.Get("compyaml"),
+					"config",
+					"--services",
+				)
 			},
-			Expected: test.Expects(0, nil, expect.Equals("hello\n")),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Equals("hello\n")),
 		},
 		{
 			Description: "config --hash=* contains service name",
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("compose", "-f", data.Get("compyaml"), "config", "--hash=*")
 			},
-			Expected: test.Expects(0, nil, expect.Contains("hello")),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("hello")),
 		},
 	}
 
@@ -81,24 +91,44 @@ services:
 	testCase := nerdtest.Setup()
 
 	testCase.Setup = func(data test.Data, helpers test.Helpers) {
-		err := os.WriteFile(filepath.Join(data.TempDir(), "compose.yaml"), []byte(fmt.Sprintf(dockerComposeYAML, "3.13")), 0o600)
+		err := os.WriteFile(
+			filepath.Join(data.TempDir(), "compose.yaml"),
+			[]byte(fmt.Sprintf(dockerComposeYAML, "3.13")),
+			0o600,
+		)
 
-		hash := helpers.Capture("compose", "-f", filepath.Join(data.TempDir(), "compose.yaml"), "config", "--hash=hello")
+		hash := helpers.Capture(
+			"compose",
+			"-f",
+			filepath.Join(data.TempDir(), "compose.yaml"),
+			"config",
+			"--hash=hello",
+		)
 		assert.NilError(t, err)
 		data.Set("hash", hash)
 
-		err = os.WriteFile(filepath.Join(data.TempDir(), "compose.yaml"), []byte(fmt.Sprintf(dockerComposeYAML, "3.14")), 0o600)
+		err = os.WriteFile(
+			filepath.Join(data.TempDir(), "compose.yaml"),
+			[]byte(fmt.Sprintf(dockerComposeYAML, "3.14")),
+			0o600,
+		)
 		assert.NilError(t, err)
 	}
 
 	testCase.Command = func(data test.Data, helpers test.Helpers) test.TestableCommand {
-		return helpers.Command("compose", "-f", filepath.Join(data.TempDir(), "compose.yaml"), "config", "--hash=hello")
+		return helpers.Command(
+			"compose",
+			"-f",
+			filepath.Join(data.TempDir(), "compose.yaml"),
+			"config",
+			"--hash=hello",
+		)
 	}
 
 	testCase.Expected = func(data test.Data, helpers test.Helpers) *test.Expected {
 		return &test.Expected{
 			ExitCode: 0,
-			Output: func(stdout string, info string, t *testing.T) {
+			Output: func(stdout, info string, t *testing.T) {
 				assert.Assert(t, data.Get("hash") != stdout, info)
 			},
 		}
@@ -112,7 +142,7 @@ func TestComposeConfigWithMultipleFile(t *testing.T) {
 
 	base := testutil.NewBase(t)
 
-	var dockerComposeYAML = `
+	dockerComposeYAML := `
 services:
   hello1:
     image: alpine:3.13
@@ -132,8 +162,10 @@ services:
     image: alpine:3.14
 `)
 
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "-f", filepath.Join(comp.Dir(), "docker-compose.test.yml"), "config").AssertOutContains("alpine:3.14")
-	base.ComposeCmd("--project-directory", comp.Dir(), "config", "--services").AssertOutExactly("hello1\n")
+	base.ComposeCmd("-f", comp.YAMLFullPath(), "-f", filepath.Join(comp.Dir(), "docker-compose.test.yml"), "config").
+		AssertOutContains("alpine:3.14")
+	base.ComposeCmd("--project-directory", comp.Dir(), "config", "--services").
+		AssertOutExactly("hello1\n")
 	base.ComposeCmd("--project-directory", comp.Dir(), "config").AssertOutContains("alpine:3.14")
 }
 
@@ -142,7 +174,7 @@ func TestComposeConfigWithComposeFileEnv(t *testing.T) {
 
 	base := testutil.NewBase(t)
 
-	var dockerComposeYAML = `
+	dockerComposeYAML := `
 services:
   hello1:
     image: alpine:3.13
@@ -157,10 +189,18 @@ services:
     image: alpine:3.14
 `)
 
-	base.Env = append(base.Env, "COMPOSE_FILE="+comp.YAMLFullPath()+","+filepath.Join(comp.Dir(), "docker-compose.test.yml"), "COMPOSE_PATH_SEPARATOR=,")
+	base.Env = append(
+		base.Env,
+		"COMPOSE_FILE="+comp.YAMLFullPath()+","+filepath.Join(
+			comp.Dir(),
+			"docker-compose.test.yml",
+		),
+		"COMPOSE_PATH_SEPARATOR=,",
+	)
 
 	base.ComposeCmd("config").AssertOutContains("alpine:3.14")
-	base.ComposeCmd("--project-directory", comp.Dir(), "config", "--services").AssertOutContainsAll("hello1\n", "hello2\n")
+	base.ComposeCmd("--project-directory", comp.Dir(), "config", "--services").
+		AssertOutContainsAll("hello1\n", "hello2\n")
 	base.ComposeCmd("--project-directory", comp.Dir(), "config").AssertOutContains("alpine:3.14")
 }
 
@@ -178,17 +218,28 @@ image: hello-world
 	testCase := nerdtest.Setup()
 
 	testCase.Setup = func(data test.Data, helpers test.Helpers) {
-		err := os.WriteFile(filepath.Join(data.TempDir(), "compose.yaml"), []byte(dockerComposeYAML), 0o600)
+		err := os.WriteFile(
+			filepath.Join(data.TempDir(), "compose.yaml"),
+			[]byte(dockerComposeYAML),
+			0o600,
+		)
 		assert.NilError(t, err)
 		err = os.WriteFile(filepath.Join(data.TempDir(), "env"), []byte(envFileContent), 0o600)
 		assert.NilError(t, err)
 	}
 
 	testCase.Command = func(data test.Data, helpers test.Helpers) test.TestableCommand {
-		return helpers.Command("compose", "-f", filepath.Join(data.TempDir(), "compose.yaml"), "--env-file", filepath.Join(data.TempDir(), "env"), "config")
+		return helpers.Command(
+			"compose",
+			"-f",
+			filepath.Join(data.TempDir(), "compose.yaml"),
+			"--env-file",
+			filepath.Join(data.TempDir(), "env"),
+			"config",
+		)
 	}
 
-	testCase.Expected = test.Expects(0, nil, expect.Contains("image: hello-world"))
+	testCase.Expected = test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("image: hello-world"))
 
 	testCase.Run(t)
 }

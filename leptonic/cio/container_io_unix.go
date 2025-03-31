@@ -40,9 +40,10 @@ func (p *pipes) closers() []io.Closer {
 	return []io.Closer{p.Stdin, p.Stdout, p.Stderr}
 }
 
-// copyIO is from https://github.com/containerd/containerd/blob/148d21b1ae0718b75718a09ecb307bb874270f59/cio/io_unix.go#L55
+// copyIO is from
+// https://github.com/containerd/containerd/blob/148d21b1ae0718b75718a09ecb307bb874270f59/cio/io_unix.go#L55
 func copyIO(cmd *exec.Cmd, fifos *cio.FIFOSet, ioset *cio.Streams) (*ncio, error) {
-	var ctx, cancel = context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(context.Background())
 	pipes, err := openFifos(ctx, fifos)
 	if err != nil {
 		cancel()
@@ -59,7 +60,7 @@ func copyIO(cmd *exec.Cmd, fifos *cio.FIFOSet, ioset *cio.Streams) (*ncio, error
 		}()
 	}
 
-	var wg = &sync.WaitGroup{}
+	wg := &sync.WaitGroup{}
 	if fifos.Stdout != "" {
 		wg.Add(1)
 		go func() {

@@ -31,15 +31,15 @@ import (
 )
 
 func LogsCommand() *cobra.Command {
-	var shortUsage = fmt.Sprintf("Fetch the logs of a container. Expected to be used with '%s run -d'.", version.RootName)
-	var longUsage = fmt.Sprintf(`Fetch the logs of a container.
+	shortUsage := fmt.Sprintf("Fetch the logs of a container. Expected to be used with '%s run -d'.", version.RootName)
+	longUsage := fmt.Sprintf(`Fetch the logs of a container.
 
 The following containers are supported:
 - Containers created with '%s run -d'. The log is currently empty for containers created without '-d'.
 - Containers created with '%s compose'.
 - Containers created with Kubernetes (EXPERIMENTAL).
 `, version.RootName, version.RootName)
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:               "logs [flags] CONTAINER",
 		Args:              helpers.IsExactArgs(1),
 		Short:             shortUsage,
@@ -53,8 +53,10 @@ The following containers are supported:
 	cmd.Flags().BoolP("follow", "f", false, "Follow log output")
 	cmd.Flags().BoolP("timestamps", "t", false, "Show timestamps")
 	cmd.Flags().StringP("tail", "n", "all", "Number of lines to show from the end of the logs")
-	cmd.Flags().String("since", "", "Show logs since timestamp (e.g. 2013-01-02T13:23:37Z) or relative (e.g. 42m for 42 minutes)")
-	cmd.Flags().String("until", "", "Show logs before a timestamp (e.g. 2013-01-02T13:23:37Z) or relative (e.g. 42m for 42 minutes)")
+	cmd.Flags().
+		String("since", "", "Show logs since timestamp (e.g. 2013-01-02T13:23:37Z) or relative (e.g. 42m for 42 minutes)")
+	cmd.Flags().
+		String("until", "", "Show logs before a timestamp (e.g. 2013-01-02T13:23:37Z) or relative (e.g. 42m for 42 minutes)")
 
 	return cmd
 }

@@ -27,7 +27,7 @@ import (
 )
 
 func LoadCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:           "load",
 		Args:          cobra.NoArgs,
 		Short:         "Load an image from a tar archive or STDIN",

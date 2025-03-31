@@ -28,7 +28,7 @@ import (
 )
 
 func runCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:                   "run [flags] SERVICE [COMMAND] [ARGS...]",
 		Short:                 "Run a one-off command on a service",
 		Args:                  cobra.MinimumNArgs(1),

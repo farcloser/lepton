@@ -42,7 +42,7 @@ type HostsToml struct {
 	Endpoints  map[string]*hostsTomlHost `toml:"host,omitempty"`
 }
 
-func (ht *HostsToml) Save(dir string, hostIP string, port int) error {
+func (ht *HostsToml) Save(dir, hostIP string, port int) error {
 	var err error
 	var r *os.File
 

@@ -34,8 +34,8 @@ import (
 )
 
 func TestBuildKitFile(t *testing.T) {
-	var tmp = t.TempDir()
-	var wd, err = os.Getwd()
+	tmp := t.TempDir()
+	wd, err := os.Getwd()
 	assert.NilError(t, err)
 	err = os.Chdir(tmp)
 	assert.NilError(t, err)
@@ -75,7 +75,7 @@ func TestBuildKitFile(t *testing.T) {
 		{
 			name: "both Dockerfile and Containerfile are present",
 			prepare: func(t *testing.T) error {
-				var err = os.WriteFile(filepath.Join(tmp, "Dockerfile"), []byte{}, 0o644)
+				err := os.WriteFile(filepath.Join(tmp, "Dockerfile"), []byte{}, 0o644)
 				if err != nil {
 					return err
 				}
@@ -89,7 +89,7 @@ func TestBuildKitFile(t *testing.T) {
 		{
 			name: "Dockerfile and Containerfile have different contents",
 			prepare: func(t *testing.T) error {
-				var err = os.WriteFile(filepath.Join(tmp, "Dockerfile"), []byte{'d'}, 0o644)
+				err := os.WriteFile(filepath.Join(tmp, "Dockerfile"), []byte{'d'}, 0o644)
 				if err != nil {
 					return err
 				}

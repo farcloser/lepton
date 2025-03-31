@@ -63,7 +63,6 @@ func (c *ncio) Wait() {
 }
 
 func (c *ncio) Close() error {
-
 	var lastErr error
 
 	if c.cmd != nil && c.cmd.Process != nil {
@@ -113,7 +112,7 @@ func (c *ncio) Cancel() {
 	}
 }
 
-func NewContainerIO(namespace string, logURI string, tty bool, stdin io.Reader, stdout, stderr io.Writer) cio.Creator {
+func NewContainerIO(namespace, logURI string, tty bool, stdin io.Reader, stdout, stderr io.Writer) cio.Creator {
 	return func(id string) (_ cio.IO, err error) {
 		var (
 			cmd     *exec.Cmd
@@ -149,7 +148,8 @@ func NewContainerIO(namespace string, logURI string, tty bool, stdin io.Reader, 
 		}
 
 		if runtime.GOOS != "windows" {
-			// starting logging binary logic is from https://github.com/containerd/containerd/blob/194a1fdd2cde35bc019ef138f30485e27fe0913e/cmd/containerd-shim-runc-v2/process/io.go#L247
+			// starting logging binary logic is from
+			// https://github.com/containerd/containerd/blob/194a1fdd2cde35bc019ef138f30485e27fe0913e/cmd/containerd-shim-runc-v2/process/io.go#L247
 			stdoutr, stdoutw, err := os.Pipe()
 			if err != nil {
 				return nil, err

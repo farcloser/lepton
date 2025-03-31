@@ -26,7 +26,7 @@ import (
 )
 
 func restartCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:           "restart [flags] [SERVICE...]",
 		Short:         "Restart containers of given (or all) services",
 		RunE:          restartAction,

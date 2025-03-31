@@ -54,7 +54,13 @@ func Sign(rawRef string, experimental bool, options options.ImageSign) error {
 }
 
 // Verify verifies an image using a verifier and options provided in options.
-func Verify(ctx context.Context, rawRef string, hostsDirs []string, experimental bool, options options.ImageVerify) (ref string, err error) {
+func Verify(
+	ctx context.Context,
+	rawRef string,
+	hostsDirs []string,
+	experimental bool,
+	options options.ImageVerify,
+) (ref string, err error) {
 	switch options.Provider {
 	case "cosign":
 		if !experimental {

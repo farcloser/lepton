@@ -27,7 +27,7 @@ import (
 )
 
 func pruneCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:           "prune",
 		Args:          cobra.NoArgs,
 		Short:         "Clean up BuildKit build cache",

@@ -44,13 +44,21 @@ func TestSaveContent(t *testing.T) {
 			helpers.Ensure("pull", "--quiet", testutil.CommonImage)
 		},
 		Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-			return helpers.Command("save", "-o", filepath.Join(data.TempDir(), "out.tar"), testutil.CommonImage)
+			return helpers.Command(
+				"save",
+				"-o",
+				filepath.Join(data.TempDir(), "out.tar"),
+				testutil.CommonImage,
+			)
 		},
 		Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 			return &test.Expected{
-				Output: func(stdout string, info string, t *testing.T) {
+				Output: func(stdout, info string, t *testing.T) {
 					rootfsPath := filepath.Join(data.TempDir(), "rootfs")
-					err := testhelpers.ExtractDockerArchive(filepath.Join(data.TempDir(), "out.tar"), rootfsPath)
+					err := testhelpers.ExtractDockerArchive(
+						filepath.Join(data.TempDir(), "out.tar"),
+						rootfsPath,
+					)
 					assert.NilError(t, err)
 					etcOSReleasePath := filepath.Join(rootfsPath, "/etc/os-release")
 					etcOSReleaseBytes, err := os.ReadFile(etcOSReleasePath)
@@ -106,7 +114,7 @@ func TestSave(t *testing.T) {
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("run", "--rm", data.Get("id"), "sh", "-euxc", "echo foo")
 			},
-			Expected: test.Expects(0, nil, expect.Equals("foo\n")),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Equals("foo\n")),
 		},
 		{
 			Description: "Image with different names, by id",
@@ -135,7 +143,7 @@ func TestSave(t *testing.T) {
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 				return helpers.Command("run", "--rm", data.Get("id"), "sh", "-euxc", "echo foo")
 			},
-			Expected: test.Expects(0, nil, expect.Equals("foo\n")),
+			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Equals("foo\n")),
 		},
 	}
 
@@ -188,7 +196,7 @@ func TestSaveMultipleImagesWithSameIDAndLoad(t *testing.T) {
 				return &test.Expected{
 					ExitCode: 0,
 					Errors:   []error{},
-					Output: func(stdout string, info string, t *testing.T) {
+					Output: func(stdout, info string, t *testing.T) {
 						assert.Equal(t, strings.Count(stdout, data.Get("id")), 2)
 					},
 				}

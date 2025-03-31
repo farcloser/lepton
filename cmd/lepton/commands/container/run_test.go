@@ -58,31 +58,33 @@ CMD ["echo", "bar"]
 	base.Cmd("build", "-t", imageName, buildCtx).AssertOK()
 	base.Cmd("run", "--rm", imageName).AssertOutExactly("foo echo bar\n")
 	base.Cmd("run", "--rm", "--entrypoint", "", imageName).AssertFail()
-	base.Cmd("run", "--rm", "--entrypoint", "", imageName, "echo", "blah").AssertOutWithFunc(func(stdout string) error {
-		if !strings.Contains(stdout, "blah") {
-			return errors.New("echo blah was not executed")
-		}
-		if strings.Contains(stdout, "bar") {
-			return errors.New("echo bar should not be executed")
-		}
-		if strings.Contains(stdout, "foo") {
-			return errors.New("echo foo should not be executed")
-		}
-		return nil
-	})
+	base.Cmd("run", "--rm", "--entrypoint", "", imageName, "echo", "blah").
+		AssertOutWithFunc(func(stdout string) error {
+			if !strings.Contains(stdout, "blah") {
+				return errors.New("echo blah was not executed")
+			}
+			if strings.Contains(stdout, "bar") {
+				return errors.New("echo bar should not be executed")
+			}
+			if strings.Contains(stdout, "foo") {
+				return errors.New("echo foo should not be executed")
+			}
+			return nil
+		})
 	base.Cmd("run", "--rm", "--entrypoint", "time", imageName).AssertFail()
-	base.Cmd("run", "--rm", "--entrypoint", "time", imageName, "echo", "blah").AssertOutWithFunc(func(stdout string) error {
-		if !strings.Contains(stdout, "blah") {
-			return errors.New("echo blah was not executed")
-		}
-		if strings.Contains(stdout, "bar") {
-			return errors.New("echo bar should not be executed")
-		}
-		if strings.Contains(stdout, "foo") {
-			return errors.New("echo foo should not be executed")
-		}
-		return nil
-	})
+	base.Cmd("run", "--rm", "--entrypoint", "time", imageName, "echo", "blah").
+		AssertOutWithFunc(func(stdout string) error {
+			if !strings.Contains(stdout, "blah") {
+				return errors.New("echo blah was not executed")
+			}
+			if strings.Contains(stdout, "bar") {
+				return errors.New("echo bar should not be executed")
+			}
+			if strings.Contains(stdout, "foo") {
+				return errors.New("echo foo should not be executed")
+			}
+			return nil
+		})
 }
 
 func TestRunWorkdir(t *testing.T) {
@@ -114,8 +116,10 @@ func TestRunExitCode(t *testing.T) {
 	testContainer123 := tID + "-123"
 	defer base.Cmd("rm", "-f", testContainer0, testContainer123).Run()
 
-	base.Cmd("run", "--name", testContainer0, testutil.CommonImage, "sh", "-euxc", "exit 0").AssertOK()
-	base.Cmd("run", "--name", testContainer123, testutil.CommonImage, "sh", "-euxc", "exit 123").AssertExitCode(123)
+	base.Cmd("run", "--name", testContainer0, testutil.CommonImage, "sh", "-euxc", "exit 0").
+		AssertOK()
+	base.Cmd("run", "--name", testContainer123, testutil.CommonImage, "sh", "-euxc", "exit 123").
+		AssertExitCode(123)
 	base.Cmd("ps", "-a").AssertOutWithFunc(func(stdout string) error {
 		if !strings.Contains(stdout, "Exited (0)") {
 			return fmt.Errorf("no entry for %q", testContainer0)
@@ -170,12 +174,19 @@ func TestRunEnvFile(t *testing.T) {
 	path2 := file2.Name()
 	defer file2.Close()
 	defer os.Remove(path2)
-	err = os.WriteFile(path2, []byte("# this is a comment line\nTESTKEY2=TESTVAL2\nHOST_ENV"), 0o666)
+	err = os.WriteFile(
+		path2,
+		[]byte("# this is a comment line\nTESTKEY2=TESTVAL2\nHOST_ENV"),
+		0o666,
+	)
 	assert.NilError(base.T, err)
 
-	base.Cmd("run", "--rm", "--env-file", path1, "--env-file", path2, testutil.CommonImage, "sh", "-c", "echo -n $TESTKEY1").AssertOutExactly("TESTVAL1")
-	base.Cmd("run", "--rm", "--env-file", path1, "--env-file", path2, testutil.CommonImage, "sh", "-c", "echo -n $TESTKEY2").AssertOutExactly("TESTVAL2")
-	base.Cmd("run", "--rm", "--env-file", path1, "--env-file", path2, testutil.CommonImage, "sh", "-c", "echo -n $HOST_ENV").AssertOutExactly("ENV-IN-HOST")
+	base.Cmd("run", "--rm", "--env-file", path1, "--env-file", path2, testutil.CommonImage, "sh", "-c", "echo -n $TESTKEY1").
+		AssertOutExactly("TESTVAL1")
+	base.Cmd("run", "--rm", "--env-file", path1, "--env-file", path2, testutil.CommonImage, "sh", "-c", "echo -n $TESTKEY2").
+		AssertOutExactly("TESTVAL2")
+	base.Cmd("run", "--rm", "--env-file", path1, "--env-file", path2, testutil.CommonImage, "sh", "-c", "echo -n $HOST_ENV").
+		AssertOutExactly("ENV-IN-HOST")
 }
 
 func TestRunEnv(t *testing.T) {
@@ -227,6 +238,7 @@ func TestRunEnv(t *testing.T) {
 		return nil
 	})
 }
+
 func TestRunHostnameEnv(t *testing.T) {
 	t.Parallel()
 
@@ -239,7 +251,8 @@ func TestRunHostnameEnv(t *testing.T) {
 	if runtime.GOOS == "windows" {
 		t.Skip("run --hostname not implemented on Windows yet")
 	}
-	base.Cmd("run", "--rm", "--hostname", "foobar", testutil.CommonImage, "env").AssertOutContains("HOSTNAME=foobar")
+	base.Cmd("run", "--rm", "--hostname", "foobar", testutil.CommonImage, "env").
+		AssertOutContains("HOSTNAME=foobar")
 }
 
 func TestRunStdin(t *testing.T) {
@@ -251,7 +264,9 @@ func TestRunStdin(t *testing.T) {
 	opts := []func(*testutil.Cmd){
 		testutil.WithStdin(strings.NewReader(testStr)),
 	}
-	base.Cmd("run", "--rm", "-i", testutil.CommonImage, "cat").CmdOption(opts...).AssertOutExactly(testStr)
+	base.Cmd("run", "--rm", "-i", testutil.CommonImage, "cat").
+		CmdOption(opts...).
+		AssertOutExactly(testStr)
 }
 
 func TestRunWithJsonFileLogDriver(t *testing.T) {
@@ -265,7 +280,8 @@ func TestRunWithJsonFileLogDriver(t *testing.T) {
 
 	defer base.Cmd("rm", "-f", containerName).AssertOK()
 	base.Cmd("run", "-d", "--log-driver", "json-file", "--log-opt", "max-size=5K", "--log-opt", "max-file=2", "--name", containerName, testutil.CommonImage,
-		"sh", "-euxc", "hexdump -C /dev/urandom | head -n1000").AssertOK()
+		"sh", "-euxc", "hexdump -C /dev/urandom | head -n1000").
+		AssertOK()
 
 	time.Sleep(3 * time.Second)
 	inspectedContainer := base.InspectContainer(containerName)
@@ -301,7 +317,8 @@ func TestRunWithJsonFileLogDriverAndLogPathOpt(t *testing.T) {
 	defer base.Cmd("rm", "-f", containerName).AssertOK()
 	customLogJSONPath := filepath.Join(t.TempDir(), containerName, containerName+"-json.log")
 	base.Cmd("run", "-d", "--log-driver", "json-file", "--log-opt", "log-path="+customLogJSONPath, "--log-opt", "max-size=5K", "--log-opt", "max-file=2", "--name", containerName, testutil.CommonImage,
-		"sh", "-euxc", "hexdump -C /dev/urandom | head -n1000").AssertOK()
+		"sh", "-euxc", "hexdump -C /dev/urandom | head -n1000").
+		AssertOK()
 
 	time.Sleep(3 * time.Second)
 	rawBytes, err := os.ReadFile(customLogJSONPath)
@@ -373,7 +390,9 @@ func TestRunWithJournaldLogDriver(t *testing.T) {
 
 			found := 0
 			check := func(log poll.LogT) poll.Result {
-				res := icmd.RunCmd(icmd.Command(journalctl, "--no-pager", "--since", "2 minutes ago", tc.filter))
+				res := icmd.RunCmd(
+					icmd.Command(journalctl, "--no-pager", "--since", "2 minutes ago", tc.filter),
+				)
 				assert.Equal(t, 0, res.ExitCode, res)
 				if strings.Contains(res.Stdout(), "bar") && strings.Contains(res.Stdout(), "foo") {
 					found = 1
@@ -381,7 +400,12 @@ func TestRunWithJournaldLogDriver(t *testing.T) {
 				}
 				return poll.Continue("reading from journald is not yet finished")
 			}
-			poll.WaitOn(t, check, poll.WithDelay(100*time.Microsecond), poll.WithTimeout(20*time.Second))
+			poll.WaitOn(
+				t,
+				check,
+				poll.WithDelay(100*time.Microsecond),
+				poll.WithTimeout(20*time.Second),
+			)
 			assert.Equal(t, 1, found)
 		})
 	}
@@ -405,13 +429,22 @@ func TestRunWithJournaldLogDriverAndLogOpt(t *testing.T) {
 
 	defer base.Cmd("rm", "-f", containerName).AssertOK()
 	base.Cmd("run", "-d", "--log-driver", "journald", "--log-opt", "tag={{.FullID}}", "--name", containerName, testutil.CommonImage,
-		"sh", "-euxc", "echo foo; echo bar").AssertOK()
+		"sh", "-euxc", "echo foo; echo bar").
+		AssertOK()
 
 	time.Sleep(3 * time.Second)
 	inspectedContainer := base.InspectContainer(containerName)
 	found := 0
 	check := func(log poll.LogT) poll.Result {
-		res := icmd.RunCmd(icmd.Command(journalctl, "--no-pager", "--since", "2 minutes ago", "SYSLOG_IDENTIFIER="+inspectedContainer.ID))
+		res := icmd.RunCmd(
+			icmd.Command(
+				journalctl,
+				"--no-pager",
+				"--since",
+				"2 minutes ago",
+				"SYSLOG_IDENTIFIER="+inspectedContainer.ID,
+			),
+		)
 		assert.Equal(t, 0, res.ExitCode, res)
 		if strings.Contains(res.Stdout(), "bar") && strings.Contains(res.Stdout(), "foo") {
 			found = 1
@@ -435,7 +468,7 @@ func TestRunWithLogBinary(t *testing.T) {
 	imageName := testutil.Identifier(t) + "-image"
 	containerName := testutil.Identifier(t)
 
-	var dockerfile = `
+	dockerfile := `
 FROM ` + testutil.GolangImage + ` as builder
 WORKDIR /go/src/
 RUN mkdir -p logger
@@ -495,16 +528,20 @@ COPY --from=builder /go/src/logger/logger /
 
 	buildCtx := various.CreateBuildContext(t, dockerfile)
 	tmpDir := t.TempDir()
-	base.Cmd("build", buildCtx, "--output", "type=local,src=/go/src/logger/logger,dest="+tmpDir).AssertOK()
+	base.Cmd("build", buildCtx, "--output", "type=local,src=/go/src/logger/logger,dest="+tmpDir).
+		AssertOK()
 	defer base.Cmd("image", "rm", "-f", imageName).AssertOK()
 
 	base.Cmd("container", "rm", "-f", containerName).AssertOK()
 	base.Cmd("run", "-d", "--log-driver", fmt.Sprintf("binary://%s/logger", tmpDir), "--name", containerName, testutil.CommonImage,
-		"sh", "-euxc", "echo foo; echo bar").AssertOK()
+		"sh", "-euxc", "echo foo; echo bar").
+		AssertOK()
 	defer base.Cmd("container", "rm", "-f", containerName).AssertOK()
 
 	inspectedContainer := base.InspectContainer(containerName)
-	output, err := os.ReadFile(filepath.Join(os.TempDir(), fmt.Sprintf("%s_%s.log", inspectedContainer.ID, "stdout")))
+	output, err := os.ReadFile(
+		filepath.Join(os.TempDir(), fmt.Sprintf("%s_%s.log", inspectedContainer.ID, "stdout")),
+	)
 	assert.NilError(t, err)
 	log := string(output)
 	assert.Check(t, strings.Contains(log, "foo"))
@@ -524,7 +561,8 @@ func TestRunAddHostRemainsWhenAnotherContainerCreated(t *testing.T) {
 
 	containerName := testutil.Identifier(t)
 	hostMapping := "test-add-host:10.0.0.1"
-	base.Cmd("run", "-d", "--add-host", hostMapping, "--name", containerName, testutil.CommonImage, "sleep", nerdtest.Infinity).AssertOK()
+	base.Cmd("run", "-d", "--add-host", hostMapping, "--name", containerName, testutil.CommonImage, "sleep", nerdtest.Infinity).
+		AssertOK()
 	defer base.Cmd("container", "rm", "-f", containerName).Run()
 
 	checkEtcHosts := func(stdout string) error {
@@ -675,7 +713,12 @@ func TestRunAttachFlag(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			actualOut := tc.testFunc(t, tc.testStr, tc.args)
-			errorMsg := fmt.Sprintf("%s failed;\nExpected: '%s'\nActual: '%s'", tc.name, tc.expectedOut, actualOut)
+			errorMsg := fmt.Sprintf(
+				"%s failed;\nExpected: '%s'\nActual: '%s'",
+				tc.name,
+				tc.expectedOut,
+				actualOut,
+			)
 			if nerdtest.IsDocker() {
 				assert.Equal(t, true, strings.Contains(actualOut, tc.dockerOut), errorMsg)
 			} else {
@@ -698,7 +741,8 @@ func TestRunQuiet(t *testing.T) {
 	teardown()
 
 	sentinel := "test run quiet"
-	result := base.Cmd("run", "--rm", "--quiet", testutil.CommonImage, fmt.Sprintf(`echo "%s"`, sentinel)).Run()
+	result := base.Cmd("run", "--rm", "--quiet", testutil.CommonImage, fmt.Sprintf(`echo "%s"`, sentinel)).
+		Run()
 	assert.Assert(t, strings.Contains(result.Combined(), sentinel))
 
 	wasQuiet := func(output, sentinel string) bool {
@@ -712,7 +756,12 @@ func TestRunQuiet(t *testing.T) {
 		sentinel = "resolved"
 	}
 
-	assert.Assert(t, wasQuiet(result.Combined(), sentinel), "Found %s in container run output", sentinel)
+	assert.Assert(
+		t,
+		wasQuiet(result.Combined(), sentinel),
+		"Found %s in container run output",
+		sentinel,
+	)
 }
 
 func TestRunFromOCIArchive(t *testing.T) {
@@ -742,7 +791,8 @@ func TestRunFromOCIArchive(t *testing.T) {
 	tarPath := fmt.Sprintf("%s/%s.tar", buildCtx, imageName)
 
 	base.Cmd("build", "--tag", tag, "--output=type=oci,dest="+tarPath, buildCtx).AssertOK()
-	base.Cmd("run", "--rm", "oci-archive://"+tarPath).AssertOutContainsAll("Loaded image: "+tag, sentinel)
+	base.Cmd("run", "--rm", "oci-archive://"+tarPath).
+		AssertOutContainsAll("Loaded image: "+tag, sentinel)
 }
 
 func TestRunDomainname(t *testing.T) {

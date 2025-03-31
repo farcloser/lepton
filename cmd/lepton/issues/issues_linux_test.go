@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"testing"
 
+	"go.farcloser.world/tigron/expect"
 	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
@@ -66,7 +67,7 @@ func TestIssue3425(t *testing.T) {
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 					return helpers.Command("push", fmt.Sprintf("localhost:%d/%s", reg.Port, data.Identifier()))
 				},
-				Expected: test.Expects(0, nil, nil),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 			},
 			{
 				Description: "with commit",
@@ -74,7 +75,16 @@ func TestIssue3425(t *testing.T) {
 				Setup: func(data test.Data, helpers test.Helpers) {
 					identifier := data.Identifier()
 					helpers.Ensure("image", "pull", testutil.CommonImage)
-					helpers.Ensure("run", "--quiet", "-d", "--name", identifier, testutil.CommonImage, "touch", "/something")
+					helpers.Ensure(
+						"run",
+						"--quiet",
+						"-d",
+						"--name",
+						identifier,
+						testutil.CommonImage,
+						"touch",
+						"/something",
+					)
 					helpers.Ensure("image", "rm", "-f", testutil.CommonImage)
 					helpers.Ensure("image", "pull", testutil.CommonImage)
 					helpers.Ensure("commit", identifier, fmt.Sprintf("localhost:%d/%s", reg.Port, identifier))
@@ -86,7 +96,7 @@ func TestIssue3425(t *testing.T) {
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 					return helpers.Command("push", fmt.Sprintf("localhost:%d/%s", reg.Port, data.Identifier()))
 				},
-				Expected: test.Expects(0, nil, nil),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 			},
 			{
 				Description: "with save",
@@ -103,7 +113,7 @@ func TestIssue3425(t *testing.T) {
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 					return helpers.Command("save", testutil.CommonImage)
 				},
-				Expected: test.Expects(0, nil, nil),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 			},
 			{
 				Description: "with convert",
@@ -125,7 +135,7 @@ func TestIssue3425(t *testing.T) {
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 					return helpers.Command("image", "convert", "--oci", testutil.CommonImage, data.Identifier())
 				},
-				Expected: test.Expects(0, nil, nil),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 			},
 		},
 	}

@@ -55,7 +55,10 @@ type CNIEnv struct {
 
 type CNIEnvOpt func(e *CNIEnv) error
 
-func (e *CNIEnv) ListNetworksMatch(reqs []string, allowPseudoNetwork bool) (list map[string][]*NetworkConfig, errs []error) {
+func (e *CNIEnv) ListNetworksMatch(
+	reqs []string,
+	allowPseudoNetwork bool,
+) (list map[string][]*NetworkConfig, errs []error) {
 	var err error
 
 	var networkConfigs []*NetworkConfig
@@ -326,7 +329,14 @@ func (e *CNIEnv) CreateNetwork(opts *options.NetworkCreate) (*NetworkConfig, err
 		if _, ok := netMap[opts.Name]; ok {
 			return errdefs.ErrAlreadyExists
 		}
-		ipam, err := e.generateIPAM(opts.IPAMDriver, opts.Subnets, opts.Gateway, opts.IPRange, opts.IPAMOptions, opts.IPv6)
+		ipam, err := e.generateIPAM(
+			opts.IPAMDriver,
+			opts.Subnets,
+			opts.Gateway,
+			opts.IPRange,
+			opts.IPAMOptions,
+			opts.IPv6,
+		)
 		if err != nil {
 			return err
 		}
@@ -377,7 +387,11 @@ func (e *CNIEnv) GetDefaultNetworkConfig() (*NetworkConfig, error) {
 	}
 	if len(labelMatches) >= 1 {
 		if len(labelMatches) > 1 {
-			log.L.Warnf("returning the first network bearing the %q label out of the multiple found: %#v", labels.DefaultNetwork, labelMatches)
+			log.L.Warnf(
+				"returning the first network bearing the %q label out of the multiple found: %#v",
+				labels.DefaultNetwork,
+				labelMatches,
+			)
 		}
 		return labelMatches[0], nil
 	}
@@ -392,14 +406,21 @@ func (e *CNIEnv) GetDefaultNetworkConfig() (*NetworkConfig, error) {
 	}
 	if len(nameMatches) >= 1 {
 		if len(nameMatches) > 1 {
-			log.L.Warnf("returning the first network bearing the %q default network name out of the multiple found: %#v", DefaultNetworkName, nameMatches)
+			log.L.Warnf(
+				"returning the first network bearing the %q default network name out of the multiple found: %#v",
+				DefaultNetworkName,
+				nameMatches,
+			)
 		}
 
 		// Warn the user if the default network was not created by us.
 		match := nameMatches[0]
 		_, statErr := os.Stat(e.getConfigPathForNetworkName(DefaultNetworkName))
 		if match.CliID == nil || statErr != nil {
-			log.L.Warnf("default network named %q does not have an internal ID or managed config file, it was most likely NOT created by us", DefaultNetworkName)
+			log.L.Warnf(
+				"default network named %q does not have an internal ID or managed config file, it was most likely NOT created by us",
+				DefaultNetworkName,
+			)
 		}
 
 		return nameMatches[0], nil
@@ -424,7 +445,11 @@ func (e *CNIEnv) ensureDefaultNetworkConfig(bridgeIP string) error {
 func (e *CNIEnv) createDefaultNetworkConfig(bridgeIP string) error {
 	filename := e.getConfigPathForNetworkName(DefaultNetworkName)
 	if _, err := os.Stat(filename); err == nil {
-		return fmt.Errorf("already found existing network config at %q, cannot create new network named %q", filename, DefaultNetworkName)
+		return fmt.Errorf(
+			"already found existing network config at %q, cannot create new network named %q",
+			filename,
+			DefaultNetworkName,
+		)
 	}
 
 	bridgeCIDR := DefaultCIDR
@@ -462,7 +487,12 @@ func (e *CNIEnv) generateNetworkConfig(name string, labels []string, plugins []C
 	for _, f := range plugins {
 		p := filepath.Join(e.Path, f.GetPluginType())
 		if _, err := exec.LookPath(p); err != nil {
-			return nil, fmt.Errorf("needs CNI plugin %q to be installed in CNI_PATH (%q), see https://github.com/containernetworking/plugins/releases: %w", f.GetPluginType(), e.Path, err)
+			return nil, fmt.Errorf(
+				"needs CNI plugin %q to be installed in CNI_PATH (%q), see https://github.com/containernetworking/plugins/releases: %w",
+				f.GetPluginType(),
+				e.Path,
+				err,
+			)
 		}
 	}
 	id := networkID(name)
@@ -510,7 +540,10 @@ func (e *CNIEnv) networkConfigList() ([]*NetworkConfig, error) {
 	}
 	namespaced := []string{}
 	if e.Namespace != "" {
-		namespaced, err = libcni.ConfFiles(filepath.Join(e.NetconfPath, e.Namespace), []string{".conf", ".conflist", ".json"})
+		namespaced, err = libcni.ConfFiles(
+			filepath.Join(e.NetconfPath, e.Namespace),
+			[]string{".conf", ".conflist", ".json"},
+		)
 		if err != nil {
 			return nil, err
 		}

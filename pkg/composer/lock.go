@@ -26,13 +26,15 @@ import (
 
 var locked *os.File
 
-func Lock(dataRoot string, address string) error {
+func Lock(dataRoot, address string) error {
 	// Compose right now cannot be made safe to use concurrently, as we shell out for multiple operations,
 	// preventing us from using the lock mechanisms from the API.
-	// This here allows to impose a global lock, effectively preventing multiple compose commands from being run in parallel and
+	// This here allows to impose a global lock, effectively preventing multiple compose commands from being run in
+	// parallel and
 	// preventing some of the problems with concurrent execution.
 	// This should be removed once we have better, in-depth solutions to make compose concurrency safe.
-	// Note that in most cases we do not close the lock explicitly. Instead, the lock will get released when the `locked` global
+	// Note that in most cases we do not close the lock explicitly. Instead, the lock will get released when the
+	// `locked` global
 	// variable will get collected and the file descriptor closed (eg: when the binary exits).
 	var err error
 	dataStore, err := clientutil.DataStore(dataRoot, address)

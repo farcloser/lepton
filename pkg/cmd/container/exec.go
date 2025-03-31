@@ -26,6 +26,7 @@ import (
 	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/pkg/cio"
 	"github.com/containerd/log"
+	"golang.org/x/term"
 
 	"go.farcloser.world/containers/specs"
 
@@ -59,7 +60,13 @@ func Exec(ctx context.Context, client *containerd.Client, args []string, options
 	return nil
 }
 
-func execActionWithContainer(ctx context.Context, client *containerd.Client, container containerd.Container, args []string, options options.ContainerExec) error {
+func execActionWithContainer(
+	ctx context.Context,
+	client *containerd.Client,
+	container containerd.Container,
+	args []string,
+	options options.ContainerExec,
+) error {
 	pspec, err := generateExecProcessSpec(ctx, client, container, args, options)
 	if err != nil {
 		return err
@@ -111,8 +118,8 @@ func execActionWithContainer(ctx context.Context, client *containerd.Client, con
 			return err
 		}
 		defer con.Reset()
-		if err := con.SetRaw(); err != nil {
-			return err
+		if _, err := term.MakeRaw(int(con.Fd())); err != nil {
+			return fmt.Errorf("failed to set the console to raw mode: %w", err)
 		}
 	}
 	if !options.Detach {
@@ -143,7 +150,13 @@ func execActionWithContainer(ctx context.Context, client *containerd.Client, con
 	return nil
 }
 
-func generateExecProcessSpec(ctx context.Context, client *containerd.Client, container containerd.Container, args []string, options options.ContainerExec) (*specs.Process, error) {
+func generateExecProcessSpec(
+	ctx context.Context,
+	client *containerd.Client,
+	container containerd.Container,
+	args []string,
+	options options.ContainerExec,
+) (*specs.Process, error) {
 	spec, err := container.Spec(ctx)
 	if err != nil {
 		return nil, err

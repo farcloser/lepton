@@ -27,8 +27,8 @@ ARG         LICENSE_ZLIB="The zlib/libpng License, https://opensource.org/licens
 ARG         BINARY_NAME=lepton
 ARG         BINARY_LICENSE="$LICENSE_APACHE_V2"
 
-ARG         CONTAINERD_VERSION=v2.0.3
-ARG         CONTAINERD_REVISION=06b99ca80cdbfbc6cc8bd567021738c9af2b36ce
+ARG         CONTAINERD_VERSION=v2.0.4
+ARG         CONTAINERD_REVISION=1a43cb6a1035441f9aca8f5666a9b3ef9e70ab20
 ARG         CONTAINERD_LICENSE="$LICENSE_APACHE_V2"
 ARG         CONTAINERD_REPO=github.com/containerd/containerd
 
@@ -142,7 +142,8 @@ RUN         echo "force-unsafe-io" > /etc/dpkg/dpkg.cfg.d/farcloser-speedup && \
 FROM        --platform=$BUILDPLATFORM tooling-base AS tooling-downloader-golang
 ARG         GO_VERSION
 ARG         SUPPORTED_ARCHS
-RUN         apt-get install -qq --no-install-recommends \
+RUN         apt-get update -qq >/dev/null && \
+            apt-get install -qq --no-install-recommends \
                curl \
                jq \
                    >/dev/null; \
@@ -169,6 +170,7 @@ FROM        --platform=$BUILDPLATFORM tooling-base AS tooling-builder
 ARG         BUILDPLATFORM
 WORKDIR     /src
 RUN         mkdir -p /out/bin; mkdir -p /metadata && \
+            apt-get update -qq >/dev/null && \
             apt-get install -qq --no-install-recommends \
                 git \
                 make \
@@ -233,7 +235,8 @@ ARG         SUPPORTED_ARCHS
 # meson: libslirp
 # automake: slirp4netns
 # libseccomp: runc, bypass4netns, slirp4netns
-RUN         apt-get install -qq --no-install-recommends \
+RUN         apt-get update -qq >/dev/null && \
+            apt-get install -qq --no-install-recommends \
                 cmake \
                 meson \
                 automake \
@@ -704,6 +707,7 @@ ARG         PKG=github.com/awslabs/soci-snapshotter
 #            sed 's/WantedBy=multi-user.target/RequiredBy=entrypoint.target/' soci-snapshotter.service > /out/lib/systemd/system/soci-snapshotter.service; \
 RUN         --mount=from=dependencies-download-soci,type=bind,target=/src,source=/src \
             --mount=from=dependencies-download-soci,type=bind,target=/metadata,source=/metadata \
+            apt-get update -qq >/dev/null && \
             apt-get install -qq --no-install-recommends \
                 zlib1g-dev:"$TARGETARCH" \
                     >/dev/null; \
@@ -763,6 +767,7 @@ RUN         --mount=from=dependencies-download-slirp4netns,type=bind,target=/src
             --mount=from=dependencies-download-slirp4netns,type=bind,target=/metadata,source=/metadata \
             --mount=from=dependencies-download-libslirp,type=bind,target=/src,source=/src \
             --mount=type=tmpfs,target=/build \
+            apt-get update -qq >/dev/null && \
             apt-get install -qq --no-install-recommends \
                 libglib2.0-dev:$TARGETARCH \
                 libcap-dev:$TARGETARCH \
@@ -796,6 +801,8 @@ RUN         --mount=from=dependencies-download-cli,type=bind,target=/metadata,so
             --mount=target=cmd,source=cmd,type=bind \
             --mount=target=leptonic,source=leptonic,type=bind \
             --mount=target=extras,source=extras,type=bind \
+            cp ./extras/rootless/containerd-rootless* /out/bin; \
+            chmod a+rx /out/bin/containerd-rootless*; \
             GOOS=linux GOARCH=$TARGETARCH go build --mod=vendor \
                 -ldflags "-X $PKG/version.Version=$(cat /metadata/VERSION) -X $PKG/pkg/version.Revision=$(cat /metadata/REVISION)" \
                 -o /out/bin/$BINARY_NAME ./cmd/$BINARY_NAME
@@ -899,8 +906,6 @@ RUN         useradd -m -s /bin/bash rootless; \
                 iproute2 \
                 dbus dbus-user-session systemd systemd-sysv \
                 uidmap \
-                openssh-server \
-                openssh-client \
                     >/dev/null; \
             systemctl mask systemd-firstboot.service systemd-udevd.service systemd-modules-load.service; \
             systemctl unmask systemd-logind
@@ -927,6 +932,7 @@ VOLUME      /var/lib/"$BINARY_NAME"
 VOLUME      /home/rootless/.local/share
 VOLUME      /tmp
 #           Use a different bridge ip to avoid conflicts with the host
+#           FIXME: tied to the current binary name
 ENV         LEPTON_BRIDGE_IP=10.42.100.1/24
 #           Pass along a specific namespace for buildkit to use
 ENV         NAMESPACE=default
@@ -954,6 +960,7 @@ ENV         PATH="/root/go/bin:/usr/local/go/bin:$PATH"
 ENV         NAMESPACE=cli-test
 RUN         --mount=target=/root/go/pkg/mod,type=cache \
             --mount=target=/src/Makefile,source=./Makefile,type=bind \
+            apt-get update -qq >/dev/null && \
             apt-get install -qq --no-install-recommends \
                 make >/dev/null; \
             NO_COLOR=true GOFLAGS= make install-dev-gotestsum; chmod -R a+rx /root/go/bin; \
@@ -961,9 +968,17 @@ RUN         --mount=target=/root/go/pkg/mod,type=cache \
                 make >/dev/null
 #           FIXME: finish removing unbuffer from the test codebase and then remove expect
 #           FIXME: curl is only necessary for a single netns test. Fix the test and remove curl.
-RUN         apt-get install -qq --no-install-recommends \
+RUN         apt-get update -qq >/dev/null && \
+            apt-get install -qq --no-install-recommends \
                  curl \
                  expect >/dev/null
+
+# XXX REMOVE - tentative hack to workaround having to mess with sysctl
+#RUN         apt-get install -qq --no-install-recommends libcap2-bin >/dev/null; \
+#            for b in /usr/local/bin/rootlesskit; do \
+#              setcap 'cap_net_bind_service+ep' "$(readlink -f $b)"; \
+#            done; \
+#            apt-get purge -qq libcap2-bin >/dev/null
 
 ########################################################################################################################
 # Final
@@ -1014,7 +1029,8 @@ RUN         chown -R rootless:rootless /home/rootless/.config
 # - verify all binaries are static and running
 FROM        tooling-runtime AS release-full-sanity
 ARG         TARGETARCH
-RUN         apt-get install -qq --no-install-recommends \
+RUN         apt-get update -qq >/dev/null && \
+            apt-get install -qq --no-install-recommends \
                 binutils \
                 patchelf \
                 devscripts \

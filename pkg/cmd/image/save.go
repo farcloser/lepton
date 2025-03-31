@@ -30,7 +30,13 @@ import (
 )
 
 // Save exports `images` to a `io.Writer` (e.g., a file writer, or os.Stdout) specified by `options.Stdout`.
-func Save(ctx context.Context, client *containerd.Client, images []string, options options.ImageSave, exportOpts ...archive.ExportOpt) error {
+func Save(
+	ctx context.Context,
+	client *containerd.Client,
+	images []string,
+	options options.ImageSave,
+	exportOpts ...archive.ExportOpt,
+) error {
 	images = strutil.DedupeStrSlice(images)
 
 	platMC, err := platformutil.NewMatchComparer(options.AllPlatforms, options.Platform)

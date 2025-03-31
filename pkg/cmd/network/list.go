@@ -35,7 +35,7 @@ type networkPrintable struct {
 	Name   string
 	Labels string
 	// TODO: "CreatedAt", "Driver", "IPv6", "Internal", "Scope"
-	file string `json:"-"`
+	file string
 }
 
 func List(ctx context.Context, globalOptions *options.Global, options *options.NetworkList) error {
@@ -62,7 +62,11 @@ func List(ctx context.Context, globalOptions *options.Global, options *options.N
 		}
 	}
 
-	e, err := netutil.NewCNIEnv(globalOptions.CNIPath, globalOptions.CNINetConfPath, netutil.WithNamespace(globalOptions.Namespace))
+	e, err := netutil.NewCNIEnv(
+		globalOptions.CNIPath,
+		globalOptions.CNINetConfPath,
+		netutil.WithNamespace(globalOptions.Namespace),
+	)
 	if err != nil {
 		return err
 	}
@@ -173,7 +177,11 @@ func getNetworkFilterFuncs(filters []string) ([]func(*map[string]string) bool, [
 	return labelFilterFuncs, nameFilterFuncs
 }
 
-func networkMatchesFilter(net *netutil.NetworkConfig, labelFilterFuncs []func(*map[string]string) bool, nameFilterFuncs []func(string) bool) bool {
+func networkMatchesFilter(
+	net *netutil.NetworkConfig,
+	labelFilterFuncs []func(*map[string]string) bool,
+	nameFilterFuncs []func(string) bool,
+) bool {
 	for _, labelFilterFunc := range labelFilterFuncs {
 		if !labelFilterFunc(net.CliLabels) {
 			return false

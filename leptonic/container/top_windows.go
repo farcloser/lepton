@@ -38,7 +38,7 @@ import (
 // ContainerTop lists the processes running inside the given
 // container. An error is returned if the container
 // is not found, or is not running.
-func containerTop(ctx context.Context, stdio io.Writer, client *containerd.Client, id string, psArgs string) error {
+func containerTop(ctx context.Context, stdio io.Writer, client *containerd.Client, id, psArgs string) error {
 	container, err := client.LoadContainer(ctx, id)
 	if err != nil {
 		return err
@@ -65,8 +65,15 @@ func containerTop(ctx context.Context, stdio io.Writer, client *containerd.Clien
 		procList.Processes = append(procList.Processes, []string{
 			info.ImageName,
 			strconv.FormatUint(uint64(info.ProcessID), 10),
-			fmt.Sprintf("%02d:%02d:%02d.%03d", int(d.Hours()), int(d.Minutes())%60, int(d.Seconds())%60, int(d.Nanoseconds()/1000000)%1000),
-			units.HumanSize(float64(info.MemoryWorkingSetPrivateBytes))})
+			fmt.Sprintf(
+				"%02d:%02d:%02d.%03d",
+				int(d.Hours()),
+				int(d.Minutes())%60,
+				int(d.Seconds())%60,
+				int(d.Nanoseconds()/1000000)%1000,
+			),
+			units.HumanSize(float64(info.MemoryWorkingSetPrivateBytes)),
+		})
 
 	}
 

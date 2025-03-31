@@ -52,7 +52,12 @@ func checkRestartCapabilities(ctx context.Context, client *containerd.Client, re
 	return nil
 }
 
-func generateRestartOpts(ctx context.Context, client *containerd.Client, restartFlag, logURI string, inRun bool) ([]containerd.NewContainerOpts, error) {
+func generateRestartOpts(
+	ctx context.Context,
+	client *containerd.Client,
+	restartFlag, logURI string,
+	inRun bool,
+) ([]containerd.NewContainerOpts, error) {
 	if restartFlag == "" || restartFlag == "no" {
 		return nil, nil
 	}
@@ -76,7 +81,12 @@ func generateRestartOpts(ctx context.Context, client *containerd.Client, restart
 }
 
 // UpdateContainerRestartPolicyLabel updates the restart policy label of the container.
-func UpdateContainerRestartPolicyLabel(ctx context.Context, client *containerd.Client, container containerd.Container, restartFlag string) error {
+func UpdateContainerRestartPolicyLabel(
+	ctx context.Context,
+	client *containerd.Client,
+	container containerd.Container,
+	restartFlag string,
+) error {
 	if err := checkRestartCapabilities(ctx, client, restartFlag); err != nil {
 		return err
 	}

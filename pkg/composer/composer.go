@@ -33,7 +33,8 @@ import (
 	"go.farcloser.world/lepton/pkg/reflectutil"
 )
 
-// Options groups the command line options recommended for a Compose implementation (ProjectOptions) and extra options for the cli
+// Options groups the command line options recommended for a Compose implementation (ProjectOptions) and extra options
+// for the cli
 type Options struct {
 	Project          string // empty for default
 	ProjectDirectory string

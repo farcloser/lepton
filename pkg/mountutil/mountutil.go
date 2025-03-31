@@ -213,7 +213,7 @@ func handleNamedVolumes(source string, volStore volumestore.VolumeService) (volu
 	return res, nil
 }
 
-func getVolumeOptions(src string, vType string, rawOpts string) ([]string, []oci.SpecOpts, error) {
+func getVolumeOptions(src, vType, rawOpts string) ([]string, []oci.SpecOpts, error) {
 	// always call parseVolumeOptions for bind mount to allow the parser to add some default options
 	var err error
 	var specOpts []oci.SpecOpts

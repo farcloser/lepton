@@ -74,7 +74,8 @@ type RegistryURL struct {
 // CanonicalIdentifier returns the identifier expected to be used to save credentials to docker auth config
 func (rn *RegistryURL) CanonicalIdentifier() string {
 	// If it is the docker index over https, port 443, on the /v1/ path, we use the docker fully qualified identifier
-	if rn.Scheme == string(schemeHTTPS) && rn.Hostname() == "index.docker.io" && rn.Path == "/v1/" && rn.Port() == StandardHTTPSPort ||
+	if rn.Scheme == string(schemeHTTPS) && rn.Hostname() == "index.docker.io" && rn.Path == "/v1/" &&
+		rn.Port() == StandardHTTPSPort ||
 		rn.URL.String() == dockerIndexServer {
 		return dockerIndexServer
 	}
@@ -82,7 +83,13 @@ func (rn *RegistryURL) CanonicalIdentifier() string {
 	identifier := rn.Host
 	// If this is a namespaced entry, wrap it, and slap the path as well, as hosts are allowed to be non-compliant
 	if rn.Namespace != nil {
-		identifier = fmt.Sprintf("%s://%s/host/%s%s", schemeExperimental, rn.Namespace.CanonicalIdentifier(), identifier, rn.Path)
+		identifier = fmt.Sprintf(
+			"%s://%s/host/%s%s",
+			schemeExperimental,
+			rn.Namespace.CanonicalIdentifier(),
+			identifier,
+			rn.Path,
+		)
 	}
 	return identifier
 }
@@ -95,7 +102,8 @@ func (rn *RegistryURL) AllIdentifiers() []string {
 		// This is rn.Host, and always have a port (see parsing)
 		canonicalID,
 	}
-	// If the canonical identifier points to Docker Hub, or is one of our experimental ids, there is no alternative / legacy id
+	// If the canonical identifier points to Docker Hub, or is one of our experimental ids, there is no alternative /
+	// legacy id
 	if canonicalID == dockerIndexServer || rn.Namespace != nil {
 		return fullList
 	}

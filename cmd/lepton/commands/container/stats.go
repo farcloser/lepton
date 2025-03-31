@@ -28,7 +28,7 @@ import (
 )
 
 func StatsCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:               "stats",
 		Short:             "Display a live stream of container(s) resource usage statistics.",
 		RunE:              statsAction,

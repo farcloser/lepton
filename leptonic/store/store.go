@@ -28,11 +28,9 @@ import (
 	"errors"
 )
 
-var (
-	// ErrLockFailure may be returned by ReadLock, WriteLock, or Unlock, when the underlying locking mechanism fails.
-	// In the case of the filesystem implementation, inability to lock the directory will return it.
-	ErrLockFailure = errors.New("lock failure")
-)
+// ErrLockFailure may be returned by ReadLock, WriteLock, or Unlock, when the underlying locking mechanism fails.
+// In the case of the filesystem implementation, inability to lock the directory will return it.
+var ErrLockFailure = errors.New("lock failure")
 
 // Store represents a store that is able to grant an exclusive lock (ensuring concurrency safety,
 // both between go routines and across multiple binaries invocations), and is performing atomic operations.
@@ -49,7 +47,8 @@ type Store interface {
 
 // Manager describes operations that can be performed on the store
 type Manager interface {
-	// List will return a slice of all subgroups (eg: subdirectories), or keys (eg: files), under a specific group (eg: dir)
+	// List will return a slice of all subgroups (eg: subdirectories), or keys (eg: files), under a specific group (eg:
+	// dir)
 	// Note that `key...` may be omitted, in which case, all objects' names at the root of the store are returned.
 	// Example, in the volumestore, List() will return all existing volumes names
 	List(key ...string) ([]string, error)

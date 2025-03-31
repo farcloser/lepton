@@ -35,15 +35,39 @@ func TestWait(t *testing.T) {
 
 	testCase.Setup = func(data test.Data, helpers test.Helpers) {
 		helpers.Ensure("run", "--quiet", "-d", "--name", data.Identifier("1"), testutil.CommonImage)
-		helpers.Ensure("run", "--quiet", "-d", "--name", data.Identifier("2"), testutil.CommonImage, "sleep", "1")
-		helpers.Ensure("run", "--quiet", "-d", "--name", data.Identifier("3"), testutil.CommonImage, "sh", "-euxc", "sleep 5; exit 123")
+		helpers.Ensure(
+			"run",
+			"--quiet",
+			"-d",
+			"--name",
+			data.Identifier("2"),
+			testutil.CommonImage,
+			"sleep",
+			"1",
+		)
+		helpers.Ensure(
+			"run",
+			"--quiet",
+			"-d",
+			"--name",
+			data.Identifier("3"),
+			testutil.CommonImage,
+			"sh",
+			"-euxc",
+			"sleep 5; exit 123",
+		)
 	}
 
 	testCase.Command = func(data test.Data, helpers test.Helpers) test.TestableCommand {
-		return helpers.Command("wait", data.Identifier("1"), data.Identifier("2"), data.Identifier("3"))
+		return helpers.Command(
+			"wait",
+			data.Identifier("1"),
+			data.Identifier("2"),
+			data.Identifier("3"),
+		)
 	}
 
-	testCase.Expected = test.Expects(0, nil, expect.Equals(`0
+	testCase.Expected = test.Expects(expect.ExitCodeSuccess, nil, expect.Equals(`0
 0
 123
 `))

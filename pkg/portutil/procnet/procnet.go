@@ -64,7 +64,8 @@ func removeEmpty(array []string) (results []string) {
 // ParseAddress is expected to be used for /proc/net/{tcp,tcp6} entries on
 // little endian machines.
 // Not sure how those entries look like on big endian machines.
-// All the code below is copied from the lima project in https://github.com/lima-vm/lima/blob/v0.8.3/pkg/guestagent/procnettcp/procnettcp.go#L95-L137
+// All the code below is copied from the lima project in
+// https://github.com/lima-vm/lima/blob/v0.8.3/pkg/guestagent/procnettcp/procnettcp.go#L95-L137
 // and is licensed under the Apache License, Version 2.0
 func ParseAddress(s string) (net.IP, uint16, error) {
 	split := strings.SplitN(s, ":", 2)

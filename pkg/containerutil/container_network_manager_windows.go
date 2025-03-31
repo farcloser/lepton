@@ -36,7 +36,12 @@ type cniNetworkManagerPlatform struct {
 
 // Verifies that the internal network settings are correct.
 func (m *cniNetworkManager) VerifyNetworkOptions(_ context.Context) error {
-	e, err := netutil.NewCNIEnv(m.globalOptions.CNIPath, m.globalOptions.CNINetConfPath, netutil.WithNamespace(m.globalOptions.Namespace), netutil.WithDefaultNetwork(m.globalOptions.BridgeIP))
+	e, err := netutil.NewCNIEnv(
+		m.globalOptions.CNIPath,
+		m.globalOptions.CNINetConfPath,
+		netutil.WithNamespace(m.globalOptions.Namespace),
+		netutil.WithDefaultNetwork(m.globalOptions.BridgeIP),
+	)
 	if err != nil {
 		return err
 	}
@@ -68,7 +73,12 @@ func (m *cniNetworkManager) VerifyNetworkOptions(_ context.Context) error {
 }
 
 func (m *cniNetworkManager) getCNI() (cni.CNI, error) {
-	e, err := netutil.NewCNIEnv(m.globalOptions.CNIPath, m.globalOptions.CNINetConfPath, netutil.WithNamespace(m.globalOptions.Namespace), netutil.WithDefaultNetwork(m.globalOptions.BridgeIP))
+	e, err := netutil.NewCNIEnv(
+		m.globalOptions.CNIPath,
+		m.globalOptions.CNINetConfPath,
+		netutil.WithNamespace(m.globalOptions.Namespace),
+		netutil.WithDefaultNetwork(m.globalOptions.BridgeIP),
+	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to instantiate CNI env: %w", err)
 	}
@@ -134,7 +144,10 @@ func (m *cniNetworkManager) InternalNetworkingOptionLabels(_ context.Context) (o
 
 // Returns a slice of `oci.SpecOpts` and `containerd.NewContainerOpts` which represent
 // the network specs which need to be applied to the container with the given ID.
-func (m *cniNetworkManager) ContainerNetworkingOpts(_ context.Context, containerID string) ([]oci.SpecOpts, []containerd.NewContainerOpts, error) {
+func (m *cniNetworkManager) ContainerNetworkingOpts(
+	_ context.Context,
+	containerID string,
+) ([]oci.SpecOpts, []containerd.NewContainerOpts, error) {
 	ns, err := m.setupNetNs()
 	if err != nil {
 		return nil, nil, err

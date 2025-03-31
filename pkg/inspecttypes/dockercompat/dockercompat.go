@@ -115,7 +115,8 @@ type Container struct {
 	HostnamePath   string
 	HostsPath      string
 	LogPath        string
-	// Unimplemented: Node            *ContainerNode `json:",omitempty"` // Node is only propagated by Docker Swarm standalone API
+	// Unimplemented: Node            *ContainerNode `json:",omitempty"` // Node is only propagated by Docker Swarm
+	// standalone API
 	Name         string
 	RestartCount int
 	Driver       string
@@ -134,7 +135,8 @@ type Container struct {
 	NetworkSettings *NetworkSettings
 }
 
-// From https://github.com/moby/moby/blob/8dbd90ec00daa26dc45d7da2431c965dec99e8b4/api/types/container/host_config.go#L391
+// From
+// https://github.com/moby/moby/blob/8dbd90ec00daa26dc45d7da2431c965dec99e8b4/api/types/container/host_config.go#L391
 // HostConfig the non-portable Config structure of a container.
 type HostConfig struct {
 	// Binds           []string      // List of volume bindings for this container
@@ -195,7 +197,8 @@ type MountPoint struct {
 	Propagation string
 }
 
-// Config is from https://github.com/moby/moby/blob/8dbd90ec00daa26dc45d7da2431c965dec99e8b4/api/types/container/config.go#L37-L69
+// Config is from
+// https://github.com/moby/moby/blob/8dbd90ec00daa26dc45d7da2431c965dec99e8b4/api/types/container/config.go#L37-L69
 type Config struct {
 	Hostname    string `json:",omitempty"` // Hostname
 	Domainname  string `json:",omitempty"` // Domainname
@@ -209,9 +212,10 @@ type Config struct {
 	// TODO: StdinOnce    bool        // If true, close stdin after the 1 attached client disconnects.
 	Env []string `json:",omitempty"` // List of environment variable to set in the container
 	Cmd []string `json:",omitempty"` // Command to run when starting the container
-	// TODO Healthcheck     *HealthConfig       `json:",omitempty"` // Healthcheck describes how to check the container is healthy
-	// TODO: ArgsEscaped     bool                `json:",omitempty"` // True if command is already escaped (meaning treat as a command line) (Windows specific).
-	// TODO: Image           string              // Name of the image as it was passed by the operator (e.g. could be symbolic)
+	// TODO Healthcheck     *HealthConfig       `json:",omitempty"` // Healthcheck describes how to check the container
+	// is healthy TODO: ArgsEscaped     bool                `json:",omitempty"` // True if command is already escaped
+	// (meaning treat as a command line) (Windows specific). TODO: Image           string              // Name of the
+	// image as it was passed by the operator (e.g. could be symbolic)
 	Volumes    map[string]struct{} `json:",omitempty"` // List of volumes (mounts) used for the container
 	WorkingDir string              `json:",omitempty"` // Current directory (PWD) in the command will be launched
 	Entrypoint []string            `json:",omitempty"` // Entrypoint to run when starting the container
@@ -526,7 +530,8 @@ func ImageFromNative(nativeImage *native.Image) (*Image, error) {
 	repository, tag := imgutil.ParseRepoTag(nativeImage.Image.Name)
 
 	image := &Image{
-		// Docker ID (digest of platform-specific config), not containerd ID (digest of multi-platform index or manifest)
+		// Docker ID (digest of platform-specific config), not containerd ID (digest of multi-platform index or
+		// manifest)
 		ID:           nativeImage.ImageConfigDesc.Digest.String(),
 		Parent:       nativeImage.Image.Labels["org.mobyproject.image.parent"],
 		Architecture: imgOCI.Architecture,

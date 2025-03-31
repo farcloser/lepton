@@ -28,7 +28,7 @@ import (
 )
 
 func KillCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:               "kill [flags] CONTAINER [CONTAINER, ...]",
 		Short:             "Kill one or more running containers",
 		Args:              cobra.MinimumNArgs(1),

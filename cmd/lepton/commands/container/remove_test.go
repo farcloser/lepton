@@ -19,6 +19,7 @@ package container_test
 import (
 	"testing"
 
+	"go.farcloser.world/tigron/expect"
 	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/pkg/testutil"
@@ -29,7 +30,16 @@ func TestRemoveContainer(t *testing.T) {
 	testCase := nerdtest.Setup()
 
 	testCase.Setup = func(data test.Data, helpers test.Helpers) {
-		helpers.Ensure("run", "--quiet", "-d", "--name", data.Identifier(), testutil.CommonImage, "sleep", nerdtest.Infinity)
+		helpers.Ensure(
+			"run",
+			"--quiet",
+			"-d",
+			"--name",
+			data.Identifier(),
+			testutil.CommonImage,
+			"sleep",
+			nerdtest.Infinity,
+		)
 	}
 
 	testCase.Cleanup = func(data test.Data, helpers test.Helpers) {
@@ -47,5 +57,5 @@ func TestRemoveContainer(t *testing.T) {
 		return helpers.Command("rm", containerID)
 	}
 
-	testCase.Expected = test.Expects(0, nil, nil)
+	testCase.Expected = test.Expects(expect.ExitCodeSuccess, nil, nil)
 }

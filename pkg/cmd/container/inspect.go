@@ -35,7 +35,12 @@ import (
 )
 
 // Inspect prints detailed information for each container in `containers`.
-func Inspect(ctx context.Context, client *containerd.Client, containers []string, options options.ContainerInspect) error {
+func Inspect(
+	ctx context.Context,
+	client *containerd.Client,
+	containers []string,
+	options options.ContainerInspect,
+) error {
 	f := &containerInspector{
 		mode:        options.Mode,
 		size:        options.Size,

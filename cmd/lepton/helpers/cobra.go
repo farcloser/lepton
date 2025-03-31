@@ -68,7 +68,7 @@ func IsExactArgs(number int) cobra.PositionalArgs {
 }
 
 // AddStringFlag is similar to cmd.Flags().String but supports aliases and env var
-func AddStringFlag(cmd *cobra.Command, name string, aliases []string, value string, env, usage string) {
+func AddStringFlag(cmd *cobra.Command, name string, aliases []string, value, env, usage string) {
 	if env != "" {
 		usage = fmt.Sprintf("%s [$%s]", usage, env)
 	}
@@ -120,7 +120,14 @@ func GlobalFlags(cmd *cobra.Command) (string, []string) {
 
 // AddPersistentStringArrayFlag is similar to cmd.Flags().StringArray but supports aliases and env var and persistent.
 // See https://github.com/spf13/cobra/blob/main/user_guide.md#persistent-flags to learn what is "persistent".
-func AddPersistentStringArrayFlag(cmd *cobra.Command, name string, aliases, nonPersistentAliases []string, value []string, env string, usage string) {
+func AddPersistentStringArrayFlag(
+	cmd *cobra.Command,
+	name string,
+	aliases, nonPersistentAliases []string,
+	value []string,
+	env string,
+	usage string,
+) {
 	if env != "" {
 		usage = fmt.Sprintf("%s [$%s]", usage, env)
 	}
@@ -157,7 +164,14 @@ func AddPersistentStringArrayFlag(cmd *cobra.Command, name string, aliases, nonP
 
 // AddPersistentStringFlag is similar to AddStringFlag but persistent.
 // See https://github.com/spf13/cobra/blob/main/user_guide.md#persistent-flags to learn what is "persistent".
-func AddPersistentStringFlag(cmd *cobra.Command, name string, aliases, localAliases, persistentAliases []string, aliasToBeInherited *pflag.FlagSet, value string, env, usage string) {
+func AddPersistentStringFlag(
+	cmd *cobra.Command,
+	name string,
+	aliases, localAliases, persistentAliases []string,
+	aliasToBeInherited *pflag.FlagSet,
+	value string,
+	env, usage string,
+) {
 	if env != "" {
 		usage = fmt.Sprintf("%s [$%s]", usage, env)
 	}
@@ -213,7 +227,13 @@ func AddPersistentStringFlag(cmd *cobra.Command, name string, aliases, localAlia
 
 // AddPersistentBoolFlag is similar to AddBoolFlag but persistent.
 // See https://github.com/spf13/cobra/blob/main/user_guide.md#persistent-flags to learn what is "persistent".
-func AddPersistentBoolFlag(cmd *cobra.Command, name string, aliases, nonPersistentAliases []string, value bool, env, usage string) {
+func AddPersistentBoolFlag(
+	cmd *cobra.Command,
+	name string,
+	aliases, nonPersistentAliases []string,
+	value bool,
+	env, usage string,
+) {
 	if env != "" {
 		usage = fmt.Sprintf("%s [$%s]", usage, env)
 	}

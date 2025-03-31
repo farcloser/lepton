@@ -29,7 +29,7 @@ import (
 )
 
 // SignNotation signs an image(`rawRef`) using a notation key name (`keyNameRef`)
-func SignNotation(rawRef string, keyNameRef string) error {
+func SignNotation(rawRef, keyNameRef string) error {
 	notationExecutable, err := exec.LookPath("notation")
 	if err != nil {
 		log.L.WithError(err).Error("notation executable not found in path $PATH")

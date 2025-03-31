@@ -35,7 +35,7 @@ func TestComposePs(t *testing.T) {
 	t.Parallel()
 
 	base := testutil.NewBase(t)
-	var dockerComposeYAML = fmt.Sprintf(`
+	dockerComposeYAML := fmt.Sprintf(`
 version: '3.1'
 
 services:
@@ -98,16 +98,20 @@ volumes:
 
 			return nil
 		}
-
 	}
 
 	time.Sleep(3 * time.Second)
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "wordpress").AssertOutWithFunc(assertHandler("wordpress_container", testutil.WordpressImage))
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "db").AssertOutWithFunc(assertHandler("db_container", testutil.MariaDBImage))
+	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "wordpress").
+		AssertOutWithFunc(assertHandler("wordpress_container", testutil.WordpressImage))
+	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "db").
+		AssertOutWithFunc(assertHandler("db_container", testutil.MariaDBImage))
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps").AssertOutNotContains(testutil.AlpineImage)
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "alpine", "-a").AssertOutWithFunc(assertHandler("alpine_container", testutil.AlpineImage))
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "-a", "--filter", "status=exited").AssertOutWithFunc(assertHandler("alpine_container", testutil.AlpineImage))
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "--services", "-a").AssertOutContainsAll("wordpress\n", "db\n", "alpine\n")
+	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "alpine", "-a").
+		AssertOutWithFunc(assertHandler("alpine_container", testutil.AlpineImage))
+	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "-a", "--filter", "status=exited").
+		AssertOutWithFunc(assertHandler("alpine_container", testutil.AlpineImage))
+	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "--services", "-a").
+		AssertOutContainsAll("wordpress\n", "db\n", "alpine\n")
 }
 
 func TestComposePsJSON(t *testing.T) {
@@ -117,7 +121,7 @@ func TestComposePsJSON(t *testing.T) {
 	testutil.DockerIncompatible(t)
 
 	base := testutil.NewBase(t)
-	var dockerComposeYAML = fmt.Sprintf(`
+	dockerComposeYAML := fmt.Sprintf(`
 version: '3.1'
 
 services:
@@ -160,16 +164,31 @@ volumes:
 			// 1. check json output can be unmarshalled back to printables.
 			var printables []compose.ContainerPrintable
 			if err := json.Unmarshal([]byte(stdout), &printables); err != nil {
-				return fmt.Errorf("[service: %s]failed to unmarshal json output from `compose ps`: %s", svc, stdout)
+				return fmt.Errorf(
+					"[service: %s]failed to unmarshal json output from `compose ps`: %s",
+					svc,
+					stdout,
+				)
 			}
 			// 2. check #printables matches expected count.
 			if len(printables) != count {
-				return fmt.Errorf("[service: %s]unmarshal generates %d printables, expected %d: %s", svc, len(printables), count, stdout)
+				return fmt.Errorf(
+					"[service: %s]unmarshal generates %d printables, expected %d: %s",
+					svc,
+					len(printables),
+					count,
+					stdout,
+				)
 			}
 			// 3. check marshalled json string has all expected substrings.
 			for _, field := range fields {
 				if !strings.Contains(stdout, field) {
-					return fmt.Errorf("[service: %s]marshalled json output doesn't have expected string (%s): %s", svc, field, stdout)
+					return fmt.Errorf(
+						"[service: %s]marshalled json output doesn't have expected string (%s): %s",
+						svc,
+						field,
+						stdout,
+					)
 				}
 			}
 			return nil
@@ -180,8 +199,17 @@ volumes:
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "--format", "yaml").AssertFail()
 	// check all services are up (can be marshalled and unmarshalled) and check Image field exists
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "--format", formatter.FormatJSON).
-		AssertOutWithFunc(assertHandler("all", 2, `"Service":"wordpress"`, `"Service":"db"`,
-			fmt.Sprintf(`"Image":"%s"`, testutil.WordpressImage), fmt.Sprintf(`"Image":"%s"`, testutil.MariaDBImage)))
+		AssertOutWithFunc(assertHandler(
+			"all",
+			2,
+			`"Service":"wordpress"`,
+			`"Service":"db"`,
+			fmt.Sprintf(
+				`"Image":"%s"`,
+				testutil.WordpressImage,
+			),
+			fmt.Sprintf(`"Image":"%s"`, testutil.MariaDBImage),
+		))
 	// check WordPress is running
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "ps", "--format", formatter.FormatJSON, "wordpress").
 		AssertOutWithFunc(assertHandler("wordpress", 1, `"Service":"wordpress"`, `"State":"running"`, `"TargetPort":80`, `"PublishedPort":8081`))

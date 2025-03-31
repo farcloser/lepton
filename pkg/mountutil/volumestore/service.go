@@ -226,7 +226,9 @@ func (vs *volumeStore) List(size bool) (res map[string]api.Volume, err error) {
 }
 
 // Remove will remove one or more containers
-func (vs *volumeStore) Remove(generator func() ([]string, []error, error)) (removed []string, warns []error, err error) {
+func (vs *volumeStore) Remove(
+	generator func() ([]string, []error, error),
+) (removed []string, warns []error, err error) {
 	defer func() {
 		if err != nil {
 			err = errors.Join(ErrServiceVolume, err)

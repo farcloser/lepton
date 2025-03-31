@@ -32,10 +32,8 @@ const (
 	blockSize = 1024
 )
 
-var (
-	// eol is the end-of-line sign in the log.
-	eol = []byte{'\n'}
-)
+// eol is the end-of-line sign in the log.
+var eol = []byte{'\n'}
 
 // FindTailLineStartIndex returns the start of last nth line.
 // * If n <= 0, return the beginning of the file.

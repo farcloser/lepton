@@ -72,7 +72,7 @@ func Destroy() error {
 	return nil
 }
 
-func WriteLogs(metadata map[string]string, stdout <-chan string, stderr <-chan string) error {
+func WriteLogs(metadata map[string]string, stdout, stderr <-chan string) error {
 	var wg sync.WaitGroup
 	wg.Add(2)
 
@@ -103,7 +103,7 @@ func ReadLogs(lvopts LogViewOptions, stdout, stderr io.Writer, stopChannel chan 
 	}
 
 	shortID := lvopts.ID[:12]
-	var journalctlArgs = []string{"SYSLOG_IDENTIFIER=" + shortID, "--output=cat"}
+	journalctlArgs := []string{"SYSLOG_IDENTIFIER=" + shortID, "--output=cat"}
 	if lvopts.Follow {
 		journalctlArgs = append(journalctlArgs, "-f")
 	}

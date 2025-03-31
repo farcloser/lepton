@@ -31,7 +31,8 @@ import (
 	"go.farcloser.world/lepton/pkg/testutil/nerdtest"
 )
 
-// This is a separate set of tests for cp specifically meant to test corner or extreme cases that do not fit in the normal testing rig
+// This is a separate set of tests for cp specifically meant to test corner or extreme cases that do not fit in the
+// normal testing rig
 // because of their complexity
 
 func TestCopyAcid(t *testing.T) {
@@ -65,10 +66,14 @@ func TestCopyAcid(t *testing.T) {
 				testutil.CommonImage, "sleep", "Inf",
 			).AssertOK()
 
-			base.Cmd("exec", rwContainer, "sh", "-euxc", "cd /vol3/dir3/rw; ln -s ../../../ relativelinktoroot").AssertOK()
-			base.Cmd("exec", rwContainer, "sh", "-euxc", "cd /vol3/dir3/rw; ln -s / absolutelinktoroot").AssertOK()
-			base.Cmd("exec", roContainer, "sh", "-euxc", "cd /vol2/dir2/rw; ln -s ../../../ relativelinktoroot").AssertOK()
-			base.Cmd("exec", roContainer, "sh", "-euxc", "cd /vol2/dir2/rw; ln -s / absolutelinktoroot").AssertOK()
+			base.Cmd("exec", rwContainer, "sh", "-euxc", "cd /vol3/dir3/rw; ln -s ../../../ relativelinktoroot").
+				AssertOK()
+			base.Cmd("exec", rwContainer, "sh", "-euxc", "cd /vol3/dir3/rw; ln -s / absolutelinktoroot").
+				AssertOK()
+			base.Cmd("exec", roContainer, "sh", "-euxc", "cd /vol2/dir2/rw; ln -s ../../../ relativelinktoroot").
+				AssertOK()
+			base.Cmd("exec", roContainer, "sh", "-euxc", "cd /vol2/dir2/rw; ln -s / absolutelinktoroot").
+				AssertOK()
 			// Create file on the host
 			err := os.WriteFile(sourceFile, sourceFileContent, filePerm)
 			assert.NilError(t, err)
@@ -121,46 +126,63 @@ func TestCopyAcid(t *testing.T) {
 		t.Run("Traverse read-only locations to a read-write location", func(t *testing.T) {
 			t.Parallel()
 
-			base.Cmd("cp", sourceFile, roContainer+":/vol1/dir1/ro/../../../vol2/dir2/rw").Assert(icmd.Expected{
-				ExitCode: 0,
-			})
+			base.Cmd("cp", sourceFile, roContainer+":/vol1/dir1/ro/../../../vol2/dir2/rw").
+				Assert(icmd.Expected{
+					ExitCode: 0,
+				})
 		})
 
-		t.Run("Follow an absolute symlink inside a read-write mount to a read-only root", func(t *testing.T) {
-			t.Parallel()
+		t.Run(
+			"Follow an absolute symlink inside a read-write mount to a read-only root",
+			func(t *testing.T) {
+				t.Parallel()
 
-			base.Cmd("cp", sourceFile, roContainer+":/vol2/dir2/rw/absolutelinktoroot").Assert(icmd.Expected{
-				ExitCode: 1,
-				Err:      expectedErr,
-			})
-		})
+				base.Cmd("cp", sourceFile, roContainer+":/vol2/dir2/rw/absolutelinktoroot").
+					Assert(icmd.Expected{
+						ExitCode: 1,
+						Err:      expectedErr,
+					})
+			},
+		)
 
-		t.Run("Follow am absolute symlink inside a read-write mount to a read-only mount", func(t *testing.T) {
-			t.Parallel()
+		t.Run(
+			"Follow am absolute symlink inside a read-write mount to a read-only mount",
+			func(t *testing.T) {
+				t.Parallel()
 
-			base.Cmd("cp", sourceFile, rwContainer+":/vol3/dir3/rw/absolutelinktoroot/vol1/dir1/ro").Assert(icmd.Expected{
-				ExitCode: 1,
-				Err:      expectedErr,
-			})
-		})
+				base.Cmd("cp", sourceFile, rwContainer+":/vol3/dir3/rw/absolutelinktoroot/vol1/dir1/ro").
+					Assert(icmd.Expected{
+						ExitCode: 1,
+						Err:      expectedErr,
+					})
+			},
+		)
 
-		t.Run("Follow a relative symlink inside a read-write location to a read-only root", func(t *testing.T) {
-			t.Parallel()
+		t.Run(
+			"Follow a relative symlink inside a read-write location to a read-only root",
+			func(t *testing.T) {
+				t.Parallel()
 
-			base.Cmd("cp", sourceFile, roContainer+":/vol2/dir2/rw/relativelinktoroot").Assert(icmd.Expected{
-				ExitCode: 1,
-				Err:      expectedErr,
-			})
-		})
+				base.Cmd("cp", sourceFile, roContainer+":/vol2/dir2/rw/relativelinktoroot").
+					Assert(icmd.Expected{
+						ExitCode: 1,
+						Err:      expectedErr,
+					})
+			},
+		)
 
-		t.Run("Follow a relative symlink inside a read-write location to a read-only mount", func(t *testing.T) {
-			t.Parallel()
+		t.Run(
+			"Follow a relative symlink inside a read-write location to a read-only mount",
+			func(t *testing.T) {
+				t.Parallel()
 
-			base.Cmd("cp", sourceFile, rwContainer+":/vol3/dir3/rw/relativelinktoroot/vol1/dir1/ro").Assert(icmd.Expected{
-				ExitCode: 1,
-				Err:      expectedErr,
-			})
-		})
+				base.Cmd("cp", sourceFile, rwContainer+":/vol3/dir3/rw/relativelinktoroot/vol1/dir1/ro").
+					Assert(icmd.Expected{
+						ExitCode: 1,
+						Err:      expectedErr,
+					})
+			},
+		)
 
 		t.Run("Cannot copy into a HOST read-only location", func(t *testing.T) {
 			t.Parallel()
@@ -172,11 +194,11 @@ func TestCopyAcid(t *testing.T) {
 
 			err := os.MkdirAll(filepath.Join(tempDir, "rotest"), 0o000)
 			assert.NilError(t, err)
-			base.Cmd("cp", roContainer+":/etc/issue", filepath.Join(tempDir, "rotest")).Assert(icmd.Expected{
-				ExitCode: 1,
-				Err:      expectedErr,
-			})
+			base.Cmd("cp", roContainer+":/etc/issue", filepath.Join(tempDir, "rotest")).
+				Assert(icmd.Expected{
+					ExitCode: 1,
+					Err:      expectedErr,
+				})
 		})
-
 	})
 }

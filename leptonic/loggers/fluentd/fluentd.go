@@ -44,7 +44,7 @@ func (f *Logger) Init(_ context.Context, config *Config) error {
 	return nil
 }
 
-func (f *Logger) WriteLogs(tag string, metadata map[string]string, stdout <-chan string, stderr <-chan string) error {
+func (f *Logger) WriteLogs(tag string, metadata map[string]string, stdout, stderr <-chan string) error {
 	var wg sync.WaitGroup
 	wg.Add(2)
 

@@ -148,14 +148,23 @@ func Build(ctx context.Context, cli *client.Client, globalOptions *options.Globa
 	return nil
 }
 
-// TODO: This struct and `loadImage` are duplicated with the code in `cmd/load.go`, remove it after `load.go` has been refactor
+// TODO: This struct and `loadImage` are duplicated with the code in `cmd/load.go`, remove it after `load.go` has been
+// refactor
 type readCounter struct {
 	io.Reader
 	N int
 }
 
-func loadImage(ctx context.Context, in io.Reader, namespace, address, snapshotter string, output io.Writer, platMC platforms.MatchComparer, quiet bool) error {
-	// In addition to passing WithImagePlatform() to cli.Import(), we also need to pass WithDefaultPlatform() to NewClient().
+func loadImage(
+	ctx context.Context,
+	in io.Reader,
+	namespace, address, snapshotter string,
+	output io.Writer,
+	platMC platforms.MatchComparer,
+	quiet bool,
+) error {
+	// In addition to passing WithImagePlatform() to cli.Import(), we also need to pass WithDefaultPlatform() to
+	// NewClient().
 	// Otherwise unpacking may fail.
 	cli, ctx, cancel, err := clientutil.NewClientWithOpt(ctx, namespace, address, client.WithDefaultPlatform(platMC))
 	if err != nil {
@@ -168,7 +177,13 @@ func loadImage(ctx context.Context, in io.Reader, namespace, address, snapshotte
 
 	r := &readCounter{Reader: in}
 
-	imgs, err := cli.Import(ctx, r, client.WithDigestRef(archive.DigestTranslator(snapshotter)), client.WithSkipDigestRef(func(name string) bool { return name != "" }), client.WithImportPlatform(platMC))
+	imgs, err := cli.Import(
+		ctx,
+		r,
+		client.WithDigestRef(archive.DigestTranslator(snapshotter)),
+		client.WithSkipDigestRef(func(name string) bool { return name != "" }),
+		client.WithImportPlatform(platMC),
+	)
 	if err != nil {
 		if r.N == 0 {
 			// Avoid confusing "unrecognized image format"
@@ -203,9 +218,14 @@ func loadImage(ctx context.Context, in io.Reader, namespace, address, snapshotte
 	return nil
 }
 
-func generateBuildctlArgs(ctx context.Context, cli *client.Client, globalOptions *options.Global, opts *options.BuilderBuild) (
-	buildctlArgs []string, needsLoading bool, metaFile string, tags []string, cleanup func(), err error) {
-
+func generateBuildctlArgs(
+	ctx context.Context,
+	cli *client.Client,
+	globalOptions *options.Global,
+	opts *options.BuilderBuild,
+) (
+	buildctlArgs []string, needsLoading bool, metaFile string, tags []string, cleanup func(), err error,
+) {
 	output := opts.Output
 	if output == "" {
 		info, err := cli.Server(ctx)
@@ -213,7 +233,13 @@ func generateBuildctlArgs(ctx context.Context, cli *client.Client, globalOptions
 			return nil, false, "", nil, nil, err
 		}
 
-		sharable, err := isImageSharable(opts.BuildKitHost, globalOptions.Namespace, info.UUID, globalOptions.Snapshotter, opts.Platform)
+		sharable, err := isImageSharable(
+			opts.BuildKitHost,
+			globalOptions.Namespace,
+			info.UUID,
+			globalOptions.Snapshotter,
+			opts.Platform,
+		)
 		if err != nil {
 			return nil, false, "", nil, nil, err
 		}
@@ -223,7 +249,8 @@ func generateBuildctlArgs(ctx context.Context, cli *client.Client, globalOptions
 		} else {
 			output = "type=docker"
 			if len(opts.Platform) > 1 {
-				// For avoiding `error: failed to solve: docker exporter does not currently support exporting manifest lists`
+				// For avoiding `error: failed to solve: docker exporter does not currently support exporting manifest
+				// lists`
 				// TODO: consider using type=oci for single-opts.Platform build too
 				output = "type=oci"
 			}
@@ -455,7 +482,12 @@ func generateBuildctlArgs(ctx context.Context, cli *client.Client, globalOptions
 		case "none":
 			buildctlArgs = append(buildctlArgs, "--opt=force-network-mode="+opts.NetworkMode)
 		case "host":
-			buildctlArgs = append(buildctlArgs, "--opt=force-network-mode="+opts.NetworkMode, "--allow=network.host", "--allow=security.insecure")
+			buildctlArgs = append(
+				buildctlArgs,
+				"--opt=force-network-mode="+opts.NetworkMode,
+				"--allow=network.host",
+				"--allow=security.insecure",
+			)
 		case "", "default":
 		default:
 		}
@@ -552,12 +584,14 @@ func isImageSharable(buildkitHost, namespace, uuid, snapshotter string, platform
 	}
 
 	// NOTE: It's possible that BuildKit doesn't download the base image of non-default platform (e.g. when the provided
-	//       Dockerfile doesn't contain instructions require base images like RUN) even if `--output type=image,unpack=true`
+	// Dockerfile doesn't contain instructions require base images like RUN) even if `--output type=image,unpack=true`
 	//       is passed to BuildKit. Thus, we need to use `type=docker` or `type=oci` when we build non-default platform
 	//       image using `platform` option.
 	parser := new(platformParser)
 
-	return executor == "client" && containerdUUID == uuid && containerdNamespace == namespace && workerSnapshotter == snapshotter && isBuildPlatformDefault(platform, parser), nil
+	return executor == "client" && containerdUUID == uuid && containerdNamespace == namespace &&
+		workerSnapshotter == snapshotter &&
+		isBuildPlatformDefault(platform, parser), nil
 }
 
 func parseContextNames(values []string) (map[string]string, error) {

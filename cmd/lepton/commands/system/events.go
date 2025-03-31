@@ -27,7 +27,7 @@ import (
 )
 
 func EventsCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:           "events",
 		Args:          cobra.NoArgs,
 		Short:         "Get real time events from the server",
@@ -40,9 +40,12 @@ func EventsCommand() *cobra.Command {
 	cmd.Flags().String("format", "", "Format the output using the given Go template, e.g, '{{json .}}'")
 	cmd.Flags().StringSliceP("filter", "f", []string{}, "Filter matches containers based on given conditions")
 
-	_ = cmd.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{formatter.FormatJSON}, cobra.ShellCompDirectiveNoFileComp
-	})
+	_ = cmd.RegisterFlagCompletionFunc(
+		"format",
+		func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			return []string{formatter.FormatJSON}, cobra.ShellCompDirectiveNoFileComp
+		},
+	)
 
 	return cmd
 }

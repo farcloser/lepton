@@ -128,7 +128,7 @@ func testDefaultNetworkCreationWithBridgeIP(t *testing.T) {
 	assert.NilError(t, err)
 	assert.Assert(t, len(files) == 2) // files[0] is the entry for '.'
 	assert.Assert(t, filepath.Join(cniConfTestDir, files[1].Name()) == defaultNetConf.File)
-	assert.Assert(t, firstConfigModTime == files[1].ModTime())
+	assert.Assert(t, firstConfigModTime.Equal(files[1].ModTime()))
 }
 
 // Tests whether the default network when required was created properly when required.

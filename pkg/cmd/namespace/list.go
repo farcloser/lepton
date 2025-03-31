@@ -41,7 +41,13 @@ type namespaceListOutput struct {
 	Labels     map[string]string `json:"labels,omitempty"`
 }
 
-func List(ctx context.Context, client *client.Client, output io.Writer, globalOptions *options.Global, opts *options.NamespaceList) error {
+func List(
+	ctx context.Context,
+	client *client.Client,
+	output io.Writer,
+	globalOptions *options.Global,
+	opts *options.NamespaceList,
+) error {
 	namespaces, err := namespace.ListNames(ctx, client)
 	if err != nil {
 		return err
@@ -132,7 +138,8 @@ func List(ctx context.Context, client *client.Client, output io.Writer, globalOp
 	}
 
 	// for _, ns := range nsList {
-	//	_, err = fmt.Fprintf(w, "%s\t%d\t%d\t%d\t%v\t\n", ns, numContainers, numImages, numVolumes, strings.Join(labelStrings, ","))
+	// 	_, err = fmt.Fprintf(w, "%s\t%d\t%d\t%d\t%v\t\n", ns, numContainers, numImages, numVolumes,
+	// strings.Join(labelStrings, ","))
 	//	if err != nil {
 	//		log.G(ctx).WithError(err)
 	//	}

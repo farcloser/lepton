@@ -44,7 +44,11 @@ type customMemoryOptions struct {
 	disableOOMKiller  *bool
 }
 
-func generateCgroupOpts(id string, options *options.ContainerCreate, internalLabels *internalLabels) ([]oci.SpecOpts, error) {
+func generateCgroupOpts(
+	id string,
+	options *options.ContainerCreate,
+	internalLabels *internalLabels,
+) ([]oci.SpecOpts, error) {
 	if options.KernelMemory != "" {
 		log.L.Warnf("The --kernel-memory flag is no longer supported. This flag is a noop.")
 	}
@@ -258,7 +262,7 @@ func generateCgroupPath(id, cgroupManager, cgroupParent string) (string, error) 
 }
 
 // ParseDevice parses the give device string into hostDevPath, containerPath and mode(defaults: "rwm").
-func ParseDevice(s string) (hostDevPath string, containerPath string, mode string, err error) {
+func ParseDevice(s string) (hostDevPath, containerPath, mode string, err error) {
 	mode = "rwm"
 	split := strings.Split(s, ":")
 	var containerDevPath string

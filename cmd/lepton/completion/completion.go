@@ -99,7 +99,10 @@ func NamespaceNames(cmd *cobra.Command, _ []string, _ string) ([]string, cobra.S
 	return nsList, cobra.ShellCompDirectiveNoFileComp
 }
 
-func ContainerNames(cmd *cobra.Command, filterFunc func(status client.ProcessStatus) bool) ([]string, cobra.ShellCompDirective) {
+func ContainerNames(
+	cmd *cobra.Command,
+	filterFunc func(status client.ProcessStatus) bool,
+) ([]string, cobra.ShellCompDirective) {
 	globalOptions, err := helpers.ProcessRootCmdFlags(cmd)
 	if err != nil {
 		return nil, cobra.ShellCompDirectiveError
@@ -164,7 +167,11 @@ func NetworkNames(cmd *cobra.Command, exclude []string) ([]string, cobra.ShellCo
 		excludeMap[ex] = struct{}{}
 	}
 
-	e, err := netutil.NewCNIEnv(globalOptions.CNIPath, globalOptions.CNINetConfPath, netutil.WithNamespace(globalOptions.Namespace))
+	e, err := netutil.NewCNIEnv(
+		globalOptions.CNIPath,
+		globalOptions.CNINetConfPath,
+		netutil.WithNamespace(globalOptions.Namespace),
+	)
 	if err != nil {
 		return nil, cobra.ShellCompDirectiveError
 	}

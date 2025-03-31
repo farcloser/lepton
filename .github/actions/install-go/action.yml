@@ -5,7 +5,7 @@ description: "A simple action installing go, with caching"
 # Note: tlsv1.2 is necessary to work on windows-2019
 
 inputs:
-  version:
+  go-version:
     default: "stable"
     description: "1.24 (latest patch release on the branch), 1.24.1 (specific patch release), \
     stable (latest stable release), canary (latest alpha/beta/RC release)"
@@ -17,10 +17,10 @@ runs:
       shell: bash
       run: |
         # Get the selector from the input
-        case "${{ inputs.version }}" in
+        case "${{ inputs.go-version }}" in
           "stable" | "") selector=.stable==true ;;
           "canary") selector=.stable==false ;;
-          *) selector=".version | startswith(\"go${{ inputs.version }}\")" ;;
+          *) selector=".version | startswith(\"go${{ inputs.go-version }}\")" ;;
         esac
 
         # Retrieve the files for the requested version

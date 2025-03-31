@@ -68,7 +68,7 @@ func (m *MockWindowsInfoUtilMockRecorder) RtlGetVersion() *gomock.Call {
 }
 
 // Create mocks the GetRegistryStringValue method of windowsInfoUtil
-func (m *MockWindowsInfoUtil) GetRegistryStringValue(key registry.Key, path string, name string) (string, error) {
+func (m *MockWindowsInfoUtil) GetRegistryStringValue(key registry.Key, path, name string) (string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetRegistryStringValue", key, path, name)
 	ret0, _ := ret[0].(string)
@@ -77,7 +77,7 @@ func (m *MockWindowsInfoUtil) GetRegistryStringValue(key registry.Key, path stri
 }
 
 // Expected call of GetRegistryStringValue
-func (m *MockWindowsInfoUtilMockRecorder) GetRegistryStringValue(key any, path any, name any) *gomock.Call {
+func (m *MockWindowsInfoUtilMockRecorder) GetRegistryStringValue(key, path, name any) *gomock.Call {
 	m.mock.ctrl.T.Helper()
 	return m.mock.ctrl.RecordCallWithMethodType(
 		m.mock,
@@ -88,7 +88,7 @@ func (m *MockWindowsInfoUtilMockRecorder) GetRegistryStringValue(key any, path a
 }
 
 // Create mocks the GetRegistryIntValue method of windowsInfoUtil
-func (m *MockWindowsInfoUtil) GetRegistryIntValue(key registry.Key, path string, name string) (int, error) {
+func (m *MockWindowsInfoUtil) GetRegistryIntValue(key registry.Key, path, name string) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetRegistryIntValue", key, path, name)
 	ret0, _ := ret[0].(int)
@@ -97,7 +97,7 @@ func (m *MockWindowsInfoUtil) GetRegistryIntValue(key registry.Key, path string,
 }
 
 // Expected call of GetRegistryIntValue
-func (m *MockWindowsInfoUtilMockRecorder) GetRegistryIntValue(key any, path any, name any) *gomock.Call {
+func (m *MockWindowsInfoUtilMockRecorder) GetRegistryIntValue(key, path, name any) *gomock.Call {
 	m.mock.ctrl.T.Helper()
 	return m.mock.ctrl.RecordCallWithMethodType(
 		m.mock,

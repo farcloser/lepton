@@ -37,7 +37,12 @@ import (
 // host IP as well as through the loopback interface.
 // `loopbackIsolationEnabled` indicates whether the test should expect connections between
 // the loopback interface and external host interface to succeed or not.
-func baseTestRunPort(t *testing.T, nginxImage string, nginxIndexHTMLSnippet string, loopbackIsolationEnabled bool) {
+func baseTestRunPort(
+	t *testing.T,
+	nginxImage string,
+	nginxIndexHTMLSnippet string,
+	loopbackIsolationEnabled bool,
+) {
 	expectedIsolationErr := ""
 	if loopbackIsolationEnabled {
 		expectedIsolationErr = testutil.ExpectedConnectionRefusedError
@@ -197,7 +202,10 @@ func baseTestRunPort(t *testing.T, nginxImage string, nginxIndexHTMLSnippet stri
 			base := testutil.NewBase(t)
 			defer base.Cmd("rm", "-f", testContainerName).Run()
 			pFlag := fmt.Sprintf("%s:%s:%s", tc.listenIP.String(), tc.hostPort, tc.containerPort)
-			connectURL := "http://" + net.JoinHostPort(tc.connectIP.String(), strconv.Itoa(tc.connectURLPort))
+			connectURL := "http://" + net.JoinHostPort(
+				tc.connectIP.String(),
+				strconv.Itoa(tc.connectURLPort),
+			)
 			t.Logf("pFlag=%q, connectURL=%q", pFlag, connectURL)
 			cmd := base.Cmd("run", "-d",
 				"--name", testContainerName,
@@ -222,5 +230,4 @@ func baseTestRunPort(t *testing.T, nginxImage string, nginxIndexHTMLSnippet stri
 			assert.Assert(t, strings.Contains(string(respBody), nginxIndexHTMLSnippet))
 		})
 	}
-
 }

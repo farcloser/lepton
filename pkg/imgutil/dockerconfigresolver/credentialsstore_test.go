@@ -55,7 +55,7 @@ func TestBrokenCredentialsStore(t *testing.T) {
 		{
 			description: "Pointing DOCKER_CONFIG at a non-existent directory inside an unreadable directory will prevent instantiation",
 			setup: func() string {
-				tmpDir := createTempDir(t, 0000)
+				tmpDir := createTempDir(t, 0o000)
 				return filepath.Join(tmpDir, "doesnotexistcantcreate")
 			},
 			errorNew: dockerconfigresolver.ErrUnableToInstantiate,
@@ -63,7 +63,7 @@ func TestBrokenCredentialsStore(t *testing.T) {
 		{
 			description: "Pointing DOCKER_CONFIG at a non-existent directory inside a read-only directory will prevent saving credentials",
 			setup: func() string {
-				tmpDir := createTempDir(t, 0500)
+				tmpDir := createTempDir(t, 0o500)
 				return filepath.Join(tmpDir, "doesnotexistcantcreate")
 			},
 			errorWrite: dockerconfigresolver.ErrUnableToStore,
@@ -71,14 +71,14 @@ func TestBrokenCredentialsStore(t *testing.T) {
 		{
 			description: "Pointing DOCKER_CONFIG at an unreadable directory will prevent instantiation",
 			setup: func() string {
-				return createTempDir(t, 0000)
+				return createTempDir(t, 0o000)
 			},
 			errorNew: dockerconfigresolver.ErrUnableToInstantiate,
 		},
 		{
 			description: "Pointing DOCKER_CONFIG at a read-only directory will prevent saving credentials",
 			setup: func() string {
-				return createTempDir(t, 0500)
+				return createTempDir(t, 0o500)
 			},
 			errorWrite: dockerconfigresolver.ErrUnableToStore,
 		},
@@ -141,7 +141,7 @@ func TestBrokenCredentialsStore(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				err = os.Chmod(filepath.Join(tmpDir, "config.json"), 0000)
+				err = os.Chmod(filepath.Join(tmpDir, "config.json"), 0o000)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -341,7 +341,6 @@ func TestWorkingCredentialsStore(t *testing.T) {
 	}
 
 	t.Run("Working credentials store", func(t *testing.T) {
-
 		for _, tc := range testCases {
 			t.Run(tc.description, func(t *testing.T) {
 				registryURL, err := dockerconfigresolver.Parse("registry.example")
@@ -388,8 +387,8 @@ func TestWorkingCredentialsStore(t *testing.T) {
 		assert.ErrorIs(t, err, nil)
 		assert.Equal(t, af.Username, "username")
 		assert.Equal(t, af.ServerAddress, "host.example:443/path?ns=namespace.example")
-
 	})
 }
 
-// TODO: add more tests that write credentials (specifically to hub locations) to verify they use the canonical id properly
+// TODO: add more tests that write credentials (specifically to hub locations) to verify they use the canonical id
+// properly

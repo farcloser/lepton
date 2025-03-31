@@ -27,7 +27,7 @@ import (
 )
 
 func CommitCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:               "commit [flags] CONTAINER REPOSITORY[:TAG]",
 		Short:             "Create a new image from a container's changes",
 		Args:              helpers.IsExactArgs(2),
@@ -39,7 +39,8 @@ func CommitCommand() *cobra.Command {
 
 	cmd.Flags().StringP("author", "a", "", `Author (e.g., "contributor <dev@example.com>")`)
 	cmd.Flags().StringP("message", "m", "", "Commit message")
-	cmd.Flags().StringArrayP("change", "c", nil, "Apply Dockerfile instruction to the created image (supported directives: [CMD, ENTRYPOINT])")
+	cmd.Flags().
+		StringArrayP("change", "c", nil, "Apply Dockerfile instruction to the created image (supported directives: [CMD, ENTRYPOINT])")
 	cmd.Flags().BoolP("pause", "p", true, "Pause container during commit")
 
 	return cmd
@@ -79,7 +80,6 @@ func commitOptions(cmd *cobra.Command, _ []string) (options.ContainerCommit, err
 		Pause:    pause,
 		Change:   change,
 	}, nil
-
 }
 
 func commitAction(cmd *cobra.Command, args []string) error {

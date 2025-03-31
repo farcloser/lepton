@@ -42,10 +42,14 @@ import (
 	"go.farcloser.world/lepton/pkg/platformutil"
 )
 
-func Convert(ctx context.Context, client *containerd.Client, output io.Writer, globalOptions *options.Global, opts *options.ImageConvert) error {
-	var (
-		convertOpts = []converter.Opt{}
-	)
+func Convert(
+	ctx context.Context,
+	client *containerd.Client,
+	output io.Writer,
+	globalOptions *options.Global,
+	opts *options.ImageConvert,
+) error {
+	convertOpts := []converter.Opt{}
 	if opts.SourceRef == "" || opts.DestinationRef == "" {
 		return errors.New("src and target image need to be specified")
 	}
@@ -140,7 +144,6 @@ func getZstdConverter(options *options.ImageConvert) (converter.ConvertFunc, err
 }
 
 func getZstdchunkedConverter(globalOptions *options.Global, opts *options.ImageConvert) (converter.ConvertFunc, error) {
-
 	esgzOpts := []estargz.Option{
 		estargz.WithChunkSize(opts.ZstdChunkedChunkSize),
 	}
@@ -159,7 +162,9 @@ func getZstdchunkedConverter(globalOptions *options.Global, opts *options.ImageC
 		var ignored []string
 		esgzOpts = append(esgzOpts, estargz.WithAllowPrioritizeNotFound(&ignored))
 	}
-	return zstdchunkedconvert.LayerConvertFuncWithCompressionLevel(zstd.EncoderLevelFromZstd(opts.ZstdChunkedCompressionLevel), esgzOpts...), nil
+	return zstdchunkedconvert.LayerConvertFuncWithCompressionLevel(
+		zstd.EncoderLevelFromZstd(opts.ZstdChunkedCompressionLevel),
+		esgzOpts...), nil
 }
 
 func readPathsFromRecordFile(filename string) ([]string, error) {

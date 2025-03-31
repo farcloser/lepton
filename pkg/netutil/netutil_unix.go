@@ -107,7 +107,13 @@ func (n *NetworkConfig) clean() error {
 	return nil
 }
 
-func (e *CNIEnv) generateCNIPlugins(driver string, name string, ipam map[string]interface{}, opts map[string]string, ipv6 bool) ([]CNIPlugin, error) {
+func (e *CNIEnv) generateCNIPlugins(
+	driver string,
+	name string,
+	ipam map[string]interface{},
+	opts map[string]string,
+	ipv6 bool,
+) ([]CNIPlugin, error) {
 	var (
 		plugins []CNIPlugin
 		err     error
@@ -151,7 +157,10 @@ func (e *CNIEnv) generateCNIPlugins(driver string, name string, ipam map[string]
 			firewallPath := filepath.Join(e.Path, "firewall")
 			ok, err := enforceFirewallPluginVersion(firewallPath)
 			if err != nil || !ok {
-				return nil, errors.Join(errors.New("unsupported firewall plugin version - you need at least 1.5.0"), err)
+				return nil, errors.Join(
+					errors.New("unsupported firewall plugin version - you need at least 1.5.0"),
+					err,
+				)
 			}
 		}
 	case "macvlan", "ipvlan":
@@ -199,7 +208,13 @@ func (e *CNIEnv) generateCNIPlugins(driver string, name string, ipam map[string]
 	return plugins, nil
 }
 
-func (e *CNIEnv) generateIPAM(driver string, subnets []string, gatewayStr, ipRangeStr string, opts map[string]string, ipv6 bool) (map[string]interface{}, error) {
+func (e *CNIEnv) generateIPAM(
+	driver string,
+	subnets []string,
+	gatewayStr, ipRangeStr string,
+	opts map[string]string,
+	ipv6 bool,
+) (map[string]interface{}, error) {
 	var ipamConfig interface{}
 	switch driver {
 	case "default", "host-local":
@@ -225,7 +240,11 @@ func (e *CNIEnv) generateIPAM(driver string, subnets []string, gatewayStr, ipRan
 		}
 		ipamConf.DaemonSocketPath = filepath.Join(crd, "dhcp.sock")
 		if err := socket.IsSocketAccessible(ipamConf.DaemonSocketPath); err != nil {
-			log.L.Warnf("cannot access dhcp socket %q (hint: try running with `dhcp daemon --socketpath=%s &` in CNI_PATH to launch the dhcp daemon)", ipamConf.DaemonSocketPath, ipamConf.DaemonSocketPath)
+			log.L.Warnf(
+				"cannot access dhcp socket %q (hint: try running with `dhcp daemon --socketpath=%s &` in CNI_PATH to launch the dhcp daemon)",
+				ipamConf.DaemonSocketPath,
+				ipamConf.DaemonSocketPath,
+			)
 		}
 
 		// Set the host-name option to the value of passed argument PREFIX_CNI_DHCP_HOSTNAME
@@ -298,7 +317,8 @@ func enforceFirewallPluginVersion(firewallPath string) (bool, error) {
 	// TODO: guess true by default in 2023
 	guessed := false
 
-	// Parse the stderr (NOT stdout) of `firewall`, such as "CNI firewall plugin v1.1.0\n", or "CNI firewall plugin version unknown\n"
+	// Parse the stderr (NOT stdout) of `firewall`, such as "CNI firewall plugin v1.1.0\n", or "CNI firewall plugin
+	// version unknown\n"
 	//
 	// We do NOT set `CNI_COMMAND=VERSION` here, because the CNI "VERSION" command reports the version of the CNI spec,
 	// not the version of the firewall plugin implementation.
@@ -327,7 +347,8 @@ func enforceFirewallPluginVersion(firewallPath string) (bool, error) {
 	return ver.GreaterThan(minVer) || ver.Equal(minVer), nil
 }
 
-// guessFirewallPluginVersion guess the version of the CNI firewall plugin (not the version of the implemented CNI spec).
+// guessFirewallPluginVersion guess the version of the CNI firewall plugin (not the version of the implemented CNI
+// spec).
 //
 // stderr is like "CNI firewall plugin v1.1.0\n", or "CNI firewall plugin version unknown\n"
 func guessFirewallPluginVersion(stderr string) (*semver.Version, error) {
@@ -341,7 +362,13 @@ func guessFirewallPluginVersion(stderr string) (*semver.Version, error) {
 		// trimmed is like "v1.1.1", "v1.1.0", ..., "v0.8.0", or "version unknown"
 		ver, err := semver.NewVersion(trimmed)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse %q (line %d of stderr=%q) as a semver: %w", trimmed, i+1, stderr, err)
+			return nil, fmt.Errorf(
+				"failed to parse %q (line %d of stderr=%q) as a semver: %w",
+				trimmed,
+				i+1,
+				stderr,
+				err,
+			)
 		}
 		return ver, nil
 	}

@@ -98,7 +98,14 @@ func (c *Composer) upServices(ctx context.Context, parsedServices []*servicepars
 	return nil
 }
 
-func (c *Composer) ensureServiceImage(ctx context.Context, ps *serviceparser.Service, allowBuild, forceBuild bool, bo BuildOptions, quiet bool, pullModeArg string) error {
+func (c *Composer) ensureServiceImage(
+	ctx context.Context,
+	ps *serviceparser.Service,
+	allowBuild, forceBuild bool,
+	bo BuildOptions,
+	quiet bool,
+	pullModeArg string,
+) error {
 	if ps.Build != nil && allowBuild {
 		if ps.Build.Force || forceBuild {
 			return c.buildServiceImage(ctx, ps.Image, ps.Build, ps.Unparsed.Platform, bo)
@@ -122,7 +129,12 @@ func (c *Composer) ensureServiceImage(ctx context.Context, ps *serviceparser.Ser
 
 // upServiceContainer must be called after ensureServiceImage
 // upServiceContainer returns container ID
-func (c *Composer) upServiceContainer(ctx context.Context, service *serviceparser.Service, container serviceparser.Container, recreate string) (string, error) {
+func (c *Composer) upServiceContainer(
+	ctx context.Context,
+	service *serviceparser.Service,
+	container serviceparser.Container,
+	recreate string,
+) (string, error) {
 	// check if container already exists
 	existingCid, err := c.containerID(ctx, container.Name, service.Unparsed.Name)
 	if err != nil {
@@ -202,7 +214,12 @@ func (c *Composer) upServiceContainer(ctx context.Context, service *serviceparse
 	return strings.TrimSpace(string(cid)), nil
 }
 
-func (c *Composer) executeUpCmd(ctx context.Context, cmd *exec.Cmd, containerName string, runFlagD, stdinOpen bool) error {
+func (c *Composer) executeUpCmd(
+	ctx context.Context,
+	cmd *exec.Cmd,
+	containerName string,
+	runFlagD, stdinOpen bool,
+) error {
 	log.G(ctx).Infof("Running %v", cmd.Args)
 	if c.DebugPrintFull {
 		log.G(ctx).Debugf("Running %v", cmd.Args)

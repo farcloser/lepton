@@ -35,15 +35,27 @@ import (
 	"go.farcloser.world/lepton/leptonic/services/containerd"
 )
 
-func NewClient(ctx context.Context, namespace string, address string) (*ctdcli.Client, context.Context, context.CancelFunc, error) {
+func NewClient(
+	ctx context.Context,
+	namespace string,
+	address string,
+) (*ctdcli.Client, context.Context, context.CancelFunc, error) {
 	return containerd.NewClient(ctx, namespace, address)
 }
 
-func NewClientWithOpt(ctx context.Context, namespace string, address string, clientOpt ctdcli.Opt) (*ctdcli.Client, context.Context, context.CancelFunc, error) {
+func NewClientWithOpt(
+	ctx context.Context,
+	namespace string,
+	address string,
+	clientOpt ctdcli.Opt,
+) (*ctdcli.Client, context.Context, context.CancelFunc, error) {
 	return containerd.NewClient(ctx, namespace, address, clientOpt)
 }
 
-func NewClientWithPlatform(ctx context.Context, namespace, address, platform string) (*ctdcli.Client, context.Context, context.CancelFunc, error) {
+func NewClientWithPlatform(
+	ctx context.Context,
+	namespace, address, platform string,
+) (*ctdcli.Client, context.Context, context.CancelFunc, error) {
 	clientOpts := []ctdcli.Opt{}
 	if platform != "" {
 		platformParsed, err := platforms.Parse(platform)
@@ -52,8 +64,11 @@ func NewClientWithPlatform(ctx context.Context, namespace, address, platform str
 		}
 
 		if canExec, canExecErr := emulation.CanExecProbably(platformParsed); !canExec {
-			warn := fmt.Sprintf("Platform %q seems incompatible with the host platform %q. If you see \"exec format error\", see https://github.com/farcloser/lepton/blob/main/docs/multi-platform.md",
-				platform, platforms.DefaultString())
+			warn := fmt.Sprintf(
+				"Platform %q seems incompatible with the host platform %q. If you see \"exec format error\", see https://github.com/farcloser/lepton/blob/main/docs/multi-platform.md",
+				platform,
+				platforms.DefaultString(),
+			)
 			if canExecErr != nil {
 				log.L.WithError(canExecErr).Warn(warn)
 			} else {

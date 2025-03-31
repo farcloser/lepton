@@ -95,7 +95,10 @@ func (c *Composer) removeContainers(ctx context.Context, containers []containerd
 	return nil
 }
 
-func (c *Composer) removeContainersFromParsedServices(ctx context.Context, containers map[string]serviceparser.Container) {
+func (c *Composer) removeContainersFromParsedServices(
+	ctx context.Context,
+	containers map[string]serviceparser.Container,
+) {
 	var rmWG sync.WaitGroup
 	for id, container := range containers {
 		rmWG.Add(1)

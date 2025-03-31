@@ -174,12 +174,17 @@ func TestParseVolumeOptions(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			opts, specOpts, err := mountutil.ParseVolumeOptionsWithMountInfo(tt.vType, tt.src, tt.optsRaw, func(string) (mount.Info, error) {
-				return mount.Info{
-					Mountpoint: tt.src,
-					Optional:   strings.Join(tt.srcOptional, " "),
-				}, nil
-			})
+			opts, specOpts, err := mountutil.ParseVolumeOptionsWithMountInfo(
+				tt.vType,
+				tt.src,
+				tt.optsRaw,
+				func(string) (mount.Info, error) {
+					return mount.Info{
+						Mountpoint: tt.src,
+						Optional:   strings.Join(tt.srcOptional, " "),
+					}, nil
+				},
+			)
 			if err != nil {
 				if tt.wantFail {
 					return
@@ -226,7 +231,8 @@ func TestProcessFlagV(t *testing.T) {
 					Destination: `/mnt/foo`,
 					Source:      `/mnt/foo`,
 					Options:     []string{"ro", "rprivate", "rbind"},
-				}},
+				},
+			},
 		},
 		// Bind volumes: relative path
 		{
@@ -238,7 +244,8 @@ func TestProcessFlagV(t *testing.T) {
 					Source:      "", // will not check source of relative paths
 					Destination: `/mnt/foo`,
 					Options:     []string{"rbind"},
-				}},
+				},
+			},
 		},
 		// Named volumes
 		{
@@ -251,7 +258,8 @@ func TestProcessFlagV(t *testing.T) {
 					Source:      "", // source of anonymous volume is a generated path, so here will not check it.
 					Destination: `/mnt/foo`,
 					Options:     []string{"rbind"},
-				}},
+				},
+			},
 		},
 		{
 			rawSpec: `/mnt/foo:TestVolume`,
@@ -300,7 +308,8 @@ func TestProcessFlagVAnonymousVolumes(t *testing.T) {
 					Type:        "none",
 					Source:      "", // source of anonymous volume is a generated path, so here will not check it.
 					Destination: `/mnt/foo`,
-				}},
+				},
+			},
 		},
 		{
 			rawSpec: `./TestVolume/Path`,
@@ -310,7 +319,8 @@ func TestProcessFlagVAnonymousVolumes(t *testing.T) {
 					Type:        "none",
 					Source:      "",                // source of anonymous volume is a generated path, so here will not check it.
 					Destination: `TestVolume/Path`, // cleanpath() removes the leading "./". Since we are mocking the os.Stat() call, this is fine.
-				}},
+				},
+			},
 		},
 		{
 			rawSpec: "TestVolume",
@@ -320,7 +330,8 @@ func TestProcessFlagVAnonymousVolumes(t *testing.T) {
 					Type:        "none",
 					Source:      "", // source of anonymous volume is a generated path, so here will not check it.
 					Destination: "TestVolume",
-				}},
+				},
+			},
 		},
 		{
 			rawSpec: `/mnt/foo::ro`,

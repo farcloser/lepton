@@ -162,5 +162,10 @@ func TestHnsEndpointsRemovedAfterAttachedRun(t *testing.T) {
 
 	existingEndpoints, err = testtooling.ListHnsEndpointsRegex(".*_" + testNet.Name)
 	assert.NilError(t, err)
-	assert.Equal(t, originalEndpointsCount, len(existingEndpoints), "the number of HNS endpoints should equal pre-test amount")
+	assert.Equal(
+		t,
+		originalEndpointsCount,
+		len(existingEndpoints),
+		"the number of HNS endpoints should equal pre-test amount",
+	)
 }

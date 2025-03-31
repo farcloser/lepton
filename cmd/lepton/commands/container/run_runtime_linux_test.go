@@ -26,5 +26,6 @@ func TestRunSysctl(t *testing.T) {
 	t.Parallel()
 
 	base := testutil.NewBase(t)
-	base.Cmd("run", "--rm", "--sysctl", "net.ipv4.ip_forward=1", testutil.AlpineImage, "cat", "/proc/sys/net/ipv4/ip_forward").AssertOutExactly("1\n")
+	base.Cmd("run", "--rm", "--sysctl", "net.ipv4.ip_forward=1", testutil.AlpineImage, "cat", "/proc/sys/net/ipv4/ip_forward").
+		AssertOutExactly("1\n")
 }

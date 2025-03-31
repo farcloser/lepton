@@ -31,7 +31,7 @@ func TestComposeImages(t *testing.T) {
 	t.Parallel()
 
 	base := testutil.NewBase(t)
-	var dockerComposeYAML = fmt.Sprintf(`
+	dockerComposeYAML := fmt.Sprintf(`
 version: '3.1'
 
 services:
@@ -74,7 +74,8 @@ volumes:
 
 	// check one service image
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "images", "db").AssertOutContains(dbImageName)
-	base.ComposeCmd("-f", comp.YAMLFullPath(), "images", "db").AssertOutNotContains(wordpressImageName)
+	base.ComposeCmd("-f", comp.YAMLFullPath(), "images", "db").
+		AssertOutNotContains(wordpressImageName)
 
 	// check all service images
 	base.ComposeCmd("-f", comp.YAMLFullPath(), "images").AssertOutContains(dbImageName)
@@ -85,7 +86,7 @@ func TestComposeImagesJson(t *testing.T) {
 	t.Parallel()
 
 	base := testutil.NewBase(t)
-	var dockerComposeYAML = fmt.Sprintf(`
+	dockerComposeYAML := fmt.Sprintf(`
 version: '3.1'
 
 services:
@@ -130,16 +131,31 @@ volumes:
 			// 1. check json output can be unmarshalled back to printables.
 			var printables []compose.ContainerPrintable
 			if err := json.Unmarshal([]byte(stdout), &printables); err != nil {
-				return fmt.Errorf("[service: %s]failed to unmarshal json output from `compose images`: %s", svc, stdout)
+				return fmt.Errorf(
+					"[service: %s]failed to unmarshal json output from `compose images`: %s",
+					svc,
+					stdout,
+				)
 			}
 			// 2. check #printables matches expected count.
 			if len(printables) != count {
-				return fmt.Errorf("[service: %s]unmarshal generates %d printables, expected %d: %s", svc, len(printables), count, stdout)
+				return fmt.Errorf(
+					"[service: %s]unmarshal generates %d printables, expected %d: %s",
+					svc,
+					len(printables),
+					count,
+					stdout,
+				)
 			}
 			// 3. check marshalled json string has all expected substrings.
 			for _, field := range fields {
 				if !strings.Contains(stdout, field) {
-					return fmt.Errorf("[service: %s]marshalled json output doesn't have expected string (%s): %s", svc, field, stdout)
+					return fmt.Errorf(
+						"[service: %s]marshalled json output doesn't have expected string (%s): %s",
+						svc,
+						field,
+						stdout,
+					)
 				}
 			}
 			return nil

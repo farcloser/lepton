@@ -1,4 +1,4 @@
-name: test-docker
+name: "i9n / docker"
 
 on:
   push:
@@ -17,7 +17,7 @@ on:
 
 jobs:
   env:
-    name: " "
+    name: "init"
     uses: ./.github/workflows/environment.yml
 
   test-integration-docker-compatibility:

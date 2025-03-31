@@ -30,7 +30,8 @@
    limitations under the License.
 */
 
-// Taken from https://github.com/awslabs/soci-snapshotter/blob/237fc956b8366e49927c84fcfee9a2defbb8f53c/fs/source/source.go
+// Taken from
+// https://github.com/awslabs/soci-snapshotter/blob/237fc956b8366e49927c84fcfee9a2defbb8f53c/fs/source/source.go
 // to avoid taking dependency, as maintainers do not wish to upgrade to containerd v2 yet.
 
 package snapshotterutil
@@ -64,7 +65,10 @@ const (
 // information to each layer descriptor as annotations during unpack. These
 // annotations will be passed to this remote snapshotter as labels and used to
 // construct source information.
-func SociAppendDefaultLabelsHandlerWrapper(indexDigest string, wrapper func(images.Handler) images.Handler) func(f images.Handler) images.Handler {
+func SociAppendDefaultLabelsHandlerWrapper(
+	indexDigest string,
+	wrapper func(images.Handler) images.Handler,
+) func(f images.Handler) images.Handler {
 	return func(f images.Handler) images.Handler {
 		return images.HandlerFunc(func(ctx context.Context, desc specs.Descriptor) ([]specs.Descriptor, error) {
 			children, err := wrapper(f).Handle(ctx, desc)
@@ -83,7 +87,9 @@ func SociAppendDefaultLabelsHandlerWrapper(indexDigest string, wrapper func(imag
 						c.Annotations[TargetSizeLabel] = strconv.FormatInt(c.Size, 10)
 						c.Annotations[TargetSociIndexDigestLabel] = indexDigest
 
-						remainingLayerDigestsCount := len(strings.Split(c.Annotations[ctdsnapshotters.TargetImageLayersLabel], ","))
+						remainingLayerDigestsCount := len(
+							strings.Split(c.Annotations[ctdsnapshotters.TargetImageLayersLabel], ","),
+						)
 
 						var layerSizes string
 						/*

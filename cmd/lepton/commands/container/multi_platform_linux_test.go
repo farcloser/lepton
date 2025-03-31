@@ -83,7 +83,8 @@ RUN echo dummy
 
 		buildCtx := various.CreateBuildContext(t, dockerfile)
 
-		base.Cmd("build", "-t", data.Get("imageName"), "--platform=amd64,arm64", buildCtx).AssertOK()
+		base.Cmd("build", "-t", data.Get("imageName"), "--platform=amd64,arm64", buildCtx).
+			AssertOK()
 		testMultiPlatformRun(base, data.Get("imageName"))
 		base.Cmd("push", "--platform=amd64,arm64", data.Get("imageName")).AssertOK()
 	}

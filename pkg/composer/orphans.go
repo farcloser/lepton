@@ -26,9 +26,12 @@ import (
 	"go.farcloser.world/lepton/pkg/labels"
 )
 
-func (c *Composer) getOrphanContainers(ctx context.Context, parsedServices []*serviceparser.Service) ([]containerd.Container, error) {
+func (c *Composer) getOrphanContainers(
+	ctx context.Context,
+	parsedServices []*serviceparser.Service,
+) ([]containerd.Container, error) {
 	// get all running containers for project
-	var filters = []string{fmt.Sprintf("labels.%q==%s", labels.ComposeProject, c.project.Name)}
+	filters := []string{fmt.Sprintf("labels.%q==%s", labels.ComposeProject, c.project.Name)}
 	containers, err := c.client.Containers(ctx, filters...)
 	if err != nil {
 		return nil, err

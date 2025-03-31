@@ -30,10 +30,18 @@ import (
 
 const SignalCaught = "received"
 
-var SigQuit os.Signal = syscall.SIGQUIT
-var SigUsr1 os.Signal = syscall.SIGUSR1
+var (
+	SigQuit os.Signal = syscall.SIGQUIT
+	SigUsr1 os.Signal = syscall.SIGUSR1
+)
 
-func RunSigProxyContainer(signal os.Signal, exitOnSignal bool, args []string, data test.Data, helpers test.Helpers) test.TestableCommand {
+func RunSigProxyContainer(
+	signal os.Signal,
+	exitOnSignal bool,
+	args []string,
+	data test.Data,
+	helpers test.Helpers,
+) test.TestableCommand {
 	sig := strconv.Itoa(int(signal.(syscall.Signal)))
 	ready := "trap ready"
 	script := `#!/bin/sh
@@ -47,7 +55,8 @@ func RunSigProxyContainer(signal os.Signal, exitOnSignal bool, args []string, da
 	trap sig_msg ` + sig + `
 	printf "` + ready + `\n"
 	while true; do
-		sleep 0.1
+		printf "waiting...\n"
+		sleep 0.5
 	done
 `
 
@@ -55,7 +64,10 @@ func RunSigProxyContainer(signal os.Signal, exitOnSignal bool, args []string, da
 	args = append([]string{"run"}, args...)
 
 	cmd := helpers.Command(args...)
-	cmd.Background(10 * time.Second)
+	// NOTE: because of a test like TestStopWithStopSignal, we need to wait enough for nerdctl to terminate the
+	// container
+	cmd.WithTimeout(20 * time.Second)
+	cmd.Background()
 	EnsureContainerStarted(helpers, data.Identifier())
 
 	for {

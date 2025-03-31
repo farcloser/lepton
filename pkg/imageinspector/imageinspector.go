@@ -29,8 +29,12 @@ import (
 )
 
 // Inspect inspects the image, for the platform specified in image.platform.
-func Inspect(ctx context.Context, client *containerd.Client, image images.Image, snapshotter snapshots.Snapshotter) (*native.Image, error) {
-
+func Inspect(
+	ctx context.Context,
+	client *containerd.Client,
+	image images.Image,
+	snapshotter snapshots.Snapshotter,
+) (*native.Image, error) {
 	n := &native.Image{}
 
 	img := containerd.NewImage(client, image)

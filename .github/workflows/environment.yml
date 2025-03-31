@@ -3,6 +3,9 @@ name: Shared environment
 on:
   workflow_call:
     outputs:
+      CONTAINERD_VERSION:
+        description: "containerd version for windows"
+        value: "2.0.4"
       GO_OLD:
         description: "oldest tested golang version"
         value: "1.23"
@@ -57,7 +60,7 @@ on:
 
 jobs:
   blank:
-    name: " "
+    name: "environment"
     runs-on: ubuntu-24.04
     steps:
       - run: |

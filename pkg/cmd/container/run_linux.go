@@ -46,7 +46,13 @@ func WithoutRunMount() func(ctx context.Context, client oci.Client, c *container
 	return oci.WithoutRunMount
 }
 
-func setPlatformOptions(ctx context.Context, client *containerd.Client, id, uts string, internalLabels *internalLabels, options *options.ContainerCreate) ([]oci.SpecOpts, error) {
+func setPlatformOptions(
+	ctx context.Context,
+	client *containerd.Client,
+	id, uts string,
+	internalLabels *internalLabels,
+	options *options.ContainerCreate,
+) ([]oci.SpecOpts, error) {
 	var opts []oci.SpecOpts
 	opts = append(opts,
 		oci.WithDefaultUnixDevices,
@@ -55,7 +61,12 @@ func setPlatformOptions(ctx context.Context, client *containerd.Client, id, uts 
 
 	opts = append(opts,
 		oci.WithMounts([]specs.Mount{
-			{Type: "cgroup", Source: "cgroup", Destination: "/sys/fs/cgroup", Options: []string{"ro", "nosuid", "noexec", "nodev"}},
+			{
+				Type:        "cgroup",
+				Source:      "cgroup",
+				Destination: "/sys/fs/cgroup",
+				Options:     []string{"ro", "nosuid", "noexec", "nodev"},
+			},
 		}))
 
 	cgOpts, err := generateCgroupOpts(id, options, internalLabels)
@@ -159,7 +170,13 @@ func generateNamespaceOpts(
 	return opts, nil
 }
 
-func generateIPCOpts(ctx context.Context, client *containerd.Client, ipcFlag string, shmSize string, stateDir string) ([]oci.SpecOpts, string, error) {
+func generateIPCOpts(
+	ctx context.Context,
+	client *containerd.Client,
+	ipcFlag string,
+	shmSize string,
+	stateDir string,
+) ([]oci.SpecOpts, string, error) {
 	ipcFlag = strings.ToLower(ipcFlag)
 
 	ipc, err := ipcutil.DetectFlags(ctx, client, stateDir, ipcFlag, shmSize)
@@ -237,7 +254,8 @@ func setOOMScoreAdj(opts []oci.SpecOpts, oomScoreAdjChanged bool, oomScoreAdj in
 	}
 
 	if userns.RunningInUserNS() {
-		// > The value of /proc/<pid>/oom_score_adj may be reduced no lower than the last value set by a CAP_SYS_RESOURCE process.
+		// > The value of /proc/<pid>/oom_score_adj may be reduced no lower than the last value set by a
+		// CAP_SYS_RESOURCE process.
 		// > To reduce the value any lower requires CAP_SYS_RESOURCE.
 		// https://github.com/torvalds/linux/blob/v6.0/Documentation/filesystems/proc.rst#31-procpidoom_adj--procpidoom_score_adj--adjust-the-oom-killer-score
 		//
@@ -306,7 +324,8 @@ func parseGPUOpt(value string) (oci.SpecOpts, error) {
 		gpuOpts = append(gpuOpts, nvidia.WithCapabilities(nvidiaCaps...))
 	} else {
 		// Add "utility", "compute" capability if unset.
-		// Please see also: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/user-guide.html#driver-capabilities
+		// Please see also:
+		// https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/user-guide.html#driver-capabilities
 		gpuOpts = append(gpuOpts, nvidia.WithCapabilities(nvidia.Utility, nvidia.Compute))
 	}
 

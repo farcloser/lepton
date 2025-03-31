@@ -42,7 +42,7 @@ Properties:
 - SIZE:       Size of the unpacked snapshots
 - BLOB SIZE:  Size of the blobs (such as layer tarballs) in the content store
 `
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:                   "images [flags] [REPOSITORY[:TAG]]",
 		Short:                 "List images",
 		Long:                  longHelp,
@@ -63,9 +63,16 @@ Properties:
 	cmd.Flags().Bool("names", false, "Show image names")
 	cmd.Flags().BoolP("all", "a", true, "(unimplemented yet, always true)")
 
-	_ = cmd.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{formatter.FormatJSON, formatter.FormatTable, formatter.FormatWide}, cobra.ShellCompDirectiveNoFileComp
-	})
+	_ = cmd.RegisterFlagCompletionFunc(
+		"format",
+		func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			return []string{
+				formatter.FormatJSON,
+				formatter.FormatTable,
+				formatter.FormatWide,
+			}, cobra.ShellCompDirectiveNoFileComp
+		},
+	)
 
 	return cmd
 }
@@ -122,7 +129,6 @@ func listOptions(cmd *cobra.Command, args []string) (*options.ImageList, error) 
 		All:              true,
 		Stdout:           cmd.OutOrStdout(),
 	}, nil
-
 }
 
 func imagesAction(cmd *cobra.Command, args []string) error {

@@ -63,16 +63,36 @@ func TestFileStoreBasics(t *testing.T) {
 
 	// Invalid keys
 	_, err = tempStore.Get("..")
-	assert.ErrorIs(t, err, errs.ErrInvalidArgument, "unsupported characters or patterns should return ErrInvalidArgument")
+	assert.ErrorIs(
+		t,
+		err,
+		errs.ErrInvalidArgument,
+		"unsupported characters or patterns should return ErrInvalidArgument",
+	)
 
 	err = tempStore.Set([]byte("foo"), "..")
-	assert.ErrorIs(t, err, errs.ErrInvalidArgument, "unsupported characters or patterns should return ErrInvalidArgument")
+	assert.ErrorIs(
+		t,
+		err,
+		errs.ErrInvalidArgument,
+		"unsupported characters or patterns should return ErrInvalidArgument",
+	)
 
 	err = tempStore.Delete("..")
-	assert.ErrorIs(t, err, errs.ErrInvalidArgument, "unsupported characters or patterns should return ErrInvalidArgument")
+	assert.ErrorIs(
+		t,
+		err,
+		errs.ErrInvalidArgument,
+		"unsupported characters or patterns should return ErrInvalidArgument",
+	)
 
 	_, err = tempStore.List("..")
-	assert.ErrorIs(t, err, errs.ErrInvalidArgument, "unsupported characters or patterns should return ErrInvalidArgument")
+	assert.ErrorIs(
+		t,
+		err,
+		errs.ErrInvalidArgument,
+		"unsupported characters or patterns should return ErrInvalidArgument",
+	)
 
 	// Writing, reading, listing, deleting
 	err = tempStore.Set([]byte("foo"), "something")
@@ -160,7 +180,6 @@ func TestFileStoreGroups(t *testing.T) {
 	doesExist, err = tempStore.Exists("group", "subgroup")
 	assert.NilError(t, err, "exist should not error")
 	assert.Assert(t, !doesExist, "should not exist")
-
 }
 
 func TestFileStoreConcurrent(t *testing.T) {

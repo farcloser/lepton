@@ -16,7 +16,7 @@ env:
 
 jobs:
   env:
-    name: " "
+    name: "init"
     uses: ./.github/workflows/environment.yml
 
   linux:
@@ -32,7 +32,7 @@ jobs:
       - name: "Setup"
         uses: ./.github/actions/node
         with:
-          go: canary
+          go-version: canary
       - name: "Prepare integration test environment"
         run: |
           # Build integration image with updated dependencies
@@ -71,7 +71,7 @@ jobs:
       - name: "Setup"
         uses: ./.github/actions/node
         with:
-          go: canary
+          go-version: canary
       # TODO: cache these
       # FIXME: caching? Takes ~30s
       - name: "Setup CNI"

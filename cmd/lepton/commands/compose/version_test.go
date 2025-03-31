@@ -41,5 +41,6 @@ func TestComposeVersionJson(t *testing.T) {
 	t.Parallel()
 
 	base := testutil.NewBase(t)
-	base.ComposeCmd("version", "--format", formatter.FormatJSON).AssertOutContains("{\"version\":\"")
+	base.ComposeCmd("version", "--format", formatter.FormatJSON).
+		AssertOutContains("{\"version\":\"")
 }

@@ -26,7 +26,8 @@ import (
 	"github.com/containerd/log"
 )
 
-// copyIO is from https://github.com/containerd/containerd/blob/148d21b1ae0718b75718a09ecb307bb874270f59/cio/io_windows.go#L44
+// copyIO is from
+// https://github.com/containerd/containerd/blob/148d21b1ae0718b75718a09ecb307bb874270f59/cio/io_windows.go#L44
 func copyIO(_ *exec.Cmd, fifos *cio.FIFOSet, ioset *cio.Streams) (_ *ncio, retErr error) {
 	ncios := &ncio{cmd: nil, config: fifos.Config}
 

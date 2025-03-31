@@ -20,6 +20,7 @@ import (
 	"strings"
 	"testing"
 
+	"go.farcloser.world/tigron/expect"
 	"go.farcloser.world/tigron/test"
 
 	"go.farcloser.world/lepton/pkg/testutil"
@@ -36,15 +37,20 @@ func TestKubeCommitSave(t *testing.T) {
 		containerID := ""
 		// NOTE: kubectl namespaces are not the same as containerd namespaces.
 		// We still want kube test objects segregated in their own Kube API namespace.
-		nerdtest.KubeCtlCommand(helpers, "create", "namespace", "cli-test-k8s").Run(&test.Expected{})
-		nerdtest.KubeCtlCommand(helpers, "run", "--image", testutil.CommonImage, identifier, "--", "sleep", nerdtest.Infinity).Run(&test.Expected{})
-		nerdtest.KubeCtlCommand(helpers, "wait", "pod", identifier, "--for=condition=ready", "--timeout=1m").Run(&test.Expected{})
-		nerdtest.KubeCtlCommand(helpers, "exec", identifier, "--", "mkdir", "-p", "/tmp/whatever").Run(&test.Expected{})
-		nerdtest.KubeCtlCommand(helpers, "get", "pods", identifier, "-o", "jsonpath={ .status.containerStatuses[0].containerID }").Run(&test.Expected{
-			Output: func(stdout string, info string, t *testing.T) {
-				containerID = strings.TrimPrefix(stdout, "containerd://")
-			},
-		})
+		nerdtest.KubeCtlCommand(helpers, "create", "namespace", "cli-test-k8s").
+			Run(&test.Expected{})
+		nerdtest.KubeCtlCommand(helpers, "run", "--image", testutil.CommonImage, identifier, "--", "sleep", nerdtest.Infinity).
+			Run(&test.Expected{})
+		nerdtest.KubeCtlCommand(helpers, "wait", "pod", identifier, "--for=condition=ready", "--timeout=1m").
+			Run(&test.Expected{})
+		nerdtest.KubeCtlCommand(helpers, "exec", identifier, "--", "mkdir", "-p", "/tmp/whatever").
+			Run(&test.Expected{})
+		nerdtest.KubeCtlCommand(helpers, "get", "pods", identifier, "-o", "jsonpath={ .status.containerStatuses[0].containerID }").
+			Run(&test.Expected{
+				Output: func(stdout, info string, t *testing.T) {
+					containerID = strings.TrimPrefix(stdout, "containerd://")
+				},
+			})
 		data.Set("containerID", containerID)
 	}
 
@@ -57,7 +63,7 @@ func TestKubeCommitSave(t *testing.T) {
 		return helpers.Command("save", "testcommitsave")
 	}
 
-	testCase.Expected = test.Expects(0, nil, nil)
+	testCase.Expected = test.Expects(expect.ExitCodeSuccess, nil, nil)
 
 	testCase.Run(t)
 

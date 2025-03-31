@@ -91,23 +91,54 @@ func TestRunCgroupV2(t *testing.T) {
 		"-w", "/sys/fs/cgroup", testutil.AlpineImage,
 		"cat", "cpu.max", "memory.max", "memory.swap.max",
 		"pids.max", "cpu.weight", "cpuset.cpus", "cpuset.mems").AssertOutExactly(expected1)
-	base.Cmd("run", "--rm",
-		"--cpu-quota", "42000", "--cpuset-mems", "0",
-		"--cpu-period", "100000", "--memory", "42m", "--memory-reservation", "6m", "--memory-swap", "100m",
-		"--pids-limit", "42", "--cpu-shares", "2000", "--cpuset-cpus", "0-1",
-		"-w", "/sys/fs/cgroup", testutil.AlpineImage,
-		"cat", "cpu.max", "memory.max", "memory.swap.max", "memory.low", "pids.max",
-		"cpu.weight", "cpuset.cpus", "cpuset.mems").AssertOutExactly(expected2)
+	base.Cmd(
+		"run",
+		"--rm",
+		"--cpu-quota",
+		"42000",
+		"--cpuset-mems",
+		"0",
+		"--cpu-period",
+		"100000",
+		"--memory",
+		"42m",
+		"--memory-reservation",
+		"6m",
+		"--memory-swap",
+		"100m",
+		"--pids-limit",
+		"42",
+		"--cpu-shares",
+		"2000",
+		"--cpuset-cpus",
+		"0-1",
+		"-w",
+		"/sys/fs/cgroup",
+		testutil.AlpineImage,
+		"cat",
+		"cpu.max",
+		"memory.max",
+		"memory.swap.max",
+		"memory.low",
+		"pids.max",
+		"cpu.weight",
+		"cpuset.cpus",
+		"cpuset.mems",
+	).AssertOutExactly(expected2)
 
 	base.Cmd("run", "--name", testutil.Identifier(t)+"-testUpdate1", "-w", "/sys/fs/cgroup", "-d",
 		testutil.AlpineImage, "sleep", nerdtest.Infinity).AssertOK()
 	defer base.Cmd("rm", "-f", testutil.Identifier(t)+"-testUpdate1").Run()
-	update := []string{"update", "--cpu-quota", "42000", "--cpuset-mems", "0", "--cpu-period", "100000",
+	update := []string{
+		"update", "--cpu-quota", "42000", "--cpuset-mems", "0", "--cpu-period", "100000",
 		"--memory", "42m",
-		"--pids-limit", "42", "--cpu-shares", "2000", "--cpuset-cpus", "0-1"}
-	if nerdtest.IsDocker() && info.CgroupVersion == strconv.Itoa(int(cgroups.Version2)) && info.SwapLimit {
+		"--pids-limit", "42", "--cpu-shares", "2000", "--cpuset-cpus", "0-1",
+	}
+	if nerdtest.IsDocker() && info.CgroupVersion == strconv.Itoa(int(cgroups.Version2)) &&
+		info.SwapLimit {
 		// Workaround for Docker with cgroup v2:
-		// > Error response from daemon: Cannot update container 67c13276a13dd6a091cdfdebb355aa4e1ecb15fbf39c2b5c9abee89053e88fce:
+		// > Error response from daemon: Cannot update container
+		// 67c13276a13dd6a091cdfdebb355aa4e1ecb15fbf39c2b5c9abee89053e88fce:
 		// > Memory limit should be smaller than already set memoryswap limit, update the memoryswap at the same time
 		update = append(update, "--memory-swap=84m")
 	}
@@ -129,7 +160,6 @@ func TestRunCgroupV2(t *testing.T) {
 	base.Cmd("exec", testutil.Identifier(t)+"-testUpdate2",
 		"cat", "cpu.max", "memory.max", "memory.swap.max", "memory.low",
 		"pids.max", "cpu.weight", "cpuset.cpus", "cpuset.mems").AssertOutExactly(expected2)
-
 }
 
 func TestRunDevice(t *testing.T) {
@@ -141,7 +171,6 @@ func TestRunDevice(t *testing.T) {
 	lo := make([]*loopback.Loopback, n)
 
 	testCase.Setup = func(data test.Data, helpers test.Helpers) {
-
 		for i := range n {
 			var err error
 			lo[i], err = loopback.New(4096)
@@ -188,7 +217,13 @@ func TestRunDevice(t *testing.T) {
 		{
 			Description: "cannot write lo0",
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-				return helpers.Command("exec", data.Get("id"), "sh", "-ec", "echo -n \"overwritten-lo1-content\">"+lo[0].Device)
+				return helpers.Command(
+					"exec",
+					data.Get("id"),
+					"sh",
+					"-ec",
+					"echo -n \"overwritten-lo1-content\">"+lo[0].Device,
+				)
 			},
 			Expected: test.Expects(expect.ExitCodeGenericFail, nil, nil),
 		},
@@ -215,13 +250,23 @@ func TestRunDevice(t *testing.T) {
 			Description: "can write lo1 and read back updated value",
 			NoParallel:  true,
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-				return helpers.Command("exec", data.Get("id"), "sh", "-ec", "echo -n \"overwritten-lo1-content\">"+lo[1].Device)
+				return helpers.Command(
+					"exec",
+					data.Get("id"),
+					"sh",
+					"-ec",
+					"echo -n \"overwritten-lo1-content\">"+lo[1].Device,
+				)
 			},
-			Expected: test.Expects(expect.ExitCodeSuccess, nil, func(stdout string, info string, t *testing.T) {
-				lo1Read, err := os.ReadFile(lo[1].Device)
-				assert.NilError(t, err)
-				assert.Equal(t, string(bytes.Trim(lo1Read, "\x00")), "overwritten-lo1-content")
-			}),
+			Expected: test.Expects(
+				expect.ExitCodeSuccess,
+				nil,
+				func(stdout, info string, t *testing.T) {
+					lo1Read, err := os.ReadFile(lo[1].Device)
+					assert.NilError(t, err)
+					assert.Equal(t, string(bytes.Trim(lo1Read, "\x00")), "overwritten-lo1-content")
+				},
+			),
 		},
 	}
 
@@ -310,7 +355,8 @@ func TestRunCgroupConf(t *testing.T) {
 		t.Skip("test requires MemoryLimit")
 	}
 	base.Cmd("run", "--rm", "--cgroup-conf", "memory.high=33554432", "-w", "/sys/fs/cgroup", testutil.AlpineImage,
-		"cat", "memory.high").AssertOutExactly("33554432\n")
+		"cat", "memory.high").
+		AssertOutExactly("33554432\n")
 }
 
 func TestRunCgroupParent(t *testing.T) {
@@ -385,7 +431,8 @@ func TestRunBlkioWeightCgroupV2(t *testing.T) {
 	containerName := testutil.Identifier(t)
 	defer base.Cmd("rm", "-f", containerName).AssertOK()
 	// when bfq io scheduler is used, the io.weight knob is exposed as io.bfq.weight
-	base.Cmd("run", "--name", containerName, "--blkio-weight", "300", "-w", "/sys/fs/cgroup", testutil.AlpineImage, "sleep", nerdtest.Infinity).AssertOK()
+	base.Cmd("run", "--name", containerName, "--blkio-weight", "300", "-w", "/sys/fs/cgroup", testutil.AlpineImage, "sleep", nerdtest.Infinity).
+		AssertOK()
 	base.Cmd("exec", containerName, "cat", "io.bfq.weight").AssertOutExactly("default 300\n")
 	base.Cmd("update", containerName, "--blkio-weight", "400").AssertOK()
 	base.Cmd("exec", containerName, "cat", "io.bfq.weight").AssertOutExactly("default 400\n")

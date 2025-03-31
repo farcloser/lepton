@@ -28,8 +28,10 @@ func TestUpdateContainer(t *testing.T) {
 	testutil.DockerIncompatible(t)
 	testContainerName := testutil.Identifier(t)
 	base := testutil.NewBase(t)
-	base.Cmd("run", "-d", "--name", testContainerName, testutil.CommonImage, "sleep", "infinity").AssertOK()
+	base.Cmd("run", "-d", "--name", testContainerName, testutil.CommonImage, "sleep", "infinity").
+		AssertOK()
 	defer base.Cmd("rm", "-f", testContainerName).Run()
 	base.Cmd("update", "--memory", "999999999", "--restart", "123", testContainerName).AssertFail()
-	base.Cmd("inspect", "--mode=native", testContainerName).AssertOutNotContains(`"limit": 999999999,`)
+	base.Cmd("inspect", "--mode=native", testContainerName).
+		AssertOutNotContains(`"limit": 999999999,`)
 }

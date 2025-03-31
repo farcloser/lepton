@@ -118,7 +118,7 @@ type SyslogLogger struct {
 	logger *syslog.Writer
 }
 
-func (sy *SyslogLogger) Init(dataStore string, ns string, id string) error {
+func (sy *SyslogLogger) Init(dataStore, ns, id string) error {
 	return nil
 }
 
@@ -131,7 +131,7 @@ func (sy *SyslogLogger) PreProcess(ctx context.Context, dataStore string, config
 	return nil
 }
 
-func (sy *SyslogLogger) Process(stdout <-chan string, stderr <-chan string) error {
+func (sy *SyslogLogger) Process(stdout, stderr <-chan string) error {
 	var wg sync.WaitGroup
 	wg.Add(2)
 	fn := func(dataChan <-chan string, logFn func(msg string) error) {

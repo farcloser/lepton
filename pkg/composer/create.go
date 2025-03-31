@@ -152,9 +152,15 @@ func (c *Composer) createService(ctx context.Context, ps *serviceparser.Service,
 // createServiceContainer returns container ID
 // TODO(djdongjin): refactor needed:
 // 1. the logic is similar to `upServiceContainer`, need to decouple some of the logic.
-// 2. ideally, `compose up` should equal to `compose create` + `compose start`, we should decouple and reuse the logic in `compose up`.
+// 2. ideally, `compose up` should equal to `compose create` + `compose start`, we should decouple and reuse the logic
+// in `compose up`.
 // 3. it'll be easier to refactor after related `compose` logic are moved to `pkg` from `cmd`.
-func (c *Composer) createServiceContainer(ctx context.Context, service *serviceparser.Service, container serviceparser.Container, recreate string) (string, error) {
+func (c *Composer) createServiceContainer(
+	ctx context.Context,
+	service *serviceparser.Service,
+	container serviceparser.Container,
+	recreate string,
+) (string, error) {
 	// check if container already exists
 	exists, err := c.containerExists(ctx, container.Name, service.Unparsed.Name)
 	if err != nil {

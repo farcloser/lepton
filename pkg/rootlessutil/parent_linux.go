@@ -41,7 +41,10 @@ func ParentMain(hostGatewayIP string) error {
 	stateDir, err := rootlesskit.StateDir()
 	log.L.Debugf("stateDir: %s", stateDir)
 	if err != nil {
-		return fmt.Errorf("rootless containerd not running? (hint: use `containerd-rootless-setuptool.sh install` to start rootless containerd): %w", err)
+		return fmt.Errorf(
+			"rootless containerd not running? (hint: use `containerd-rootless-setuptool.sh install` to start rootless containerd): %w",
+			err,
+		)
 	}
 	childPid, err := rootlesskit.ChildPid(stateDir)
 	if err != nil {

@@ -179,7 +179,8 @@ func TestStopWithLongTimeoutAndSIGKILL(t *testing.T) {
 	defer base.Cmd("rm", "-f", testContainerName).Run()
 
 	// Start a container that sleeps forever
-	base.Cmd("run", "-d", "--name", testContainerName, testutil.CommonImage, "sleep", "Inf").AssertOK()
+	base.Cmd("run", "-d", "--name", testContainerName, testutil.CommonImage, "sleep", "Inf").
+		AssertOK()
 
 	// Stop the container with a 5-second timeout and SIGKILL
 	start := time.Now()
@@ -197,7 +198,8 @@ func TestStopWithTimeout(t *testing.T) {
 	defer base.Cmd("rm", "-f", testContainerName).Run()
 
 	// Start a container that sleeps forever
-	base.Cmd("run", "-d", "--name", testContainerName, testutil.CommonImage, "sleep", "Inf").AssertOK()
+	base.Cmd("run", "-d", "--name", testContainerName, testutil.CommonImage, "sleep", "Inf").
+		AssertOK()
 
 	// Stop the container with a 3-second timeout
 	start := time.Now()

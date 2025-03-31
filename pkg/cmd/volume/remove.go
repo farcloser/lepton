@@ -33,7 +33,13 @@ import (
 	"go.farcloser.world/lepton/pkg/mountutil"
 )
 
-func Remove(ctx context.Context, client *containerd.Client, output io.Writer, globalOptions *options.Global, opts *options.VolumeRemove) error {
+func Remove(
+	ctx context.Context,
+	client *containerd.Client,
+	output io.Writer,
+	globalOptions *options.Global,
+	opts *options.VolumeRemove,
+) error {
 	volStore, err := Store(globalOptions.Namespace, globalOptions.DataRoot, globalOptions.Address)
 	if err != nil {
 		return err
@@ -53,7 +59,10 @@ func Remove(ctx context.Context, client *containerd.Client, output io.Writer, gl
 
 		for _, name := range opts.NamesList {
 			if _, ok := usedVolumesList[name]; ok {
-				cannotRemove = append(cannotRemove, fmt.Errorf("volume %q is in use (%w)", name, errdefs.ErrFailedPrecondition))
+				cannotRemove = append(
+					cannotRemove,
+					fmt.Errorf("volume %q is in use (%w)", name, errdefs.ErrFailedPrecondition),
+				)
 				continue
 			}
 			volumeNames = append(volumeNames, name)

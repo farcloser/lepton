@@ -31,7 +31,7 @@ const (
 )
 
 func PushCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:               "push [flags] NAME[:TAG]",
 		Short:             "Push an image or a repository to a registry.",
 		Args:              helpers.IsExactArgs(1),
@@ -45,16 +45,21 @@ func PushCommand() *cobra.Command {
 	cmd.Flags().Bool("all-platforms", false, "Push content for all platforms")
 	cmd.Flags().String("sign", "none", "Sign the image (none|cosign|notation")
 	cmd.Flags().String("cosign-key", "", "Path to the private key file, KMS URI or Kubernetes Secret for --sign=cosign")
-	cmd.Flags().String("notation-key-name", "", "Signing key name for a key previously added to notation's key list for --sign=notation")
+	cmd.Flags().
+		String("notation-key-name", "", "Signing key name for a key previously added to notation's key list for --sign=notation")
 	cmd.Flags().Int64("soci-span-size", -1, "Span size that soci index uses to segment layer data. Default is 4 MiB.")
-	cmd.Flags().Int64("soci-min-layer-size", -1, "Minimum layer size to build zTOC for. Smaller layers won't have zTOC and not lazy pulled. Default is 10 MiB.")
+	cmd.Flags().
+		Int64("soci-min-layer-size", -1, "Minimum layer size to build zTOC for. Smaller layers won't have zTOC and not lazy pulled. Default is 10 MiB.")
 	cmd.Flags().BoolP("quiet", "q", false, "Suppress verbose output")
 	cmd.Flags().Bool(allowNonDistFlag, false, "Allow pushing images with non-distributable blobs")
 
 	_ = cmd.RegisterFlagCompletionFunc("platform", completion.Platforms)
-	_ = cmd.RegisterFlagCompletionFunc("sign", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{"none", "cosign", "notation"}, cobra.ShellCompDirectiveNoFileComp
-	})
+	_ = cmd.RegisterFlagCompletionFunc(
+		"sign",
+		func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			return []string{"none", "cosign", "notation"}, cobra.ShellCompDirectiveNoFileComp
+		},
+	)
 
 	return cmd
 }

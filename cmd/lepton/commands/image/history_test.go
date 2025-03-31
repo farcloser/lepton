@@ -26,6 +26,7 @@ import (
 
 	"gotest.tools/v3/assert"
 
+	"go.farcloser.world/tigron/expect"
 	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
@@ -73,9 +74,11 @@ func TestImageHistory(t *testing.T) {
 	testCase := &test.Case{
 		Require: require.All(
 			require.Not(nerdtest.Docker),
-			// XXX the results here are obviously platform dependent - and it seems like windows cannot pull a linux image?
+			// XXX the results here are obviously platform dependent - and it seems like windows cannot pull a linux
+			// image?
 			require.Not(require.Windows),
-			// XXX Currently, history does not work on non-native platform, so, we cannot test reliably on other platforms
+			// XXX Currently, history does not work on non-native platform, so, we cannot test reliably on other
+			// platforms
 			require.Arm64,
 		),
 		Setup: func(data test.Data, helpers test.Helpers) {
@@ -88,14 +91,20 @@ func TestImageHistory(t *testing.T) {
 		SubTests: []*test.Case{
 			{
 				Description: "trunc, no quiet, human",
-				Command:     test.Command("image", "history", "--human=true", "--format=json", testutil.CommonImage),
-				Expected: test.Expects(0, nil, func(stdout string, info string, t *testing.T) {
+				Command: test.Command(
+					"image",
+					"history",
+					"--human=true",
+					"--format=json",
+					testutil.CommonImage,
+				),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, func(stdout, info string, t *testing.T) {
 					history, err := decode(stdout)
 					assert.NilError(t, err, info)
 					assert.Equal(t, len(history), 2, info)
 					assert.Equal(t, history[0].Size, "0B", info)
 					// FIXME: how is this going to age?
-					assert.Equal(t, history[0].CreatedSince, "3 years ago", info)
+					assert.Equal(t, history[0].CreatedSince, "4 years ago", info)
 					assert.Equal(t, history[0].Snapshot, "<missing>", info)
 					assert.Equal(t, history[0].Comment, "", info)
 
@@ -104,20 +113,41 @@ func TestImageHistory(t *testing.T) {
 					compTime1, _ := time.Parse(time.RFC3339, history[0].CreatedAt)
 					compTime2, _ := time.Parse(time.RFC3339, history[1].CreatedAt)
 					assert.Equal(t, compTime1.UTC().String(), localTimeL1.UTC().String(), info)
-					assert.Equal(t, history[0].CreatedBy, "/bin/sh -c #(nop)  CMD [\"/bin/sh\"]", info)
+					assert.Equal(
+						t,
+						history[0].CreatedBy,
+						"/bin/sh -c #(nop)  CMD [\"/bin/sh\"]",
+						info,
+					)
 					assert.Equal(t, compTime2.UTC().String(), localTimeL2.UTC().String(), info)
-					assert.Equal(t, history[1].CreatedBy, "/bin/sh -c #(nop) ADD file:3b16ffee2b26d8af5…", info)
+					assert.Equal(
+						t,
+						history[1].CreatedBy,
+						"/bin/sh -c #(nop) ADD file:3b16ffee2b26d8af5…",
+						info,
+					)
 
 					assert.Equal(t, history[1].Size, "5.947MB", info)
-					assert.Equal(t, history[1].CreatedSince, "3 years ago", info)
-					assert.Equal(t, history[1].Snapshot, "sha256:56bf55b8eed1f0b4794a30386e4d1d3da949c…", info)
+					assert.Equal(t, history[1].CreatedSince, "4 years ago", info)
+					assert.Equal(
+						t,
+						history[1].Snapshot,
+						"sha256:56bf55b8eed1f0b4794a30386e4d1d3da949c…",
+						info,
+					)
 					assert.Equal(t, history[1].Comment, "", info)
 				}),
 			},
 			{
 				Description: "no human - dates and sizes and not prettyfied",
-				Command:     test.Command("image", "history", "--human=false", "--format=json", testutil.CommonImage),
-				Expected: test.Expects(0, nil, func(stdout string, info string, t *testing.T) {
+				Command: test.Command(
+					"image",
+					"history",
+					"--human=false",
+					"--format=json",
+					testutil.CommonImage,
+				),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, func(stdout, info string, t *testing.T) {
 					history, err := decode(stdout)
 					assert.NilError(t, err, info)
 					assert.Equal(t, history[0].Size, "0", info)
@@ -128,26 +158,63 @@ func TestImageHistory(t *testing.T) {
 			},
 			{
 				Description: "no trunc - do not truncate sha or cmd",
-				Command:     test.Command("image", "history", "--human=false", "--no-trunc", "--format=json", testutil.CommonImage),
-				Expected: test.Expects(0, nil, func(stdout string, info string, t *testing.T) {
+				Command: test.Command(
+					"image",
+					"history",
+					"--human=false",
+					"--no-trunc",
+					"--format=json",
+					testutil.CommonImage,
+				),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, func(stdout, info string, t *testing.T) {
 					history, err := decode(stdout)
 					assert.NilError(t, err, info)
-					assert.Equal(t, history[1].Snapshot, "sha256:56bf55b8eed1f0b4794a30386e4d1d3da949c25bcb5155e898097cd75dc77c2a")
-					assert.Equal(t, history[1].CreatedBy, "/bin/sh -c #(nop) ADD file:3b16ffee2b26d8af5db152fcc582aaccd9e1ec9e3343874e9969a205550fe07d in / ")
+					assert.Equal(
+						t,
+						history[1].Snapshot,
+						"sha256:56bf55b8eed1f0b4794a30386e4d1d3da949c25bcb5155e898097cd75dc77c2a",
+					)
+					assert.Equal(
+						t,
+						history[1].CreatedBy,
+						"/bin/sh -c #(nop) ADD file:3b16ffee2b26d8af5db152fcc582aaccd9e1ec9e3343874e9969a205550fe07d in / ",
+					)
 				}),
 			},
 			{
 				Description: "Quiet has no effect with format, so, go no-json, no-trunc",
-				Command:     test.Command("image", "history", "--human=false", "--no-trunc", "--quiet", testutil.CommonImage),
-				Expected: test.Expects(0, nil, func(stdout string, info string, t *testing.T) {
-					assert.Equal(t, stdout, "<missing>\nsha256:56bf55b8eed1f0b4794a30386e4d1d3da949c25bcb5155e898097cd75dc77c2a\n")
+				Command: test.Command(
+					"image",
+					"history",
+					"--human=false",
+					"--no-trunc",
+					"--quiet",
+					testutil.CommonImage,
+				),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, func(stdout, info string, t *testing.T) {
+					assert.Equal(
+						t,
+						stdout,
+						"<missing>\nsha256:56bf55b8eed1f0b4794a30386e4d1d3da949c25bcb5155e898097cd75dc77c2a\n",
+					)
 				}),
 			},
 			{
 				Description: "With quiet, trunc has no effect",
-				Command:     test.Command("image", "history", "--human=false", "--no-trunc", "--quiet", testutil.CommonImage),
-				Expected: test.Expects(0, nil, func(stdout string, info string, t *testing.T) {
-					assert.Equal(t, stdout, "<missing>\nsha256:56bf55b8eed1f0b4794a30386e4d1d3da949c25bcb5155e898097cd75dc77c2a\n")
+				Command: test.Command(
+					"image",
+					"history",
+					"--human=false",
+					"--no-trunc",
+					"--quiet",
+					testutil.CommonImage,
+				),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, func(stdout, info string, t *testing.T) {
+					assert.Equal(
+						t,
+						stdout,
+						"<missing>\nsha256:56bf55b8eed1f0b4794a30386e4d1d3da949c25bcb5155e898097cd75dc77c2a\n",
+					)
 				}),
 			},
 		},

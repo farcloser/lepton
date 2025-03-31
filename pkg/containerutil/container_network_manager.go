@@ -134,7 +134,8 @@ type NetworkOptionsManager interface {
 	// Should only be called to revert any setup steps performed in SetupNetworking.
 	CleanupNetworking(ctx context.Context, container containerd.Container) error
 
-	// InternalNetworkingOptionLabels Returns the set of NetworkingOptions which should be set as labels on the container.
+	// InternalNetworkingOptionLabels Returns the set of NetworkingOptions which should be set as labels on the
+	// container.
 	//
 	// These options can potentially differ from the actual networking options
 	// that the NetworkOptionsManager was initially instantiated with.
@@ -144,11 +145,18 @@ type NetworkOptionsManager interface {
 
 	// ContainerNetworkingOpts Returns a slice of `oci.SpecOpts` and `containerd.NewContainerOpts` which represent
 	// the network specs which need to be applied to the container with the given ID.
-	ContainerNetworkingOpts(ctx context.Context, containerID string) ([]oci.SpecOpts, []containerd.NewContainerOpts, error)
+	ContainerNetworkingOpts(
+		ctx context.Context,
+		containerID string,
+	) ([]oci.SpecOpts, []containerd.NewContainerOpts, error)
 }
 
 // NewNetworkingOptionsManager Returns a types.NetworkOptionsManager based on the provided command's flags.
-func NewNetworkingOptionsManager(globalOptions *options.Global, netOpts options.ContainerNetwork, client *containerd.Client) (NetworkOptionsManager, error) {
+func NewNetworkingOptionsManager(
+	globalOptions *options.Global,
+	netOpts options.ContainerNetwork,
+	client *containerd.Client,
+) (NetworkOptionsManager, error) {
 	netType, err := nettype.Detect(netOpts.NetworkSlice)
 	if err != nil {
 		return nil, err
@@ -240,11 +248,7 @@ func (m *noneNetworkManager) SetupNetworking(ctx context.Context, containerID st
 	}
 
 	// Save the meta information
-	if err = hs.Acquire(hsMeta); err != nil {
-		return err
-	}
-
-	return nil
+	return hs.Acquire(hsMeta)
 }
 
 // CleanupNetworking Performs any required cleanup actions for the given container.
@@ -269,10 +273,7 @@ func (m *noneNetworkManager) CleanupNetworking(ctx context.Context, container co
 	}
 
 	// Release
-	if err = hs.Release(container.ID()); err != nil {
-		return err
-	}
-	return nil
+	return hs.Release(container.ID())
 }
 
 // InternalNetworkingOptionLabels Returns the set of NetworkingOptions which should be set as labels on the container.
@@ -285,7 +286,10 @@ func (m *noneNetworkManager) InternalNetworkingOptionLabels(_ context.Context) (
 
 // ContainerNetworkingOpts Returns a slice of `oci.SpecOpts` and `containerd.NewContainerOpts` which represent
 // the network specs which need to be applied to the container with the given ID.
-func (m *noneNetworkManager) ContainerNetworkingOpts(_ context.Context, containerID string) ([]oci.SpecOpts, []containerd.NewContainerOpts, error) {
+func (m *noneNetworkManager) ContainerNetworkingOpts(
+	_ context.Context,
+	containerID string,
+) ([]oci.SpecOpts, []containerd.NewContainerOpts, error) {
 	dataStore, err := clientutil.DataStore(m.globalOptions.DataRoot, m.globalOptions.Address)
 	if err != nil {
 		return nil, nil, err
@@ -384,7 +388,10 @@ func (m *containerNetworkManager) VerifyNetworkOptions(_ context.Context) error 
 	})
 
 	if len(nonZeroParams) != 0 {
-		return fmt.Errorf("conflicting options: the following arguments are not supported when using `--network=container:<container>`: %s", nonZeroParams)
+		return fmt.Errorf(
+			"conflicting options: the following arguments are not supported when using `--network=container:<container>`: %s",
+			nonZeroParams,
+		)
 	}
 
 	return nil
@@ -433,10 +440,17 @@ func (m *containerNetworkManager) CleanupNetworking(_ context.Context, _ contain
 }
 
 // Searches for and returns the networking container for the given network argument.
-func (m *containerNetworkManager) getNetworkingContainerForArgument(ctx context.Context, containerNetArg string, client *containerd.Client) (containerd.Container, error) {
+func (m *containerNetworkManager) getNetworkingContainerForArgument(
+	ctx context.Context,
+	containerNetArg string,
+	client *containerd.Client,
+) (containerd.Container, error) {
 	netItems := strings.Split(containerNetArg, ":")
 	if len(netItems) < 2 {
-		return nil, fmt.Errorf("container networking argument format must be 'container:<id|name>', got: %q", containerNetArg)
+		return nil, fmt.Errorf(
+			"container networking argument format must be 'container:<id|name>', got: %q",
+			containerNetArg,
+		)
 	}
 	containerName := netItems[1]
 
@@ -463,10 +477,14 @@ func (m *containerNetworkManager) getNetworkingContainerForArgument(ctx context.
 }
 
 // InternalNetworkingOptionLabels Returns the set of NetworkingOptions which should be set as labels on the container.
-func (m *containerNetworkManager) InternalNetworkingOptionLabels(ctx context.Context) (options.ContainerNetwork, error) {
+func (m *containerNetworkManager) InternalNetworkingOptionLabels(
+	ctx context.Context,
+) (options.ContainerNetwork, error) {
 	opts := m.netOpts
 	if m.netOpts.NetworkSlice == nil || len(m.netOpts.NetworkSlice) != 1 {
-		return opts, errors.New("conflicting options: exactly one network specification is allowed when using '--network=container:<container>'")
+		return opts, errors.New(
+			"conflicting options: exactly one network specification is allowed when using '--network=container:<container>'",
+		)
 	}
 	// MacAddress is not allowed with container networking
 	opts.MACAddress = ""
@@ -482,7 +500,10 @@ func (m *containerNetworkManager) InternalNetworkingOptionLabels(ctx context.Con
 
 // ContainerNetworkingOpts Returns a slice of `oci.SpecOpts` and `containerd.NewContainerOpts` which represent
 // the network specs which need to be applied to the container with the given ID.
-func (m *containerNetworkManager) ContainerNetworkingOpts(ctx context.Context, _ string) ([]oci.SpecOpts, []containerd.NewContainerOpts, error) {
+func (m *containerNetworkManager) ContainerNetworkingOpts(
+	ctx context.Context,
+	_ string,
+) ([]oci.SpecOpts, []containerd.NewContainerOpts, error) {
 	opts := []oci.SpecOpts{}
 	cOpts := []containerd.NewContainerOpts{}
 
@@ -662,7 +683,10 @@ func getHostNetworkingNamespace(netModeArg string) (oci.SpecOpts, error) {
 
 // ContainerNetworkingOpts Returns a slice of `oci.SpecOpts` and `containerd.NewContainerOpts` which represent
 // the network specs which need to be applied to the container with the given ID.
-func (m *hostNetworkManager) ContainerNetworkingOpts(_ context.Context, containerID string) ([]oci.SpecOpts, []containerd.NewContainerOpts, error) {
+func (m *hostNetworkManager) ContainerNetworkingOpts(
+	_ context.Context,
+	containerID string,
+) ([]oci.SpecOpts, []containerd.NewContainerOpts, error) {
 	dataStore, err := clientutil.DataStore(m.globalOptions.DataRoot, m.globalOptions.Address)
 	if err != nil {
 		return nil, nil, err
@@ -816,7 +840,11 @@ func validateUtsSettings(netOpts options.ContainerNetwork) error {
 // spec for the file to be mounted under /etc/hostname in the new container.
 // If the hostname is empty, the leading 12 characters of the containerID
 // This sets world readable permissions on /etc/hostname, ignoring umask
-func writeEtcHostnameForContainer(globalOptions *options.Global, hostname string, containerID string) ([]oci.SpecOpts, error) {
+func writeEtcHostnameForContainer(
+	globalOptions *options.Global,
+	hostname string,
+	containerID string,
+) ([]oci.SpecOpts, error) {
 	if containerID == "" {
 		return nil, errors.New("container ID is required for setting up hostname file")
 	}
@@ -846,7 +874,11 @@ func writeEtcHostnameForContainer(globalOptions *options.Global, hostname string
 
 // Loads all available networks and verifies that every selected network
 // from the networkSlice is of a type within supportedTypes.
-func verifyNetworkTypes(env *netutil.CNIEnv, networkSlice []string, supportedTypes []string) (map[string]*netutil.NetworkConfig, error) {
+func verifyNetworkTypes(
+	env *netutil.CNIEnv,
+	networkSlice []string,
+	supportedTypes []string,
+) (map[string]*netutil.NetworkConfig, error) {
 	res := make(map[string]*netutil.NetworkConfig, len(networkSlice))
 	var netConfig *netutil.NetworkConfig
 	var err error
@@ -857,7 +889,12 @@ func verifyNetworkTypes(env *netutil.CNIEnv, networkSlice []string, supportedTyp
 
 		netType := netConfig.Plugins[0].Network.Type
 		if supportedTypes != nil && !strutil.InStringSlice(supportedTypes, netType) {
-			return nil, fmt.Errorf("network type %q is not supported for network mapping %q, must be one of: %v", netType, netstr, supportedTypes)
+			return nil, fmt.Errorf(
+				"network type %q is not supported for network mapping %q, must be one of: %v",
+				netType,
+				netstr,
+				supportedTypes,
+			)
 		}
 
 		res[netstr] = netConfig

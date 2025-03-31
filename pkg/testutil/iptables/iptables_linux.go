@@ -60,10 +60,15 @@ func ForwardExists(t *testing.T, ipt *iptables.IPTables, chain, containerIP stri
 // GetRedirectedChain returns the chain where the traffic is being redirected.
 // This is how libcni manage its port maps.
 // Suppose you have the following rule:
-// -A CNI-HOSTPORT-DNAT -p tcp -m comment --comment "dnat name: \"bridge\" id: \"default-YYYYYY\"" -m multiport --dports 9999 -j CNI-DN-XXXXXX
+// -A CNI-HOSTPORT-DNAT -p tcp -m comment --comment "dnat name: \"bridge\" id: \"default-YYYYYY\"" -m multiport --dports
+// 9999 -j CNI-DN-XXXXXX
 // So the chain where the traffic is redirected is CNI-DN-XXXXXX
 // Returns an empty string in case nothing was found.
-func GetRedirectedChain(t *testing.T, ipt *iptables.IPTables, chain, namespace, containerID string) string {
+func GetRedirectedChain(
+	t *testing.T,
+	ipt *iptables.IPTables,
+	chain, namespace, containerID string,
+) string {
 	rules, err := ipt.List("nat", chain)
 	if err != nil {
 		t.Logf("error listing rules in chain: %q\n", err)

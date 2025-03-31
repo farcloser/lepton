@@ -57,10 +57,11 @@ services:
 	t.Logf("projectName=%q", projectName)
 
 	base.ComposeCmd("-p", projectName, "-f", compFull.YAMLFullPath(), "up", "-d").AssertOK()
-	defer base.ComposeCmd("-p", projectName, "-f", compFull.YAMLFullPath(), "down", "--remove-orphans").AssertOK()
+	defer base.ComposeCmd("-p", projectName, "-f", compFull.YAMLFullPath(), "down", "--remove-orphans").
+		AssertOK()
 
-	base.ComposeCmd("-p", projectName, "-f", compOrphan.YAMLFullPath(), "down", "-v").AssertCombinedOutContains("in use")
-
+	base.ComposeCmd("-p", projectName, "-f", compOrphan.YAMLFullPath(), "down", "-v").
+		AssertCombinedOutContains("in use")
 }
 
 func TestComposeDownRemoveOrphans(t *testing.T) {
@@ -99,6 +100,8 @@ services:
 	base.ComposeCmd("-p", projectName, "-f", compFull.YAMLFullPath(), "up", "-d").AssertOK()
 	defer base.ComposeCmd("-p", projectName, "-f", compFull.YAMLFullPath(), "down", "-v").Run()
 
-	base.ComposeCmd("-p", projectName, "-f", compOrphan.YAMLFullPath(), "down", "--remove-orphans").AssertOK()
-	base.ComposeCmd("-p", projectName, "-f", compFull.YAMLFullPath(), "ps", "-a").AssertOutNotContains(orphanContainer)
+	base.ComposeCmd("-p", projectName, "-f", compOrphan.YAMLFullPath(), "down", "--remove-orphans").
+		AssertOK()
+	base.ComposeCmd("-p", projectName, "-f", compFull.YAMLFullPath(), "ps", "-a").
+		AssertOutNotContains(orphanContainer)
 }

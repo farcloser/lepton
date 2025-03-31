@@ -69,8 +69,18 @@ CMD ["echo", "build-test-string"]
 			assert.NilError(helpers.T(), err)
 			helpers.Ensure("build", "-t", testImageRef+":one", buildCtx)
 			helpers.Ensure("build", "-t", testImageRef+":two", buildCtx)
-			helpers.Ensure("push", "--sign=cosign", "--cosign-key="+keyPair.PrivateKey, testImageRef+":one")
-			helpers.Ensure("push", "--sign=cosign", "--cosign-key="+keyPair.PrivateKey, testImageRef+":two")
+			helpers.Ensure(
+				"push",
+				"--sign=cosign",
+				"--cosign-key="+keyPair.PrivateKey,
+				testImageRef+":one",
+			)
+			helpers.Ensure(
+				"push",
+				"--sign=cosign",
+				"--cosign-key="+keyPair.PrivateKey,
+				testImageRef+":two",
+			)
 			helpers.Ensure("rmi", "-f", testImageRef)
 			data.Set("imageref", testImageRef)
 		},
@@ -89,9 +99,15 @@ CMD ["echo", "build-test-string"]
 			{
 				Description: "Pull with the correct key",
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-					return helpers.Command("pull", "--quiet", "--verify=cosign", "--cosign-key="+keyPair.PublicKey, data.Get("imageref")+":one")
+					return helpers.Command(
+						"pull",
+						"--quiet",
+						"--verify=cosign",
+						"--cosign-key="+keyPair.PublicKey,
+						data.Get("imageref")+":one",
+					)
 				},
-				Expected: test.Expects(0, nil, nil),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 			},
 			{
 				Description: "Pull with unrelated key",
@@ -100,7 +116,13 @@ CMD ["echo", "build-test-string"]
 				},
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 					newKeyPair := various.NewCosignKeyPair(t, "cosign-key-pair-test", "2")
-					return helpers.Command("pull", "--quiet", "--verify=cosign", "--cosign-key="+newKeyPair.PublicKey, data.Get("imageref")+":two")
+					return helpers.Command(
+						"pull",
+						"--quiet",
+						"--verify=cosign",
+						"--cosign-key="+newKeyPair.PublicKey,
+						data.Get("imageref")+":two",
+					)
 				},
 				Expected: test.Expects(12, nil, nil),
 			},
@@ -141,7 +163,7 @@ CMD ["echo", "build-test-string"]
 				reg.IP.String(), data.Identifier(), strings.Split(testutil.CommonImage, ":")[1])
 			return helpers.Command("--insecure-registry", "pull", testImageRef)
 		},
-		Expected: test.Expects(0, nil, nil),
+		Expected: test.Expects(expect.ExitCodeSuccess, nil, nil),
 		Cleanup: func(data test.Data, helpers test.Helpers) {
 			if reg != nil {
 				reg.Cleanup(nil)
@@ -176,8 +198,11 @@ func TestImagePullSoci(t *testing.T) {
 				Setup: func(data test.Data, helpers test.Helpers) {
 					cmd := helpers.Custom("mount")
 					cmd.Run(&test.Expected{
-						Output: func(stdout string, info string, t *testing.T) {
-							data.Set("remoteSnapshotsInitialCount", strconv.Itoa(strings.Count(stdout, "fuse.rawBridge")))
+						Output: func(stdout, info string, t *testing.T) {
+							data.Set(
+								"remoteSnapshotsInitialCount",
+								strconv.Itoa(strings.Count(stdout, "fuse.rawBridge")),
+							)
 						},
 					})
 					helpers.Ensure("--snapshotter=soci", "pull", testutil.FfmpegSociImage)
@@ -190,13 +215,19 @@ func TestImagePullSoci(t *testing.T) {
 				},
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
-						Output: func(stdout string, info string, t *testing.T) {
-							remoteSnapshotsInitialCount, _ := strconv.Atoi(data.Get("remoteSnapshotsInitialCount"))
+						Output: func(stdout, info string, t *testing.T) {
+							remoteSnapshotsInitialCount, _ := strconv.Atoi(
+								data.Get("remoteSnapshotsInitialCount"),
+							)
 							remoteSnapshotsActualCount := strings.Count(stdout, "fuse.rawBridge")
-							assert.Equal(t,
+							assert.Equal(
+								t,
 								data.Get("remoteSnapshotsExpectedCount"),
-								strconv.Itoa(remoteSnapshotsActualCount-remoteSnapshotsInitialCount),
-								info)
+								strconv.Itoa(
+									remoteSnapshotsActualCount-remoteSnapshotsInitialCount,
+								),
+								info,
+							)
 						},
 					}
 				},
@@ -209,8 +240,11 @@ func TestImagePullSoci(t *testing.T) {
 				Setup: func(data test.Data, helpers test.Helpers) {
 					cmd := helpers.Custom("mount")
 					cmd.Run(&test.Expected{
-						Output: func(stdout string, info string, t *testing.T) {
-							data.Set("remoteSnapshotsInitialCount", strconv.Itoa(strings.Count(stdout, "fuse.rawBridge")))
+						Output: func(stdout, info string, t *testing.T) {
+							data.Set(
+								"remoteSnapshotsInitialCount",
+								strconv.Itoa(strings.Count(stdout, "fuse.rawBridge")),
+							)
 						},
 					})
 					helpers.Ensure("--snapshotter=soci", "pull", testutil.FfmpegSociImage)
@@ -223,13 +257,19 @@ func TestImagePullSoci(t *testing.T) {
 				},
 				Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
 					return &test.Expected{
-						Output: func(stdout string, info string, t *testing.T) {
-							remoteSnapshotsInitialCount, _ := strconv.Atoi(data.Get("remoteSnapshotsInitialCount"))
+						Output: func(stdout, info string, t *testing.T) {
+							remoteSnapshotsInitialCount, _ := strconv.Atoi(
+								data.Get("remoteSnapshotsInitialCount"),
+							)
 							remoteSnapshotsActualCount := strings.Count(stdout, "fuse.rawBridge")
-							assert.Equal(t,
+							assert.Equal(
+								t,
 								data.Get("remoteSnapshotsExpectedCount"),
-								strconv.Itoa(remoteSnapshotsActualCount-remoteSnapshotsInitialCount),
-								info)
+								strconv.Itoa(
+									remoteSnapshotsActualCount-remoteSnapshotsInitialCount,
+								),
+								info,
+							)
 						},
 					}
 				},
@@ -254,7 +294,7 @@ func TestImagePullProcessOutput(t *testing.T) {
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 					return helpers.Command("pull", testutil.BusyboxImage)
 				},
-				Expected: test.Expects(0, nil, expect.Contains(testutil.BusyboxImage)),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains(testutil.BusyboxImage)),
 			},
 			{
 				Description: "Run Container with image pull - output should be in stderr",
@@ -265,7 +305,7 @@ func TestImagePullProcessOutput(t *testing.T) {
 				Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
 					return helpers.Command("run", "--rm", testutil.BusyboxImage)
 				},
-				Expected: test.Expects(0, nil, expect.DoesNotContain(testutil.BusyboxImage)),
+				Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.DoesNotContain(testutil.BusyboxImage)),
 			},
 		},
 	}

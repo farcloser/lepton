@@ -29,8 +29,18 @@ import (
 	"go.farcloser.world/lepton/pkg/strutil"
 )
 
-func Prune(ctx context.Context, client *containerd.Client, output io.Writer, globalOptions *options.Global, opts *options.NetworkPrune) error {
-	e, err := netutil.NewCNIEnv(globalOptions.CNIPath, globalOptions.CNINetConfPath, netutil.WithNamespace(globalOptions.Namespace))
+func Prune(
+	ctx context.Context,
+	client *containerd.Client,
+	output io.Writer,
+	globalOptions *options.Global,
+	opts *options.NetworkPrune,
+) error {
+	e, err := netutil.NewCNIEnv(
+		globalOptions.CNIPath,
+		globalOptions.CNINetConfPath,
+		netutil.WithNamespace(globalOptions.Namespace),
+	)
 	if err != nil {
 		return err
 	}

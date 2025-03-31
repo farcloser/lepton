@@ -39,12 +39,22 @@ import (
 )
 
 // New returns a new *composer.Composer.
-func New(client *containerd.Client, globalOptions *options.Global, opts *composer.Options, stdout, stderr io.Writer) (*composer.Composer, error) {
+func New(
+	client *containerd.Client,
+	globalOptions *options.Global,
+	opts *composer.Options,
+	stdout, stderr io.Writer,
+) (*composer.Composer, error) {
 	if err := composer.Lock(globalOptions.DataRoot, globalOptions.Address); err != nil {
 		return nil, err
 	}
 
-	cniEnv, err := netutil.NewCNIEnv(globalOptions.CNIPath, globalOptions.CNINetConfPath, netutil.WithNamespace(globalOptions.Namespace), netutil.WithDefaultNetwork(globalOptions.BridgeIP))
+	cniEnv, err := netutil.NewCNIEnv(
+		globalOptions.CNIPath,
+		globalOptions.CNINetConfPath,
+		netutil.WithNamespace(globalOptions.Namespace),
+		netutil.WithDefaultNetwork(globalOptions.BridgeIP),
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +128,13 @@ func New(client *containerd.Client, globalOptions *options.Global, opts *compose
 		}
 
 		imageVerifyOptions := imageVerifyOptionsFromCompose(ps)
-		ref, err := signutil.Verify(ctx, imageName, globalOptions.HostsDir, globalOptions.Experimental, imageVerifyOptions)
+		ref, err := signutil.Verify(
+			ctx,
+			imageName,
+			globalOptions.HostsDir,
+			globalOptions.Experimental,
+			imageVerifyOptions,
+		)
 		if err != nil {
 			return err
 		}

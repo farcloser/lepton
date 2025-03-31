@@ -26,7 +26,7 @@ import (
 )
 
 func logsCommand() *cobra.Command {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:           "logs [flags] [SERVICE...]",
 		Short:         "Show logs of running containers",
 		RunE:          logsAction,

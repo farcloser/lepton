@@ -127,7 +127,9 @@ func generateSecurityOpts(privileged bool, securityOptsMap map[string]string) ([
 	}
 
 	if privilegedWithoutHostDevices && !privileged {
-		return nil, errors.New("flag `--security-opt privileged-without-host-devices` can't be used without `--privileged` enabled")
+		return nil, errors.New(
+			"flag `--security-opt privileged-without-host-devices` can't be used without `--privileged` enabled",
+		)
 	}
 
 	if privileged {
