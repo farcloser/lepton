@@ -2,6 +2,8 @@ module go.farcloser.world/lepton
 
 go 1.23.0
 
+toolchain go1.24.1
+
 // FIXME:
 // github.com/docker/docker/pkg/sysinfo has been replaced by a fork kept under ./pkg2/sysinfo
 // as Moby is not going to move to containerd v2 anytime soon or fix these transient dependencies.
@@ -56,7 +58,7 @@ require (
 	go.farcloser.world/tigron v0.2.1-0.20250330174633-f89db265a035
 	go.uber.org/mock v0.5.0
 	golang.org/x/crypto v0.36.0
-	golang.org/x/net v0.37.0
+	golang.org/x/net v0.38.0
 	golang.org/x/sync v0.12.0
 	golang.org/x/sys v0.31.0
 	golang.org/x/term v0.30.0
