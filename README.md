@@ -36,14 +36,15 @@ They are compiled, from pinned commit shas, ensuring consistent compilation sett
 The full-release bundles together:
 - containerd
 - runc
-- soci
+- cni
+- buildkit
+- rootlesskit
 - bypass4netns
 - slirp4netns
-- tini
-- cni
-- rootlesskit
-- buildkit
+- soci
+- cosign
 - imgcrypt
+- tini
 - buildg
 
 All C (or CGO) binaries are compiled as static PIE executables, with immediate binding and read-only relocations.
@@ -89,13 +90,15 @@ Unlike nerdctl, lepton does not support (and has removed from its codebase):
 - IPFS
 - cgroup v1
 - fuse-overlayfs
+- btrfs
 
 Also, lepton does not explicitly support and does not test anymore (might still work):
 - containerd pre v2 (v1.7, v1.6)
 - ubuntu 22.04 and earlier
 
-So far, besides removal of unsupported code, lepton has been focused on cleanup, reviewing and moving "library"
-packages up into https://github.com/farcloser/go-containers.
+So far, besides removal of unsupported code, lepton has been focused on:
+- build system and CI rewrite
+- cleanup, reviewing and moving "library" packages up into https://github.com/farcloser/go-containers
 
 
 <!--

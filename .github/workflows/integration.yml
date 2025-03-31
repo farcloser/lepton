@@ -1,4 +1,4 @@
-name: i9n
+name: i9n / linux
 
 on:
   push:
@@ -40,39 +40,68 @@ jobs:
             --local dockerfile=$(pwd) \
             --local context=$(pwd)
 
-#  build-dependencies:
-#    needs: env
-#    timeout-minutes: ${{ fromJSON(needs.env.outputs.TIMEOUT_LONG) }}
-#    name: dependencies
-#    runs-on: ${{ matrix.runner }}
-#    strategy:
-#      fail-fast: false
-#      matrix:
-#        include:
-#          - runner: ${{ needs.env.outputs.RUNNER_LINUX_AMD64_STABLE }}
-##          - runner: ${{ needs.env.outputs.RUNNER_LINUX_ARM64_STABLE }}
-#    steps:
-#      - name: "Clone"
-#        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
-#      - name: "Buildkit"
-#        uses: ./.github/actions/install-buildkit
-#      - name: "Build base dependencies for all targets"
+  test-integration-ipv6:
+    needs:
+      - env
+      - build-dependencies
+    timeout-minutes: ${{ fromJSON(needs.env.outputs.TIMEOUT_LONG) }}
+    name: ipv6 | ${{ matrix.runner }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ${{ needs.env.outputs.RUNNER_LINUX_AMD64_STABLE }}
+            flaky: true
+    steps:
+      - name: "Clone"
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      # FIXME: remove - only necessary if we build lepton
+      - name: "Setup"
+        uses: ./.github/actions/node
+      - name: "Buildkit"
+        uses: ./.github/actions/install-buildkit
+      - name: "Enable ipv4 and ipv6 forwarding"
+        run: |
+          sudo sysctl -w net.ipv6.conf.all.forwarding=1
+          sudo sysctl -w net.ipv4.ip_forward=1
+      - name: "Enable IPv6 for Docker, and configure docker to use containerd for gha"
+        run: |
+          sudo mkdir -p /etc/docker
+          echo '{"ipv6": true, "fixed-cidr-v6": "2001:db8:1::/64", "experimental": true, "ip6tables": true}' | sudo tee /etc/docker/daemon.json
+          sudo systemctl restart docker
+      - name: "Remove snap loopback devices (conflicts with our loopback devices in TestRunDevice)"
+        run: |
+          sudo systemctl disable --now snapd.service snapd.socket
+          sudo apt-get purge -y snapd
+          sudo losetup -Dv
+          sudo losetup -lv
+          sudo apt-get install -qq expect
+      - name: "Prepare integration test environment"
+        run: |
+          time sudo -E buildctl build \
+            --opt platform=$ACTION_NODE_OS/$ACTION_NODE_ARCH \
+            --frontend=dockerfile.v0 \
+            --import-cache="type=gha,scope=build-i9n-${{ matrix.runner }}" \
+            --output=type=docker,name=test-integration \
+            --opt target="test-integration" \
+            --local dockerfile=$(pwd) \
+            --local context=$(pwd) | docker load
+#      - name: "Make lepton"
 #        run: |
-#          # FIXME: rid docker
-#          sudo docker run --net none --privileged --rm tonistiigi/binfmt --install linux/arm64 || true
-#          # This is building both arm and amd versions of the base dependencies (assembly-integration)
-#          # IMPORTANT: currently, you cannot run a non-native go with qemu as of 2025-03.
-#          # For that reason, the next stages down there cannot be pinned to the same BUILDPLATFORM, and all builds
-#          # have to be done here.
-#          # This will introduce significant cache churn, but there is no other choice.
-#          sudo -E buildctl build \
-#            --opt platform=linux/amd64,linux/arm64 \
-#            --frontend=dockerfile.v0 \
-#            --import-cache="type=gha,scope=build-i9n" \
-#            --export-cache="type=gha,scope=build-i9n,compression=zstd,mode=max" \
-#            --opt target="test-integration" \
-#            --local dockerfile=$(pwd) \
-#            --local context=$(pwd)
+#          # FIXME: replace by a fixed version download
+#          make build
+#          sudo make install
+#      - name: "QEMU"
+#        run: |
+#          [ "$RUNNER_ARCH" == "amd64" ] || sudo lepton run --net none --privileged --rm tonistiigi/binfmt --install linux/amd64
+#          [ "$RUNNER_ARCH" == "arm64" ] || sudo lepton run --net none --privileged --rm tonistiigi/binfmt --install linux/arm64
+      - name: "Run integration tests (flaky: ${{matrix.flaky}})"
+        run: |
+          docker run --network host -t --rm --privileged test-integration ./hack/test-integration.sh -test.only-ipv6
+#          # FIXME: we should delete on container shutdown instead
+#          sudo ip link delete lepton0 2>/dev/null || true
+#          sudo unbuffer lepton run -t --net host --rm --privileged test-integration ./hack/test-integration.sh -test.only-flaky=${{matrix.flaky}}
 
   test-integration:
     needs:
@@ -133,4 +162,80 @@ jobs:
         run: |
           # FIXME: we should delete on container shutdown instead
           sudo ip link delete lepton0 2>/dev/null || true
-          sudo unbuffer lepton run -t --net host --rm --privileged test-integration ./hack/test-integration.sh -test.only-flaky=${{matrix.flaky}}
+          sudo su --pty -c "lepton run -t --net host --rm --privileged test-integration ./hack/test-integration.sh -test.only-flaky=${{matrix.flaky}}"
+
+  test-integration-rootless:
+    needs:
+      - env
+      - build-dependencies
+    timeout-minutes: ${{ fromJSON(needs.env.outputs.TIMEOUT_LONG) }}
+    name: "rootless | ${{ matrix.runner }} (flaky: ${{ matrix.flaky }})"
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ${{ needs.env.outputs.RUNNER_LINUX_AMD64_STABLE }}
+            flaky: false
+          - runner: ${{ needs.env.outputs.RUNNER_LINUX_ARM64_STABLE }}
+            flaky: false
+    steps:
+      - name: "Clone"
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      # FIXME: remove - only necessary if we build lepton
+      - name: "Setup"
+        uses: ./.github/actions/node
+      - name: "Buildkit"
+        uses: ./.github/actions/install-buildkit
+      - name: "Prepare integration test environment"
+        run: |
+          # --output=type=docker,name=test-integration \
+          time sudo -E buildctl build \
+            --opt platform=$ACTION_NODE_OS/$ACTION_NODE_ARCH \
+            --frontend=dockerfile.v0 \
+            --import-cache="type=gha,scope=build-i9n-${{ matrix.runner }}" \
+            --opt target="test-integration-rootless" \
+            --output=type=image,name=test-integration \
+            --local dockerfile=$(pwd) \
+            --local context=$(pwd)
+      - name: "Set up AppArmor"
+        run: |
+          cat <<EOT | sudo tee "/etc/apparmor.d/usr.local.bin.rootlesskit"
+          abi <abi/4.0>,
+          include <tunables/global>
+
+          /usr/local/bin/rootlesskit flags=(unconfined) {
+          userns,
+
+          # Site-specific additions and overrides. See local/README for details.
+          include if exists <local/usr.local.bin.rootlesskit>
+          }
+          EOT
+          sudo systemctl restart apparmor.service
+      - name: "Remove snap loopback devices (conflicts with our loopback devices in TestRunDevice)"
+        run: |
+          sudo systemctl disable --now snapd.service snapd.socket
+          sudo apt-get purge -y snapd
+          sudo losetup -Dv
+          sudo losetup -lv
+          sudo apt-get install -qq expect
+      - name: "Make lepton"
+        run: |
+          # FIXME: replace by a fixed version download
+          make build
+          sudo make install
+      - name: "QEMU"
+        run: |
+          [ "$RUNNER_ARCH" == "amd64" ] || sudo lepton run --net none --privileged --rm tonistiigi/binfmt --install linux/amd64
+          [ "$RUNNER_ARCH" == "arm64" ] || sudo lepton run --net none --privileged --rm tonistiigi/binfmt --install linux/arm64
+      - name: "Run integration tests (flaky: ${{matrix.flaky}})"
+        run: |
+          # FIXME: we should delete on container shutdown instead
+          sudo ip link delete lepton0 2>/dev/null || true
+          sudo su --pty -c "lepton run -t --rm --privileged test-integration /test-integration-rootless.sh ./hack/test-integration.sh -test.only-flaky=${{matrix.flaky}}"
+
+          # Current state of affairs:
+          # - cap NET_BIND breaks rootlesskit
+          # - CI is hanging somewhere in compose tests
+          # Temporarily reverting to Docker here
+          #          docker run -t --rm --privileged test-integration /test-integration-rootless.sh ./hack/test-integration.sh -test.only-flaky=${{matrix.flaky}}

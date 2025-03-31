@@ -889,10 +889,6 @@ ENV         TZ="America/Los_Angeles"
 RUN         useradd -m -s /bin/bash rootless; \
             mkdir -p /home/rootless/.local/share; \
             chown -R rootless:rootless /home/rootless; \
-#           FIXME: replace this ssh thing with something else
-#           SSH is necessary for rootless testing (to create systemd user session).
-#           (`sudo` does not work for this purpose,
-#           OTOH `machinectl shell` can create the session but does not propagate exit code)
             echo "force-unsafe-io" > /etc/dpkg/dpkg.cfg.d/farcloser-speedup && \
             echo 'Acquire::Languages "none";' > /etc/apt/apt.conf.d/farcloser-no-language && \
             echo 'Acquire::GzipIndexes "true";' > /etc/apt/apt.conf.d/farcloser-gzip-indexes && \
@@ -1004,15 +1000,11 @@ COPY        --from=dependencies-download-cli /src/vendor /src/vendor
 COPY        . /src
 CMD         ["./hack/test-integration.sh"]
 
-#           test-integration-rootless
 FROM        test-integration AS test-integration-rootless
-# TODO: update containerized-systemd to enable sshd by default, or allow `systemctl wants <TARGET> ssh` here
-RUN         ssh-keygen -q -t rsa -f /root/.ssh/id_rsa -N '' && \
-            mkdir -p -m 0700 /home/rootless/.ssh && \
-            cp -a /root/.ssh/id_rsa.pub /home/rootless/.ssh/authorized_keys
-VOLUME      /home/rootless/.local/share
 COPY        ./Dockerfile.d/test-integration-rootless.sh /
-RUN         chmod a+rx /test-integration-rootless.sh
+RUN         chmod a+rx /test-integration-rootless.sh; \
+            chown -R rootless /src; \
+            cp /root/go/bin/gotestsum /usr/local/bin
 CMD         ["/test-integration-rootless.sh", "./hack/test-integration.sh"]
 
 # test for CONTAINERD_ROOTLESS_ROOTLESSKIT_PORT_DRIVER=slirp4netns

@@ -19,6 +19,8 @@ set -o errexit -o errtrace -o functrace -o nounset -o pipefail
 root="$(cd "$(dirname "${BASH_SOURCE[0]:-$PWD}")" 2>/dev/null 1>&2 && pwd)"
 readonly root
 
+set -x
+
 readonly binary=lepton
 
 # This is mildly annoying
@@ -55,8 +57,9 @@ done
 if [ "$needsudo" == "true" ] || [ "$needsudo" == "yes" ] || [ "$needsudo" == "1" ]; then
   gotestsum "${args[@]}" -- -timeout="$timeout" -p 1 -exec sudo -args -test.allow-kill-daemon "$@"
 else
-  gotestsum "${args[@]}" -- -timeout="$timeout" -p 1 -args -test.allow-kill-daemon "$@"
+#  gotestsum "${args[@]}" -- -timeout="$timeout" -p 1 -args -test.allow-kill-daemon "$@"
+  go test "$root"/../cmd/"$binary"/... -p 1 -test.allow-kill-daemon "$@"
 fi
 
-echo "These are the tests that took more than 10 seconds:"
-gotestsum tool slowest --threshold 10s --jsonfile /tmp/test-integration.log
+#echo "These are the tests that took more than 10 seconds:"
+#gotestsum tool slowest --threshold 10s --jsonfile /tmp/test-integration.log

@@ -13,48 +13,47 @@ on:
   pull_request:
 
 jobs:
-  lint:
-    name: "lint"
-    uses: ./.github/workflows/lint.yml
-
   env:
     name: "init"
     uses: ./.github/workflows/environment.yml
 
-#  lint:
-#    needs: env
-#    timeout-minutes: ${{ fromJSON(needs.env.outputs.TIMEOUT_SHORT) }}
-#    name: lint | go ${{ matrix.go}} | ${{ matrix.runner }}
-#    runs-on: ${{ matrix.runner }}
-#    defaults:
-#      run:
-#        shell: bash
-#
-#    strategy:
-#      fail-fast: false
-#      matrix:
-#        include:
-#          - runner: ${{ needs.env.outputs.RUNNER_LINUX_STABLE }}
-#            go: ${{ needs.env.outputs.GO_STABLE }}
-#          - runner: ${{ needs.env.outputs.RUNNER_LINUX_CANARY }}
-#            go: ${{ needs.env.outputs.GO_CANARY }}
-#
-#    steps:
-#      - name: "Clone"
-#        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
-#        with:
-#          fetch-depth: 100
-#      - name: "Setup"
-#        uses: ./.github/actions/node
-#        with:
-#          go-version: ${{ matrix.go }}
-#      - name: "Linting"
-#        env:
-#          VERBOSE: true
-#          NO_COLOR: true
-#        run: |
-#          export LINT_COMMIT_RANGE="$(jq -r '.after + "..HEAD"' ${GITHUB_EVENT_PATH})"
-#          make lint
+  lint:
+    needs: env
+    timeout-minutes: ${{ fromJSON(needs.env.outputs.TIMEOUT_SHORT) }}
+    name: lint | go ${{ matrix.go}} | ${{ matrix.runner }}
+    runs-on: ${{ matrix.runner }}
+    defaults:
+      run:
+        shell: bash
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ${{ needs.env.outputs.RUNNER_LINUX_STABLE }}
+            go: ${{ needs.env.outputs.GO_STABLE }}
+          - runner: ${{ needs.env.outputs.RUNNER_LINUX_CANARY }}
+            go: ${{ needs.env.outputs.GO_CANARY }}
+
+    steps:
+      - name: "Clone"
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+        with:
+          fetch-depth: 100
+      - name: "Setup"
+        uses: ./.github/actions/node
+        with:
+          go-version: ${{ matrix.go }}
+      - name: "Linting"
+        run: |
+          # FIXME: right now, go-licenses is broken on canary.
+          export LINT_COMMIT_RANGE="$(jq -r '.after + "..HEAD"' ${GITHUB_EVENT_PATH})"
+          if [ "${{ matrix.go }}" == "${{ needs.env.outputs.GO_STABLE }}" ]; then
+            make lint
+          else
+            # For some reason, go-licenses does not work on canary
+            make lint-go-all
+          fi
 
   unit:
     needs: env
