@@ -128,7 +128,7 @@ func Convert(
 	}
 
 	// converter.Convert() gains the lease by itself
-	newImg, err := converter.Convert(ctx, client, targetRef, srcRef, convertOpts...)
+	newImg, err := converterutil.Convert(ctx, client, targetRef, srcRef, convertOpts...)
 	if err != nil {
 		return err
 	}
