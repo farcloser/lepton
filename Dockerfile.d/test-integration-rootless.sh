@@ -14,7 +14,6 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-# shellcheck disable=SC2034
 set -o errexit -o errtrace -o functrace -o nounset -o pipefail
 
 if [[ "$(id -u)" = "0" ]]; then
