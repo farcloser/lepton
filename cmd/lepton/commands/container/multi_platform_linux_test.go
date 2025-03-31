@@ -49,10 +49,33 @@ func testMultiPlatformRun(base *testutil.Base, alpineImage string) {
 }
 
 func TestMultiPlatformRun(t *testing.T) {
-	t.Parallel()
+	testCase := nerdtest.Setup()
+	testCase.Require = require.All(
+		nerdtest.Private,
+		nerdtest.IsFlaky("mixed tests using both legacy and non-legacy are considered flaky"),
+	)
 
-	base := testutil.NewBase(t)
-	testMultiPlatformRun(base, testutil.AlpineImage)
+	testCase.NoParallel = true
+
+	testCase.Setup = func(data test.Data, helpers test.Helpers) {
+		testutil.RequireExecPlatform(t, "linux/amd64", "linux/arm64")
+		base := testutil.NewBase(t)
+		testCases := map[string]string{
+			"amd64": "x86_64",
+			"arm64": "aarch64",
+		}
+		for plat, expectedUnameM := range testCases {
+			t.Logf("Testing %q (%q)", plat, expectedUnameM)
+			cmd := base.Cmd("run", "--rm", "--platform="+plat, testutil.AlpineImage, "uname", "-m")
+			cmd.AssertOutExactly(expectedUnameM + "\n")
+		}
+	}
+
+	testCase.Cleanup = func(data test.Data, helpers test.Helpers) {
+		helpers.Anyhow("rmi", "-f", testutil.AlpineImage)
+	}
+
+	testCase.Run(t)
 }
 
 func TestMultiPlatformBuildPush(t *testing.T) {
@@ -155,6 +178,7 @@ func TestMultiPlatformPullPushAllPlatforms(t *testing.T) {
 	testCase.Require = require.All(
 		nerdtest.Registry,
 		require.Not(nerdtest.Docker),
+		nerdtest.Private,
 		nerdtest.IsFlaky("mixed tests using both legacy and non-legacy are considered flaky"),
 	)
 
