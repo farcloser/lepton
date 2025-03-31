@@ -101,6 +101,10 @@ func newNerdCommand(conf test.Config, t *testing.T) *nerdCommand {
 		"GOROOT_",
 		"DOTNET_",
 		"SUDO_",
+		"DEBIAN_",
+		"MEMORY_",
+		"SYSTEMD_",
+		"GO",
 	})
 	return ret
 }
