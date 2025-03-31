@@ -17,13 +17,24 @@ jobs:
   test-integration-windows:
     needs: env
     timeout-minutes: ${{ fromJSON(needs.env.outputs.TIMEOUT_LONG) }}
-    name: windows
+    name: "${{ matrix.runner }} | go ${{ matrix.go }} (flaky: ${{ matrix.flaky }})"
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
       matrix:
         include:
           - runner: ${{ needs.env.outputs.RUNNER_WINDOWS_STABLE }}
+            go: ${{ needs.env.outputs.GO_STABLE }}
+            flaky: false
+          - runner: ${{ needs.env.outputs.RUNNER_WINDOWS_STABLE }}
+            go: ${{ needs.env.outputs.GO_STABLE }}
+            flaky: true
+          - runner: ${{ needs.env.outputs.RUNNER_WINDOWS_CANARY }}
+            go: ${{ needs.env.outputs.GO_CANARY }}
+            flaky: false
+          - runner: ${{ needs.env.outputs.RUNNER_WINDOWS_CANARY }}
+            go: ${{ needs.env.outputs.GO_CANARY }}
+            flaky: true
     defaults:
       run:
         shell: bash
@@ -32,23 +43,28 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
       - name: "Setup"
         uses: ./.github/actions/node
+        with:
+          go-version: ${{ matrix.go }}
       # TODO: cache these
       - name: "Set up CNI"
-        run: GOPATH=$(go env GOPATH) ./hack/provisioning/windows/cni.sh
+        run: GOPATH=$(go env GOPATH) ./hack/provisioning/windows/cni.sh ${{ needs.env.outputs.WINCNI_VERSION }}
       - name: "Set up containerd"
         env:
           ctrdVersion: ${{ needs.env.outputs.CONTAINERD_VERSION }}
-        run: powershell ./hack/provisioning/windows/containerd.ps1
-
+        run: |
+          # Get latest tagged containerd
+          if [ "${{matrix.go}}" == "${{ needs.env.outputs.GO_CANARY }}" ]; then
+            args=(curl --proto '=https' --tlsv1.2 -fsSL -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28")
+            [ "${{ needs.env.outputs.GITHUB_TOKEN }}" == "" ] && {
+              echo "GITHUB_TOKEN is not set - you might face rate limitations with the Github API"
+            } || args+=(-H "Authorization: Bearer ${{ needs.env.outputs.GITHUB_TOKEN }}")
+            ctd_v="$("${args[@]}" https://api.github.com/repos/containerd/containerd/tags | jq -rc .[0].name)"
+            export ctrdVersion="${ctd_v:1}"
+          fi
+          powershell ./hack/provisioning/windows/containerd.ps1
       - name: "Build and install cli"
         run: |
-          go install ./cmd/lepton
-          which lepton
-          which lepton.exe
-          ls -lA ~/go/bin
           make build
-          ls -lA _output
+          cp _output/lepton.exe ~/go/bin
       - name: "Run integration tests"
-        run: ./hack/test-integration.sh -test.only-flaky=false
-#      - name: "Run integration tests (flaky)"
-#        run: ./hack/test-integration.sh -test.only-flaky=true
+        run: ./hack/test-integration.sh -test.only-flaky=${{ matrix.flaky }}

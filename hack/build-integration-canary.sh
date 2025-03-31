@@ -44,7 +44,7 @@ dependencies=(
 )
 
 canary::build::integration(){
-  docker_args=(docker build -t test-integration --target test-integration)
+  extras=()
 
   for dep in "${dependencies[@]}"; do
     local bl=""
@@ -72,13 +72,12 @@ canary::build::integration(){
 
       if [ "$old_version" != "$higher_readable" ]; then
         log::warning "Dependency ${shortsafename} is going to use an updated version $higher_readable (currently: $old_version)"
-        docker_args+=(--build-arg "${shortsafename}_VERSION=$higher_readable" --build-arg "${shortsafename}_REVISION=$revision")
+        extras+=(--opt build-arg:"${shortsafename}_VERSION=$higher_readable" --opt build-arg:"${shortsafename}_REVISION=$revision")
       fi
     done < ./Dockerfile
   done
 
-  docker_args+=(--build-arg "GO_VERSION=${GO_VERSION:-canary}")
+  extras+=(--opt build-arg:"GO_VERSION=${GO_VERSION:-canary}")
 
-  log::debug "${docker_args[*]} ."
-  "${docker_args[@]}" "."
+  export extras
 }

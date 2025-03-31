@@ -19,7 +19,7 @@
 #shellcheck disable=SC2154
 set -o errexit -o errtrace -o functrace -o nounset -o pipefail
 
-WINCNI_VERSION=v0.3.1
+WINCNI_VERSION="${1:-v0.3.1}"
 
 git config --global advice.detachedHead false
 

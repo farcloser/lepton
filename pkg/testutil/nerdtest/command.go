@@ -83,9 +83,8 @@ func newNerdCommand(conf test.Config, t *testing.T) *nerdCommand {
 	}
 
 	ret.WithBinary(binary)
-	// Not interested in these - and insulate us from parent environment side effects
 	ret.WithBlacklist([]string{
-		"LS_COLORS",
+		// Insulate us from parent environment side effects
 		"DOCKER_CONFIG",
 		"CONTAINERD_SNAPSHOTTER",
 		envPrefix + "_TOML",
@@ -94,6 +93,14 @@ func newNerdCommand(conf test.Config, t *testing.T) *nerdCommand {
 		"NETCONFPATH",
 		envPrefix + "_EXPERIMENTAL",
 		envPrefix + "_HOST_GATEWAY_IP",
+		// On CI: noisy and irrelevant
+		"LS_COLORS",
+		"ANDROID_",
+		"JAVA_",
+		"HOMEBREW_",
+		"GOROOT_",
+		"DOTNET_",
+		"SUDO_",
 	})
 	return ret
 }

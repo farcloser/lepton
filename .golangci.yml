@@ -89,7 +89,6 @@ linters:
     interfacebloat:
       # Default is 10
       max: 13
-
     depguard:
       rules:
         main:
@@ -132,12 +131,10 @@ linters:
               desc: pkg must not depend on cobra or pflag
             - pkg: go.farcloser.world/lepton/cmd
               desc: pkg must not depend on cmd files
-
     gocritic:
       disabled-checks:
         - appendAssign
         - ifElseChain
-
     staticcheck:
       checks:
         # Below is the default set
@@ -150,9 +147,6 @@ linters:
         - "-ST1022"
 
         ##### TODO: fix and enable these
-        # 4 occurrences.
-        # Use fmt.Fprintf(x, ...) instead of x.Write(fmt.Sprintf(...)) https://staticcheck.dev/docs/checks#QF1012
-        - "-QF1012"
         # 6 occurrences.
         # Apply De Morgan’s law https://staticcheck.dev/docs/checks#QF1001
         - "-QF1001"
@@ -181,13 +175,10 @@ linters:
           # 14 occurrences. This is generally risky and encourages bad coding for newcomers.
           disabled: true
         - name: bare-return
-          # 31 occurrences. Bare returns are just evil, very unfriendly, and make reading and editing much harder.
+          # 21 occurrences. Bare returns are just evil, very unfriendly, and make reading and editing much harder.
           disabled: true
         - name: import-shadowing
-          # 44 occurrences. Shadowing makes things prone to errors / confusing to read.
-          disabled: true
-        - name: use-errors-new
-          # 84 occurrences. Improves error testing.
+          # 91 occurrences. Shadowing makes things prone to errors / confusing to read.
           disabled: true
 
         ##### P1: consider making a dent on these, but not critical.

@@ -247,7 +247,7 @@ install-go:
 	@mkdir -p $(GO_INSTALL_DESTINATION)
 	@if [ ! -e $(GO_INSTALL_DESTINATION)/go ]; then cd $(GO_INSTALL_DESTINATION); \
 		curl -o go.archive -fsSL --proto '=https' --tlsv1.2 https://go.dev/dl/$(shell \
-			curl -fsSL --proto "=https" --tlsv1.2 "https://go.dev/dl/?mode=json&include=all" | \
+			curl --proto "=https" --tlsv1.2 -fsSL "https://go.dev/dl/?mode=json&include=all" | \
 			jq -rc 'map(select($(GO_VERSION_SELECTOR)))[0].files | map(select(.os=="$(OS)" and .arch=="$(ARCH)"))[0].filename'); \
 		[ "$(OS)" = windows ] && unzip go.archive >/dev/null || tar xzf go.archive; \
 	else \
@@ -257,7 +257,7 @@ install-go:
 	$(call footer, $@)
 
 install-go-resolve-version:
-	@curl -fsSL --proto "=https" --tlsv1.2 "https://go.dev/dl/?mode=json&include=all" | \
+	@curl --proto "=https" --tlsv1.2 -fsSL "https://go.dev/dl/?mode=json&include=all" | \
 		jq -rc 'map(select($(GO_VERSION_SELECTOR)))[0].version' | sed s/go//
 
 test-unit:

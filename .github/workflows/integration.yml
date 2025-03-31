@@ -79,20 +79,33 @@ jobs:
       - env
       - build-dependencies
     timeout-minutes: ${{ fromJSON(needs.env.outputs.TIMEOUT_LONG) }}
-    name: "rootful | ${{ matrix.runner }} (flaky: ${{ matrix.flaky }})"
+    name: "rootful | ${{ matrix.runner }} | go ${{ matrix.go }} (flaky: ${{ matrix.flaky }})"
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
       matrix:
         include:
+          # amd64
           - runner: ${{ needs.env.outputs.RUNNER_LINUX_AMD64_STABLE }}
             flaky: false
+            go: ${{ needs.env.outputs.GO_STABLE }}
           - runner: ${{ needs.env.outputs.RUNNER_LINUX_AMD64_STABLE }}
             flaky: true
+            go: ${{ needs.env.outputs.GO_STABLE }}
+          # arm64
           - runner: ${{ needs.env.outputs.RUNNER_LINUX_ARM64_STABLE }}
             flaky: false
+            go: ${{ needs.env.outputs.GO_STABLE }}
           - runner: ${{ needs.env.outputs.RUNNER_LINUX_ARM64_STABLE }}
             flaky: true
+            go: ${{ needs.env.outputs.GO_STABLE }}
+          # canary
+          - runner: ${{ needs.env.outputs.RUNNER_LINUX_CANARY }}
+            flaky: false
+            go: ${{ needs.env.outputs.GO_CANARY }}
+          - runner: ${{ needs.env.outputs.RUNNER_LINUX_CANARY }}
+            flaky: true
+            go: ${{ needs.env.outputs.GO_CANARY }}
     steps:
       - name: "Clone"
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
@@ -100,11 +113,18 @@ jobs:
       - name: "Setup"
         uses: ./.github/actions/node
         with:
-          go-version: ${{ env.GO_STABLE }}
+          go-version: ${{ matrix.go }}
       - name: "Buildkit"
         uses: ./.github/actions/install-buildkit
       - name: "Prepare integration test environment"
         run: |
+          extras=()
+          if [ "${{ matrix.go }}" == "${{ needs.env.outputs.GO_CANARY }}" ]; then
+            # Build integration image with updated dependencies
+            . ./hack/build-integration-canary.sh
+            LOG_LEVEL=info canary::build::integration
+          fi
+          extras+=(--local context=$(pwd))
           time sudo -E buildctl build \
             --opt platform=$ACTION_NODE_OS/$ACTION_NODE_ARCH \
             --frontend=dockerfile.v0 \
@@ -112,7 +132,7 @@ jobs:
             --output=type=image,name=test-integration \
             --opt target="test-integration" \
             --local dockerfile=$(pwd) \
-            --local context=$(pwd)
+            "${extras[@]}"
       - name: "Remove snap loopback devices (conflicts with our loopback devices in TestRunDevice)"
         run: |
           sudo systemctl disable --now snapd.service snapd.socket
@@ -133,4 +153,5 @@ jobs:
         run: |
           # FIXME: we should delete on container shutdown instead
           sudo ip link delete lepton0 2>/dev/null || true
-          sudo unbuffer lepton run -t --net host --rm --privileged test-integration ./hack/test-integration.sh -test.only-flaky=${{matrix.flaky}}
+          # See https://github.com/farcloser/lepton/issues/172
+          sudo su --pty -c "lepton run -t --net host --rm --privileged test-integration ./hack/test-integration.sh -test.only-flaky=${{matrix.flaky}}"
