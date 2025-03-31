@@ -20,33 +20,38 @@ jobs:
     name: "init"
     uses: ./.github/workflows/environment.yml
 
-  test-integration-docker-compatibility:
+  test-integration-docker:
     needs: env
     timeout-minutes: ${{ fromJSON(needs.env.outputs.TIMEOUT_LONG) }}
-    name: docker
+    name: "docker (flaky: ${{ matrix.flaky }})"
     runs-on: ${{ needs.env.outputs.RUNNER_LINUX_STABLE }}
-
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - flaky: false
+          - flaky: true
     steps:
       - name: "Clone"
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
       - name: "Setup"
         uses: ./.github/actions/node
-
+        with:
+          go-version: ${{ matrix.go }}
       # FIXME: finish migrating unbuffer tests out
       - name: "Add expect"
         run: |
           sudo apt-get install -qq --no-install-recommends expect
-      - name: "Register QEMU"
+      - name: "Make lepton"
         run: |
           # FIXME: replace by a fixed version download
           make build
           sudo make install
-
-          sudo lepton run --net none --privileged --rm tonistiigi/binfmt --install linux/amd64 || true
-          sudo lepton run --net none --privileged --rm tonistiigi/binfmt --install linux/arm64 || true
+      - name: "QEMU"
+        run: |
+          [ "$RUNNER_ARCH" == "amd64" ] || sudo lepton run --net none --privileged --rm tonistiigi/binfmt --install linux/amd64
+          [ "$RUNNER_ARCH" == "arm64" ] || sudo lepton run --net none --privileged --rm tonistiigi/binfmt --install linux/arm64
       - name: "Ensure that the integration test suite is compatible with Docker"
-        run: WITH_SUDO=true ./hack/test-integration.sh -test.target=docker
+        run: WITH_SUDO=true ./hack/test-integration.sh -test.target=docker -test.only-flaky=${{matrix.flaky}}
       - name: "Ensure that the IPv6 integration test suite is compatible with Docker"
-        run: WITH_SUDO=true ./hack/test-integration.sh -test.target=docker -test.only-ipv6
-      - name: "Ensure that the integration test suite is compatible with Docker (flaky only)"
-        run: WITH_SUDO=true ./hack/test-integration.sh -test.target=docker -test.only-flaky
+        run: WITH_SUDO=true ./hack/test-integration.sh -test.target=docker -test.only-ipv6 -test.only-flaky=${{matrix.flaky}}

@@ -3,9 +3,6 @@ name: Shared environment
 on:
   workflow_call:
     outputs:
-      CONTAINERD_VERSION:
-        description: "containerd version for windows"
-        value: "2.0.4"
       GO_OLD:
         description: "oldest tested golang version"
         value: "1.23"
@@ -57,6 +54,9 @@ on:
       GITHUB_TOKEN:
         description: "Github token"
         value: ""
+      CONTAINERD_VERSION:
+        description: "containerd version for windows"
+        value: "2.0.4"
 
 jobs:
   blank:
