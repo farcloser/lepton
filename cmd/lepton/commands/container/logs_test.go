@@ -290,8 +290,6 @@ func TestLogsWithForegroundContainers(t *testing.T) {
 }
 
 func TestTailFollowRotateLogs(t *testing.T) {
-	t.Parallel()
-
 	// FIXME this is flaky by nature... 2 lines is arbitrary, 10000 ms is arbitrary, and both are some sort of educated
 	// guess that things will mostly always kinda work maybe...
 	// Furthermore, parallelizing will put pressure on the daemon which might be even slower in answering, increasing
