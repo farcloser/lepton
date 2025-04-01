@@ -55,6 +55,9 @@ func TestRunVerifyCosign(t *testing.T) {
 	testCase.Cleanup = func(data test.Data, helpers test.Helpers) {
 		if reg != nil {
 			reg.Cleanup(data, helpers)
+		}
+
+		if keyPair != nil {
 			keyPair.Cleanup()
 		}
 	}

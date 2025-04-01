@@ -45,12 +45,27 @@ jobs:
         uses: ./.github/actions/node
         with:
           go-version: ${{ matrix.go }}
-      # TODO: cache these
+#      - name: "Prepare environment"
+#        run: |
+#          if [ "${{matrix.go}}" == "${{ needs.env.outputs.GO_CANARY }}" ]; then
+#            args=(curl --proto '=https' --tlsv1.2 -fsSL -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28")
+#            [ "${{ needs.env.outputs.GITHUB_TOKEN }}" == "" ] && {
+#              echo "GITHUB_TOKEN is not set - you might face rate limitations with the Github API"
+#            } || args+=(-H "Authorization: Bearer ${{ needs.env.outputs.GITHUB_TOKEN }}")
+#
+#            ctd_v="$("${args[@]}" https://api.github.com/repos/containerd/containerd/tags | jq -rc .[0].name)"
+#            export CONTAINERD_VERSION="$ctd_v"
+#            cni_v="$("${args[@]}" https://api.github.com/repos/microsoft/windows-container-networking/tags | jq -rc .[0].name)"
+#            export WINCNI_VERSION="$cni_v"
+#            bk_v="$("${args[@]}" https://api.github.com/repos/moby/buildkit/tags | jq -rc .[0].name)"
+#            export BUILDKIT_VERSION="$bk_v"
+#          fi
+#          powershell ./hack/provisioning/windows/installer.ps1
       - name: "Set up CNI"
-        run: GOPATH=$(go env GOPATH) ./hack/provisioning/windows/cni.sh ${{ needs.env.outputs.WINCNI_VERSION }}
+        run: GOPATH=$(go env GOPATH) ./hack/provisioning/windows/cni.sh ${{ needs.env.outputs.WINDOWS_WINCNI_VERSION }}
       - name: "Set up containerd"
         env:
-          ctrdVersion: ${{ needs.env.outputs.CONTAINERD_VERSION }}
+          ctrdVersion: ${{ needs.env.outputs.WINDOWS_CONTAINERD_VERSION }}
         run: |
           # Get latest tagged containerd
           if [ "${{matrix.go}}" == "${{ needs.env.outputs.GO_CANARY }}" ]; then
@@ -59,8 +74,9 @@ jobs:
               echo "GITHUB_TOKEN is not set - you might face rate limitations with the Github API"
             } || args+=(-H "Authorization: Bearer ${{ needs.env.outputs.GITHUB_TOKEN }}")
             ctd_v="$("${args[@]}" https://api.github.com/repos/containerd/containerd/tags | jq -rc .[0].name)"
-            export ctrdVersion="${ctd_v:1}"
+            export ctrdVersion="$ctd_v"
           fi
+          export ctrdVersion="${ctrdVersion:1}"
           powershell ./hack/provisioning/windows/containerd.ps1
       - name: "Build and install cli"
         run: |

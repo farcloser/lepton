@@ -34,6 +34,7 @@ import (
 
 	"go.farcloser.world/lepton/pkg/api/options"
 	"go.farcloser.world/lepton/pkg/errutil"
+	converterutil "go.farcloser.world/lepton/pkg/imgutil/converter"
 	"go.farcloser.world/lepton/pkg/imgutil/dockerconfigresolver"
 	"go.farcloser.world/lepton/pkg/imgutil/push"
 	"go.farcloser.world/lepton/pkg/platformutil"
@@ -60,7 +61,11 @@ func Push(ctx context.Context, client *containerd.Client, rawRef string, options
 		// Push fails with "400 Bad Request" when the manifest is multi-platform, but we do not locally have
 		// multi-platform blobs.
 		// So we create a tmp reduced-platform image to avoid the error.
-		platImg, err := converter.Convert(ctx, client, pushRef, ref, converter.WithPlatform(platMC))
+		err = EnsureAllContent(ctx, client, ref, platMC, options.GOptions)
+		if err != nil {
+			return err
+		}
+		platImg, err := converterutil.Convert(ctx, client, pushRef, ref, converter.WithPlatform(platMC))
 		if err != nil {
 			if len(options.Platforms) == 0 {
 				return fmt.Errorf("failed to create a tmp single-platform image %q: %w", pushRef, err)
@@ -72,6 +77,12 @@ func Push(ctx context.Context, client *containerd.Client, rawRef string, options
 				err,
 			)
 		}
+
+		err = EnsureAllContent(ctx, client, ref, platMC, options.GOptions)
+		if err != nil {
+			return err
+		}
+
 		defer client.ImageService().Delete(ctx, platImg.Name, images.SynchronousDelete())
 		log.G(ctx).
 			Infof("pushing as a reduced-platform image (%s, %s)", platImg.Target.MediaType, platImg.Target.Digest)

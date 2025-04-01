@@ -14,7 +14,6 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-# shellcheck disable=SC2034
 set -o errexit -o errtrace -o functrace -o nounset -o pipefail
 root="$(cd "$(dirname "${BASH_SOURCE[0]:-$PWD}")" 2>/dev/null 1>&2 && pwd)"
 readonly root
@@ -22,7 +21,6 @@ readonly root
 . "$root/scripts/lib.sh"
 
 GO_VERSION=1.24
-KIND_VERSION=v0.24.0
 CNI_PLUGINS_VERSION=v1.5.1
 
 [ "$(uname -m)" == "aarch64" ] && GOARCH=arm64 || GOARCH=amd64

@@ -132,7 +132,7 @@ func Build(ctx context.Context, cli *client.Client, globalOptions *options.Globa
 			if _, err := imageService.Create(ctx, image); err != nil {
 				// if already exists; skip.
 				if errors.Is(err, errdefs.ErrAlreadyExists) {
-					if err = imageService.Delete(ctx, targetRef); err != nil {
+					if err = imageService.Delete(ctx, targetRef, images.SynchronousDelete()); err != nil {
 						return err
 					}
 					if _, err = imageService.Create(ctx, image); err != nil {

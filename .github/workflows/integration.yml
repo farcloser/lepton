@@ -59,7 +59,7 @@ jobs:
 #      - name: "Build base dependencies for all targets"
 #        run: |
 #          # FIXME: rid docker
-#          sudo docker run --net none --privileged --rm tonistiigi/binfmt --install linux/arm64 || true
+#          sudo docker run --net none --privileged --rm ghcr.io/apostasie/binfmt --install linux/arm64 || true
 #          # This is building both arm and amd versions of the base dependencies (assembly-integration)
 #          # IMPORTANT: currently, you cannot run a non-native go with qemu as of 2025-03.
 #          # For that reason, the next stages down there cannot be pinned to the same BUILDPLATFORM, and all builds
@@ -79,7 +79,7 @@ jobs:
       - env
       - build-dependencies
     timeout-minutes: ${{ fromJSON(needs.env.outputs.TIMEOUT_LONG) }}
-    name: "rootful | ${{ matrix.runner }} | go ${{ matrix.go }} (flaky: ${{ matrix.flaky }})"
+    name: "${{ matrix.rooting }} | ${{ matrix.runner }} | go ${{ matrix.go }} (flaky: ${{ matrix.flaky }})"
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
@@ -87,25 +87,41 @@ jobs:
         include:
           # amd64
           - runner: ${{ needs.env.outputs.RUNNER_LINUX_AMD64_STABLE }}
+            go: ${{ needs.env.outputs.GO_STABLE }}
+            rooting: "rootful"
             flaky: false
-            go: ${{ needs.env.outputs.GO_STABLE }}
           - runner: ${{ needs.env.outputs.RUNNER_LINUX_AMD64_STABLE }}
-            flaky: true
             go: ${{ needs.env.outputs.GO_STABLE }}
+            rooting: "rootful"
+            flaky: true
+          - runner: ${{ needs.env.outputs.RUNNER_LINUX_AMD64_STABLE }}
+            go: ${{ needs.env.outputs.GO_STABLE }}
+            rooting: "rootless"
+            flaky: false
+          - runner: ${{ needs.env.outputs.RUNNER_LINUX_AMD64_STABLE }}
+            go: ${{ needs.env.outputs.GO_STABLE }}
+            rooting: "rootless"
+            flaky: true
+
           # arm64
           - runner: ${{ needs.env.outputs.RUNNER_LINUX_ARM64_STABLE }}
+            go: ${{ needs.env.outputs.GO_STABLE }}
+            rooting: "rootful"
             flaky: false
-            go: ${{ needs.env.outputs.GO_STABLE }}
           - runner: ${{ needs.env.outputs.RUNNER_LINUX_ARM64_STABLE }}
-            flaky: true
             go: ${{ needs.env.outputs.GO_STABLE }}
+            rooting: "rootful"
+            flaky: true
+
           # canary
           - runner: ${{ needs.env.outputs.RUNNER_LINUX_CANARY }}
+            go: ${{ needs.env.outputs.GO_CANARY }}
+            rooting: "rootful"
             flaky: false
-            go: ${{ needs.env.outputs.GO_CANARY }}
           - runner: ${{ needs.env.outputs.RUNNER_LINUX_CANARY }}
-            flaky: true
             go: ${{ needs.env.outputs.GO_CANARY }}
+            rooting: "rootful"
+            flaky: true
     steps:
       - name: "Clone"
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
@@ -133,13 +149,25 @@ jobs:
             --opt target="test-integration" \
             --local dockerfile=$(pwd) \
             "${extras[@]}"
+      - name: "Set up AppArmor"
+        run: |
+          cat <<EOT | sudo tee "/etc/apparmor.d/usr.local.bin.rootlesskit"
+          abi <abi/4.0>,
+          include <tunables/global>
+          /usr/local/bin/rootlesskit flags=(unconfined) {
+          userns,
+          # Site-specific additions and overrides. See local/README for details.
+          include if exists <local/usr.local.bin.rootlesskit>
+          }
+          EOT
+          sudo systemctl restart apparmor.service
       - name: "Remove snap loopback devices (conflicts with our loopback devices in TestRunDevice)"
         run: |
           sudo systemctl disable --now snapd.service snapd.socket
           sudo apt-get purge -y snapd
           sudo losetup -Dv
           sudo losetup -lv
-          sudo apt-get install -qq expect
+#          sudo apt-get install -qq expect
       - name: "Make lepton"
         run: |
           # FIXME: replace by a fixed version download
@@ -147,11 +175,14 @@ jobs:
           sudo make install
       - name: "QEMU"
         run: |
-          [ "$RUNNER_ARCH" == "amd64" ] || sudo lepton run --net none --privileged --rm tonistiigi/binfmt --install linux/amd64
-          [ "$RUNNER_ARCH" == "arm64" ] || sudo lepton run --net none --privileged --rm tonistiigi/binfmt --install linux/arm64
-      - name: "Run integration tests (flaky: ${{matrix.flaky}})"
+          [ "$RUNNER_ARCH" == "amd64" ] || sudo lepton run --net none --privileged --rm ghcr.io/apostasie/binfmt --install linux/amd64
+          [ "$RUNNER_ARCH" == "arm64" ] || sudo lepton run --net none --privileged --rm ghcr.io/apostasie/binfmt --install linux/arm64
+      - name: "Run integration tests"
         run: |
           # FIXME: we should delete on container shutdown instead
           sudo ip link delete lepton0 2>/dev/null || true
           # See https://github.com/farcloser/lepton/issues/172
-          sudo su --pty -c "lepton run -t --net host --rm --privileged test-integration ./hack/test-integration.sh -test.only-flaky=${{matrix.flaky}}"
+          [ "${{ matrix.rooting }}" == "rootless" ] && \
+            command=(/test-integration-rootless.sh ./hack/test-integration.sh) || \
+            command=(./hack/test-integration.sh)
+          sudo su --pty -c "lepton run -t --net host --rm --privileged test-integration ${command[*]} -test.only-flaky=${{matrix.flaky}}"

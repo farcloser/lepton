@@ -42,13 +42,13 @@ ARG         CNI_PLUGINS_REVISION=7f756b411efc3d3730c707e2cc1f2baf1a66e28c
 ARG         CNI_PLUGINS_LICENSE="$LICENSE_APACHE_V2"
 ARG         CNI_PLUGINS_REPO=github.com/containernetworking/plugins
 
-ARG         BUILDKIT_VERSION=v0.20.1
-ARG         BUILDKIT_REVISION=de56a3c5056341667b5bad71f414ece70b50724f
+ARG         BUILDKIT_VERSION=v0.20.2
+ARG         BUILDKIT_REVISION=97437fdd7e32f29bb80288d800cd4ffcb34e1c15
 ARG         BUILDKIT_LICENSE="$LICENSE_APACHE_V2"
 ARG         BUILDKIT_REPO=github.com/moby/buildkit
 
-ARG         IMGCRYPT_VERSION=v2.0.0
-ARG         IMGCRYPT_REVISION=1e301ef2620964bedfa68ee4b841ff80f4887736
+ARG         IMGCRYPT_VERSION=v2.0.1
+ARG         IMGCRYPT_REVISION=c377ec98ff79ec9205eabf555ebd2ea784738c6c
 ARG         IMGCRYPT_LICENSE="$LICENSE_APACHE_V2"
 ARG         IMGCRYPT_REPO=github.com/containerd/imgcrypt
 
@@ -889,10 +889,6 @@ ENV         TZ="America/Los_Angeles"
 RUN         useradd -m -s /bin/bash rootless; \
             mkdir -p /home/rootless/.local/share; \
             chown -R rootless:rootless /home/rootless; \
-#           FIXME: replace this ssh thing with something else
-#           SSH is necessary for rootless testing (to create systemd user session).
-#           (`sudo` does not work for this purpose,
-#           OTOH `machinectl shell` can create the session but does not propagate exit code)
             echo "force-unsafe-io" > /etc/dpkg/dpkg.cfg.d/farcloser-speedup && \
             echo 'Acquire::Languages "none";' > /etc/apt/apt.conf.d/farcloser-no-language && \
             echo 'Acquire::GzipIndexes "true";' > /etc/apt/apt.conf.d/farcloser-gzip-indexes && \
@@ -1002,21 +998,14 @@ RUN         mkdir -p /etc/bash_completion.d && \
             "$BINARY_NAME" completion bash >/usr/share/bash-completion/completions/"$BINARY_NAME"
 COPY        --from=dependencies-download-cli /src/vendor /src/vendor
 COPY        . /src
-CMD         ["./hack/test-integration.sh"]
-
-#           test-integration-rootless
-FROM        test-integration AS test-integration-rootless
-# TODO: update containerized-systemd to enable sshd by default, or allow `systemctl wants <TARGET> ssh` here
-RUN         ssh-keygen -q -t rsa -f /root/.ssh/id_rsa -N '' && \
-            mkdir -p -m 0700 /home/rootless/.ssh && \
-            cp -a /root/.ssh/id_rsa.pub /home/rootless/.ssh/authorized_keys
-VOLUME      /home/rootless/.local/share
 COPY        ./Dockerfile.d/test-integration-rootless.sh /
 RUN         chmod a+rx /test-integration-rootless.sh
-CMD         ["/test-integration-rootless.sh", "./hack/test-integration.sh"]
+CMD         ["./hack/test-integration.sh"]
+# For rootless:
+# CMD         ["/test-integration-rootless.sh", "./hack/test-integration.sh"]
 
 # test for CONTAINERD_ROOTLESS_ROOTLESSKIT_PORT_DRIVER=slirp4netns
-FROM        test-integration-rootless AS test-integration-rootless-port-slirp4netns
+FROM        test-integration AS test-integration-rootless-port-slirp4netns
 COPY        ./Dockerfile.d/home_rootless_.config_systemd_user_containerd.service.d_port-slirp4netns.conf /home/rootless/.config/systemd/user/containerd.service.d/port-slirp4netns.conf
 RUN         chown -R rootless:rootless /home/rootless/.config
 

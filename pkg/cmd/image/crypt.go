@@ -34,6 +34,7 @@ import (
 	"go.farcloser.world/containers/specs"
 
 	"go.farcloser.world/lepton/pkg/api/options"
+	converterutil "go.farcloser.world/lepton/pkg/imgutil/converter"
 	"go.farcloser.world/lepton/pkg/platformutil"
 )
 
@@ -129,7 +130,7 @@ func Crypt(
 	convertOpts = append(convertOpts, converter.WithIndexConvertFunc(convertFunc))
 
 	// converter.Convert() gains the lease by itself
-	newImg, err := converter.Convert(ctx, cli, targetRef, srcRef, convertOpts...)
+	newImg, err := converterutil.Convert(ctx, cli, targetRef, srcRef, convertOpts...)
 	if err != nil {
 		return err
 	}
