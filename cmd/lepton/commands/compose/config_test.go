@@ -18,7 +18,6 @@ package compose_test
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 	"testing"
 
@@ -40,20 +39,15 @@ services:
 	testCase := nerdtest.Setup()
 
 	testCase.Setup = func(data test.Data, helpers test.Helpers) {
-		err := os.WriteFile(
-			filepath.Join(data.TempDir(), "compose.yaml"),
-			[]byte(dockerComposeYAML),
-			0o600,
-		)
-		assert.NilError(t, err)
-		data.Set("compyaml", filepath.Join(data.TempDir(), "compose.yaml"))
+		data.Save("compose.yaml", dockerComposeYAML)
+		data.Set("YAMLPath", data.Path("compose.yaml"))
 	}
 
 	testCase.SubTests = []*test.Case{
 		{
 			Description: "config contains service name",
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-				return helpers.Command("compose", "-f", data.Get("compyaml"), "config")
+				return helpers.Command("compose", "-f", data.Get("YAMLPath"), "config")
 			},
 			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("hello:")),
 		},
@@ -63,7 +57,7 @@ services:
 				return helpers.Command(
 					"compose",
 					"-f",
-					data.Get("compyaml"),
+					data.Get("YAMLPath"),
 					"config",
 					"--services",
 				)
@@ -73,7 +67,7 @@ services:
 		{
 			Description: "config --hash=* contains service name",
 			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
-				return helpers.Command("compose", "-f", data.Get("compyaml"), "config", "--hash=*")
+				return helpers.Command("compose", "-f", data.Get("YAMLPath"), "config", "--hash=*")
 			},
 			Expected: test.Expects(expect.ExitCodeSuccess, nil, expect.Contains("hello")),
 		},
@@ -91,35 +85,26 @@ services:
 	testCase := nerdtest.Setup()
 
 	testCase.Setup = func(data test.Data, helpers test.Helpers) {
-		err := os.WriteFile(
-			filepath.Join(data.TempDir(), "compose.yaml"),
-			[]byte(fmt.Sprintf(dockerComposeYAML, "3.13")),
-			0o600,
-		)
+		data.Save("compose.yaml", fmt.Sprintf(dockerComposeYAML, "3.13"))
 
 		hash := helpers.Capture(
 			"compose",
 			"-f",
-			filepath.Join(data.TempDir(), "compose.yaml"),
+			data.Path("compose.yaml"),
 			"config",
 			"--hash=hello",
 		)
-		assert.NilError(t, err)
+
 		data.Set("hash", hash)
 
-		err = os.WriteFile(
-			filepath.Join(data.TempDir(), "compose.yaml"),
-			[]byte(fmt.Sprintf(dockerComposeYAML, "3.14")),
-			0o600,
-		)
-		assert.NilError(t, err)
+		data.Save("compose.yaml", fmt.Sprintf(dockerComposeYAML, "3.14"))
 	}
 
 	testCase.Command = func(data test.Data, helpers test.Helpers) test.TestableCommand {
 		return helpers.Command(
 			"compose",
 			"-f",
-			filepath.Join(data.TempDir(), "compose.yaml"),
+			data.Path("compose.yaml"),
 			"config",
 			"--hash=hello",
 		)
@@ -218,23 +203,17 @@ image: hello-world
 	testCase := nerdtest.Setup()
 
 	testCase.Setup = func(data test.Data, helpers test.Helpers) {
-		err := os.WriteFile(
-			filepath.Join(data.TempDir(), "compose.yaml"),
-			[]byte(dockerComposeYAML),
-			0o600,
-		)
-		assert.NilError(t, err)
-		err = os.WriteFile(filepath.Join(data.TempDir(), "env"), []byte(envFileContent), 0o600)
-		assert.NilError(t, err)
+		data.Save("compose.yaml", dockerComposeYAML)
+		data.Save("env", envFileContent)
 	}
 
 	testCase.Command = func(data test.Data, helpers test.Helpers) test.TestableCommand {
 		return helpers.Command(
 			"compose",
 			"-f",
-			filepath.Join(data.TempDir(), "compose.yaml"),
+			data.Path("compose.yaml"),
 			"--env-file",
-			filepath.Join(data.TempDir(), "env"),
+			data.Path("env"),
 			"config",
 		)
 	}
