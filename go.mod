@@ -56,7 +56,7 @@ require (
 	go.farcloser.world/containers v0.1.1-0.20250310001017-14c23cde5749
 	go.farcloser.world/core v0.1.1-0.20250309235229-b34054776a90
 	go.farcloser.world/tigron v0.2.1-0.20250330174633-f89db265a035
-	go.uber.org/mock v0.5.0
+	go.uber.org/mock v0.5.1
 	golang.org/x/crypto v0.36.0
 	golang.org/x/net v0.38.0
 	golang.org/x/sync v0.12.0
