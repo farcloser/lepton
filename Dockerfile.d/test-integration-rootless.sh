@@ -39,6 +39,7 @@ else
   # Recover the path and current working directory (PATH cannot be whitelisted with su)
   cd "${BYPWD:-.}"
   export PATH="$BYPATH"
+
   # Set dbus and XDG runtime
   DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$(id -u)/bus"
   XDG_RUNTIME_DIR="/run/user/$(id -u)"
