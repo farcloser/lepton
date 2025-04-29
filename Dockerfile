@@ -821,6 +821,7 @@ ARG         SECCOMP_LICENSE
 ARG         ZLIB_LICENSE
 ARG         GLIB_LICENSE
 ARG         LIBCAP_LICENSE
+ARG         LIBSLIRP_LICENSE
 COPY        --from=dependencies-download-cli /out/share /out/share
 RUN         --mount=target=/metadata-$BINARY_NAME,type=cache,from=dependencies-download-cli,source=/metadata \
             --mount=target=/metadata-containerd,type=cache,from=dependencies-download-containerd,source=/metadata \
@@ -959,7 +960,9 @@ RUN         --mount=target=/root/go/pkg/mod,type=cache \
             apt-get update -qq >/dev/null && \
             apt-get install -qq --no-install-recommends \
                 make >/dev/null; \
-            NO_COLOR=true GOFLAGS= make install-dev-gotestsum; chmod -R a+rx /root/go/bin; \
+            NO_COLOR=true GOFLAGS= make install-dev-gotestsum; \
+            cp /root/go/bin/gotestsum /usr/local/bin; \
+            chmod a+rx /usr/local/bin/gotestsum; \
             apt-get purge -qq \
                 make >/dev/null
 #           FIXME: finish removing unbuffer from the test codebase and then remove expect

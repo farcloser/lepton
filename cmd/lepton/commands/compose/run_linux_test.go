@@ -19,6 +19,7 @@ package compose_test
 import (
 	"fmt"
 	"io"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -26,6 +27,7 @@ import (
 	"github.com/containerd/log"
 	"gotest.tools/v3/assert"
 
+	"go.farcloser.world/tigron/expect"
 	"go.farcloser.world/tigron/require"
 	"go.farcloser.world/tigron/test"
 
@@ -36,12 +38,7 @@ import (
 )
 
 func TestComposeRun(t *testing.T) {
-	t.Parallel()
-
-	base := testutil.NewBase(t)
-	// specify the name of container in order to remove
-	// TODO: when `compose rm` is implemented, replace it.
-	containerName := testutil.Identifier(t)
+	const expectedOutput = "speed 38400 baud"
 
 	dockerComposeYAML := fmt.Sprintf(`
 version: '3.1'
@@ -52,62 +49,69 @@ services:
       - stty
 `, testutil.AlpineImage)
 
-	comp := testutil.NewComposeDir(t, dockerComposeYAML)
-	defer comp.CleanUp()
-	projectName := comp.ProjectName()
-	t.Logf("projectName=%q", projectName)
-	defer base.ComposeCmd("-f", comp.YAMLFullPath(), "down", "-v").Run()
+	testCase := nerdtest.Setup()
 
-	defer base.Cmd("rm", "-f", "-v", containerName).Run()
-	const sttyPartialOutput = "speed 38400 baud"
-	// unbuffer(1) emulates tty, which is required by `run -t`.
-	// unbuffer(1) can be installed with `apt-get install expect`.
-	unbuffer := []string{"unbuffer"}
-	base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(),
-		"run", "--name", containerName, "alpine").AssertOutContains(sttyPartialOutput)
-}
+	testCase.SubTests = []*test.Case{
+		{
+			Description: "pty run",
+			Setup: func(data test.Data, helpers test.Helpers) {
+				data.Save("compose.yaml", dockerComposeYAML)
+			},
+			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
+				cmd := helpers.Command(
+					"compose",
+					"-f",
+					data.Path("compose.yaml"),
+					"run",
+					"--name",
+					data.Identifier(),
+					"alpine",
+				)
+				cmd.WithPseudoTTY()
+				return cmd
+			},
+			Expected: test.Expects(0, nil, expect.Contains(expectedOutput)),
+			Cleanup: func(data test.Data, helpers test.Helpers) {
+				helpers.Anyhow("rm", "-f", "-v", data.Identifier())
+				helpers.Anyhow("compose", "-f", filepath.Join(data.TempDir(), "compose.yaml"), "down", "-v")
+			},
+		},
+		{
+			Description: "pty run with --rm",
+			Setup: func(data test.Data, helpers test.Helpers) {
+				data.Save("compose.yaml", dockerComposeYAML)
+			},
+			Command: func(data test.Data, helpers test.Helpers) test.TestableCommand {
+				cmd := helpers.Command(
+					"compose",
+					"-f",
+					data.Path("compose.yaml"),
+					"run",
+					"--name",
+					data.Identifier(),
+					"--rm",
+					"alpine",
+				)
+				cmd.WithPseudoTTY()
+				return cmd
+			},
+			Expected: func(data test.Data, helpers test.Helpers) *test.Expected {
+				// Ensure the container has been removed
+				capt := helpers.Capture("ps", "-a", "--format=\"{{.Names}}\"")
+				assert.Assert(t, !strings.Contains(capt, data.Identifier()), capt)
 
-func TestComposeRunWithRM(t *testing.T) {
-	// Test does not make sense. Image may or may not be there.
-	// t.Parallel()
-
-	base := testutil.NewBase(t)
-	// specify the name of container in order to remove
-	// TODO: when `compose rm` is implemented, replace it.
-	containerName := testutil.Identifier(t)
-
-	dockerComposeYAML := fmt.Sprintf(`
-version: '3.1'
-services:
-  alpine:
-    image: %s
-    entrypoint:
-      - stty
-`, testutil.AlpineImage)
-
-	comp := testutil.NewComposeDir(t, dockerComposeYAML)
-	defer comp.CleanUp()
-	projectName := comp.ProjectName()
-	t.Logf("projectName=%q", projectName)
-	defer base.ComposeCmd("-f", comp.YAMLFullPath(), "down", "-v").Run()
-
-	defer base.Cmd("rm", "-f", "-v", containerName).Run()
-	const sttyPartialOutput = "speed 38400 baud"
-	// unbuffer(1) emulates tty, which is required by `run -t`.
-	// unbuffer(1) can be installed with `apt-get install expect`.
-	unbuffer := []string{"unbuffer"}
-	base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(),
-		"run", "--name", containerName, "--rm", "alpine").AssertOutContains(sttyPartialOutput)
-
-	psCmd := base.Cmd("ps", "-a", "--format=\"{{.Names}}\"")
-	result := psCmd.Run()
-	stdoutContent := result.Stdout() + result.Stderr()
-	assert.Assert(psCmd.T, result.ExitCode == 0, stdoutContent)
-	if strings.Contains(stdoutContent, containerName) {
-		log.L.Errorf("test failed, the container %s is not removed", stdoutContent)
-		t.Fail()
-		return
+				return &test.Expected{
+					Output: expect.Contains(expectedOutput),
+				}
+			},
+			Cleanup: func(data test.Data, helpers test.Helpers) {
+				helpers.Anyhow("rm", "-f", "-v", data.Identifier())
+				helpers.Anyhow("compose", "-f", filepath.Join(data.TempDir(), "compose.yaml"), "down", "-v")
+			},
+		},
 	}
+
+	testCase.Run(t)
 }
 
 func TestComposeRunWithServicePorts(t *testing.T) {
@@ -551,13 +555,13 @@ services:
 		unbuffer := []string{"unbuffer"}
 		base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(), "run", "svc0").
 			AssertOutContains(sttyPartialOutput)
-			// key match
+		// key match
 		base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(), "run", "svc1").
 			AssertFail()
-			// key mismatch
+		// key mismatch
 		base.ComposeCmdWithHelper(unbuffer, "-f", comp.YAMLFullPath(), "run", "svc2").
 			AssertOutContains(sttyPartialOutput)
-			// verify passed
+		// verify passed
 		// 5. compose up
 		base.ComposeCmd("-f", comp.YAMLFullPath(), "up", "svc0").AssertOK()   // key match
 		base.ComposeCmd("-f", comp.YAMLFullPath(), "up", "svc1").AssertFail() // key mismatch
