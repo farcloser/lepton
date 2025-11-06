@@ -39,7 +39,7 @@ require (
 	github.com/fatih/color v1.18.0
 	github.com/fluent/fluent-logger-golang v1.9.0
 	github.com/fsnotify/fsnotify v1.8.0
-	github.com/go-viper/mapstructure/v2 v2.2.1
+	github.com/go-viper/mapstructure/v2 v2.4.0
 	github.com/moby/sys/mount v0.3.4
 	github.com/moby/sys/signal v0.7.1
 	github.com/moby/sys/userns v0.1.0
