@@ -30,7 +30,7 @@ require (
 	github.com/containernetworking/plugins v1.6.2
 	github.com/coreos/go-iptables v0.8.0
 	github.com/coreos/go-systemd/v22 v22.5.0
-	github.com/cyphar/filepath-securejoin v0.4.1
+	github.com/cyphar/filepath-securejoin v0.6.0
 	github.com/docker/cli v28.0.4+incompatible
 	github.com/docker/docker v28.0.4+incompatible
 	github.com/docker/go-connections v0.5.0
@@ -68,6 +68,7 @@ require (
 )
 
 require (
+	cyphar.com/go-pathrs v0.2.1 // indirect
 	github.com/AdaLogics/go-fuzz-headers v0.0.0-20240806141605-e8a1dd7889d6 // indirect
 	github.com/AdamKorcz/go-118-fuzz-build v0.0.0-20231105174938-2b5cbb29f3e2 // indirect
 	github.com/Azure/go-ansiterm v0.0.0-20250102033503-faa5f7b0171c // indirect
@@ -106,7 +107,7 @@ require (
 	github.com/moby/sys/user v0.3.0 // indirect
 	github.com/opencontainers/go-digest v1.0.1-0.20231212064514-429d0316a3dd // indirect
 	github.com/opencontainers/runtime-spec v1.2.1 // indirect
-	github.com/opencontainers/selinux v1.12.0 // indirect
+	github.com/opencontainers/selinux v1.13.0 // indirect
 	github.com/petermattis/goid v0.0.0-20250319124200-ccd6737f222a // indirect
 	github.com/philhofer/fwd v1.1.3-0.20240916144458-20a13a1f6b7c // indirect
 	github.com/pkg/errors v0.9.1 // indirect
