@@ -40,9 +40,9 @@ require (
 	github.com/fluent/fluent-logger-golang v1.9.0
 	github.com/fsnotify/fsnotify v1.8.0
 	github.com/go-viper/mapstructure/v2 v2.2.1
-	github.com/moby/sys/mount v0.3.4
+	github.com/moby/sys/mount v0.3.5
 	github.com/moby/sys/signal v0.7.1
-	github.com/moby/sys/userns v0.1.0
+	github.com/moby/sys/userns v0.2.1
 	github.com/moby/term v0.5.2
 	github.com/muesli/cancelreader v0.2.2
 	github.com/opencontainers/image-spec v1.1.1
