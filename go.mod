@@ -50,7 +50,7 @@ require (
 	github.com/rootless-containers/bypass4netns v0.4.2
 	github.com/rootless-containers/rootlesskit/v2 v2.3.4
 	github.com/spf13/cobra v1.9.1
-	github.com/spf13/pflag v1.0.6
+	github.com/spf13/pflag v1.0.10
 	github.com/vishvananda/netlink v1.3.0
 	github.com/yuchanns/srslog v1.1.0
 	go.farcloser.world/containers v0.1.1-0.20250310001017-14c23cde5749
